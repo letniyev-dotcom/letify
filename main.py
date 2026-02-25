@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
-"""fitbot — фитнес-бот"""
+"""fitbot v4 — глобальный апгрейд: баги, редизайн, новые функции"""
+
+import subprocess, sys
+def _pip(pkg): subprocess.check_call([sys.executable,"-m","pip","install",pkg,"-q"])
+try:    import aiogram
+except: _pip("aiogram")
+try:    import apscheduler
+except: _pip("apscheduler")
+try:    import zoneinfo; zoneinfo.ZoneInfo("UTC")
+except: _pip("tzdata")
 
 import asyncio, logging, os, sqlite3, re, json
 from datetime import datetime, timedelta, date as dt_date, time as dt_time
@@ -12,9 +21,9 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-TOKEN   = os.environ.get("BOT_TOKEN")
+TOKEN = os.environ.get("BOT_TOKEN")
 if not TOKEN:
-    raise RuntimeError("Переменная окружения BOT_TOKEN не задана!")
+    raise RuntimeError("BOT_TOKEN не задан")
 DB_PATH = "fitbot.db"
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
@@ -37,15 +46,11 @@ ACTS = {
 def aico(t): return ACTS.get(t,("✦",""))[0]
 def anam(t): return ACTS.get(t,("✦",t))[1]
 
-MEALS = {
-    "breakfast": ("☀️", "завтрак"),
-    "lunch":     ("🌤",  "обед"),
-    "dinner":    ("🌙", "ужин"),
-    "snack":     ("🍫", "перекус"),
-    "other":     ("✦",  "другое"),
-}
-def mico(t): return MEALS.get(t, ("✦",""))[0]
-def mnam(t): return MEALS.get(t, ("✦", t))[1]
+MEALS = {"breakfast":("☀️","завтрак"),"lunch":("🌤","обед"),
+         "dinner":("🌙","ужин"),"snack":("🍫","перекус"),"other":("✦","другое")}
+MEAL_ORDER = ["breakfast","lunch","dinner","snack","other"]
+def mico(k): return MEALS.get(k,("✦",""))[0]
+def mnam(k): return MEALS.get(k,("✦",k))[1]
 
 # ── ДЕФОЛТНЫЕ ПРОДУКТЫ ──────────────────────────────────────────────
 DEFAULT_PRODUCTS = [
@@ -95,9 +100,8 @@ class St(StatesGroup):
     qp_carb = State()
     # 🧮 КБЖУ
     kbzhu_grams = State()
-    # 🍽 Приёмы пищи
-    meal_cal    = State()
-    meal_desc   = State()
+    # 🍽 Логирование еды
+    food_grams = State()
     # 🔔 Напоминания
     remind_water_interval = State()
     remind_water_manual   = State()
@@ -195,6 +199,9 @@ def init_db():
         cx = {r[1] for r in c.execute("PRAGMA table_info(calories_log)")}
         if "meal_type" not in cx:
             c.execute("ALTER TABLE calories_log ADD COLUMN meal_type TEXT DEFAULT 'other'")
+        qx = {r[1] for r in c.execute("PRAGMA table_info(quick_products)")}
+        if "last_used" not in qx:
+            c.execute("ALTER TABLE quick_products ADD COLUMN last_used TEXT DEFAULT ''")
 
 def ensure_defaults(uid):
     """Добавить дефолтные продукты и напоминания для нового пользователя."""
@@ -283,22 +290,27 @@ def log_cal(uid, a, desc="", meal_type="other"):
     with db() as c: c.execute("INSERT INTO calories_log (user_id,amount,description,meal_type) VALUES (?,?,?,?)", (uid, a, desc, meal_type))
 
 def today_cal_by_meal(uid):
-    """dict meal_type -> (kcal, count)"""
     with db() as c:
-        rows = c.execute(
-            "SELECT meal_type, SUM(amount) s, COUNT(*) n FROM calories_log WHERE user_id=? AND date(logged_at)=date(\'now\') GROUP BY meal_type",
+        rows=c.execute(
+            "SELECT meal_type,SUM(amount) s,COUNT(*) n FROM calories_log WHERE user_id=? AND date(logged_at)=date('now') GROUP BY meal_type",
             (uid,)).fetchall()
-    return {r["meal_type"]: (r["s"], r["n"]) for r in rows}
+    return {r["meal_type"]:(r["s"],r["n"]) for r in rows}
 
-def cal_entries_by_meal(uid, meal_type, date_str=None):
-    ds = date_str or dt_date.today().strftime("%Y-%m-%d")
+def cal_entries_by_meal(uid, meal_type):
     with db() as c:
         return c.execute(
-            "SELECT id,amount,description,logged_at FROM calories_log WHERE user_id=? AND meal_type=? AND date(logged_at)=? ORDER BY logged_at",
-            (uid, meal_type, ds)).fetchall()
+            "SELECT id,amount,description,logged_at FROM calories_log WHERE user_id=? AND meal_type=? AND date(logged_at)=date('now') ORDER BY logged_at",
+            (uid, meal_type)).fetchall()
 
-def del_cal_entry(entry_id):
-    with db() as c: c.execute("DELETE FROM calories_log WHERE id=?", (entry_id,))
+def get_recent_products(uid, n=8):
+    with db() as c:
+        return c.execute(
+            "SELECT * FROM quick_products WHERE user_id=? AND last_used!='' ORDER BY last_used DESC LIMIT ?",
+            (uid, n)).fetchall()
+
+def mark_product_used(pid):
+    with db() as c:
+        c.execute("UPDATE quick_products SET last_used=datetime('now') WHERE id=?", (pid,))
 
 def del_last_cal(uid):
     with db() as c:
@@ -484,33 +496,15 @@ def parse_time_hm(raw):
     return h, mn
 
 def pbar(pct, n=8, on="🟩", off="⬜"): return on*int(pct/100*n)+off*(n-int(pct/100*n))
-
+def pbar_block(pct, n=10): return "[" + "█"*int(pct/100*n) + "░"*(n-int(pct/100*n)) + "]"
 def get_bar_style(uid):
-    """0 = эмодзи (по умолчанию), 1 = блочный"""
     with db() as c:
-        r = c.execute("SELECT bar_style FROM user_settings WHERE user_id=?", (uid,)).fetchone()
-        return (r[0] or 0) if r else 0
-
-def pbar_block(pct, n=10):
-    """Красивая блочная полоса: [████░░░░░░]"""
-    filled = int(pct / 100 * n)
-    return "[" + "█" * filled + "░" * (n - filled) + "]"
-
-def wbar(p, uid=None):
-    if uid and get_bar_style(uid): return pbar_block(p)
-    return pbar(p,8,"🟦","⬜")
-
-def cbar(p, uid=None):
-    if uid and get_bar_style(uid): return pbar_block(p)
-    return pbar(p,8,"🟧","⬜")
-
-def gbar(p, uid=None):
-    if uid and get_bar_style(uid): return pbar_block(p)
-    return pbar(p,8,"🟩","⬜")
-
-def sbar(q, uid=None):
-    if uid and get_bar_style(uid): return pbar_block(q*20)
-    return pbar(q*20,8,"🟪","⬜")   # quality 1-5 → %
+        r=c.execute("SELECT bar_style FROM user_settings WHERE user_id=?",(uid,)).fetchone()
+        return (r["bar_style"] or 0) if r else 0
+def wbar(p,uid=None): return pbar_block(p) if uid and get_bar_style(uid) else pbar(p,8,"🟦","⬜")
+def cbar(p,uid=None): return pbar_block(p) if uid and get_bar_style(uid) else pbar(p,8,"🟧","⬜")
+def gbar(p,uid=None): return pbar_block(p) if uid and get_bar_style(uid) else pbar(p,8,"🟩","⬜")
+def sbar(q,uid=None): return pbar_block(q*20) if uid and get_bar_style(uid) else pbar(q*20,8,"🟪","⬜")
 def bq(t): return "<blockquote>{}</blockquote>".format(t)
 def strike(t): return "<s>{}</s>".format(t)
 
@@ -536,10 +530,8 @@ def fmt_log_cal(rows):
     lines = ""
     for e in rows:
         t = datetime.fromisoformat(e["logged_at"]).strftime("%H:%M")
-        d = "  "+e["description"][:12] if e.get("description") else ""
-        mt = e["meal_type"] if "meal_type" in e.keys() and e["meal_type"] and e["meal_type"]!="other" else ""
-        mt_s = "  [{}]".format(mnam(mt)) if mt else ""
-        lines += "{:5}  +{} ккал{}{}\n".format(t, e["amount"], d, mt_s)
+        d = "  "+e["description"][:12] if e["description"] else ""
+        lines += "{:5}  +{} ккал{}\n".format(t, e["amount"], d)
     return "<code>{}</code>".format(lines.rstrip())
 
 def fmt_log_weight(rows):
@@ -617,19 +609,55 @@ def kb_cal():
 
 def kb_nutrition():
     return KB(
-        [("☀️ завтрак", "meal_breakfast"), ("🌤 обед",     "meal_lunch")],
-        [("🌙 ужин",     "meal_dinner"),   ("🍫 перекус",  "meal_snack")],
-        [("📓 дневник",  "food_diary"),    ("🍎 продукты", "quick_products")],
-        [("🧮 кбжу",    "kbzhu"),          ("< назад",     "main")],
+        [("➕ добавить еду", "food_add")],
+        [("📓 дневник",      "food_diary"),  ("🍎 продукты", "quick_products")],
+        [("🧮 кбжу",         "kbzhu"),       ("< назад",     "main")],
     )
 
-def kb_meal(meal_type):
+# ── выбор продукта при логировании ─────────────────────────────────
+def kb_food_add(uid):
+    recent=get_recent_products(uid,8)
+    rows=[]
+    for p in recent:
+        label="{} · {}ккал/100г".format(p["name"],p["calories"])
+        rows.append([B(label,"food_pick_{}".format(p["id"]))])
+    rows.append([B("📋 все продукты","food_all_0"), B("➕ новый","food_new")])
+    rows.append([B("< питание","nutrition")])
+    return InlineKeyboardMarkup(inline_keyboard=rows)
+
+def kb_food_all(uid, page=0):
+    prods=get_products(uid); ps=6
+    total_p=max(1,(len(prods)+ps-1)//ps); page=max(0,min(page,total_p-1))
+    chunk=prods[page*ps:(page+1)*ps]
+    rows=[]
+    for p in chunk:
+        rows.append([B("{} · {}ккал/100г".format(p["name"],p["calories"]),"food_pick_{}".format(p["id"]))])
+    if total_p>1:
+        rows.append([B("←","food_all_{}".format(page-1) if page>0 else "noop"),
+                     B("{} из {}".format(page+1,total_p),"noop"),
+                     B("→","food_all_{}".format(page+1) if page<total_p-1 else "noop")])
+    rows.append([B("< назад","food_add")])
+    return InlineKeyboardMarkup(inline_keyboard=rows)
+
+def kb_food_grams(pid):
     return KB(
-        [("100 ккал","mc_100_{}".format(meal_type)), ("200 ккал","mc_200_{}".format(meal_type)),
-         ("300 ккал","mc_300_{}".format(meal_type)), ("500 ккал","mc_500_{}".format(meal_type))],
-        [("700 ккал","mc_700_{}".format(meal_type)), ("1000 ккал","mc_1000_{}".format(meal_type))],
-        [("✏️ своё","mc_custom_{}".format(meal_type))],
-        [("< питание","nutrition")],
+        [("50г","fg_{}_50".format(pid)), ("100г","fg_{}_100".format(pid)),
+         ("150г","fg_{}_150".format(pid)),("200г","fg_{}_200".format(pid))],
+        [("250г","fg_{}_250".format(pid)),("300г","fg_{}_300".format(pid)),
+         ("400г","fg_{}_400".format(pid)),("500г","fg_{}_500".format(pid))],
+        [("✏️ свой вес","fgc_{}".format(pid))],
+        [("< назад","food_add")],
+    )
+
+def kb_food_meal(pid, grams):
+    pg="{}_{}".format(pid,grams)
+    return KB(
+        [("☀️ завтрак","fs_{}_breakfast".format(pg)),
+         ("🌤 обед",   "fs_{}_lunch".format(pg))],
+        [("🌙 ужин",   "fs_{}_dinner".format(pg)),
+         ("🍫 перекус","fs_{}_snack".format(pg))],
+        [("✦ другое",  "fs_{}_other".format(pg))],
+        [("← граммы", "food_pick_{}".format(pid))],
     )
 
 def kb_goals():
@@ -654,23 +682,24 @@ def kb_progress():
 
 def kb_settings():
     return KB(
-        [("📋 план",        "plan_manage"),       ("📤 загрузить план", "plan_upload_start")],
-        [("🎯 цели и нормы","goals"),             ("🔔 напоминания",    "reminders")],
-        [("🏠 экран",       "sett_display"),      ("🗑 сбросить",       "sett_reset")],
+        [("📋 план",        "plan_manage"),      ("📤 загрузить план","plan_upload_start")],
+        [("🎯 цели и нормы","goals"),            ("🔔 напоминания",   "reminders")],
+        [("🏠 экран",       "sett_display"),     ("🗑 сбросить",      "sett_reset")],
         [("< меню",        "main")],
     )
 
 def kb_sett_display(uid):
-    s = gsett(uid)
+    s=gsett(uid)
     def ch(v): return "✅" if v else "☐"
-    sl = s["show_sleep"] if "show_sleep" in s.keys() else 1
-    bs = s["bar_style"] if "bar_style" in s.keys() else 0
+    sl=s["show_sleep"] if "show_sleep" in s.keys() else 1
+    bs=s["bar_style"]  if "bar_style"  in s.keys() else 0
+    bar_lbl="[██░░] блочная" if bs else "🟩⬜ эмодзи"
     return KB(
-        [("{} ⚖️ вес".format(ch(s["show_weight"])),     "stog_weight"),
-         ("{} 💧 вода".format(ch(s["show_water"])),     "stog_water")],
-        [("{} 🔥 калории".format(ch(s["show_calories"])),"stog_calories"),
-         ("{} 😴 сон".format(ch(sl)),                   "stog_sleep")],
-        [("{} полоса: {}".format(ch(bs), "[██░░]" if bs else "🟩⬜"), "stog_bar_style")],
+        [("{} ⚖️ вес".format(ch(s["show_weight"])),      "stog_weight"),
+         ("{} 💧 вода".format(ch(s["show_water"])),      "stog_water")],
+        [("{} 🔥 калории".format(ch(s["show_calories"])), "stog_calories"),
+         ("{} 😴 сон".format(ch(sl)),                    "stog_sleep")],
+        [("{} полоса: {}".format(ch(bs),bar_lbl),        "stog_bar_style")],
         [("< настройки","settings")],
     )
 
@@ -783,11 +812,11 @@ def kb_quick_products(uid, page=0):
             p["name"],p["calories"],
             round(p["protein"],1),round(p["fat"],1),round(p["carbs"],1)),
             "qp_log_{}".format(p["id"]))])
-    if total_p > 1:
-        rows.append([
-            B("←","qp_page_{}".format(page-1) if page>0 else "noop"),
-            B("→","qp_page_{}".format(page+1) if page<total_p-1 else "noop"),
-        ])
+    nav = []
+    if page > 0: nav.append(B("<","qp_page_{}".format(page-1)))
+    nav.append(B("{}/{}".format(page+1,total_p),"noop"))
+    if page < total_p-1: nav.append(B(">","qp_page_{}".format(page+1)))
+    if nav: rows.append(nav)
     rows.append([B("➕ добавить","qp_add"), B("🗑 удалить","qp_del_mode")])
     rows.append([B("< назад","nutrition")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
@@ -800,11 +829,10 @@ def kb_qp_delete_mode(uid, page=0):
     rows = []
     for p in chunk:
         rows.append([B("🗑 {}".format(p["name"]), "qp_dodel_{}".format(p["id"]))])
-    if total_p > 1:
-        rows.append([
-            B("←","qpdm_{}".format(page-1) if page>0 else "noop"),
-            B("→","qpdm_{}".format(page+1) if page<total_p-1 else "noop"),
-        ])
+    nav = []
+    if page > 0: nav.append(B("<","qpdm_{}".format(page-1)))
+    if page < total_p-1: nav.append(B(">","qpdm_{}".format(page+1)))
+    if nav: rows.append(nav)
     rows.append([B("< назад","quick_products")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
@@ -817,11 +845,11 @@ def kb_kbzhu(uid, page=0):
     rows = []
     for p in chunk:
         rows.append([B("{}  {}ккал/100г".format(p["name"],p["calories"]), "kbzhu_pick_{}".format(p["id"]))])
-    if total_p > 1:
-        rows.append([
-            B("←","kbzhu_page_{}".format(page-1) if page>0 else "noop"),
-            B("→","kbzhu_page_{}".format(page+1) if page<total_p-1 else "noop"),
-        ])
+    nav = []
+    if page > 0: nav.append(B("<","kbzhu_page_{}".format(page-1)))
+    nav.append(B("{}/{}".format(page+1,total_p),"noop"))
+    if page < total_p-1: nav.append(B(">","kbzhu_page_{}".format(page+1)))
+    if nav: rows.append(nav)
     rows.append([B("< назад","nutrition")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
@@ -1017,16 +1045,12 @@ def scr_weight_hist(uid, page=0, ps=20):
     all_h=weight_hist(uid); total=len(all_h)
     pages=max(1,(total+ps-1)//ps); page=max(0,min(page,pages-1))
     chunk=all_h[page*ps:(page+1)*ps]
-    kb_rows=[]
-    if pages > 1:
-        kb_rows.append([
-            B("←","wh_p{}".format(page-1) if page>0 else "noop"),
-            B("→","wh_p{}".format(page+1) if page<pages-1 else "noop"),
-        ])
-    kb_rows.append([B("< назад","weight")])
-    kb=InlineKeyboardMarkup(inline_keyboard=kb_rows)
-    page_s="  <i>{} из {}</i>".format(page+1,pages) if pages>1 else ""
-    return "⚖️  <b>история</b>  <i>{} записей</i>{}\n\n{}".format(total,page_s,bq(fmt_log_weight(chunk))), kb
+    nav=[]
+    if page>0: nav.append(B("<","wh_p{}".format(page-1)))
+    nav.append(B("{}/{}".format(page+1,pages),"noop"))
+    if page<pages-1: nav.append(B(">","wh_p{}".format(page+1)))
+    kb=InlineKeyboardMarkup(inline_keyboard=[nav,[B("< назад","weight")]])
+    return "⚖️  <b>история</b>  <i>{} записей</i>\n\n{}".format(total,bq(fmt_log_weight(chunk))), kb
 
 def scr_water(uid):
     u=guser(uid); today=today_water(uid); goal=u["water_goal"] or 2000
@@ -1142,21 +1166,21 @@ def scr_settings(uid):
     acts=acts_for_day(uid,dt_date.today())
     total=len(acts); done=sum(1 for a in acts if a.get("completed"))
     plan_s="нет задач" if not total else "{} из {} выполнено".format(done,total)
-    text="⚙️  <b>настройки</b>\n\nплан сегодня: <i>{}</i>".format(plan_s)
-    return text, kb_settings()
+    return "⚙️  <b>настройки</b>\n\nплан сегодня: <i>{}</i>".format(plan_s), kb_settings()
 
 def scr_sett_display(uid):
     s=gsett(uid)
     def ch(v): return "✅" if v else "☐"
-    sl = s["show_sleep"] if "show_sleep" in s.keys() else 1
-    bs = s["bar_style"] if "bar_style" in s.keys() else 0
+    sl=s["show_sleep"] if "show_sleep" in s.keys() else 1
+    bs=s["bar_style"]  if "bar_style"  in s.keys() else 0
+    bar_lbl="[██░░] блочная" if bs else "🟩⬜ эмодзи"
     lines=[
         "{} ⚖️ вес".format(ch(s["show_weight"])),
         "{} 💧 вода".format(ch(s["show_water"])),
         "{} 🔥 калории".format(ch(s["show_calories"])),
         "{} 😴 сон".format(ch(sl)),
         "",
-        "{} полоса прогресса: {}".format(ch(bs), "[██░░] блочная" if bs else "🟩⬜ эмодзи"),
+        "{} полоса: {}".format(ch(bs),bar_lbl),
     ]
     return "🏠  <b>главная</b>\n\n{}\n\n<i>нажми чтобы переключить</i>".format("\n".join(lines)), kb_sett_display(uid)
 
@@ -1272,91 +1296,107 @@ def scr_sleep_hist(uid):
         avg_h,bq("\n".join(lines))), KB([("< назад","sleep")])
 
 # ── ЭКРАН: ПИТАНИЕ ─────────────────────────────────────────────────
+# ── ЭКРАНЫ: ПИТАНИЕ ────────────────────────────────────────────────
 def scr_nutrition(uid):
     cal=today_cal(uid); u=guser(uid); goal=u["cal_goal"] or 2000
     pct=min(100,int(cal/goal*100))
     by_meal=today_cal_by_meal(uid)
-    lines=[]
-    for mk in ("breakfast","lunch","dinner","snack","other"):
+    rows=[]
+    for mk in MEAL_ORDER:
         if mk in by_meal:
-            kcal, cnt = by_meal[mk]
-            lines.append("{}  {}  —  <b>{} ккал</b>  <i>({} записей)</i>".format(mico(mk),mnam(mk),kcal,cnt))
-    meal_block="\n".join(lines) if lines else "<i>сегодня ничего не записано</i>"
-    text="🍽  <b>питание</b>\n\n<b>{} / {} ккал</b>  {}  {}%\n\n{}\n\n<i>выбери приём пищи чтобы добавить</i>".format(
-        cal,goal,cbar(pct,uid),pct,meal_block)
-    return text, kb_nutrition()
+            kcal,cnt=by_meal[mk]
+            rows.append("{}  {}  —  {} ккал  <i>×{}</i>".format(mico(mk),mnam(mk),kcal,cnt))
+    meal_s="\n".join(rows) if rows else "<i>сегодня пусто — нажми «добавить еду»</i>"
+    return ("\U0001f37d  <b>\u043f\u0438\u0442\u0430\u043d\u0438\u0435</b>\n\n"
+            "<b>{} / {} \u043a\u043a\u0430\u043b</b>\n{} {}%\n\n{}".format(
+            cal,goal,cbar(pct,uid),pct,meal_s)), kb_nutrition()
 
-def scr_meal(uid, meal_type):
-    entries=cal_entries_by_meal(uid, meal_type)
-    total=sum(e["amount"] for e in entries)
-    ico=mico(meal_type); nam=mnam(meal_type)
-    if entries:
-        lines=[]
-        for e in entries:
-            t=datetime.fromisoformat(e["logged_at"]).strftime("%H:%M")
-            d="  {}".format(e["description"][:16]) if e["description"] else ""
-            lines.append("<code>{:5}  {} ккал{}</code>".format(t,e["amount"],d))
-        block="\n".join(lines)
-        total_s="\nитого: <b>{} ккал</b>".format(total)
+def scr_food_add(uid):
+    recent=get_recent_products(uid,8)
+    if recent:
+        head="\u043d\u0435\u0434\u0430\u0432\u043d\u0438\u0435 \u2014 \u043d\u0430\u0436\u043c\u0438 \u0447\u0442\u043e\u0431\u044b \u0434\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u0441\u043d\u043e\u0432\u0430:"
     else:
-        block="<i>пусто</i>"; total_s=""
-    text="{}  <b>{}</b>\n\n{}{}\n\n<i>выбери количество или введи своё:</i>".format(ico,nam,block,total_s)
-    return text, kb_meal(meal_type)
+        head="\u043f\u043e\u043a\u0430 \u043d\u0435\u0442 \u043d\u0435\u0434\u0430\u0432\u043d\u0438\u0445. \u0432\u044b\u0431\u0435\u0440\u0438 \u0438\u0437 \u0431\u0430\u0437\u044b \u0438\u043b\u0438 \u0441\u043e\u0437\u0434\u0430\u0439 \u043d\u043e\u0432\u044b\u0439 \u043f\u0440\u043e\u0434\u0443\u043a\u0442:"
+    return "\u2795  <b>\u0434\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u0435\u0434\u0443</b>\n\n<i>{}</i>".format(head), kb_food_add(uid)
+
+def scr_food_all(uid, page=0):
+    prods=get_products(uid); ps=6
+    total_p=max(1,(len(prods)+ps-1)//ps); page=max(0,min(page,total_p-1))
+    page_s="  <i>{} \u0438\u0437 {}</i>".format(page+1,total_p) if total_p>1 else ""
+    return ("\U0001f4cb  <b>\u0432\u0441\u0435 \u043f\u0440\u043e\u0434\u0443\u043a\u0442\u044b</b>  <i>{} \u0448\u0442</i>{}\n\n"
+            "<i>\u0432\u044b\u0431\u0435\u0440\u0438 \u043f\u0440\u043e\u0434\u0443\u043a\u0442</i>".format(len(prods),page_s)), kb_food_all(uid,page)
+
+def scr_food_grams(pid):
+    p=get_product(pid)
+    if not p: return "\u274c \u043f\u0440\u043e\u0434\u0443\u043a\u0442 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d", kb_back("food_add")
+    return ("\U0001f34e  <b>{}</b>\n\n"
+            "<code>{}\u043a\u043a\u0430\u043b  |  \u0411{}  \u0416{}  \u0423{}</code>  \u043d\u0430 100\u0433\n\n"
+            "<i>\u0441\u043a\u043e\u043b\u044c\u043a\u043e \u0433\u0440\u0430\u043c\u043c \u0441\u044a\u0435\u043b?</i>".format(
+            p["name"],p["calories"],
+            round(p["protein"],1),round(p["fat"],1),round(p["carbs"],1))), kb_food_grams(pid)
+
+def scr_food_meal(pid, grams):
+    p=get_product(pid)
+    if not p: return "\u274c \u043f\u0440\u043e\u0434\u0443\u043a\u0442 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d", kb_back("food_add")
+    kcal=int(p["calories"]*grams/100)
+    prot=round(p["protein"]*grams/100,1)
+    fat =round(p["fat"]*grams/100,1)
+    carb=round(p["carbs"]*grams/100,1)
+    return ("\U0001f34e  <b>{}</b>  {}\u0433\n\n"
+            "<code>\u043a\u043a\u0430\u043b   {}\n"
+            "\u0431\u0435\u043b\u043a\u0438  {}\n"
+            "\u0436\u0438\u0440\u044b   {}\n"
+            "\u0443\u0433\u043b\u0435\u0432. {}</code>\n\n"
+            "<i>\u043a \u043a\u0430\u043a\u043e\u043c\u0443 \u043f\u0440\u0438\u0451\u043c\u0443 \u043e\u0442\u043d\u0435\u0441\u0442\u0438?</i>".format(
+            p["name"],grams,kcal,prot,fat,carb)), kb_food_meal(pid,grams)
 
 def scr_food_diary(uid):
     total=today_cal(uid); u=guser(uid); goal=u["cal_goal"] or 2000
     pct=min(100,int(total/goal*100))
     sections=[]
-    for mk in ("breakfast","lunch","dinner","snack","other"):
-        entries=cal_entries_by_meal(uid, mk)
+    for mk in MEAL_ORDER:
+        entries=cal_entries_by_meal(uid,mk)
         if not entries: continue
         meal_total=sum(e["amount"] for e in entries)
-        lines=[]
+        rows_=[]
         for e in entries:
-            t=datetime.fromisoformat(e["logged_at"]).strftime("%H:%M")
-            d="  {}".format(e["description"][:18]) if e["description"] else ""
-            lines.append("  {:5}  {} ккал{}".format(t,e["amount"],d))
-        sections.append("{}  <b>{}</b>  <i>{} ккал</i>\n{}".format(
-            mico(mk),mnam(mk),meal_total,"\n".join(lines)))
-    diary="\n\n".join(sections) if sections else "<i>сегодня записей нет</i>"
-    text="📓  <b>дневник питания</b>  <i>сегодня</i>\n\n{}\n\n<b>всего: {} / {} ккал</b>  {}  {}%".format(
-        diary,total,goal,cbar(pct,uid),pct)
-    return text, KB([("< питание","nutrition")])
+            t_s=datetime.fromisoformat(e["logged_at"]).strftime("%H:%M")
+            d="  {}".format(e["description"][:20]) if e["description"] else ""
+            rows_.append("  {}  {} \u043a\u043a\u0430\u043b{}".format(t_s,e["amount"],d))
+        sections.append("{}  <b>{}</b>  <i>{} \u043a\u043a\u0430\u043b</i>\n{}".format(
+            mico(mk),mnam(mk),meal_total,"\n".join(rows_)))
+    diary="\n\n".join(sections) if sections else "<i>\u0437\u0430\u043f\u0438\u0441\u0435\u0439 \u043d\u0435\u0442</i>"
+    return ("\U0001f4d3  <b>\u0434\u043d\u0435\u0432\u043d\u0438\u043a \u043f\u0438\u0442\u0430\u043d\u0438\u044f</b>  "
+            "<i>\u0441\u0435\u0433\u043e\u0434\u043d\u044f</i>\n\n"
+            "{}\n\n<b>\u0438\u0442\u043e\u0433\u043e: {} / {} \u043a\u043a\u0430\u043b</b>  {}  {}%".format(
+            diary,total,goal,cbar(pct,uid),pct)), KB(
+        [("\u21a9 \u0443\u0434\u0430\u043b\u0438\u0442\u044c \u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0435\u0435","food_del_last"),
+         ("< \u043f\u0438\u0442\u0430\u043d\u0438\u0435","nutrition")])
 
 # ── ЭКРАН: БЫСТРЫЕ ПРОДУКТЫ ─────────────────────────────────────────
 def scr_quick_products(uid, page=0):
-    prods=get_products(uid); ps=5
-    total_p=max(1,(len(prods)+ps-1)//ps); page=max(0,min(page,total_p-1))
-    page_s="  <i>{} из {}</i>".format(page+1,total_p) if total_p>1 else ""
-    text="🍎  <b>быстрые продукты</b>  <i>{} шт</i>{}\n\n<i>нажми → логировать  ·  КБЖУ на 100г</i>".format(len(prods),page_s)
+    prods=get_products(uid)
+    text="🍎  <b>быстрые продукты</b>  <i>{} шт</i>\n\n<i>нажми → логировать  ·  КБЖУ на 100г</i>".format(len(prods))
     return text, kb_quick_products(uid, page)
 
-def scr_qp_del_mode(uid, page=0):
-    prods=get_products(uid); ps=5
-    total_p=max(1,(len(prods)+ps-1)//ps); page=max(0,min(page,total_p-1))
-    page_s="  <i>{} из {}</i>".format(page+1,total_p) if total_p>1 else ""
-    return "🗑  <b>удалить продукт</b>{}\n\nвыбери:".format(page_s), kb_qp_delete_mode(uid, page)
-
 def scr_kbzhu(uid, page=0):
-    prods=get_products(uid); ps=5
-    total_p=max(1,(len(prods)+ps-1)//ps); page=max(0,min(page,total_p-1))
-    page_s="  <i>{} из {}</i>".format(page+1,total_p) if total_p>1 else ""
-    text="🧮  <b>КБЖУ‑калькулятор</b>{}\n\n<i>выбери продукт из списка</i>".format(page_s)
+    text="🧮  <b>КБЖУ‑калькулятор</b>\n\n<i>выбери продукт из списка</i>"
     return text, kb_kbzhu(uid, page)
 
 # ── ЭКРАН: ТАЙМЕР ТРЕНИРОВКИ ─────────────────────────────────────────
 def scr_workout_timer(uid):
-    t=get_wt(uid)
-    if not t:
+    wt=get_wt(uid)
+    t=None
+    if not wt:
         return "⏱  <b>таймер тренировки</b>\n\n<i>нет активной тренировки</i>\n\nзапусти таймер из карточки задачи", kb_workout_timer_empty()
     try:
-        started=datetime.fromisoformat(t["started_at"])
+        started=datetime.fromisoformat(wt["started_at"])
         elapsed=int((datetime.now()-started).total_seconds()/60)
-        dur=t["duration_planned"] or 30
+        dur=wt["duration_planned"] or 30
         rem=dur-elapsed
         pct=min(100,int(elapsed/dur*100))
         bar=pbar_block(pct) if get_bar_style(uid) else pbar(pct,10,"🟩","⬜")
-        name=t.get("act_name","тренировка")
+        name=wt.get("act_name","тренировка")
         if rem>0:
             status="осталось  <b>{}</b>".format(fmt_dur(rem))
         else:
@@ -1704,28 +1744,60 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
     if data=="food_diary":
         t,m=scr_food_diary(uid); await s(t,m); return
 
-    # приёмы пищи: meal_breakfast / meal_lunch / meal_dinner / meal_snack
-    if data.startswith("meal_"):
-        mt=data[5:]
-        if mt in MEALS:
-            t,m=scr_meal(uid,mt); await s(t,m); return
+    if data=="food_del_last":
+        del_last_cal(uid); t,m=scr_food_diary(uid); await s("↩ удалено\n\n"+t,m); return
 
-    # быстрый лог в приём: mc_300_lunch
-    if data.startswith("mc_"):
-        parts_=data[3:].split("_",1)
+    # добавить еду: выбор продукта
+    if data=="food_add":
+        t,m=scr_food_add(uid); await s(t,m); return
+
+    if data=="food_new":
+        await state.set_state(St.qp_name)
+        await state.update_data(qp_ctx="food")
+        await s("➕  <b>новый продукт</b>\n\nшаг 1 — название:",kb_x("food_add")); return
+
+    if data.startswith("food_all_"):
+        page=int(data[9:]); t,m=scr_food_all(uid,page); await s(t,m); return
+
+    # food_pick_{pid} — выбрали продукт → граммы
+    if data.startswith("food_pick_"):
+        pid=int(data[10:]); t,m=scr_food_grams(pid); await s(t,m); return
+
+    # fg_{pid}_{grams} — быстрые граммы → выбор приёма
+    if data.startswith("fg_"):
+        parts_=data[3:].rsplit("_",1)
         if len(parts_)==2:
-            amount_s,mt=parts_
-            if amount_s=="custom":
-                await state.update_data(meal_type=mt)
-                await state.set_state(St.meal_cal)
-                await s("{}  <b>{}</b>\n\nвведи количество ккал:".format(mico(mt),mnam(mt)), kb_x("meal_{}".format(mt))); return
-            try:
-                amt=int(amount_s); log_cal(uid,amt,meal_type=mt)
-                t,m=scr_meal(uid,mt); await s("✓  +{} ккал\n\n".format(amt)+t,m)
-            except: pass
+            pid=int(parts_[0]); grams=int(parts_[1])
+            t,m=scr_food_meal(pid,grams); await s(t,m)
         return
 
-    # ── КАЛОРИИ (legacy) ──────────────────────────────────────────
+    # fgc_{pid} — ввод своих граммов
+    if data.startswith("fgc_"):
+        pid=int(data[4:]); p=get_product(pid)
+        if not p: t,m=scr_food_add(uid); await s("❌ продукт не найден\n\n"+t,m); return
+        await state.set_state(St.food_grams)
+        await state.update_data(food_pid=pid)
+        await s("🍎  <b>{}</b>\n{}ккал/100г\n\n<i>введи граммы:</i>".format(
+            p["name"],p["calories"]), kb_x("food_pick_{}".format(pid))); return
+
+    # fs_{pid}_{grams}_{meal} — сохраняем запись
+    if data.startswith("fs_"):
+        tail=data[3:].rsplit("_",1)
+        if len(tail)==2:
+            pid_g,mt=tail
+            pg=pid_g.rsplit("_",1)
+            if len(pg)==2:
+                pid=int(pg[0]); grams=int(pg[1]); p=get_product(pid)
+                if p:
+                    kcal=int(p["calories"]*grams/100)
+                    mark_product_used(pid)
+                    log_cal(uid,kcal,desc="{} {}г".format(p["name"],grams),meal_type=mt)
+                    t,m=scr_nutrition(uid)
+                    await s("✅  {} {}  —  {} {}г  +{} ккал\n\n".format(
+                        mico(mt),mnam(mt),p["name"],grams,kcal)+t,m); return
+        t,m=scr_nutrition(uid); await s(t,m); return
+
+    # ── КАЛОРИИ legacy ───────────────────────────────────────────
     if data=="calories":
         t,m=scr_nutrition(uid); await s(t,m); return
     if data=="cal_goal_set":
@@ -1773,7 +1845,8 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
     if data=="reset_sleep":
         reset_sleep(uid); await s("😴 история сна сброшена",kb_sett_reset()); return
 
-    _tog={"stog_weight":"show_weight","stog_water":"show_water","stog_calories":"show_calories","stog_sleep":"show_sleep","stog_bar_style":"bar_style"}
+    _tog={"stog_weight":"show_weight","stog_water":"show_water","stog_calories":"show_calories",
+           "stog_sleep":"show_sleep","stog_bar_style":"bar_style"}
     if data in _tog:
         toggle_sett(uid,_tog[data]); t,m=scr_sett_display(uid); await s(t,m); return
 
@@ -1928,10 +2001,10 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
     if data=="qp_del_mode":
         if not get_products(uid):
             t,m=scr_quick_products(uid); await s("список пуст\n\n"+t,m); return
-        t,m=scr_qp_del_mode(uid,0); await s(t,m); return
+        await s("🗑  <b>удалить продукт</b>\n\nвыбери:",kb_qp_delete_mode(uid)); return
 
     if data.startswith("qpdm_"):
-        page=int(data[5:]); t,m=scr_qp_del_mode(uid,page); await s(t,m); return
+        page=int(data[5:]); await s("🗑  <b>удалить продукт</b>\n\nвыбери:",kb_qp_delete_mode(uid,page)); return
 
     if data.startswith("qp_dodel_"):
         pid=int(data[9:]); del_product(pid)
@@ -1962,8 +2035,9 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
         p=get_product(pid)
         if p:
             kcal=int(p["calories"]*grams/100)
+            mark_product_used(p["id"])
             log_cal(uid,kcal,desc="{} {}г".format(p["name"],grams))
-            t,m=scr_cal(uid); await s("+{} ккал ({} {}г)\n\n".format(kcal,p["name"],grams)+t,m)
+            t,m=scr_nutrition(uid); await s("+{} ккал ({} {}г)\n\n".format(kcal,p["name"],grams)+t,m)
         return
 
     # ── ТАЙМЕР ТРЕНИРОВКИ ─────────────────────────────────────────
@@ -1981,11 +2055,11 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
         t,m=scr_workout_timer(uid); await s(t,m); return
 
     if data=="wt_finish":
-        wt=get_wt(uid)
-        if wt:
-            complete_act(wt["act_id"])
+        t=get_wt(uid)
+        if t:
+            complete_act(t["act_id"])
             stop_wt(uid)
-            started=datetime.fromisoformat(wt["started_at"])
+            started=datetime.fromisoformat(t["started_at"])
             elapsed=int((datetime.now()-started).total_seconds()/60)
             await s("✅  <b>тренировка завершена!</b>\n\nвремя: <b>{}</b>".format(fmt_dur(elapsed)),
                 KB([("< назад","main")])); return
@@ -2285,9 +2359,17 @@ async def fh_qp_carb(msg: Message, state: FSMContext):
         c=float(msg.text.replace(",",".")); assert 0<=c<=100
         sd=await state.get_data()
         add_product(uid,sd["qp_name"],sd["qp_cal"],sd.get("qp_prot",0),sd.get("qp_fat",0),c)
-        await state.set_state(None); await state.update_data(qp_name=None,qp_cal=None,qp_prot=None,qp_fat=None)
-        t,m=scr_quick_products(uid)
-        await show(uid,state,"✅  <b>{}</b> добавлен\n\n".format(sd["qp_name"])+t,m)
+        ctx=sd.get("qp_ctx","")
+        await state.set_state(None)
+        await state.update_data(qp_name=None,qp_cal=None,qp_prot=None,qp_fat=None,qp_ctx=None)
+        with db() as _c:
+            new_p=_c.execute("SELECT * FROM quick_products WHERE user_id=? ORDER BY id DESC LIMIT 1",(uid,)).fetchone()
+        if ctx=="food" and new_p:
+            t,m=scr_food_grams(new_p["id"])
+            await show(uid,state,"✅  <b>{}</b> сохранён\n\n".format(sd["qp_name"])+t,m)
+        else:
+            t,m=scr_quick_products(uid)
+            await show(uid,state,"✅  <b>{}</b> добавлен\n\n".format(sd["qp_name"])+t,m)
     except: await show(uid,state,"❌ введи число 0–100",kb_x("quick_products"))
 
 # ── FSM: КБЖУ ГРАММЫ ─────────────────────────────────────────────────
@@ -2307,8 +2389,9 @@ async def fh_kbzhu(msg: Message, state: FSMContext):
             p["name"],grams,kcal,prot,fat,carb)
         await state.set_state(None)
         if mode=="log":
+            mark_product_used(p["id"])
             log_cal(uid,kcal,desc="{} {}г".format(p["name"],grams))
-            t,m=scr_cal(uid)
+            t,m=scr_nutrition(uid)
             await show(uid,state,text+"\n\n✅  <b>+{} ккал</b> записано\n\n".format(kcal)+t,m)
         else:
             kb_=KB([("✅ записать {} ккал".format(kcal),"kbzhu_log_{}_{}".format(pid,grams))],
@@ -2353,28 +2436,16 @@ async def fh_remind_report(msg: Message, state: FSMContext):
     except: await show(uid,state,"❌ формат: <code>09:00</code>",kb_x("reminders"))
 
 
-# ── FSM: ПРИЁМ ПИЩИ ─────────────────────────────────────────────────
-@dp.message(St.meal_cal)
-async def fh_meal_cal(msg: Message, state: FSMContext):
+# ── FSM: ГРАММЫ ПРИ ДОБАВЛЕНИИ ────────────────────────────────────
+@dp.message(St.food_grams)
+async def fh_food_grams(msg: Message, state: FSMContext):
     uid=msg.from_user.id; await _del(msg)
     try:
-        cal=int(float(msg.text.replace(",","."))); assert 1<=cal<=9999
-        sd=await state.get_data(); mt=sd.get("meal_type","other")
-        await state.update_data(meal_cal_val=cal)
-        await state.set_state(St.meal_desc)
-        await show(uid,state,"{}  <b>{}</b>\n\n<b>{} ккал</b> — как называется блюдо?\n<i>(или отправь «-» чтобы пропустить)</i>".format(
-            mico(mt),mnam(mt),cal), kb_x("meal_{}".format(mt)))
-    except: await show(uid,state,"❌ введи число 1–9999",kb_x("nutrition"))
-
-@dp.message(St.meal_desc)
-async def fh_meal_desc(msg: Message, state: FSMContext):
-    uid=msg.from_user.id; await _del(msg)
-    sd=await state.get_data(); mt=sd.get("meal_type","other"); cal=sd.get("meal_cal_val",0)
-    desc="" if msg.text.strip()=="-" else msg.text.strip()[:40]
-    log_cal(uid,cal,desc=desc,meal_type=mt)
-    await state.set_state(None)
-    t,m=scr_meal(uid,mt)
-    await show(uid,state,"✓  +{} ккал  {}\n\n".format(cal,desc)+t,m)
+        grams=int(float(msg.text.replace(",","."))); assert 1<=grams<=5000
+        sd=await state.get_data(); pid=sd.get("food_pid")
+        await state.set_state(None)
+        t,m=scr_food_meal(pid,grams); await show(uid,state,t,m)
+    except: await show(uid,state,"❌ введи количество граммов (например 150)",kb_x("food_add"))
 
 # ── FALLBACK ────────────────────────────────────────────────────────
 @dp.message(F.text)
@@ -2407,7 +2478,7 @@ async def main():
     scheduler.add_job(check_weight_reminders,"interval",seconds=60, id="weight_remind")
     scheduler.add_job(check_weekly_report,  "interval", seconds=60, id="weekly_report")
     scheduler.start()
-    log.info("fitbot запущен ✅")
+    log.info("fitbot v4 запущен ✅")
     await dp.start_polling(bot, drop_pending_updates=True)
 
 if __name__=="__main__":
