@@ -738,11 +738,11 @@ def kb_quick_products(uid, page=0):
             p["name"],p["calories"],
             round(p["protein"],1),round(p["fat"],1),round(p["carbs"],1)),
             "qp_log_{}".format(p["id"]))])
-    nav = []
-    if page > 0: nav.append(B("<","qp_page_{}".format(page-1)))
-    nav.append(B("{}/{}".format(page+1,total_p),"noop"))
-    if page < total_p-1: nav.append(B(">","qp_page_{}".format(page+1)))
-    if nav: rows.append(nav)
+    if total_p > 1:
+        rows.append([
+            B("←","qp_page_{}".format(page-1) if page>0 else "noop"),
+            B("→","qp_page_{}".format(page+1) if page<total_p-1 else "noop"),
+        ])
     rows.append([B("➕ добавить","qp_add"), B("🗑 удалить","qp_del_mode")])
     rows.append([B("🧮 КБЖУ‑калькулятор","kbzhu"), B("< назад","nutrition")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
@@ -755,10 +755,11 @@ def kb_qp_delete_mode(uid, page=0):
     rows = []
     for p in chunk:
         rows.append([B("🗑 {}".format(p["name"]), "qp_dodel_{}".format(p["id"]))])
-    nav = []
-    if page > 0: nav.append(B("<","qpdm_{}".format(page-1)))
-    if page < total_p-1: nav.append(B(">","qpdm_{}".format(page+1)))
-    if nav: rows.append(nav)
+    if total_p > 1:
+        rows.append([
+            B("←","qpdm_{}".format(page-1) if page>0 else "noop"),
+            B("→","qpdm_{}".format(page+1) if page<total_p-1 else "noop"),
+        ])
     rows.append([B("< назад","quick_products")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
@@ -771,11 +772,11 @@ def kb_kbzhu(uid, page=0):
     rows = []
     for p in chunk:
         rows.append([B("{}  {}ккал/100г".format(p["name"],p["calories"]), "kbzhu_pick_{}".format(p["id"]))])
-    nav = []
-    if page > 0: nav.append(B("<","kbzhu_page_{}".format(page-1)))
-    nav.append(B("{}/{}".format(page+1,total_p),"noop"))
-    if page < total_p-1: nav.append(B(">","kbzhu_page_{}".format(page+1)))
-    if nav: rows.append(nav)
+    if total_p > 1:
+        rows.append([
+            B("←","kbzhu_page_{}".format(page-1) if page>0 else "noop"),
+            B("→","kbzhu_page_{}".format(page+1) if page<total_p-1 else "noop"),
+        ])
     rows.append([B("< назад","nutrition")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
@@ -971,12 +972,16 @@ def scr_weight_hist(uid, page=0, ps=20):
     all_h=weight_hist(uid); total=len(all_h)
     pages=max(1,(total+ps-1)//ps); page=max(0,min(page,pages-1))
     chunk=all_h[page*ps:(page+1)*ps]
-    nav=[]
-    if page>0: nav.append(B("<","wh_p{}".format(page-1)))
-    nav.append(B("{}/{}".format(page+1,pages),"noop"))
-    if page<pages-1: nav.append(B(">","wh_p{}".format(page+1)))
-    kb=InlineKeyboardMarkup(inline_keyboard=[nav,[B("< назад","weight")]])
-    return "⚖️  <b>история</b>  <i>{} записей</i>\n\n{}".format(total,bq(fmt_log_weight(chunk))), kb
+    kb_rows=[]
+    if pages > 1:
+        kb_rows.append([
+            B("←","wh_p{}".format(page-1) if page>0 else "noop"),
+            B("→","wh_p{}".format(page+1) if page<pages-1 else "noop"),
+        ])
+    kb_rows.append([B("< назад","weight")])
+    kb=InlineKeyboardMarkup(inline_keyboard=kb_rows)
+    page_s="  <i>{} из {}</i>".format(page+1,pages) if pages>1 else ""
+    return "⚖️  <b>история</b>  <i>{} записей</i>{}\n\n{}".format(total,page_s,bq(fmt_log_weight(chunk))), kb
 
 def scr_water(uid):
     u=guser(uid); today=today_water(uid); goal=u["water_goal"] or 2000
@@ -1238,12 +1243,23 @@ def scr_nutrition(uid):
 
 # ── ЭКРАН: БЫСТРЫЕ ПРОДУКТЫ ─────────────────────────────────────────
 def scr_quick_products(uid, page=0):
-    prods=get_products(uid)
-    text="🍎  <b>быстрые продукты</b>  <i>{} шт</i>\n\n<i>нажми → логировать  ·  КБЖУ на 100г</i>".format(len(prods))
+    prods=get_products(uid); ps=5
+    total_p=max(1,(len(prods)+ps-1)//ps); page=max(0,min(page,total_p-1))
+    page_s="  <i>{} из {}</i>".format(page+1,total_p) if total_p>1 else ""
+    text="🍎  <b>быстрые продукты</b>  <i>{} шт</i>{}\n\n<i>нажми → логировать  ·  КБЖУ на 100г</i>".format(len(prods),page_s)
     return text, kb_quick_products(uid, page)
 
+def scr_qp_del_mode(uid, page=0):
+    prods=get_products(uid); ps=5
+    total_p=max(1,(len(prods)+ps-1)//ps); page=max(0,min(page,total_p-1))
+    page_s="  <i>{} из {}</i>".format(page+1,total_p) if total_p>1 else ""
+    return "🗑  <b>удалить продукт</b>{}\n\nвыбери:".format(page_s), kb_qp_delete_mode(uid, page)
+
 def scr_kbzhu(uid, page=0):
-    text="🧮  <b>КБЖУ‑калькулятор</b>\n\n<i>выбери продукт из списка</i>"
+    prods=get_products(uid); ps=5
+    total_p=max(1,(len(prods)+ps-1)//ps); page=max(0,min(page,total_p-1))
+    page_s="  <i>{} из {}</i>".format(page+1,total_p) if total_p>1 else ""
+    text="🧮  <b>КБЖУ‑калькулятор</b>{}\n\n<i>выбери продукт из списка</i>".format(page_s)
     return text, kb_kbzhu(uid, page)
 
 # ── ЭКРАН: ТАЙМЕР ТРЕНИРОВКИ ─────────────────────────────────────────
@@ -1811,10 +1827,10 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
     if data=="qp_del_mode":
         if not get_products(uid):
             t,m=scr_quick_products(uid); await s("список пуст\n\n"+t,m); return
-        await s("🗑  <b>удалить продукт</b>\n\nвыбери:",kb_qp_delete_mode(uid)); return
+        t,m=scr_qp_del_mode(uid,0); await s(t,m); return
 
     if data.startswith("qpdm_"):
-        page=int(data[5:]); await s("🗑  <b>удалить продукт</b>\n\nвыбери:",kb_qp_delete_mode(uid,page)); return
+        page=int(data[5:]); t,m=scr_qp_del_mode(uid,page); await s(t,m); return
 
     if data.startswith("qp_dodel_"):
         pid=int(data[9:]); del_product(pid)
