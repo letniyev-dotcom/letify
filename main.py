@@ -10,7 +10,7 @@ except: _pip("apscheduler")
 try:    import zoneinfo; zoneinfo.ZoneInfo("UTC")
 except: _pip("tzdata")
 
-import asyncio, logging, os, sqlite3, re, json
+import asyncio, logging, os, sqlite3, re, json, calendar as _cal_module
 from datetime import datetime, timedelta, date as dt_date, time as dt_time
 
 from aiogram import Bot, Dispatcher, F
@@ -307,6 +307,37 @@ def get_recent_products(uid, n=8):
         return c.execute(
             "SELECT * FROM quick_products WHERE user_id=? AND last_used!='' ORDER BY last_used DESC LIMIT ?",
             (uid, n)).fetchall()
+
+def get_recent_products_paged(uid, limit=100):
+    with db() as c:
+        return c.execute(
+            "SELECT * FROM quick_products WHERE user_id=? AND last_used!='' ORDER BY last_used DESC LIMIT ?",
+            (uid, limit)).fetchall()
+
+def clear_recent_products(uid):
+    with db() as c:
+        c.execute("UPDATE quick_products SET last_used='' WHERE user_id=?", (uid,))
+
+def today_cal_by_meal_for_date(uid, date_str):
+    with db() as c:
+        rows = c.execute(
+            "SELECT meal_type,SUM(amount) s,COUNT(*) n FROM calories_log WHERE user_id=? AND date(logged_at)=? GROUP BY meal_type",
+            (uid, date_str)).fetchall()
+    return {r["meal_type"]: (r["s"], r["n"]) for r in rows}
+
+def cal_meal_entries_for_date(uid, date_str, meal_type):
+    with db() as c:
+        return c.execute(
+            "SELECT id,amount,description,logged_at FROM calories_log WHERE user_id=? AND meal_type=? AND date(logged_at)=? ORDER BY logged_at",
+            (uid, meal_type, date_str)).fetchall()
+
+def get_days_with_calories(uid, year, month):
+    month_str = "{:04d}-{:02d}".format(year, month)
+    with db() as c:
+        rows = c.execute(
+            "SELECT DISTINCT date(logged_at) d FROM calories_log WHERE user_id=? AND strftime('%Y-%m',logged_at)=?",
+            (uid, month_str)).fetchall()
+    return {int(r["d"].split("-")[2]) for r in rows}
 
 def mark_product_used(pid):
     with db() as c:
@@ -616,11 +647,10 @@ def kb_nutrition():
 
 # ── выбор продукта при логировании ─────────────────────────────────
 def kb_food_add(uid):
-    recent=get_recent_products(uid,8)
-    rows=[]
-    for p in recent:
-        label="{} · {}ккал/100г".format(p["name"],p["calories"])
-        rows.append([B(label,"food_pick_{}".format(p["id"]))])
+    recent = get_recent_products(uid, 4)
+    rows = []
+    if recent:
+        rows.append([B("🕐 недавние", "recent_prods")])
     rows.append([B("📋 все продукты","food_all_0"), B("➕ новый","food_new")])
     rows.append([B("< питание","nutrition")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
@@ -631,7 +661,7 @@ def kb_food_all(uid, page=0):
     chunk=prods[page*ps:(page+1)*ps]
     rows=[]
     for p in chunk:
-        rows.append([B("{} · {}ккал/100г".format(p["name"],p["calories"]),"food_pick_{}".format(p["id"]))])
+        rows.append([B(p["name"],"food_pick_{}".format(p["id"]))])
     if total_p>1:
         rows.append([B("←","food_all_{}".format(page-1) if page>0 else "noop"),
                      B("{} из {}".format(page+1,total_p),"noop"),
@@ -808,10 +838,7 @@ def kb_quick_products(uid, page=0):
     chunk = prods[page*ps:(page+1)*ps]
     rows = []
     for p in chunk:
-        rows.append([B("{}  {} ккал  |  Б{} Ж{} У{}".format(
-            p["name"],p["calories"],
-            round(p["protein"],1),round(p["fat"],1),round(p["carbs"],1)),
-            "qp_log_{}".format(p["id"]))])
+        rows.append([B(p["name"], "qp_log_{}".format(p["id"]))])
     nav = []
     if page > 0: nav.append(B("<","qp_page_{}".format(page-1)))
     nav.append(B("{}/{}".format(page+1,total_p),"noop"))
@@ -844,7 +871,7 @@ def kb_kbzhu(uid, page=0):
     chunk = prods[page*ps:(page+1)*ps]
     rows = []
     for p in chunk:
-        rows.append([B("{}  {}ккал/100г".format(p["name"],p["calories"]), "kbzhu_pick_{}".format(p["id"]))])
+        rows.append([B(p["name"], "kbzhu_pick_{}".format(p["id"]))])
     nav = []
     if page > 0: nav.append(B("<","kbzhu_page_{}".format(page-1)))
     nav.append(B("{}/{}".format(page+1,total_p),"noop"))
@@ -866,6 +893,59 @@ def kb_workout_timer_empty():
         [("📋 к задачам","plan_cards")],
         [("< назад","main")],
     )
+
+# ── Клавиатура календаря дневника ────────────────────────────────────
+_MONTH_NAMES = ["","январь","февраль","март","апрель","май","июнь",
+                "июль","август","сентябрь","октябрь","ноябрь","декабрь"]
+
+def kb_diary_cal(uid, year, month):
+    days_with = get_days_with_calories(uid, year, month)
+    prev_m = month-1; prev_y = year
+    if prev_m < 1: prev_m = 12; prev_y = year-1
+    next_m = month+1; next_y = year
+    if next_m > 12: next_m = 1; next_y = year+1
+    rows = []
+    rows.append([
+        B("← " + _MONTH_NAMES[prev_m], "diary_cal_{}_{}".format(prev_y, prev_m)),
+        B("{} {}".format(_MONTH_NAMES[month], year), "noop"),
+        B(_MONTH_NAMES[next_m] + " →", "diary_cal_{}_{}".format(next_y, next_m)),
+    ])
+    rows.append([B(d,"noop") for d in ["пн","вт","ср","чт","пт","сб","вс"]])
+    today = dt_date.today()
+    for week in _cal_module.monthcalendar(year, month):
+        row = []
+        for day in week:
+            if day == 0:
+                row.append(B(" ","noop"))
+            else:
+                d = dt_date(year, month, day)
+                if d > today:
+                    row.append(B(str(day),"noop"))
+                else:
+                    marker = "•" if day in days_with else ""
+                    ds = "{:04d}-{:02d}-{:02d}".format(year, month, day)
+                    row.append(B("{}{}".format(day, marker), "diary_date_{}".format(ds)))
+        rows.append(row)
+    rows.append([B("< назад к дневнику","food_diary")])
+    return InlineKeyboardMarkup(inline_keyboard=rows)
+
+# ── Клавиатура недавних продуктов ────────────────────────────────────
+def kb_recent_products(uid, page=0):
+    recent = get_recent_products_paged(uid, 100)
+    ps = 4; total_p = max(1,(len(recent)+ps-1)//ps)
+    page = max(0,min(page,total_p-1))
+    chunk = recent[page*ps:(page+1)*ps]
+    rows = []
+    for p in chunk:
+        rows.append([B(p["name"], "food_pick_{}".format(p["id"]))])
+    nav = []
+    if page > 0: nav.append(B("<","recent_page_{}".format(page-1)))
+    nav.append(B("{}/{}".format(page+1,total_p),"noop"))
+    if page < total_p-1: nav.append(B(">","recent_page_{}".format(page+1)))
+    if nav: rows.append(nav)
+    rows.append([B("🗑 очистить недавние","recent_clear")])
+    rows.append([B("< назад","food_add")])
+    return InlineKeyboardMarkup(inline_keyboard=rows)
 
 # ── Клавиатура карточки ─────────────────────────────────────────────
 def kb_card(idx, card_list, aid):
@@ -1312,19 +1392,24 @@ def scr_nutrition(uid):
             cal,goal,cbar(pct,uid),pct,meal_s)), kb_nutrition()
 
 def scr_food_add(uid):
-    recent=get_recent_products(uid,8)
-    if recent:
-        head="\u043d\u0435\u0434\u0430\u0432\u043d\u0438\u0435 \u2014 \u043d\u0430\u0436\u043c\u0438 \u0447\u0442\u043e\u0431\u044b \u0434\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u0441\u043d\u043e\u0432\u0430:"
-    else:
-        head="\u043f\u043e\u043a\u0430 \u043d\u0435\u0442 \u043d\u0435\u0434\u0430\u0432\u043d\u0438\u0445. \u0432\u044b\u0431\u0435\u0440\u0438 \u0438\u0437 \u0431\u0430\u0437\u044b \u0438\u043b\u0438 \u0441\u043e\u0437\u0434\u0430\u0439 \u043d\u043e\u0432\u044b\u0439 \u043f\u0440\u043e\u0434\u0443\u043a\u0442:"
-    return "\u2795  <b>\u0434\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u0435\u0434\u0443</b>\n\n<i>{}</i>".format(head), kb_food_add(uid)
+    recent = get_recent_products(uid, 4)
+    sub = "  <i>есть недавние — нажми кнопку ниже</i>" if recent else ""
+    return "➕  <b>добавить еду</b>\n\n<i>выбери продукт из базы или добавь новый{}</i>".format(sub), kb_food_add(uid)
 
 def scr_food_all(uid, page=0):
-    prods=get_products(uid); ps=6
-    total_p=max(1,(len(prods)+ps-1)//ps); page=max(0,min(page,total_p-1))
-    page_s="  <i>{} \u0438\u0437 {}</i>".format(page+1,total_p) if total_p>1 else ""
-    return ("\U0001f4cb  <b>\u0432\u0441\u0435 \u043f\u0440\u043e\u0434\u0443\u043a\u0442\u044b</b>  <i>{} \u0448\u0442</i>{}\n\n"
-            "<i>\u0432\u044b\u0431\u0435\u0440\u0438 \u043f\u0440\u043e\u0434\u0443\u043a\u0442</i>".format(len(prods),page_s)), kb_food_all(uid,page)
+    prods = get_products(uid); ps = 6
+    total_p = max(1,(len(prods)+ps-1)//ps); page = max(0,min(page,total_p-1))
+    chunk = prods[page*ps:(page+1)*ps]
+    lines = []
+    for i,p in enumerate(chunk, page*ps+1):
+        lines.append("{}. <b>{}</b>  —  {} ккал  Б{}  Ж{}  У{}".format(
+            i, p["name"], p["calories"],
+            round(p["protein"],1), round(p["fat"],1), round(p["carbs"],1)))
+    page_s = "  <i>{} из {}</i>".format(page+1,total_p) if total_p > 1 else ""
+    text = ("📋  <b>все продукты</b>  <i>{} шт</i>{}\n\n"
+            "{}\n\n<i>выбери продукт</i>").format(
+        len(prods), page_s, "\n".join(lines) if lines else "<i>пусто</i>")
+    return text, kb_food_all(uid, page)
 
 def scr_food_grams(pid):
     p=get_product(pid)
@@ -1350,37 +1435,88 @@ def scr_food_meal(pid, grams):
             "<i>\u043a \u043a\u0430\u043a\u043e\u043c\u0443 \u043f\u0440\u0438\u0451\u043c\u0443 \u043e\u0442\u043d\u0435\u0441\u0442\u0438?</i>".format(
             p["name"],grams,kcal,prot,fat,carb)), kb_food_meal(pid,grams)
 
-def scr_food_diary(uid):
-    total=today_cal(uid); u=guser(uid); goal=u["cal_goal"] or 2000
-    pct=min(100,int(total/goal*100))
-    sections=[]
+def scr_food_diary(uid, date_str=None):
+    if date_str is None:
+        date_str = dt_date.today().isoformat()
+    try:
+        d = dt_date.fromisoformat(date_str)
+    except:
+        d = dt_date.today(); date_str = d.isoformat()
+    is_today = (d == dt_date.today())
+    date_label = "сегодня" if is_today else d.strftime("%d.%m.%Y")
+    by_meal = today_cal_by_meal_for_date(uid, date_str)
+    sections = []
     for mk in MEAL_ORDER:
-        entries=cal_entries_by_meal(uid,mk)
-        if not entries: continue
-        meal_total=sum(e["amount"] for e in entries)
-        rows_=[]
+        if mk not in by_meal: continue
+        meal_total, _ = by_meal[mk]
+        entries = cal_meal_entries_for_date(uid, date_str, mk)
+        rows_ = []
         for e in entries:
-            t_s=datetime.fromisoformat(e["logged_at"]).strftime("%H:%M")
-            d="  {}".format(e["description"][:20]) if e["description"] else ""
-            rows_.append("  {}  {} \u043a\u043a\u0430\u043b{}".format(t_s,e["amount"],d))
-        sections.append("{}  <b>{}</b>  <i>{} \u043a\u043a\u0430\u043b</i>\n{}".format(
-            mico(mk),mnam(mk),meal_total,"\n".join(rows_)))
-    diary="\n\n".join(sections) if sections else "<i>\u0437\u0430\u043f\u0438\u0441\u0435\u0439 \u043d\u0435\u0442</i>"
-    return ("\U0001f4d3  <b>\u0434\u043d\u0435\u0432\u043d\u0438\u043a \u043f\u0438\u0442\u0430\u043d\u0438\u044f</b>  "
-            "<i>\u0441\u0435\u0433\u043e\u0434\u043d\u044f</i>\n\n"
-            "{}\n\n<b>\u0438\u0442\u043e\u0433\u043e: {} / {} \u043a\u043a\u0430\u043b</b>  {}  {}%".format(
-            diary,total,goal,cbar(pct,uid),pct)), KB(
-        [("\u21a9 \u0443\u0434\u0430\u043b\u0438\u0442\u044c \u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0435\u0435","food_del_last"),
-         ("< \u043f\u0438\u0442\u0430\u043d\u0438\u0435","nutrition")])
+            t_s = datetime.fromisoformat(e["logged_at"]).strftime("%H:%M")
+            d_s = "  {}".format(e["description"][:22]) if e["description"] else ""
+            rows_.append("  {}  {} ккал{}".format(t_s, e["amount"], d_s))
+        block = "<blockquote expandable>{}</blockquote>".format("\n".join(rows_)) if rows_ else ""
+        sections.append("{}  <b>{}</b>  <i>{} ккал</i>\n{}".format(
+            mico(mk), mnam(mk), meal_total, block))
+    diary = "\n\n".join(sections) if sections else "<i>записей нет</i>"
+    kb_rows = []
+    if is_today:
+        kb_rows.append([B("↩ удалить последнее","food_del_last")])
+    kb_rows.append([B("📅 посмотреть другой день","food_diary_cal")])
+    kb_rows.append([B("< питание","nutrition")])
+    return ("📓  <b>дневник питания</b>  <i>{}</i>\n\n{}".format(date_label, diary),
+            InlineKeyboardMarkup(inline_keyboard=kb_rows))
 
 # ── ЭКРАН: БЫСТРЫЕ ПРОДУКТЫ ─────────────────────────────────────────
 def scr_quick_products(uid, page=0):
-    prods=get_products(uid)
-    text="🍎  <b>быстрые продукты</b>  <i>{} шт</i>\n\n<i>нажми → логировать  ·  КБЖУ на 100г</i>".format(len(prods))
+    prods = get_products(uid); ps = 5
+    total_p = max(1,(len(prods)+ps-1)//ps)
+    page = max(0,min(page,total_p-1))
+    chunk = prods[page*ps:(page+1)*ps]
+    lines = []
+    for i,p in enumerate(chunk, page*ps+1):
+        lines.append("{}. <b>{}</b>  —  {} ккал  Б{}  Ж{}  У{}".format(
+            i, p["name"], p["calories"],
+            round(p["protein"],1), round(p["fat"],1), round(p["carbs"],1)))
+    page_s = "  <i>стр. {}/{}</i>".format(page+1,total_p) if total_p > 1 else ""
+    products_text = "\n".join(lines) if lines else "<i>нет продуктов</i>"
+    text = ("🍎  <b>быстрые продукты</b>  <i>{} шт</i>{}\n\n"
+            "{}\n\n"
+            "<i>нажми → логировать  ·  КБЖУ на 100г</i>").format(len(prods), page_s, products_text)
     return text, kb_quick_products(uid, page)
 
+# ── ЭКРАН: НЕДАВНИЕ ПРОДУКТЫ ──────────────────────────────────────────
+def scr_recent_products(uid, page=0):
+    recent = get_recent_products_paged(uid, 100)
+    if not recent:
+        return "🕐  <b>недавние продукты</b>\n\n<i>пока нет недавних</i>", KB([("< назад","food_add")])
+    ps = 4; total_p = max(1,(len(recent)+ps-1)//ps)
+    page = max(0,min(page,total_p-1))
+    chunk = recent[page*ps:(page+1)*ps]
+    lines = []
+    for p in chunk:
+        lines.append("  <b>{}</b>  —  {} ккал  Б{}  Ж{}  У{}".format(
+            p["name"], p["calories"],
+            round(p["protein"],1), round(p["fat"],1), round(p["carbs"],1)))
+    page_s = "  <i>стр. {}/{}</i>".format(page+1,total_p) if total_p > 1 else ""
+    text = ("🕐  <b>недавние</b>  <i>{} шт</i>{}\n\n"
+            "{}\n\n"
+            "<i>нажми → добавить снова</i>").format(len(recent), page_s, "\n".join(lines))
+    return text, kb_recent_products(uid, page)
+
 def scr_kbzhu(uid, page=0):
-    text="🧮  <b>КБЖУ‑калькулятор</b>\n\n<i>выбери продукт из списка</i>"
+    prods = get_products(uid); ps = 5
+    total_p = max(1,(len(prods)+ps-1)//ps)
+    page = max(0,min(page,total_p-1))
+    chunk = prods[page*ps:(page+1)*ps]
+    lines = []
+    for i,p in enumerate(chunk, page*ps+1):
+        lines.append("{}. <b>{}</b>  —  {} ккал/100г  Б{}  Ж{}  У{}".format(
+            i, p["name"], p["calories"],
+            round(p["protein"],1), round(p["fat"],1), round(p["carbs"],1)))
+    page_s = "  <i>стр. {}/{}</i>".format(page+1,total_p) if total_p > 1 else ""
+    text = "🧮  <b>КБЖУ-калькулятор</b>{}\n\n{}\n\n<i>выбери продукт из списка</i>".format(
+        page_s, "\n".join(lines) if lines else "<i>нет продуктов</i>")
     return text, kb_kbzhu(uid, page)
 
 # ── ЭКРАН: ТАЙМЕР ТРЕНИРОВКИ ─────────────────────────────────────────
@@ -1746,6 +1882,35 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
 
     if data=="food_del_last":
         del_last_cal(uid); t,m=scr_food_diary(uid); await s("↩ удалено\n\n"+t,m); return
+
+    if data=="food_diary_cal":
+        today=dt_date.today()
+        await s("📅  <b>выбери день</b>\n\n<i>•  — есть записи</i>",
+                kb_diary_cal(uid,today.year,today.month)); return
+
+    if data.startswith("diary_cal_"):
+        parts_=data[10:].split("_")
+        if len(parts_)==2:
+            try:
+                y,m_=int(parts_[0]),int(parts_[1])
+                await s("📅  <b>выбери день</b>\n\n<i>•  — есть записи</i>",
+                        kb_diary_cal(uid,y,m_)); return
+            except: pass
+        t,m=scr_food_diary(uid); await s(t,m); return
+
+    if data.startswith("diary_date_"):
+        date_str=data[11:]; t,m=scr_food_diary(uid,date_str); await s(t,m); return
+
+    # ── НЕДАВНИЕ ПРОДУКТЫ ─────────────────────────────────────────
+    if data=="recent_prods":
+        t,m=scr_recent_products(uid); await s(t,m); return
+
+    if data.startswith("recent_page_"):
+        page=int(data[12:]); t,m=scr_recent_products(uid,page); await s(t,m); return
+
+    if data=="recent_clear":
+        clear_recent_products(uid); t,m=scr_food_add(uid)
+        await s("🗑 недавние очищены\n\n"+t,m); return
 
     # добавить еду: выбор продукта
     if data=="food_add":
