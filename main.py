@@ -37,6 +37,16 @@ ACTS = {
 def aico(t): return ACTS.get(t,("✦",""))[0]
 def anam(t): return ACTS.get(t,("✦",t))[1]
 
+MEALS = {
+    "breakfast": ("☀️", "завтрак"),
+    "lunch":     ("🌤",  "обед"),
+    "dinner":    ("🌙", "ужин"),
+    "snack":     ("🍫", "перекус"),
+    "other":     ("✦",  "другое"),
+}
+def mico(t): return MEALS.get(t, ("✦",""))[0]
+def mnam(t): return MEALS.get(t, ("✦", t))[1]
+
 # ── ДЕФОЛТНЫЕ ПРОДУКТЫ ──────────────────────────────────────────────
 DEFAULT_PRODUCTS = [
     ("банан",           89,  1.1, 0.3, 23.0),
@@ -85,6 +95,9 @@ class St(StatesGroup):
     qp_carb = State()
     # 🧮 КБЖУ
     kbzhu_grams = State()
+    # 🍽 Приёмы пищи
+    meal_cal    = State()
+    meal_desc   = State()
     # 🔔 Напоминания
     remind_water_interval = State()
     remind_water_manual   = State()
@@ -179,6 +192,9 @@ def init_db():
             c.execute("ALTER TABLE user_settings ADD COLUMN show_sleep INTEGER DEFAULT 1")
         if "bar_style" not in sx:
             c.execute("ALTER TABLE user_settings ADD COLUMN bar_style INTEGER DEFAULT 0")
+        cx = {r[1] for r in c.execute("PRAGMA table_info(calories_log)")}
+        if "meal_type" not in cx:
+            c.execute("ALTER TABLE calories_log ADD COLUMN meal_type TEXT DEFAULT 'other'")
 
 def ensure_defaults(uid):
     """Добавить дефолтные продукты и напоминания для нового пользователя."""
@@ -263,8 +279,26 @@ def today_water(uid):
         r = c.execute("SELECT COALESCE(SUM(amount),0) t FROM water_log WHERE user_id=? AND date(logged_at)=date('now')", (uid,)).fetchone()
         return r["t"] if r else 0
 
-def log_cal(uid, a, desc=""):
-    with db() as c: c.execute("INSERT INTO calories_log (user_id,amount,description) VALUES (?,?,?)", (uid, a, desc))
+def log_cal(uid, a, desc="", meal_type="other"):
+    with db() as c: c.execute("INSERT INTO calories_log (user_id,amount,description,meal_type) VALUES (?,?,?,?)", (uid, a, desc, meal_type))
+
+def today_cal_by_meal(uid):
+    """dict meal_type -> (kcal, count)"""
+    with db() as c:
+        rows = c.execute(
+            "SELECT meal_type, SUM(amount) s, COUNT(*) n FROM calories_log WHERE user_id=? AND date(logged_at)=date(\'now\') GROUP BY meal_type",
+            (uid,)).fetchall()
+    return {r["meal_type"]: (r["s"], r["n"]) for r in rows}
+
+def cal_entries_by_meal(uid, meal_type, date_str=None):
+    ds = date_str or dt_date.today().strftime("%Y-%m-%d")
+    with db() as c:
+        return c.execute(
+            "SELECT id,amount,description,logged_at FROM calories_log WHERE user_id=? AND meal_type=? AND date(logged_at)=? ORDER BY logged_at",
+            (uid, meal_type, ds)).fetchall()
+
+def del_cal_entry(entry_id):
+    with db() as c: c.execute("DELETE FROM calories_log WHERE id=?", (entry_id,))
 
 def del_last_cal(uid):
     with db() as c:
@@ -502,8 +536,10 @@ def fmt_log_cal(rows):
     lines = ""
     for e in rows:
         t = datetime.fromisoformat(e["logged_at"]).strftime("%H:%M")
-        d = "  "+e["description"][:12] if e["description"] else ""
-        lines += "{:5}  +{} ккал{}\n".format(t, e["amount"], d)
+        d = "  "+e["description"][:12] if e.get("description") else ""
+        mt = e["meal_type"] if "meal_type" in e.keys() and e["meal_type"] and e["meal_type"]!="other" else ""
+        mt_s = "  [{}]".format(mnam(mt)) if mt else ""
+        lines += "{:5}  +{} ккал{}{}\n".format(t, e["amount"], d, mt_s)
     return "<code>{}</code>".format(lines.rstrip())
 
 def fmt_log_weight(rows):
@@ -581,9 +617,19 @@ def kb_cal():
 
 def kb_nutrition():
     return KB(
-        [("🔥 калории", "calories"), ("🍎 продукты", "quick_products")],
-        [("🧮 КБЖУ", "kbzhu")],
-        [("< назад", "main")],
+        [("☀️ завтрак", "meal_breakfast"), ("🌤 обед",     "meal_lunch")],
+        [("🌙 ужин",     "meal_dinner"),   ("🍫 перекус",  "meal_snack")],
+        [("📓 дневник",  "food_diary"),    ("🍎 продукты", "quick_products")],
+        [("🧮 кбжу",    "kbzhu"),          ("< назад",     "main")],
+    )
+
+def kb_meal(meal_type):
+    return KB(
+        [("100 ккал","mc_100_{}".format(meal_type)), ("200 ккал","mc_200_{}".format(meal_type)),
+         ("300 ккал","mc_300_{}".format(meal_type)), ("500 ккал","mc_500_{}".format(meal_type))],
+        [("700 ккал","mc_700_{}".format(meal_type)), ("1000 ккал","mc_1000_{}".format(meal_type))],
+        [("✏️ своё","mc_custom_{}".format(meal_type))],
+        [("< питание","nutrition")],
     )
 
 def kb_goals():
@@ -608,11 +654,10 @@ def kb_progress():
 
 def kb_settings():
     return KB(
-        [("📋 план",         "plan_manage"),    ("📤 загрузить план","plan_upload_start")],
-        [("🎯 цели и нормы", "goals")],
-        [("🔔 напоминания",  "reminders"),      ("🏠 главная",       "sett_display")],
-        [("🗑 сбросить",     "sett_reset")],
-        [("< меню",         "main")],
+        [("📋 план",        "plan_manage"),       ("📤 загрузить план", "plan_upload_start")],
+        [("🎯 цели и нормы","goals"),             ("🔔 напоминания",    "reminders")],
+        [("🏠 экран",       "sett_display"),      ("🗑 сбросить",       "sett_reset")],
+        [("< меню",        "main")],
     )
 
 def kb_sett_display(uid):
@@ -744,7 +789,7 @@ def kb_quick_products(uid, page=0):
             B("→","qp_page_{}".format(page+1) if page<total_p-1 else "noop"),
         ])
     rows.append([B("➕ добавить","qp_add"), B("🗑 удалить","qp_del_mode")])
-    rows.append([B("🧮 КБЖУ‑калькулятор","kbzhu"), B("< назад","nutrition")])
+    rows.append([B("< назад","nutrition")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
 def kb_qp_delete_mode(uid, page=0):
@@ -1094,16 +1139,10 @@ def scr_week_stats(uid):
     return "📅  <b>неделя</b>\n\n<code>{}</code>\n\n{} {}%".format(tbl,wbar(wp,uid),wp), KB([("< статистика","progress")])
 
 def scr_settings(uid):
-    s=gsett(uid)
-    shown=[]
-    if s["show_weight"]:   shown.append("⚖️")
-    if s["show_water"]:    shown.append("💧")
-    if s["show_calories"]: shown.append("🔥")
-    shown_s=" ".join(shown) if shown else "<i>всё скрыто</i>"
     acts=acts_for_day(uid,dt_date.today())
     total=len(acts); done=sum(1 for a in acts if a.get("completed"))
     plan_s="нет задач" if not total else "{} из {} выполнено".format(done,total)
-    text="⚙️  <b>настройки</b>\n\nглавный экран: {}\nплан сегодня: <i>{}</i>".format(shown_s,plan_s)
+    text="⚙️  <b>настройки</b>\n\nплан сегодня: <i>{}</i>".format(plan_s)
     return text, kb_settings()
 
 def scr_sett_display(uid):
@@ -1236,10 +1275,53 @@ def scr_sleep_hist(uid):
 def scr_nutrition(uid):
     cal=today_cal(uid); u=guser(uid); goal=u["cal_goal"] or 2000
     pct=min(100,int(cal/goal*100))
-    prods=get_products(uid)
-    text="🍽  <b>питание</b>\n\n🔥  <b>{} / {} ккал</b>\n{} {}%\n\n<i>{} продуктов в базе</i>".format(
-        cal,goal,cbar(pct,uid),pct,len(prods))
+    by_meal=today_cal_by_meal(uid)
+    lines=[]
+    for mk in ("breakfast","lunch","dinner","snack","other"):
+        if mk in by_meal:
+            kcal, cnt = by_meal[mk]
+            lines.append("{}  {}  —  <b>{} ккал</b>  <i>({} записей)</i>".format(mico(mk),mnam(mk),kcal,cnt))
+    meal_block="\n".join(lines) if lines else "<i>сегодня ничего не записано</i>"
+    text="🍽  <b>питание</b>\n\n<b>{} / {} ккал</b>  {}  {}%\n\n{}\n\n<i>выбери приём пищи чтобы добавить</i>".format(
+        cal,goal,cbar(pct,uid),pct,meal_block)
     return text, kb_nutrition()
+
+def scr_meal(uid, meal_type):
+    entries=cal_entries_by_meal(uid, meal_type)
+    total=sum(e["amount"] for e in entries)
+    ico=mico(meal_type); nam=mnam(meal_type)
+    if entries:
+        lines=[]
+        for e in entries:
+            t=datetime.fromisoformat(e["logged_at"]).strftime("%H:%M")
+            d="  {}".format(e["description"][:16]) if e["description"] else ""
+            lines.append("<code>{:5}  {} ккал{}</code>".format(t,e["amount"],d))
+        block="\n".join(lines)
+        total_s="\nитого: <b>{} ккал</b>".format(total)
+    else:
+        block="<i>пусто</i>"; total_s=""
+    text="{}  <b>{}</b>\n\n{}{}\n\n<i>выбери количество или введи своё:</i>".format(ico,nam,block,total_s)
+    return text, kb_meal(meal_type)
+
+def scr_food_diary(uid):
+    total=today_cal(uid); u=guser(uid); goal=u["cal_goal"] or 2000
+    pct=min(100,int(total/goal*100))
+    sections=[]
+    for mk in ("breakfast","lunch","dinner","snack","other"):
+        entries=cal_entries_by_meal(uid, mk)
+        if not entries: continue
+        meal_total=sum(e["amount"] for e in entries)
+        lines=[]
+        for e in entries:
+            t=datetime.fromisoformat(e["logged_at"]).strftime("%H:%M")
+            d="  {}".format(e["description"][:18]) if e["description"] else ""
+            lines.append("  {:5}  {} ккал{}".format(t,e["amount"],d))
+        sections.append("{}  <b>{}</b>  <i>{} ккал</i>\n{}".format(
+            mico(mk),mnam(mk),meal_total,"\n".join(lines)))
+    diary="\n\n".join(sections) if sections else "<i>сегодня записей нет</i>"
+    text="📓  <b>дневник питания</b>  <i>сегодня</i>\n\n{}\n\n<b>всего: {} / {} ккал</b>  {}  {}%".format(
+        diary,total,goal,cbar(pct,uid),pct)
+    return text, KB([("< питание","nutrition")])
 
 # ── ЭКРАН: БЫСТРЫЕ ПРОДУКТЫ ─────────────────────────────────────────
 def scr_quick_products(uid, page=0):
@@ -1619,18 +1701,37 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
     if data=="nutrition":
         t,m=scr_nutrition(uid); await s(t,m); return
 
-    # ── КАЛОРИИ ───────────────────────────────────────────────────
+    if data=="food_diary":
+        t,m=scr_food_diary(uid); await s(t,m); return
+
+    # приёмы пищи: meal_breakfast / meal_lunch / meal_dinner / meal_snack
+    if data.startswith("meal_"):
+        mt=data[5:]
+        if mt in MEALS:
+            t,m=scr_meal(uid,mt); await s(t,m); return
+
+    # быстрый лог в приём: mc_300_lunch
+    if data.startswith("mc_"):
+        parts_=data[3:].split("_",1)
+        if len(parts_)==2:
+            amount_s,mt=parts_
+            if amount_s=="custom":
+                await state.update_data(meal_type=mt)
+                await state.set_state(St.meal_cal)
+                await s("{}  <b>{}</b>\n\nвведи количество ккал:".format(mico(mt),mnam(mt)), kb_x("meal_{}".format(mt))); return
+            try:
+                amt=int(amount_s); log_cal(uid,amt,meal_type=mt)
+                t,m=scr_meal(uid,mt); await s("✓  +{} ккал\n\n".format(amt)+t,m)
+            except: pass
+        return
+
+    # ── КАЛОРИИ (legacy) ──────────────────────────────────────────
     if data=="calories":
-        t,m=scr_cal(uid); await s(t,m); return
-    _cm={"c100":100,"c200":200,"c300":300,"c500":500,"c700":700,"c1000":1000}
-    if data in _cm:
-        log_cal(uid,_cm[data]); t,m=scr_cal(uid); await s("+{} ккал\n\n".format(_cm[data])+t,m); return
-    if data=="cal_custom":
-        await state.set_state(St.calories); await s("введи количество ккал:",kb_x("calories")); return
+        t,m=scr_nutrition(uid); await s(t,m); return
     if data=="cal_goal_set":
         await state.set_state(St.cal_goal); await s("дневная цель (ккал):",kb_x("settings")); return
     if data=="cal_del":
-        del_last_cal(uid); t,m=scr_cal(uid); await s("↩ удалено\n\n"+t,m); return
+        del_last_cal(uid); t,m=scr_nutrition(uid); await s("↩ удалено\n\n"+t,m); return
 
     # ── ЦЕЛИ ──────────────────────────────────────────────────────
     if data=="goals":
@@ -2251,6 +2352,29 @@ async def fh_remind_report(msg: Message, state: FSMContext):
         await show(uid,state,"✅  отчёт {}  в {}\n\n".format(DAYS_RU[day],t_s)+t,m)
     except: await show(uid,state,"❌ формат: <code>09:00</code>",kb_x("reminders"))
 
+
+# ── FSM: ПРИЁМ ПИЩИ ─────────────────────────────────────────────────
+@dp.message(St.meal_cal)
+async def fh_meal_cal(msg: Message, state: FSMContext):
+    uid=msg.from_user.id; await _del(msg)
+    try:
+        cal=int(float(msg.text.replace(",","."))); assert 1<=cal<=9999
+        sd=await state.get_data(); mt=sd.get("meal_type","other")
+        await state.update_data(meal_cal_val=cal)
+        await state.set_state(St.meal_desc)
+        await show(uid,state,"{}  <b>{}</b>\n\n<b>{} ккал</b> — как называется блюдо?\n<i>(или отправь «-» чтобы пропустить)</i>".format(
+            mico(mt),mnam(mt),cal), kb_x("meal_{}".format(mt)))
+    except: await show(uid,state,"❌ введи число 1–9999",kb_x("nutrition"))
+
+@dp.message(St.meal_desc)
+async def fh_meal_desc(msg: Message, state: FSMContext):
+    uid=msg.from_user.id; await _del(msg)
+    sd=await state.get_data(); mt=sd.get("meal_type","other"); cal=sd.get("meal_cal_val",0)
+    desc="" if msg.text.strip()=="-" else msg.text.strip()[:40]
+    log_cal(uid,cal,desc=desc,meal_type=mt)
+    await state.set_state(None)
+    t,m=scr_meal(uid,mt)
+    await show(uid,state,"✓  +{} ккал  {}\n\n".format(cal,desc)+t,m)
 
 # ── FALLBACK ────────────────────────────────────────────────────────
 @dp.message(F.text)
