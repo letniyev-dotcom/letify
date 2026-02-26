@@ -7,7 +7,7 @@ try:    import aiogram
 except: _pip("aiogram")
 try:    import apscheduler
 except: _pip("apscheduler")
-try:    import zoneinfo; zoneinfo.ZoneInfo("UTC")
+try:    import zoneinfo; zoneinfo.ZoneInfo("Europe/Moscow")
 except: _pip("tzdata")
 
 import asyncio, logging, os, sqlite3, re, json, calendar as _cal_module
@@ -27,6 +27,23 @@ if not TOKEN:
 DB_PATH = "fitbot.db"
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
+
+# ── ЧАСОВОЙ ПОЯС ────────────────────────────────────────────────────
+# Бот всегда работает в московском времени (UTC+3)
+from zoneinfo import ZoneInfo
+TZ_MSK = ZoneInfo("Europe/Moscow")
+
+def now_msk() -> datetime:
+    """Текущее время в МСК (naive datetime для сравнения с хранимыми значениями)."""
+    return datetime.now(TZ_MSK).replace(tzinfo=None)
+
+def today_msk() -> dt_date:
+    """Текущая дата в МСК."""
+    return now_msk().date()
+
+def datetime_now_sql() -> str:
+    """Текущее datetime МСК в формате ISO для INSERT в БД."""
+    return now_msk().strftime("%Y-%m-%d %H:%M:%S")
 bot       = Bot(token=TOKEN)
 dp        = Dispatcher(storage=MemoryStorage())
 scheduler = AsyncIOScheduler()
@@ -108,6 +125,9 @@ class St(StatesGroup):
     remind_weight_time    = State()
     remind_report_time    = State()
     remind_report_day     = State()
+    # 👟 Шаги
+    steps_custom  = State()
+    steps_goal    = State()
 
 
 # ── ИНИЦИАЛИЗАЦИЯ БД ────────────────────────────────────────────────
@@ -126,16 +146,16 @@ def init_db():
         );
         CREATE TABLE IF NOT EXISTS weight_log (
             id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER,
-            weight REAL, logged_at TEXT DEFAULT (datetime('now'))
+            weight REAL, logged_at TEXT DEFAULT (datetime('now','+3 hours'))
         );
         CREATE TABLE IF NOT EXISTS water_log (
             id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER,
-            amount INTEGER, logged_at TEXT DEFAULT (datetime('now'))
+            amount INTEGER, logged_at TEXT DEFAULT (datetime('now','+3 hours'))
         );
         CREATE TABLE IF NOT EXISTS calories_log (
             id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER,
             amount INTEGER, description TEXT DEFAULT '',
-            logged_at TEXT DEFAULT (datetime('now'))
+            logged_at TEXT DEFAULT (datetime('now','+3 hours'))
         );
         CREATE TABLE IF NOT EXISTS activities (
             id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER,
@@ -155,7 +175,7 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER,
             hours REAL NOT NULL, quality INTEGER DEFAULT 3,
             note TEXT DEFAULT '',
-            logged_at TEXT DEFAULT (datetime('now'))
+            logged_at TEXT DEFAULT (datetime('now','+3 hours'))
         );
         CREATE TABLE IF NOT EXISTS quick_products (
             id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER,
@@ -178,6 +198,11 @@ def init_db():
             duration_planned INTEGER DEFAULT 30,
             is_active INTEGER DEFAULT 1
         );
+        CREATE TABLE IF NOT EXISTS steps_log (
+            id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER,
+            steps INTEGER, source TEXT DEFAULT 'manual',
+            logged_at TEXT DEFAULT (datetime('now','+3 hours'))
+        );
         """)
         # ── Миграции ─────────────────────────────────────────────────
         ex = {r[1] for r in c.execute("PRAGMA table_info(activities)")}
@@ -185,7 +210,7 @@ def init_db():
             if col not in ex:
                 c.execute("ALTER TABLE activities ADD COLUMN {} {}".format(col, defn))
         ux = {r[1] for r in c.execute("PRAGMA table_info(users)")}
-        for col, defn in [("cal_goal","INTEGER DEFAULT 2000"),("gender","TEXT DEFAULT 'male'")]:
+        for col, defn in [("cal_goal","INTEGER DEFAULT 2000"),("gender","TEXT DEFAULT 'male'"),("steps_goal","INTEGER DEFAULT 8000")]:
             if col not in ux:
                 c.execute("ALTER TABLE users ADD COLUMN {} {}".format(col, defn))
         rx = {r[1] for r in c.execute("PRAGMA table_info(reminders)")}
@@ -279,11 +304,11 @@ def del_last_water(uid):
         if r: c.execute("DELETE FROM water_log WHERE id=?", (r["id"],))
 
 def reset_water(uid):
-    with db() as c: c.execute("DELETE FROM water_log WHERE user_id=? AND date(logged_at)=date('now')", (uid,))
+    with db() as c: c.execute("DELETE FROM water_log WHERE user_id=? AND date(logged_at)=date('now','+3 hours')", (uid,))
 
 def today_water(uid):
     with db() as c:
-        r = c.execute("SELECT COALESCE(SUM(amount),0) t FROM water_log WHERE user_id=? AND date(logged_at)=date('now')", (uid,)).fetchone()
+        r = c.execute("SELECT COALESCE(SUM(amount),0) t FROM water_log WHERE user_id=? AND date(logged_at)=date('now','+3 hours')", (uid,)).fetchone()
         return r["t"] if r else 0
 
 def log_cal(uid, a, desc="", meal_type="other"):
@@ -292,14 +317,14 @@ def log_cal(uid, a, desc="", meal_type="other"):
 def today_cal_by_meal(uid):
     with db() as c:
         rows=c.execute(
-            "SELECT meal_type,SUM(amount) s,COUNT(*) n FROM calories_log WHERE user_id=? AND date(logged_at)=date('now') GROUP BY meal_type",
+            "SELECT meal_type,SUM(amount) s,COUNT(*) n FROM calories_log WHERE user_id=? AND date(logged_at)=date('now','+3 hours') GROUP BY meal_type",
             (uid,)).fetchall()
     return {r["meal_type"]:(r["s"],r["n"]) for r in rows}
 
 def cal_entries_by_meal(uid, meal_type):
     with db() as c:
         return c.execute(
-            "SELECT id,amount,description,logged_at FROM calories_log WHERE user_id=? AND meal_type=? AND date(logged_at)=date('now') ORDER BY logged_at",
+            "SELECT id,amount,description,logged_at FROM calories_log WHERE user_id=? AND meal_type=? AND date(logged_at)=date('now','+3 hours') ORDER BY logged_at",
             (uid, meal_type)).fetchall()
 
 def get_recent_products(uid, n=8):
@@ -341,7 +366,7 @@ def get_days_with_calories(uid, year, month):
 
 def mark_product_used(pid):
     with db() as c:
-        c.execute("UPDATE quick_products SET last_used=datetime('now') WHERE id=?", (pid,))
+        c.execute("UPDATE quick_products SET last_used=datetime('now','+3 hours') WHERE id=?", (pid,))
 
 def del_last_cal(uid):
     with db() as c:
@@ -349,11 +374,45 @@ def del_last_cal(uid):
         if r: c.execute("DELETE FROM calories_log WHERE id=?", (r["id"],))
 
 def reset_cal(uid):
-    with db() as c: c.execute("DELETE FROM calories_log WHERE user_id=? AND date(logged_at)=date('now')", (uid,))
+    with db() as c: c.execute("DELETE FROM calories_log WHERE user_id=? AND date(logged_at)=date('now','+3 hours')", (uid,))
+
+# ── HELPERS: ШАГИ ────────────────────────────────────────────────────
+def log_steps(uid, steps, source="manual"):
+    with db() as c:
+        # Если уже есть запись за сегодня — суммируем (обновляем последнюю)
+        r = c.execute(
+            "SELECT id FROM steps_log WHERE user_id=? AND date(logged_at)=date('now','+3 hours') AND source=? ORDER BY id DESC LIMIT 1",
+            (uid, source)).fetchone()
+        if r and source != "manual":
+            c.execute("UPDATE steps_log SET steps=? WHERE id=?", (steps, r["id"]))
+        else:
+            c.execute("INSERT INTO steps_log (user_id,steps,source) VALUES (?,?,?)", (uid, steps, source))
+
+def today_steps(uid):
+    with db() as c:
+        r = c.execute(
+            "SELECT COALESCE(SUM(steps),0) t FROM steps_log WHERE user_id=? AND date(logged_at)=date('now','+3 hours')",
+            (uid,)).fetchone()
+        return r["t"] if r else 0
+
+def steps_hist(uid, n=7):
+    with db() as c:
+        return c.execute(
+            "SELECT date(logged_at) d, SUM(steps) s FROM steps_log WHERE user_id=? GROUP BY date(logged_at) ORDER BY d DESC LIMIT ?",
+            (uid, n)).fetchall()
+
+def del_last_steps(uid):
+    with db() as c:
+        r = c.execute("SELECT id FROM steps_log WHERE user_id=? ORDER BY logged_at DESC LIMIT 1", (uid,)).fetchone()
+        if r: c.execute("DELETE FROM steps_log WHERE id=?", (r["id"],))
+
+def reset_steps(uid):
+    with db() as c:
+        c.execute("DELETE FROM steps_log WHERE user_id=? AND date(logged_at)=date('now','+3 hours')", (uid,))
 
 def today_cal(uid):
     with db() as c:
-        r = c.execute("SELECT COALESCE(SUM(amount),0) t FROM calories_log WHERE user_id=? AND date(logged_at)=date('now')", (uid,)).fetchone()
+        r = c.execute("SELECT COALESCE(SUM(amount),0) t FROM calories_log WHERE user_id=? AND date(logged_at)=date('now','+3 hours')", (uid,)).fetchone()
         return r["t"] if r else 0
 
 def water_streak(uid):
@@ -362,7 +421,7 @@ def water_streak(uid):
         rows = c.execute(
             "SELECT date(logged_at) d, SUM(amount) s FROM water_log WHERE user_id=? GROUP BY date(logged_at) ORDER BY date(logged_at) DESC",
             (uid,)).fetchall()
-    streak = 0; check = dt_date.today()
+    streak = 0; check = today_msk()
     for r in rows:
         d = dt_date.fromisoformat(r["d"])
         if d != check: break
@@ -390,11 +449,11 @@ def del_act(aid):
 
 def complete_act(aid):
     with db() as c:
-        c.execute("UPDATE activities SET completed=1,ended_at=datetime('now') WHERE id=?", (aid,))
+        c.execute("UPDATE activities SET completed=1,ended_at=datetime('now','+3 hours') WHERE id=?", (aid,))
 
 def start_act(aid):
     with db() as c:
-        c.execute("UPDATE activities SET started_at=datetime('now') WHERE id=?", (aid,))
+        c.execute("UPDATE activities SET started_at=datetime('now','+3 hours') WHERE id=?", (aid,))
 
 def acts_for_day(uid, check_date):
     dow = check_date.weekday(); ds = check_date.strftime("%Y-%m-%d")
@@ -419,7 +478,7 @@ def acts_for_day(uid, check_date):
     result.sort(key=lambda x: x["scheduled_at"]); return result
 
 def get_today_card_list(uid):
-    return [a["id"] for a in acts_for_day(uid, dt_date.today())]
+    return [a["id"] for a in acts_for_day(uid, today_msk())]
 
 def get_smart_card_idx(card_list):
     for i, aid in enumerate(card_list):
@@ -492,7 +551,7 @@ def get_all_users():
 def start_wt(uid, act_id, act_name, duration_planned=30):
     with db() as c:
         c.execute(
-            "INSERT OR REPLACE INTO workout_timers (user_id,act_id,act_name,started_at,duration_planned,is_active) VALUES (?,?,?,datetime('now'),?,1)",
+            "INSERT OR REPLACE INTO workout_timers (user_id,act_id,act_name,started_at,duration_planned,is_active) VALUES (?,?,?,datetime('now','+3 hours'),?,1)",
             (uid, act_id, act_name, duration_planned))
 
 def get_wt(uid):
@@ -607,14 +666,14 @@ def kb_x(d="main"):    return KB([("✕", d)])
 def kb_back(d="main"): return KB([("< назад", d)])
 
 def kb_main(uid):
-    acts  = acts_for_day(uid, dt_date.today())
+    acts  = acts_for_day(uid, today_msk())
     total = len(acts); done = sum(1 for a in acts if a.get("completed"))
     plan_label = "📋  план  {}/{}".format(done, total) if total else "📋  план"
     return KB(
         [(plan_label, "plan_cards")],
         [("⚖️", "weight"), ("💧", "water"), ("🍎", "nutrition")],
-        [("😴", "sleep"),  ("⏱️", "workout_timer"), ("📊", "progress")],
-        [("👤 профиль", "profile"), ("⚙️ настройки", "settings")],
+        [("😴", "sleep"),  ("👟", "steps"),  ("⏱️", "workout_timer")],
+        [("📊", "progress"), ("👤 профиль", "profile"), ("⚙️", "settings")],
     )
 
 def kb_weight():
@@ -737,7 +796,19 @@ def kb_sett_reset():
     return KB(
         [("💧 вода за день","reset_water"),   ("🔥 ккал за день","reset_cal")],
         [("⚖️ история веса","reset_weight"),  ("😴 история сна","reset_sleep")],
+        [("👟 шаги за день","reset_steps")],
         [("< настройки","settings")],
+    )
+
+def kb_steps(uid):
+    u = guser(uid); goal = (u["steps_goal"] if u else None) or 8000
+    return KB(
+        [("1 000","s1000"), ("3 000","s3000"), ("5 000","s5000"), ("7 000","s7000")],
+        [("8 000","s8000"), ("10 000","s10000"), ("12 000","s12000"), ("15 000","s15000")],
+        [("✏️ своё","steps_custom"), ("↩ удалить","steps_del")],
+        [("🎯 цель: {}".format(goal),"steps_goal_set"), ("📋 история","steps_hist")],
+        [("🔗 подключить приложение","steps_connect")],
+        [("< назад","main")],
     )
 
 def kb_days(sel: set):
@@ -857,8 +928,9 @@ def kb_qp_delete_mode(uid, page=0):
     for p in chunk:
         rows.append([B("🗑 {}".format(p["name"]), "qp_dodel_{}".format(p["id"]))])
     nav = []
-    if page > 0: nav.append(B("<","qpdm_{}".format(page-1)))
-    if page < total_p-1: nav.append(B(">","qpdm_{}".format(page+1)))
+    if page > 0: nav.append(B("←","qpdm_{}".format(page-1)))
+    nav.append(B("{} из {}".format(page+1, total_p), "noop"))
+    if page < total_p-1: nav.append(B("→","qpdm_{}".format(page+1)))
     if nav: rows.append(nav)
     rows.append([B("< назад","quick_products")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
@@ -911,7 +983,7 @@ def kb_diary_cal(uid, year, month):
         B(_MONTH_NAMES[next_m] + " →", "diary_cal_{}_{}".format(next_y, next_m)),
     ])
     rows.append([B(d,"noop") for d in ["пн","вт","ср","чт","пт","сб","вс"]])
-    today = dt_date.today()
+    today = today_msk()
     for week in _cal_module.monthcalendar(year, month):
         row = []
         for day in week:
@@ -951,7 +1023,7 @@ def kb_recent_products(uid, page=0):
 def kb_card(idx, card_list, aid):
     rows = []
     a = get_act(aid)
-    now = datetime.now()
+    now = now_msk()
     if a and not a.get("completed"):
         started = bool(a.get("started_at"))
         try:
@@ -983,7 +1055,7 @@ def build_card_text(uid, idx, card_list):
     a   = get_act(aid)
     if not a: return "❌ задача не найдена"
 
-    now       = datetime.now()
+    now       = now_msk()
     completed = bool(a.get("completed"))
     started   = bool(a.get("started_at")) and not completed
     remaining = sum(1 for c in card_list if not (get_act(c) or {}).get("completed"))
@@ -1043,7 +1115,7 @@ def scr_main(uid):
     lw=weight_hist(uid,1)
     w_s="{:.1f}".format(lw[0]["weight"]) if lw else "—"
     g_s="{:.1f}".format(u["goal_weight"]) if u["goal_weight"] else "—"
-    streak=water_streak(uid); now=datetime.now()
+    streak=water_streak(uid); now=now_msk()
     name=u["name"] or "привет"
 
     parts=["<b>{}</b>  <i>{}</i>".format(name,now.strftime("%d.%m  %H:%M")),""]
@@ -1068,7 +1140,16 @@ def scr_main(uid):
             parts.append("😴  <b>{:.1f}ч</b>  {}  {}".format(sl_h,quality_icon(sl_q),sbar(sl_q,uid)))
             parts.append("")
 
-    acts=acts_for_day(uid,dt_date.today())
+    # шаги
+    st_today = today_steps(uid)
+    if st_today:
+        st_goal = (u["steps_goal"] if u else None) or 8000
+        st_pct = min(100, int(st_today / st_goal * 100))
+        parts.append("👟  <b>{:,} / {:,} шагов</b>".format(st_today, st_goal))
+        parts.append(pbar(st_pct, 10, "🟩", "⬜") + "  {}%".format(st_pct))
+        parts.append("")
+
+    acts=acts_for_day(uid,today_msk())
     if acts:
         plan_lines=[]
         for a in acts:
@@ -1112,7 +1193,7 @@ def scr_weight(uid):
         if need>0 and abs(rate)>0.01:
             try:
                 days_left=int(need/abs(rate)*7)
-                eta_d=(dt_date.today()+timedelta(days=days_left)).strftime("%d.%m.%Y")
+                eta_d=(today_msk()+timedelta(days=days_left)).strftime("%d.%m.%Y")
                 forecast="\nпрогноз  <b>{}</b>".format(eta_d)
             except: pass
         prog="\n\n{} {}%{}{}".format(gbar(pct,uid),pct,rate_s,forecast)
@@ -1137,7 +1218,7 @@ def scr_water(uid):
     pct=min(100,int(today/goal*100)); streak=water_streak(uid)
     with db() as c:
         rows=c.execute(
-            "SELECT amount,logged_at FROM water_log WHERE user_id=? AND date(logged_at)=date('now') ORDER BY logged_at DESC LIMIT 10",
+            "SELECT amount,logged_at FROM water_log WHERE user_id=? AND date(logged_at)=date('now','+3 hours') ORDER BY logged_at DESC LIMIT 10",
             (uid,)).fetchall()
     text="💧  <b>вода</b>\n\n<b>{} / {} мл</b>{}\n{} {}%\n\n{}".format(
         today,goal,"  🔥{}д".format(streak) if streak>=2 else "",
@@ -1149,7 +1230,7 @@ def scr_cal(uid):
     pct=min(100,int(today/goal*100))
     with db() as c:
         rows=c.execute(
-            "SELECT amount,description,logged_at FROM calories_log WHERE user_id=? AND date(logged_at)=date('now') ORDER BY logged_at DESC LIMIT 10",
+            "SELECT amount,description,logged_at FROM calories_log WHERE user_id=? AND date(logged_at)=date('now','+3 hours') ORDER BY logged_at DESC LIMIT 10",
             (uid,)).fetchall()
     text="🔥  <b>калории</b>\n\n<b>{} / {} ккал</b>\n{} {}%\n\n{}".format(
         today,goal,cbar(pct,uid),pct,
@@ -1173,7 +1254,7 @@ def scr_goals(uid):
                 rate=abs(all_h[-1]["weight"]-all_h[0]["weight"])/days
                 if rate>0.001:
                     days_left=int(need/rate)
-                    eta_d=(dt_date.today()+timedelta(days=days_left)).strftime("%d.%m.%Y")
+                    eta_d=(today_msk()+timedelta(days=days_left)).strftime("%d.%m.%Y")
                     forecast_s="\nпри текущем темпе → <b>{}</b>".format(eta_d)
             except: pass
     tbl="старт    {}\nсейчас   {}\nцель     {}\nвода     {} мл/д\nккал     {} ккал/д".format(
@@ -1216,23 +1297,25 @@ def scr_progress(uid):
     with db() as c:
         ta=c.execute("SELECT COUNT(*) cnt FROM activities WHERE user_id=? AND completed=1",(uid,)).fetchone()["cnt"]
         tw=c.execute("SELECT COALESCE(SUM(amount),0) t FROM water_log WHERE user_id=?",(uid,)).fetchone()["t"]
-        w7=c.execute("SELECT COALESCE(SUM(amount),0) t FROM water_log WHERE user_id=? AND date(logged_at)>=date('now','-7 days')",(uid,)).fetchone()["t"]
-        c7=c.execute("SELECT COALESCE(SUM(amount),0) t FROM calories_log WHERE user_id=? AND date(logged_at)>=date('now','-7 days')",(uid,)).fetchone()["t"]
-        d7=c.execute("SELECT COUNT(DISTINCT date(logged_at)) cnt FROM water_log WHERE user_id=? AND date(logged_at)>=date('now','-7 days')",(uid,)).fetchone()["cnt"] or 1
-        sl=c.execute("SELECT AVG(hours) a FROM sleep_log WHERE user_id=? AND date(logged_at)>=date('now','-7 days')",(uid,)).fetchone()["a"]
+        w7=c.execute("SELECT COALESCE(SUM(amount),0) t FROM water_log WHERE user_id=? AND date(logged_at)>=date('now','+3 hours','-7 days')",(uid,)).fetchone()["t"]
+        c7=c.execute("SELECT COALESCE(SUM(amount),0) t FROM calories_log WHERE user_id=? AND date(logged_at)>=date('now','+3 hours','-7 days')",(uid,)).fetchone()["t"]
+        d7=c.execute("SELECT COUNT(DISTINCT date(logged_at)) cnt FROM water_log WHERE user_id=? AND date(logged_at)>=date('now','+3 hours','-7 days')",(uid,)).fetchone()["cnt"] or 1
+        sl=c.execute("SELECT AVG(hours) a FROM sleep_log WHERE user_id=? AND date(logged_at)>=date('now','+3 hours','-7 days')",(uid,)).fetchone()["a"]
+        st7=c.execute("SELECT COALESCE(SUM(steps),0) t FROM steps_log WHERE user_id=? AND date(logged_at)>=date('now','+3 hours','-7 days')",(uid,)).fetchone()["t"]
     streak=water_streak(uid)
     sleep_s="{:.1f}ч".format(sl) if sl else "—"
-    tbl="тренировок   {}\nвода всего   {:.1f} л\nсерия вода   {} дн\n─────────────────\nср вода/день {} мл\nср ккал/день {}\nср сон/ночь  {}".format(
-        ta,tw/1000,streak,w7//d7,c7//d7,sleep_s)
+    steps_s="{:,}".format(st7) if st7 else "—"
+    tbl="тренировок   {}\nвода всего   {:.1f} л\nсерия вода   {} дн\n─────────────────\nср вода/день {} мл\nср ккал/день {}\nср сон/ночь  {}\nшаги за 7д   {}".format(
+        ta,tw/1000,streak,w7//d7,c7//d7,sleep_s,steps_s)
     return "📊  <b>статистика</b>\n\n<code>{}</code>".format(tbl), kb_progress()
 
 def scr_week_stats(uid):
     with db() as c:
-        water7=c.execute("SELECT COALESCE(SUM(amount),0) t FROM water_log WHERE user_id=? AND date(logged_at)>=date('now','-7 days')",(uid,)).fetchone()["t"]
-        cal7=c.execute("SELECT COALESCE(SUM(amount),0) t FROM calories_log WHERE user_id=? AND date(logged_at)>=date('now','-7 days')",(uid,)).fetchone()["t"]
-        acts7=c.execute("SELECT COUNT(*) cnt FROM activities WHERE user_id=? AND completed=1 AND date(ended_at)>=date('now','-7 days')",(uid,)).fetchone()["cnt"]
-        sl7=c.execute("SELECT AVG(hours) a, COUNT(*) cnt FROM sleep_log WHERE user_id=? AND date(logged_at)>=date('now','-7 days')",(uid,)).fetchone()
-        lw=c.execute("SELECT weight FROM weight_log WHERE user_id=? AND date(logged_at)>=date('now','-7 days') ORDER BY logged_at",(uid,)).fetchall()
+        water7=c.execute("SELECT COALESCE(SUM(amount),0) t FROM water_log WHERE user_id=? AND date(logged_at)>=date('now','+3 hours','-7 days')",(uid,)).fetchone()["t"]
+        cal7=c.execute("SELECT COALESCE(SUM(amount),0) t FROM calories_log WHERE user_id=? AND date(logged_at)>=date('now','+3 hours','-7 days')",(uid,)).fetchone()["t"]
+        acts7=c.execute("SELECT COUNT(*) cnt FROM activities WHERE user_id=? AND completed=1 AND date(ended_at)>=date('now','+3 hours','-7 days')",(uid,)).fetchone()["cnt"]
+        sl7=c.execute("SELECT AVG(hours) a, COUNT(*) cnt FROM sleep_log WHERE user_id=? AND date(logged_at)>=date('now','+3 hours','-7 days')",(uid,)).fetchone()
+        lw=c.execute("SELECT weight FROM weight_log WHERE user_id=? AND date(logged_at)>=date('now','+3 hours','-7 days') ORDER BY logged_at",(uid,)).fetchall()
     u=guser(uid); wgoal=(u["water_goal"] or 2000)*7
     wp=min(100,int(water7/wgoal*100))
     wdelta=""
@@ -1243,7 +1326,7 @@ def scr_week_stats(uid):
     return "📅  <b>неделя</b>\n\n<code>{}</code>\n\n{} {}%".format(tbl,wbar(wp,uid),wp), KB([("< статистика","progress")])
 
 def scr_settings(uid):
-    acts=acts_for_day(uid,dt_date.today())
+    acts=acts_for_day(uid,today_msk())
     total=len(acts); done=sum(1 for a in acts if a.get("completed"))
     plan_s="нет задач" if not total else "{} из {} выполнено".format(done,total)
     return "⚙️  <b>настройки</b>\n\nплан сегодня: <i>{}</i>".format(plan_s), kb_settings()
@@ -1269,7 +1352,7 @@ def scr_sett_reset():
 
 def scr_plan_manage(uid, day_offset=0):
     day_offset=day_offset%7
-    today=dt_date.today()
+    today=today_msk()
     sel=today-timedelta(days=today.weekday())+timedelta(days=day_offset)
     acts=acts_for_day(uid,sel)
     dlabel="сегодня" if sel==today else "завтра" if sel==today+timedelta(days=1) else sel.strftime("%d.%m")
@@ -1295,8 +1378,8 @@ def scr_plan_manage(uid, day_offset=0):
     return text, kb
 
 def scr_plan_intro(uid):
-    acts=acts_for_day(uid,dt_date.today())
-    total=len(acts); done=sum(1 for a in acts if a.get("completed")); now=datetime.now()
+    acts=acts_for_day(uid,today_msk())
+    total=len(acts); done=sum(1 for a in acts if a.get("completed")); now=now_msk()
     if total==0:
         text="📋  <b>план на сегодня</b>\n\n<i>задач пока нет</i>\n\nдобавь через ⚙️ → управление планом"
         kb=KB([("⚙️ настройки","settings"),("< назад","main")])
@@ -1437,12 +1520,12 @@ def scr_food_meal(pid, grams):
 
 def scr_food_diary(uid, date_str=None):
     if date_str is None:
-        date_str = dt_date.today().isoformat()
+        date_str = today_msk().isoformat()
     try:
         d = dt_date.fromisoformat(date_str)
     except:
-        d = dt_date.today(); date_str = d.isoformat()
-    is_today = (d == dt_date.today())
+        d = today_msk(); date_str = d.isoformat()
+    is_today = (d == today_msk())
     date_label = "сегодня" if is_today else d.strftime("%d.%m.%Y")
     by_meal = today_cal_by_meal_for_date(uid, date_str)
     sections = []
@@ -1527,7 +1610,7 @@ def scr_workout_timer(uid):
         return "⏱  <b>таймер тренировки</b>\n\n<i>нет активной тренировки</i>\n\nзапусти таймер из карточки задачи", kb_workout_timer_empty()
     try:
         started=datetime.fromisoformat(wt["started_at"])
-        elapsed=int((datetime.now()-started).total_seconds()/60)
+        elapsed=int((now_msk()-started).total_seconds()/60)
         dur=wt["duration_planned"] or 30
         rem=dur-elapsed
         pct=min(100,int(elapsed/dur*100))
@@ -1568,6 +1651,54 @@ def scr_reminders(uid):
         "📅 отчёт {}  {}".format(en(rep),info_rep(rep)),
     ]
     return "🔔  <b>напоминания</b>\n\n<code>{}</code>".format("\n".join(lines)), kb_reminders(uid)
+
+
+def scr_steps(uid):
+    u = guser(uid); goal = (u["steps_goal"] if u else None) or 8000
+    today = today_steps(uid)
+    pct = min(100, int(today / goal * 100))
+    hist = steps_hist(uid, 7)
+    hist_lines = []
+    for r in hist:
+        d_s = r["d"]; s = r["s"]
+        try:
+            d = dt_date.fromisoformat(d_s)
+            label = "сегодня" if d == today_msk() else d.strftime("%d.%m")
+        except:
+            label = d_s
+        bar_w = min(10, int(s / goal * 10))
+        bar_s = "🟩" * bar_w + "⬜" * (10 - bar_w)
+        hist_lines.append("{:8s}  {:>6}  {}".format(label, s, bar_s))
+    hist_block = "<blockquote>{}</blockquote>".format("\n".join(hist_lines)) if hist_lines else "<i>нет данных</i>"
+    kcal_est = int(today * 0.04)  # ~0.04 ккал/шаг
+    km_est = round(today * 0.0007, 1)  # ~0.7 км / 1000 шагов
+    text = ("👟  <b>шаги</b>\n\n"
+            "<b>{:,} / {:,}</b> шагов\n"
+            "{} {}%\n\n"
+            "<code>~{} ккал  ·  ~{} км</code>\n\n"
+            "{}").format(
+        today, goal,
+        pbar(pct, 10, "🟩", "⬜"), pct,
+        kcal_est, km_est,
+        hist_block)
+    return text, kb_steps(uid)
+
+def scr_steps_connect():
+    text = ("🔗  <b>подключение шагомера</b>\n\n"
+            "Бот принимает шаги вручную или через автоматизацию.\n\n"
+            "<b>📱 Google Fit / Samsung Health / Apple Health:</b>\n"
+            "Используй <b>IFTTT</b> или <b>Tasker + HTTP Request</b>:\n\n"
+            "<code>POST https://api.telegram.org/bot{TOKEN}/sendMessage\n"
+            "chat_id=ВАШ_ID\n"
+            "text=/steps ЧИСЛО</code>\n\n"
+            "Или используй приложение <b>AutoSync for Google Fit</b> → IFTTT Applet → отправка команды боту.\n\n"
+            "<b>🤖 Пример IFTTT:</b>\n"
+            "If: Google Fit — Daily step goal achieved\n"
+            "Then: Send Telegram message <code>/steps {{StepCount}}</code>\n\n"
+            "<b>⌚ Garmin / Fitbit / Xiaomi Mi Band:</b>\n"
+            "Через IFTTT Webhooks → отправь боту <code>/steps ЧИСЛО</code>\n\n"
+            "<i>Или просто вводи шаги вручную каждый день 👇</i>")
+    return text, KB([("< назад","steps")])
 
 
 
@@ -1611,7 +1742,7 @@ async def save_act(uid, state, na):
     dur=na.get("duration",30); time_=na.get("time","00:00")
     name_=na.get("name",""); type_=na.get("type","other")
     tr=na.get("time_range",time_)
-    date_=dt_date.today().strftime("%Y-%m-%d") if rep else na.get("date",dt_date.today().strftime("%Y-%m-%d"))
+    date_=today_msk().strftime("%Y-%m-%d") if rep else na.get("date",today_msk().strftime("%Y-%m-%d"))
     sched="{} {}:00".format(date_,time_)
     add_act(uid,name_,type_,sched,dur,dow)
     reps=" · ".join(DAYS_RU[d] for d in rep) if rep else "одноразово"
@@ -1640,7 +1771,7 @@ async def tick_cards():
 
 # ── ПЛАНИРОВЩИК: НАПОМИНАНИЯ О ВОДЕ ────────────────────────────────
 async def check_water_reminders():
-    now=datetime.now()
+    now=now_msk()
     now_hm=now.strftime("%H:%M"); now_h=now.hour
     for uid in get_all_users():
         try:
@@ -1671,7 +1802,7 @@ async def check_water_reminders():
 
 # ── ПЛАНИРОВЩИК: НАПОМИНАНИЕ ВЗВЕСИТЬСЯ ────────────────────────────
 async def check_weight_reminders():
-    now=datetime.now(); now_hm=now.strftime("%H:%M")
+    now=now_msk(); now_hm=now.strftime("%H:%M")
     for uid in get_all_users():
         try:
             r=get_reminder(uid,"weight")
@@ -1682,7 +1813,7 @@ async def check_weight_reminders():
                 last_s=""
                 if lw:
                     ld=datetime.fromisoformat(lw[0]["logged_at"])
-                    if (datetime.now()-ld).days<1: continue  # уже взвешивался сегодня
+                    if (now_msk()-ld).days<1: continue  # уже взвешивался сегодня
                     last_s="\n<i>последний раз: {} ({} кг)</i>".format(
                         ld.strftime("%d.%m"),lw[0]["weight"])
                 await bot.send_message(
@@ -1695,7 +1826,7 @@ async def check_weight_reminders():
 
 # ── ПЛАНИРОВЩИК: ЕЖЕНЕДЕЛЬНЫЙ ОТЧЁТ ────────────────────────────────
 async def check_weekly_report():
-    now=datetime.now(); now_hm=now.strftime("%H:%M"); now_dow=now.weekday()
+    now=now_msk(); now_hm=now.strftime("%H:%M"); now_dow=now.weekday()
     for uid in get_all_users():
         try:
             r=get_reminder(uid,"report")
@@ -1705,12 +1836,12 @@ async def check_weekly_report():
             if now_dow!=rep_day or now_hm not in sch: continue
             # Собираем данные за неделю
             with db() as c:
-                water7=c.execute("SELECT COALESCE(SUM(amount),0) t FROM water_log WHERE user_id=? AND date(logged_at)>=date('now','-7 days')",(uid,)).fetchone()["t"]
-                cal7=c.execute("SELECT COALESCE(SUM(amount),0) t FROM calories_log WHERE user_id=? AND date(logged_at)>=date('now','-7 days')",(uid,)).fetchone()["t"]
-                d7=c.execute("SELECT COUNT(DISTINCT date(logged_at)) cnt FROM calories_log WHERE user_id=? AND date(logged_at)>=date('now','-7 days')",(uid,)).fetchone()["cnt"] or 1
-                acts7=c.execute("SELECT COUNT(*) cnt FROM activities WHERE user_id=? AND completed=1 AND date(ended_at)>=date('now','-7 days')",(uid,)).fetchone()["cnt"]
-                sl7=c.execute("SELECT AVG(hours) a FROM sleep_log WHERE user_id=? AND date(logged_at)>=date('now','-7 days')",(uid,)).fetchone()["a"]
-                lw7=c.execute("SELECT weight FROM weight_log WHERE user_id=? AND date(logged_at)>=date('now','-7 days') ORDER BY logged_at",(uid,)).fetchall()
+                water7=c.execute("SELECT COALESCE(SUM(amount),0) t FROM water_log WHERE user_id=? AND date(logged_at)>=date('now','+3 hours','-7 days')",(uid,)).fetchone()["t"]
+                cal7=c.execute("SELECT COALESCE(SUM(amount),0) t FROM calories_log WHERE user_id=? AND date(logged_at)>=date('now','+3 hours','-7 days')",(uid,)).fetchone()["t"]
+                d7=c.execute("SELECT COUNT(DISTINCT date(logged_at)) cnt FROM calories_log WHERE user_id=? AND date(logged_at)>=date('now','+3 hours','-7 days')",(uid,)).fetchone()["cnt"] or 1
+                acts7=c.execute("SELECT COUNT(*) cnt FROM activities WHERE user_id=? AND completed=1 AND date(ended_at)>=date('now','+3 hours','-7 days')",(uid,)).fetchone()["cnt"]
+                sl7=c.execute("SELECT AVG(hours) a FROM sleep_log WHERE user_id=? AND date(logged_at)>=date('now','+3 hours','-7 days')",(uid,)).fetchone()["a"]
+                lw7=c.execute("SELECT weight FROM weight_log WHERE user_id=? AND date(logged_at)>=date('now','+3 hours','-7 days') ORDER BY logged_at",(uid,)).fetchall()
             u=guser(uid); wgoal=(u["water_goal"] if u else 2000)*7
             wp=min(100,int(water7/wgoal*100))
             wdelta=""; wline=""
@@ -1718,8 +1849,8 @@ async def check_weekly_report():
                 wdelta="{:+.1f} кг".format(lw7[-1]["weight"]-lw7[0]["weight"])
                 wline="\n⚖️ вес за неделю  <b>{}</b>".format(wdelta)
             sleep_s="  ср. {:.1f}ч/ночь".format(sl7) if sl7 else ""
-            d_start=(dt_date.today()-timedelta(days=6)).strftime("%d.%m")
-            d_end=dt_date.today().strftime("%d.%m")
+            d_start=(today_msk()-timedelta(days=6)).strftime("%d.%m")
+            d_end=today_msk().strftime("%d.%m")
             text="📅  <b>отчёт  {} – {}</b>{}\n\n".format(d_start,d_end,wline)
             text+="💧 вода   {:.1f} / {:.1f} л  ({}%)\n".format(water7/1000,wgoal/1000,wp)
             text+="🔥 ккал   {} ккал  (ср. {}/день)\n".format(cal7,cal7//d7)
@@ -1884,7 +2015,7 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
         del_last_cal(uid); t,m=scr_food_diary(uid); await s("↩ удалено\n\n"+t,m); return
 
     if data=="food_diary_cal":
-        today=dt_date.today()
+        today=today_msk()
         await s("📅  <b>выбери день</b>\n\n<i>•  — есть записи</i>",
                 kb_diary_cal(uid,today.year,today.month)); return
 
@@ -2051,11 +2182,11 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
         cmd=data[6:]
         if cmd=="all":   sel=set(range(7))
         elif cmd=="none": sel=set()
-        elif cmd=="today": sel={dt_date.today().weekday()}
+        elif cmd=="today": sel={today_msk().weekday()}
         elif cmd=="save":
             if not sel:
                 await s("выбери хотя бы один день",kb_upload_days(sel)); return
-            today=dt_date.today(); dow=",".join(str(d) for d in sorted(sel)); saved=0
+            today=today_msk(); dow=",".join(str(d) for d in sorted(sel)); saved=0
             for task in tasks:
                 sched="{} {}:00".format(today.strftime("%Y-%m-%d"),task["time"])
                 add_act(uid,task["name"],task["type"],sched,task["duration"],dow); saved+=1
@@ -2142,6 +2273,36 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
     if data=="sleep_hist":
         t,m=scr_sleep_hist(uid); await s(t,m); return
 
+    # ── ШАГИ ──────────────────────────────────────────────────────
+    if data=="steps":
+        t,m=scr_steps(uid); await s(t,m); return
+
+    if data=="steps_del":
+        del_last_steps(uid); t,m=scr_steps(uid); await s("↩ удалено\n\n"+t,m); return
+
+    if data=="steps_hist":
+        t,m=scr_steps(uid); await s(t,m); return
+
+    if data=="steps_connect":
+        t,m=scr_steps_connect(); await s(t,m); return
+
+    if data=="steps_goal_set":
+        await state.set_state(St.steps_goal)
+        await s("🎯 введи дневную цель по шагам (например 8000 или 10000):", kb_x("steps")); return
+
+    if data=="steps_custom":
+        await state.set_state(St.steps_custom)
+        await s("👟 введи количество шагов:", kb_x("steps")); return
+
+    _sm = {"s1000":1000,"s3000":3000,"s5000":5000,"s7000":7000,
+           "s8000":8000,"s10000":10000,"s12000":12000,"s15000":15000}
+    if data in _sm:
+        log_steps(uid, _sm[data])
+        t,m=scr_steps(uid); await s("✅ +{:,} шагов\n\n".format(_sm[data])+t,m); return
+
+    if data=="reset_steps":
+        reset_steps(uid); await s("👟 шаги за день сброшены", kb_sett_reset()); return
+
     # ── БЫСТРЫЕ ПРОДУКТЫ ──────────────────────────────────────────
     if data=="quick_products":
         t,m=scr_quick_products(uid); await s(t,m); return
@@ -2164,12 +2325,16 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
         await s("➕  <b>новый продукт</b>\n\nшаг 1 — название:",kb_x("quick_products")); return
 
     if data=="qp_del_mode":
-        if not get_products(uid):
+        prods = get_products(uid)
+        if not prods:
             t,m=scr_quick_products(uid); await s("список пуст\n\n"+t,m); return
-        await s("🗑  <b>удалить продукт</b>\n\nвыбери:",kb_qp_delete_mode(uid)); return
+        ps=5; total_p=max(1,(len(prods)+ps-1)//ps)
+        await s("🗑  <b>удалить продукт</b>\n\nвыбери:  <i>стр. 1 из {}</i>".format(total_p),kb_qp_delete_mode(uid)); return
 
     if data.startswith("qpdm_"):
-        page=int(data[5:]); await s("🗑  <b>удалить продукт</b>\n\nвыбери:",kb_qp_delete_mode(uid,page)); return
+        page=int(data[5:])
+        prods = get_products(uid); ps=5; total_p=max(1,(len(prods)+ps-1)//ps)
+        await s("🗑  <b>удалить продукт</b>\n\nвыбери:  <i>стр. {} из {}</i>".format(page+1,total_p),kb_qp_delete_mode(uid,page)); return
 
     if data.startswith("qp_dodel_"):
         pid=int(data[9:]); del_product(pid)
@@ -2225,7 +2390,7 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
             complete_act(t["act_id"])
             stop_wt(uid)
             started=datetime.fromisoformat(t["started_at"])
-            elapsed=int((datetime.now()-started).total_seconds()/60)
+            elapsed=int((now_msk()-started).total_seconds()/60)
             await s("✅  <b>тренировка завершена!</b>\n\nвремя: <b>{}</b>".format(fmt_dur(elapsed)),
                 KB([("< назад","main")])); return
         t2,m=scr_main(uid); await s(t2,m); return
@@ -2418,7 +2583,7 @@ async def fh_an(msg: Message, state: FSMContext):
 async def fh_ad(msg: Message, state: FSMContext):
     uid=msg.from_user.id; await _del(msg)
     try:
-        tl=msg.text.strip().lower(); td=dt_date.today()
+        tl=msg.text.strip().lower(); td=today_msk()
         d=td if tl in ("сегодня","today") else \
           (td+timedelta(days=1) if tl in ("завтра","tomorrow") else \
            datetime.strptime(msg.text.strip(),"%d.%m.%Y").date())
@@ -2451,7 +2616,7 @@ async def fh_plan_num(msg: Message, state: FSMContext):
         t,m=scr_plan_manage(uid,off); await show(uid,state,t,m); return
     n=int(text)
     sd=await state.get_data(); off=sd.get("plan_day",0)
-    today=dt_date.today()
+    today=today_msk()
     sel=today-timedelta(days=today.weekday())+timedelta(days=off)
     acts=acts_for_day(uid,sel)
     if n<1 or n>len(acts):
@@ -2611,6 +2776,43 @@ async def fh_food_grams(msg: Message, state: FSMContext):
         await state.set_state(None)
         t,m=scr_food_meal(pid,grams); await show(uid,state,t,m)
     except: await show(uid,state,"❌ введи количество граммов (например 150)",kb_x("food_add"))
+
+# ── FSM: ШАГИ ────────────────────────────────────────────────────────
+@dp.message(St.steps_custom)
+async def fh_steps_custom(msg: Message, state: FSMContext):
+    uid=msg.from_user.id; await _del(msg)
+    try:
+        steps=int(float(msg.text.replace(",","."))); assert 1<=steps<=100000
+        log_steps(uid, steps)
+        await state.set_state(None)
+        t,m=scr_steps(uid)
+        await show(uid,state,"✅ +{:,} шагов\n\n".format(steps)+t,m)
+    except: await show(uid,state,"❌ введи число от 1 до 100000",kb_x("steps"))
+
+@dp.message(St.steps_goal)
+async def fh_steps_goal(msg: Message, state: FSMContext):
+    uid=msg.from_user.id; await _del(msg)
+    try:
+        goal=int(float(msg.text.replace(",","."))); assert 100<=goal<=100000
+        upd_user(uid, steps_goal=goal)
+        await state.set_state(None)
+        t,m=scr_steps(uid)
+        await show(uid,state,"🎯 цель: {:,} шагов\n\n".format(goal)+t,m)
+    except: await show(uid,state,"❌ введи число от 100 до 100000",kb_x("steps"))
+
+# ── /steps команда (для IFTTT/автоматизации) ─────────────────────────
+@dp.message(F.text.regexp(r'^/steps\s+\d+'))
+async def cmd_steps(msg: Message, state: FSMContext):
+    uid=msg.from_user.id
+    upsert(uid, msg.from_user.first_name or "")
+    await _del(msg)
+    try:
+        steps=int(msg.text.split()[1]); assert 1<=steps<=100000
+        log_steps(uid, steps, source="auto")
+        t,m=scr_steps(uid)
+        await show(uid,state,"✅  <b>+{:,} шагов</b> (авто)\n\n".format(steps)+t,m)
+    except:
+        await show(uid,state,"❌ формат: <code>/steps 8500</code>",kb_x("steps"))
 
 # ── FALLBACK ────────────────────────────────────────────────────────
 @dp.message(F.text)
