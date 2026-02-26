@@ -849,7 +849,7 @@ def kb_sleep_quality(hours_str):
 
 # ── Клавиатура быстрых продуктов ────────────────────────────────────
 def kb_quick_products(uid, page=0):
-    prods = get_products(uid); ps = 5
+    prods = get_products(uid); ps = 4
     total_p = max(1,(len(prods)+ps-1)//ps)
     page = max(0,min(page,total_p-1))
     chunk = prods[page*ps:(page+1)*ps]
@@ -866,7 +866,7 @@ def kb_quick_products(uid, page=0):
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
 def kb_qp_delete_mode(uid, page=0):
-    prods = get_products(uid); ps = 5
+    prods = get_products(uid); ps = 4
     total_p = max(1,(len(prods)+ps-1)//ps)
     page = max(0,min(page,total_p-1))
     chunk = prods[page*ps:(page+1)*ps]
@@ -875,8 +875,9 @@ def kb_qp_delete_mode(uid, page=0):
         rows.append([B("🗑 {}".format(p["name"]), "qp_dodel_{}".format(p["id"]))])
     nav = []
     if page > 0: nav.append(B("<","qpdm_{}".format(page-1)))
+    nav.append(B("{}/{}".format(page+1,total_p),"noop"))
     if page < total_p-1: nav.append(B(">","qpdm_{}".format(page+1)))
-    if nav: rows.append(nav)
+    rows.append(nav)
     rows.append([B("< назад","quick_products")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
@@ -1486,7 +1487,7 @@ def scr_food_diary(uid, date_str=None):
 
 # ── ЭКРАН: БЫСТРЫЕ ПРОДУКТЫ ─────────────────────────────────────────
 def scr_quick_products(uid, page=0):
-    prods = get_products(uid); ps = 5
+    prods = get_products(uid); ps = 4
     total_p = max(1,(len(prods)+ps-1)//ps)
     page = max(0,min(page,total_p-1))
     chunk = prods[page*ps:(page+1)*ps]
@@ -1496,10 +1497,11 @@ def scr_quick_products(uid, page=0):
             i, p["name"], p["calories"],
             round(p["protein"],1), round(p["fat"],1), round(p["carbs"],1)))
     page_s = "  <i>стр. {}/{}</i>".format(page+1,total_p) if total_p > 1 else ""
-    products_text = "\n".join(lines) if lines else "<i>нет продуктов</i>"
-    text = ("🍎  <b>быстрые продукты</b>  <i>{} шт</i>{}\n\n"
+    products_block = "<blockquote expandable>{}</blockquote>".format(
+        "\n".join(lines)) if lines else "<i>нет продуктов</i>"
+    text = ("🍎  <b>быстрые продукты</b>  <i>{} шт</i>  стр. {}/{}\n\n"
             "{}\n\n"
-            "<i>нажми → логировать  ·  КБЖУ на 100г</i>").format(len(prods), page_s, products_text)
+            "<i>нажми → логировать  ·  КБЖУ на 100г</i>").format(len(prods), page+1, total_p, products_block)
     return text, kb_quick_products(uid, page)
 
 # ── ЭКРАН: НЕДАВНИЕ ПРОДУКТЫ ──────────────────────────────────────────
@@ -2183,10 +2185,14 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
     if data=="qp_del_mode":
         if not get_products(uid):
             t,m=scr_quick_products(uid); await s("список пуст\n\n"+t,m); return
-        await s("🗑  <b>удалить продукт</b>\n\nвыбери:",kb_qp_delete_mode(uid)); return
+        prods=get_products(uid); total_p=max(1,(len(prods)+3)//4)
+        await s("🗑  <b>удалить продукт</b>\n\nвыбери:  <i>стр. 1/{}</i>".format(total_p),kb_qp_delete_mode(uid)); return
 
     if data.startswith("qpdm_"):
-        page=int(data[5:]); await s("🗑  <b>удалить продукт</b>\n\nвыбери:",kb_qp_delete_mode(uid,page)); return
+        page=int(data[5:])
+        prods=get_products(uid); total_p=max(1,(len(prods)+3)//4)
+        page=max(0,min(page,total_p-1))
+        await s("🗑  <b>удалить продукт</b>\n\nвыбери:  <i>стр. {}/{}</i>".format(page+1,total_p),kb_qp_delete_mode(uid,page)); return
 
     if data.startswith("qp_dodel_"):
         pid=int(data[9:]); del_product(pid)
