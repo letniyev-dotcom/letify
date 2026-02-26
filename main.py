@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""fitbot v8 — google fit автосинхронизация через настройки"""
+"""fitbot v9 — google fit полная синхронизация + улучшенные форматы"""
 
 import subprocess, sys
 def _pip(pkg): subprocess.check_call([sys.executable,"-m","pip","install",pkg,"-q"])
@@ -46,6 +46,7 @@ GFIT_SCOPES = " ".join([
     "https://www.googleapis.com/auth/fitness.activity.read",
     "https://www.googleapis.com/auth/fitness.body.read",
     "https://www.googleapis.com/auth/fitness.nutrition.read",
+    "https://www.googleapis.com/auth/fitness.sleep.read",
 ])
 GFIT_AUTH_URL   = "https://accounts.google.com/o/oauth2/v2/auth"
 GFIT_TOKEN_URL  = "https://oauth2.googleapis.com/token"
@@ -254,6 +255,8 @@ def init_db():
             c.execute("ALTER TABLE user_settings ADD COLUMN show_sleep INTEGER DEFAULT 1")
         if "bar_style" not in sx:
             c.execute("ALTER TABLE user_settings ADD COLUMN bar_style INTEGER DEFAULT 0")
+        if "show_steps" not in sx:
+            c.execute("ALTER TABLE user_settings ADD COLUMN show_steps INTEGER DEFAULT 1")
         cx = {r[1] for r in c.execute("PRAGMA table_info(calories_log)")}
         if "meal_type" not in cx:
             c.execute("ALTER TABLE calories_log ADD COLUMN meal_type TEXT DEFAULT 'other'")
@@ -443,6 +446,13 @@ def reset_steps(uid):
     with db() as c:
         c.execute("DELETE FROM steps_log WHERE user_id=? AND date(logged_at)=date('now','+3 hours')", (uid,))
 
+def steps_entries_today(uid):
+    """Все записи шагов за сегодня (индивидуальные строки для отображения +X)."""
+    with db() as c:
+        return c.execute(
+            "SELECT steps, source, logged_at FROM steps_log WHERE user_id=? AND date(logged_at)=date('now','+3 hours') ORDER BY logged_at DESC",
+            (uid,)).fetchall()
+
 # ── HELPERS: GOOGLE FIT ──────────────────────────────────────────────
 import secrets as _secrets
 
@@ -626,12 +636,34 @@ def gfit_sync(uid):
     except Exception as e:
         log.warning("gfit nutrition uid=%s: %s", uid, e)
 
+    # ── Сон ──
+    try:
+        body = {"aggregateBy":[{"dataTypeName":"com.google.sleep.segment"}],
+                "bucketByTime":{"durationMillis": 86400000},
+                "startTimeMillis": start_ms, "endTimeMillis": end_ms}
+        r = requests.post(GFIT_API_BASE+"/dataset:aggregate", json=body, headers=headers, timeout=10)
+        buckets = r.json().get("bucket", [])
+        sleep_ms = 0
+        for b in buckets:
+            for ds in b.get("dataset", []):
+                for pt in ds.get("point", []):
+                    # type 72 = SLEEP_LIGHT, 73 = SLEEP_DEEP, 74 = SLEEP_REM, 112 = SLEEP (generic)
+                    seg_type = pt.get("value", [{}])[0].get("intVal", 0) if pt.get("value") else 0
+                    if seg_type in (72, 73, 74, 112):
+                        t_start = int(pt.get("startTimeNanos", 0)) // 1_000_000
+                        t_end   = int(pt.get("endTimeNanos",   0)) // 1_000_000
+                        sleep_ms += max(0, t_end - t_start)
+        if sleep_ms > 0:
+            result["sleep_hours"] = round(sleep_ms / 3_600_000, 1)
+    except Exception as e:
+        log.warning("gfit sleep uid=%s: %s", uid, e)
+
     # ── Применяем данные ──
     applied = []
 
     if result.get("steps", 0) > 0:
         log_steps(uid, result["steps"], source="gfit")
-        applied.append("👟 {} шагов".format(result["steps"]))
+        applied.append("👟 {:,} шагов".format(result["steps"]))
 
     if result.get("kcal_burned", 0) > 0:
         applied.append("🔥 сожжено ~{} ккал".format(result["kcal_burned"]))
@@ -643,6 +675,10 @@ def gfit_sync(uid):
     if result.get("food_kcal", 0) > 0:
         log_cal(uid, result["food_kcal"], desc="google fit (питание)", meal_type="other")
         applied.append("🍽 {} ккал из еды".format(result["food_kcal"]))
+
+    if result.get("sleep_hours", 0) > 0.5:
+        log_sleep(uid, result["sleep_hours"], quality=3, note="google fit")
+        applied.append("😴 {:.1f}ч сна".format(result["sleep_hours"]))
 
     if result.get("activities"):
         for act in result["activities"]:
@@ -1012,16 +1048,17 @@ def kb_progress():
     )
 
 def kb_settings(uid=None):
-    rows = [
+    rows = []
+    if GFIT_ENABLED:
+        if uid and gfit_is_connected(uid):
+            rows.append([B("🔗 google fit  ✅  синхронизировать","gfit_settings")])
+        else:
+            rows.append([B("🔗 подключить google fit","gfit_settings")])
+    rows += [
         [B("📋 план",        "plan_manage"),      B("📤 загрузить план","plan_upload_start")],
         [B("🎯 цели и нормы","goals"),            B("🔔 напоминания",   "reminders")],
         [B("🏠 экран",       "sett_display"),     B("🗑 сбросить",      "sett_reset")],
     ]
-    if GFIT_ENABLED:
-        if uid and gfit_is_connected(uid):
-            rows.append([B("🔗 google fit  ✅","gfit_settings")])
-        else:
-            rows.append([B("🔗 подключить google fit","gfit_settings")])
     rows.append([B("< меню","main")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
@@ -1030,13 +1067,15 @@ def kb_sett_display(uid):
     def ch(v): return "✅" if v else "☐"
     sl=s["show_sleep"] if "show_sleep" in s.keys() else 1
     bs=s["bar_style"]  if "bar_style"  in s.keys() else 0
+    ss=s["show_steps"] if "show_steps" in s.keys() else 1
     bar_lbl="[██░░] блочная" if bs else "🟩⬜ эмодзи"
     return KB(
         [("{} ⚖️ вес".format(ch(s["show_weight"])),      "stog_weight"),
          ("{} 💧 вода".format(ch(s["show_water"])),      "stog_water")],
         [("{} 🔥 калории".format(ch(s["show_calories"])), "stog_calories"),
          ("{} 😴 сон".format(ch(sl)),                    "stog_sleep")],
-        [("{} полоса: {}".format(ch(bs),bar_lbl),        "stog_bar_style")],
+        [("{} 👟 шаги".format(ch(ss)),                   "stog_steps"),
+         ("{} полоса: {}".format(ch(bs),bar_lbl),        "stog_bar_style")],
         [("< настройки","settings")],
     )
 
@@ -1384,12 +1423,13 @@ def scr_main(uid):
             parts.append("")
 
     # шаги
-    st_today = today_steps(uid)
-    if st_today:
+    sh_steps = s["show_steps"] if "show_steps" in s.keys() else 1
+    if sh_steps:
+        st_today = today_steps(uid)
         st_goal = (u["steps_goal"] if u else None) or 8000
         st_pct = min(100, int(st_today / st_goal * 100))
         parts.append("👟  <b>{:,} / {:,} шагов</b>".format(st_today, st_goal))
-        parts.append(pbar(st_pct, 10, "🟩", "⬜") + "  {}%".format(st_pct))
+        parts.append(gbar(st_pct, uid) + "  {}%".format(st_pct))
         parts.append("")
 
     acts=acts_for_day(uid,today_msk())
@@ -1580,12 +1620,14 @@ def scr_sett_display(uid):
     def ch(v): return "✅" if v else "☐"
     sl=s["show_sleep"] if "show_sleep" in s.keys() else 1
     bs=s["bar_style"]  if "bar_style"  in s.keys() else 0
+    ss=s["show_steps"] if "show_steps" in s.keys() else 1
     bar_lbl="[██░░] блочная" if bs else "🟩⬜ эмодзи"
     lines=[
         "{} ⚖️ вес".format(ch(s["show_weight"])),
         "{} 💧 вода".format(ch(s["show_water"])),
         "{} 🔥 калории".format(ch(s["show_calories"])),
         "{} 😴 сон".format(ch(sl)),
+        "{} 👟 шаги".format(ch(ss)),
         "",
         "{} полоса: {}".format(ch(bs),bar_lbl),
     ]
@@ -1901,30 +1943,26 @@ def scr_steps(uid):
     u = guser(uid); goal = (u["steps_goal"] if u else None) or 8000
     today = today_steps(uid)
     pct = min(100, int(today / goal * 100))
-    hist = steps_hist(uid, 7)
-    hist_lines = []
-    for r in hist:
-        d_s = r["d"]; sv = r["s"]
-        try:
-            d = dt_date.fromisoformat(d_s)
-            label = "сегодня" if d == today_msk() else d.strftime("%d.%m")
-        except:
-            label = d_s
-        bar_w = min(10, int(sv / goal * 10))
-        bar_s = "🟩" * bar_w + "⬜" * (10 - bar_w)
-        hist_lines.append("{:8s}  {:>6}  {}".format(label, sv, bar_s))
-    hist_block = "<blockquote>{}</blockquote>".format("\n".join(hist_lines)) if hist_lines else "<i>нет данных</i>"
     kcal_est = int(today * 0.04)
     km_est = round(today * 0.0007, 1)
     gfit_s = ""
     if GFIT_ENABLED and gfit_is_connected(uid):
         gfit_s = "  <i>🔗 google fit</i>"
+    # Записи за сегодня → "+X" в свёрнутом блоке
+    entries = steps_entries_today(uid)
+    if entries:
+        entry_lines = []
+        for e in entries:
+            src_s = "  <i>gfit</i>" if e["source"] == "gfit" else ""
+            entry_lines.append("+{:,}{}".format(e["steps"], src_s))
+        hist_block = "\n\n<blockquote expandable>{}</blockquote>".format("\n".join(entry_lines))
+    else:
+        hist_block = ""
     hint = "\n\n<i>отправь число — запишу шаги</i>" if not today else ""
     text = ("👟  <b>шаги</b>{}\n\n"
             "<b>{:,} / {:,}</b>  шагов\n"
             "{} {}%\n\n"
-            "<code>~{} ккал сожжено  ·  ~{} км</code>\n\n"
-            "{}{}").format(
+            "<code>~{} ккал сожжено  ·  ~{} км</code>{}{}").format(
         gfit_s, today, goal,
         pbar(pct, 10, "🟩", "⬜"), pct,
         kcal_est, km_est, hist_block, hint)
@@ -1965,7 +2003,8 @@ def scr_gfit_connect(uid):
         "  🔥 сожжённые калории\n"
         "  🍽 питание\n"
         "  💪 тренировки и активности\n"
-        "  ⚖️ вес\n\n"
+        "  ⚖️ вес\n"
+        "  😴 сон\n\n"
         "<i>данные за сегодня загрузятся сразу после подключения</i>"
     )
     kb = InlineKeyboardMarkup(inline_keyboard=[
@@ -1985,7 +2024,7 @@ def scr_gfit_status(uid):
         "🔗  <b>google fit</b>  ✅ подключён\n\n"
         "<i>подключено: {}</i>\n\n"
         "синхронизируется автоматически каждый час:\n"
-        "  👟 шаги · 🔥 калории · 💪 тренировки · ⚖️ вес · 🍽 питание\n\n"
+        "  👟 шаги · 🔥 калории · 💪 тренировки · ⚖️ вес · 🍽 питание · 😴 сон\n\n"
         "<i>нажми «синхронизировать» для немедленного обновления</i>"
     ).format(connected_at)
     return text, KB(
@@ -2437,7 +2476,7 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
         reset_sleep(uid); await s("😴 история сна сброшена",kb_sett_reset()); return
 
     _tog={"stog_weight":"show_weight","stog_water":"show_water","stog_calories":"show_calories",
-           "stog_sleep":"show_sleep","stog_bar_style":"bar_style"}
+           "stog_sleep":"show_sleep","stog_bar_style":"bar_style","stog_steps":"show_steps"}
     if data in _tog:
         toggle_sett(uid,_tog[data]); t,m=scr_sett_display(uid); await s(t,m); return
 
