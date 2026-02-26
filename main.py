@@ -1599,6 +1599,7 @@ async def safe_del(cid, mid):
     except: pass
 
 async def show(uid, state, text, markup):
+    if len(text) > 4000: text = text[:3997] + "…"
     data=await state.get_data(); mid=data.get("msg_id")
     if mid:
         try:
@@ -1904,7 +1905,8 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
 
     if data=="food_diary_cal":
         today=today_msk()
-        await s("📅  <b>выбери день</b>\n\n<i>•  — есть записи</i>",
+        month_label="{} {}".format(_MONTH_NAMES[today.month],today.year)
+        await s("📅  <b>выбери день</b>  <i>{}</i>\n\n<i>•  — есть записи</i>".format(month_label),
                 kb_diary_cal(uid,today.year,today.month)); return
 
     if data.startswith("diary_cal_"):
@@ -1912,7 +1914,8 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
         if len(parts_)==2:
             try:
                 y,m_=int(parts_[0]),int(parts_[1])
-                await s("📅  <b>выбери день</b>\n\n<i>•  — есть записи</i>",
+                month_label="{} {}".format(_MONTH_NAMES[m_],y)
+                await s("📅  <b>выбери день</b>  <i>{}</i>\n\n<i>•  — есть записи</i>".format(month_label),
                         kb_diary_cal(uid,y,m_)); return
             except: pass
         t,m=scr_food_diary(uid); await s(t,m); return
