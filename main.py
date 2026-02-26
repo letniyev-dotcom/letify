@@ -38,13 +38,25 @@ log = logging.getLogger(__name__)
 # ── GOOGLE FIT ───────────────────────────────────────────────────────
 GFIT_CLIENT_ID     = os.environ.get("GFIT_CLIENT_ID", "")
 GFIT_CLIENT_SECRET = os.environ.get("GFIT_CLIENT_SECRET", "")
-# Loopback URI — для "Desktop app" в Google Cloud, пользователь копирует URL вручную.
-# Если нужен публичный callback-сервер — укажи свой URL в GFIT_REDIRECT_URI.
-GFIT_REDIRECT_URI  = os.environ.get("GFIT_REDIRECT_URI", "http://localhost/")
 GFIT_PORT          = int(os.environ.get("GFIT_PORT", "8080"))
 GFIT_ENABLED       = bool(GFIT_CLIENT_ID and GFIT_CLIENT_SECRET)
-# Запускать aiohttp callback-сервер только если redirect — не localhost
-GFIT_USE_SERVER    = GFIT_ENABLED and not GFIT_REDIRECT_URI.startswith("http://localhost")
+
+def _detect_public_url():
+    """Автоматически определяем публичный IP/URL для callback."""
+    custom = os.environ.get("GFIT_REDIRECT_URI", "")
+    if custom:
+        return custom.rstrip("/")
+    # Пробуем получить публичный IP
+    for svc in ("https://api.ipify.org", "https://ifconfig.me/ip", "https://icanhazip.com"):
+        try:
+            import urllib.request as _ur
+            ip = _ur.urlopen(svc, timeout=4).read().decode().strip()
+            if ip:
+                return "http://{}:{}/gfit/callback".format(ip, GFIT_PORT)
+        except: pass
+    return "http://localhost:{}/gfit/callback".format(GFIT_PORT)
+
+GFIT_REDIRECT_URI = _detect_public_url() if GFIT_ENABLED else ""
 
 GFIT_SCOPES = " ".join([
     "https://www.googleapis.com/auth/fitness.activity.read",
@@ -156,8 +168,7 @@ class St(StatesGroup):
     remind_report_day     = State()
     # 👟 шаги
     steps_goal    = State()
-    # 🔗 google fit
-    gfit_code     = State()
+
 
 
 # ── ИНИЦИАЛИЗАЦИЯ БД ────────────────────────────────────────────────
@@ -1981,17 +1992,16 @@ def scr_gfit_settings(uid):
     if not GFIT_ENABLED:
         return (
             "🔗  <b>google fit</b>\n\n"
-            "<b>шаг 1</b> — создай проект в Google Cloud\n"
-            "<a href=\"https://console.cloud.google.com/\">console.cloud.google.com</a>\n\n"
-            "<b>шаг 2</b> — включи <b>Fitness API</b>\n"
-            "APIs & Services → Library → поиск «Fitness API» → Enable\n\n"
-            "<b>шаг 3</b> — OAuth consent screen\n"
-            "External → добавь test users (свой gmail)\n\n"
-            "<b>шаг 4</b> — создай credentials\n"
-            "Credentials → Create → <b>OAuth client ID</b> → тип: <b>Desktop app</b>\n\n"
-            "<b>шаг 5</b> — скопируй Client ID и Client Secret и задай:\n"
-            "<code>GFIT_CLIENT_ID=...\nGFIT_CLIENT_SECRET=...</code>\n\n"
-            "<i>redirect_uri настраивать не нужно — используется localhost</i>",
+            "⚙️  <b>настройка для владельца бота</b>\n\n"
+            "<b>1.</b> <a href=\"https://console.cloud.google.com/\">Google Cloud Console</a> → новый проект\n"
+            "<b>2.</b> APIs & Services → Library → <b>Fitness API</b> → Enable\n"
+            "<b>3.</b> OAuth consent screen → External → добавь аккаунты в Test users\n"
+            "<b>4.</b> Credentials → Create OAuth client ID → тип: <b>Web application</b>\n"
+            "   Authorized redirect URI: <code>http://ВАШ_IP:{}/gfit/callback</code>\n"
+            "<b>5.</b> Задай переменные окружения:\n"
+            "<code>GFIT_CLIENT_ID=ваш_client_id\n"
+            "GFIT_CLIENT_SECRET=ваш_secret</code>\n\n"
+            "<i>Бот сам определит свой публичный IP и запустит callback-сервер</i>".format(GFIT_PORT),
             KB([("< настройки","settings")])
         )
     if not gfit_is_connected(uid):
@@ -1999,7 +2009,7 @@ def scr_gfit_settings(uid):
     return scr_gfit_status(uid)
 
 def scr_gfit_connect(uid):
-    state = gfit_make_state(uid)
+    state_tok = gfit_make_state(uid)
     params = {
         "client_id":     GFIT_CLIENT_ID,
         "redirect_uri":  GFIT_REDIRECT_URI,
@@ -2007,38 +2017,21 @@ def scr_gfit_connect(uid):
         "scope":         GFIT_SCOPES,
         "access_type":   "offline",
         "prompt":        "consent",
-        "state":         state,
+        "state":         state_tok,
     }
     url = GFIT_AUTH_URL + "?" + urlencode(params)
-
-    if GFIT_USE_SERVER:
-        # публичный сервер — редирект автоматический
-        text = (
-            "🔗  <b>подключение google fit</b>\n\n"
-            "нажми кнопку ниже и войди в google — подключение произойдёт автоматически.\n\n"
-            "что синхронизируется:\n"
-            "  👟 шаги · 🔥 калории · 💪 тренировки · ⚖️ вес · 🍽 питание · 😴 сон"
-        )
-        kb = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="🔗 войти через google", url=url)],
-            [B("< настройки","settings")],
-        ])
-    else:
-        # loopback flow — пользователь копирует URL вручную
-        text = (
-            "🔗  <b>подключение google fit</b>\n\n"
-            "<b>шаг 1</b> — нажми кнопку ниже и войди в Google\n\n"
-            "<b>шаг 2</b> — после входа браузер откроет страницу\n"
-            "<i>«Этот сайт недоступен»</i> — это нормально!\n\n"
-            "<b>шаг 3</b> — скопируй <b>полный URL</b> из адресной строки браузера "
-            "(начинается с <code>http://localhost/...</code>) и отправь его сюда в чат\n\n"
-            "что синхронизируется:\n"
-            "  👟 шаги · 🔥 калории · 💪 тренировки · ⚖️ вес · 🍽 питание · 😴 сон"
-        )
-        kb = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="🔗 шаг 1 — войти через google", url=url)],
-            [B("✕ отмена","settings")],
-        ])
+    text = (
+        "🔗  <b>подключение google fit</b>\n\n"
+        "нажми кнопку, войди в Google и разреши доступ — "
+        "бот подключится автоматически 🎉\n\n"
+        "что будет синхронизироваться каждый час:\n"
+        "  👟 шаги · 🔥 калории · ⚖️ вес\n"
+        "  🍽 питание · 💪 тренировки · 😴 сон"
+    )
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="🔗 войти через Google", url=url)],
+        [B("< настройки","settings")],
+    ])
     return text, kb
 
 def scr_gfit_status(uid):
@@ -2647,13 +2640,8 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
 
     # ── GOOGLE FIT ────────────────────────────────────────────────
     if data=="gfit_settings":
-        t,m=scr_gfit_settings(uid)
-        # если loopback flow — ждём URL от пользователя
-        if GFIT_ENABLED and not GFIT_USE_SERVER and not gfit_is_connected(uid):
-            await state.set_state(St.gfit_code)
-        else:
-            await state.set_state(None)
-        await s(t,m); return
+        await state.set_state(None)
+        t,m=scr_gfit_settings(uid); await s(t,m); return
 
     if data=="gfit_connect":
         t,m=scr_gfit_connect(uid); await s(t,m); return
@@ -2663,7 +2651,6 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
 
     if data=="gfit_disconnect":
         gfit_disconnect(uid)
-        await state.set_state(None)
         t,m=scr_settings(uid); await s("🔌 google fit отключён\n\n"+t,m); return
 
     if data=="gfit_sync":
@@ -3160,82 +3147,6 @@ async def fh_food_grams(msg: Message, state: FSMContext):
         t,m=scr_food_meal(pid,grams); await show(uid,state,t,m)
     except: await show(uid,state,"❌ введи количество граммов (например 150)",kb_x("food_add"))
 
-# ── FSM: GOOGLE FIT CODE ─────────────────────────────────────────────
-@dp.message(St.gfit_code)
-async def fh_gfit_code(msg: Message, state: FSMContext):
-    uid = msg.from_user.id; await _del(msg)
-    raw = msg.text.strip() if msg.text else ""
-    code = None; state_param = None
-
-    # Пробуем разобрать как URL (http://localhost/?code=...&state=...)
-    from urllib.parse import urlparse, parse_qs
-    try:
-        parsed = urlparse(raw)
-        qs = parse_qs(parsed.query)
-        if "code" in qs:
-            code        = qs["code"][0]
-            state_param = qs.get("state", [None])[0]
-    except: pass
-
-    # Или просто голый код
-    if not code and re.match(r"^[A-Za-z0-9/_\-]{10,}$", raw):
-        code = raw
-
-    if not code:
-        await show(uid, state,
-            "❌ не могу распознать код\n\nотправь полный URL из браузера или только код",
-            KB([("✕ отмена","settings")]))
-        return
-
-    # Проверяем state (если передан)
-    if state_param:
-        expected_uid = gfit_pop_state(state_param)
-        if expected_uid and expected_uid != uid:
-            await show(uid, state, "❌ неверный state — начни подключение заново",
-                       KB([("🔗 подключить","gfit_settings")])); return
-    else:
-        # state не передан — очищаем старые state этого пользователя
-        with db() as c:
-            c.execute("DELETE FROM gfit_oauth_state WHERE user_id=?", (uid,))
-
-    await show(uid, state, "🔄 подключаю google fit...", KB([("✕ отмена","settings")]))
-
-    try:
-        r = requests.post(GFIT_TOKEN_URL, data={
-            "code":          code,
-            "client_id":     GFIT_CLIENT_ID,
-            "client_secret": GFIT_CLIENT_SECRET,
-            "redirect_uri":  GFIT_REDIRECT_URI,
-            "grant_type":    "authorization_code",
-        }, timeout=15)
-        d = r.json()
-        if "access_token" not in d:
-            err = d.get("error_description") or d.get("error") or str(d)
-            raise ValueError(err)
-        gfit_save_token(uid, d["access_token"], d.get("refresh_token",""), d.get("expires_in", 3600))
-    except Exception as e:
-        await state.set_state(None)
-        await show(uid, state,
-            "❌ ошибка подключения:\n<code>{}</code>\n\n"
-            "<i>убедись что скопировал URL полностью и попробуй ещё раз</i>".format(str(e)[:200]),
-            KB([("🔗 попробовать снова","gfit_settings"),("< настройки","settings")]))
-        return
-
-    await state.set_state(None)
-
-    # Первая синхронизация
-    try:
-        res = await asyncio.get_event_loop().run_in_executor(None, gfit_sync, uid)
-        applied = res.get("applied", []) if res else []
-        sync_s = "\n".join(applied) if applied else "<i>данных за сегодня нет</i>"
-    except Exception as e:
-        log.warning("gfit first sync uid=%s: %s", uid, e)
-        sync_s = "<i>синхронизация будет при следующем тике</i>"
-
-    t, m = scr_gfit_status(uid)
-    await show(uid, state,
-        "✅  <b>google fit подключён!</b>\n\nданные за сегодня:\n{}\n\n{}".format(sync_s, t), m)
-
 
 # ── FSM: ШАГИ ────────────────────────────────────────────────────────
 
@@ -3360,19 +3271,20 @@ async def main():
     if GFIT_ENABLED:
         scheduler.add_job(gfit_autosync,    "interval", minutes=60,   id="gfit_autosync")
     scheduler.start()
-    mode = ("  +google fit (server)" if GFIT_USE_SERVER else "  +google fit (loopback)") if GFIT_ENABLED else ""
-    log.info("fitbot v9 запущен ✅%s", mode)
 
     tasks = [dp.start_polling(bot, drop_pending_updates=True)]
 
-    if GFIT_USE_SERVER:
+    if GFIT_ENABLED:
+        # Всегда запускаем callback-сервер когда Google Fit настроен
         app = aio_web.Application()
         app.router.add_get("/gfit/callback", gfit_oauth_handler)
         runner = aio_web.AppRunner(app)
         await runner.setup()
         site = aio_web.TCPSite(runner, "0.0.0.0", GFIT_PORT)
         await site.start()
-        log.info("google fit oauth сервер на :%s", GFIT_PORT)
+        log.info("fitbot v9 ✅  google fit callback: %s  (port %s)", GFIT_REDIRECT_URI, GFIT_PORT)
+    else:
+        log.info("fitbot v9 ✅  (google fit не настроен)")
 
     await asyncio.gather(*tasks)
 
