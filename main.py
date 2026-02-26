@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""fitbot v4 — глобальный апгрейд: баги, редизайн, новые функции"""
+"""fitbot v8 — google fit автосинхронизация через настройки"""
 
 import subprocess, sys
 def _pip(pkg): subprocess.check_call([sys.executable,"-m","pip","install",pkg,"-q"])
@@ -9,9 +9,14 @@ try:    import apscheduler
 except: _pip("apscheduler")
 try:    import zoneinfo; zoneinfo.ZoneInfo("Europe/Moscow")
 except: _pip("tzdata")
+try:    import aiohttp
+except: _pip("aiohttp")
+try:    import requests as _req_test; del _req_test
+except: _pip("requests")
 
-import asyncio, logging, os, sqlite3, re, json, calendar as _cal_module
+import asyncio, logging, os, sqlite3, re, json, calendar as _cal_module, requests
 from datetime import datetime, timedelta, date as dt_date, time as dt_time
+from urllib.parse import urlencode
 
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import CommandStart
@@ -20,6 +25,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+import aiohttp
+from aiohttp import web as aio_web
 
 TOKEN = os.environ.get("BOT_TOKEN")
 if not TOKEN:
@@ -27,6 +34,22 @@ if not TOKEN:
 DB_PATH = "fitbot.db"
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
+
+# ── GOOGLE FIT ───────────────────────────────────────────────────────
+GFIT_CLIENT_ID     = os.environ.get("GFIT_CLIENT_ID", "")
+GFIT_CLIENT_SECRET = os.environ.get("GFIT_CLIENT_SECRET", "")
+GFIT_REDIRECT_URI  = os.environ.get("GFIT_REDIRECT_URI", "http://localhost:8080/gfit/callback")
+GFIT_PORT          = int(os.environ.get("GFIT_PORT", "8080"))
+GFIT_ENABLED       = bool(GFIT_CLIENT_ID and GFIT_CLIENT_SECRET)
+
+GFIT_SCOPES = " ".join([
+    "https://www.googleapis.com/auth/fitness.activity.read",
+    "https://www.googleapis.com/auth/fitness.body.read",
+    "https://www.googleapis.com/auth/fitness.nutrition.read",
+])
+GFIT_AUTH_URL   = "https://accounts.google.com/o/oauth2/v2/auth"
+GFIT_TOKEN_URL  = "https://oauth2.googleapis.com/token"
+GFIT_API_BASE   = "https://www.googleapis.com/fitness/v1/users/me"
 
 # ── ЧАСОВОЙ ПОЯС ────────────────────────────────────────────────────
 # Бот всегда работает в московском времени (UTC+3)
@@ -87,8 +110,9 @@ DEFAULT_PRODUCTS = [
 
 # ── АКТИВНЫЕ СЕССИИ ──────────────────────────────────────────────────
 card_sessions: dict = {}          # uid -> {card_list, card_idx, msg_id}
-water_remind_msgs: dict = {}      # uid -> msg_id  (для редактирования уведомления)
-workout_timer_msgs: dict = {}     # uid -> msg_id  (для экрана таймера)
+water_remind_msgs: dict = {}      # uid -> msg_id
+workout_timer_msgs: dict = {}     # uid -> msg_id
+steps_sessions: dict = {}         # uid -> True  (открыт экран шагов)
 
 
 # ── FSM СОСТОЯНИЯ ───────────────────────────────────────────────────
@@ -125,8 +149,7 @@ class St(StatesGroup):
     remind_weight_time    = State()
     remind_report_time    = State()
     remind_report_day     = State()
-    # 👟 Шаги
-    steps_custom  = State()
+    # 👟 шаги
     steps_goal    = State()
 
 
@@ -202,6 +225,16 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER,
             steps INTEGER, source TEXT DEFAULT 'manual',
             logged_at TEXT DEFAULT (datetime('now','+3 hours'))
+        );
+        CREATE TABLE IF NOT EXISTS gfit_tokens (
+            user_id INTEGER PRIMARY KEY,
+            access_token TEXT, refresh_token TEXT,
+            expires_at TEXT, connected_at TEXT
+        );
+        CREATE TABLE IF NOT EXISTS gfit_oauth_state (
+            state TEXT PRIMARY KEY,
+            user_id INTEGER,
+            created_at TEXT DEFAULT (datetime('now','+3 hours'))
         );
         """)
         # ── Миграции ─────────────────────────────────────────────────
@@ -409,6 +442,215 @@ def del_last_steps(uid):
 def reset_steps(uid):
     with db() as c:
         c.execute("DELETE FROM steps_log WHERE user_id=? AND date(logged_at)=date('now','+3 hours')", (uid,))
+
+# ── HELPERS: GOOGLE FIT ──────────────────────────────────────────────
+import secrets as _secrets
+
+def gfit_save_token(uid, access_token, refresh_token, expires_in):
+    expires_at = (now_msk() + timedelta(seconds=expires_in)).strftime("%Y-%m-%d %H:%M:%S")
+    with db() as c:
+        c.execute(
+            "INSERT OR REPLACE INTO gfit_tokens (user_id,access_token,refresh_token,expires_at,connected_at) VALUES (?,?,?,?,?)",
+            (uid, access_token, refresh_token, expires_at, datetime_now_sql()))
+
+def gfit_get_token(uid):
+    with db() as c:
+        return c.execute("SELECT * FROM gfit_tokens WHERE user_id=?", (uid,)).fetchone()
+
+def gfit_disconnect(uid):
+    with db() as c:
+        c.execute("DELETE FROM gfit_tokens WHERE user_id=?", (uid,))
+
+def gfit_is_connected(uid):
+    t = gfit_get_token(uid)
+    return bool(t and t["refresh_token"])
+
+def gfit_make_state(uid):
+    state = _secrets.token_urlsafe(16)
+    with db() as c:
+        c.execute("INSERT INTO gfit_oauth_state (state,user_id) VALUES (?,?)", (state, uid))
+    return state
+
+def gfit_pop_state(state):
+    with db() as c:
+        r = c.execute("SELECT user_id FROM gfit_oauth_state WHERE state=?", (state,)).fetchone()
+        c.execute("DELETE FROM gfit_oauth_state WHERE state=?", (state,))
+    return r["user_id"] if r else None
+
+def gfit_refresh(uid):
+    """Обновить access_token по refresh_token. Вернуть новый или None."""
+    t = gfit_get_token(uid)
+    if not t or not t["refresh_token"]: return None
+    try:
+        r = requests.post(GFIT_TOKEN_URL, data={
+            "client_id":     GFIT_CLIENT_ID,
+            "client_secret": GFIT_CLIENT_SECRET,
+            "refresh_token": t["refresh_token"],
+            "grant_type":    "refresh_token",
+        }, timeout=10)
+        d = r.json()
+        if "access_token" not in d: return None
+        gfit_save_token(uid, d["access_token"], t["refresh_token"], d.get("expires_in", 3600))
+        return d["access_token"]
+    except Exception as e:
+        log.warning("gfit_refresh uid=%s: %s", uid, e)
+        return None
+
+def gfit_get_access_token(uid):
+    """Вернуть валидный access_token (обновит если нужно)."""
+    t = gfit_get_token(uid)
+    if not t: return None
+    try:
+        exp = datetime.fromisoformat(t["expires_at"])
+        if now_msk() < exp - timedelta(minutes=5):
+            return t["access_token"]
+    except: pass
+    return gfit_refresh(uid)
+
+def _gfit_ns_time(dt_obj):
+    """datetime → наносекунды с эпохи (строка)."""
+    return str(int(dt_obj.timestamp() * 1e9))
+
+def gfit_sync(uid):
+    """
+    Синхронизировать с Google Fit:
+      - шаги за сегодня
+      - сожжённые калории за сегодня
+      - активности (сессии) за сегодня
+      - вес (последний)
+    Возвращает dict с результатами или None при ошибке.
+    """
+    token = gfit_get_access_token(uid)
+    if not token: return None
+    headers = {"Authorization": "Bearer " + token}
+    today = today_msk()
+    start_dt = datetime.combine(today, dt_time.min)
+    end_dt   = datetime.combine(today, dt_time.max)
+    start_ms = int(start_dt.timestamp() * 1000)
+    end_ms   = int(end_dt.timestamp() * 1000)
+    start_ns = _gfit_ns_time(start_dt)
+    end_ns   = _gfit_ns_time(end_dt)
+
+    result = {}
+
+    # ── Шаги ──
+    try:
+        body = {"aggregateBy":[{"dataTypeName":"com.google.step_count.delta"}],
+                "bucketByTime":{"durationMillis": 86400000},
+                "startTimeMillis": start_ms, "endTimeMillis": end_ms}
+        r = requests.post(GFIT_API_BASE+"/dataset:aggregate", json=body, headers=headers, timeout=10)
+        buckets = r.json().get("bucket", [])
+        steps = 0
+        for b in buckets:
+            for ds in b.get("dataset", []):
+                for pt in ds.get("point", []):
+                    for v in pt.get("value", []):
+                        steps += v.get("intVal", 0)
+        result["steps"] = steps
+    except Exception as e:
+        log.warning("gfit steps uid=%s: %s", uid, e)
+
+    # ── Сожжённые калории ──
+    try:
+        body = {"aggregateBy":[{"dataTypeName":"com.google.calories.expended"}],
+                "bucketByTime":{"durationMillis": 86400000},
+                "startTimeMillis": start_ms, "endTimeMillis": end_ms}
+        r = requests.post(GFIT_API_BASE+"/dataset:aggregate", json=body, headers=headers, timeout=10)
+        buckets = r.json().get("bucket", [])
+        kcal = 0.0
+        for b in buckets:
+            for ds in b.get("dataset", []):
+                for pt in ds.get("point", []):
+                    for v in pt.get("value", []):
+                        kcal += v.get("fpVal", 0)
+        result["kcal_burned"] = int(kcal)
+    except Exception as e:
+        log.warning("gfit kcal uid=%s: %s", uid, e)
+
+    # ── Активности (сессии) ──
+    try:
+        url = (GFIT_API_BASE + "/sessions"
+               "?startTime={}&endTime={}&includeDeleted=false").format(
+            start_dt.strftime("%Y-%m-%dT%H:%M:%S.000Z"),
+            end_dt.strftime("%Y-%m-%dT%H:%M:%S.000Z"))
+        r = requests.get(url, headers=headers, timeout=10)
+        sessions = r.json().get("session", [])
+        activities = []
+        ACT_MAP = {
+            7:  ("run",  "бег"),   8: ("walk","ходьба"),
+            1:  ("bike", "велосипед"), 97:("gym","зал"),
+            99: ("yoga", "йога"),  82:("swim","плавание"),
+        }
+        for s in sessions:
+            act_type_id = s.get("activityType", 4)
+            atype, aname = ACT_MAP.get(act_type_id, ("other", s.get("name","активность")))
+            start_ms_ = int(s.get("startTimeMillis", 0))
+            end_ms_   = int(s.get("endTimeMillis", 0))
+            dur_min   = int((end_ms_ - start_ms_) / 60000)
+            activities.append({"type": atype, "name": aname, "duration": dur_min,
+                                "start_ms": start_ms_})
+        result["activities"] = activities
+    except Exception as e:
+        log.warning("gfit sessions uid=%s: %s", uid, e)
+
+    # ── Вес ──
+    try:
+        url = (GFIT_API_BASE +
+               "/dataSources/derived:com.google.weight:com.google.android.gms:merge_weight"
+               "/datasets/{}-{}".format(start_ns, end_ns))
+        r = requests.get(url, headers=headers, timeout=10)
+        pts = r.json().get("point", [])
+        if pts:
+            w = pts[-1]["value"][0].get("fpVal")
+            if w: result["weight"] = round(w, 1)
+    except Exception as e:
+        log.warning("gfit weight uid=%s: %s", uid, e)
+
+    # ── Питание (калории из еды) ──
+    try:
+        body = {"aggregateBy":[{"dataTypeName":"com.google.nutrition"}],
+                "bucketByTime":{"durationMillis": 86400000},
+                "startTimeMillis": start_ms, "endTimeMillis": end_ms}
+        r = requests.post(GFIT_API_BASE+"/dataset:aggregate", json=body, headers=headers, timeout=10)
+        buckets = r.json().get("bucket", [])
+        food_kcal = 0.0
+        for b in buckets:
+            for ds in b.get("dataset", []):
+                for pt in ds.get("point", []):
+                    for v in pt.get("value", []):
+                        for mv in v.get("mapVal", []):
+                            if mv.get("key") == "calories":
+                                food_kcal += mv.get("value", {}).get("fpVal", 0)
+        if food_kcal > 0:
+            result["food_kcal"] = int(food_kcal)
+    except Exception as e:
+        log.warning("gfit nutrition uid=%s: %s", uid, e)
+
+    # ── Применяем данные ──
+    applied = []
+
+    if result.get("steps", 0) > 0:
+        log_steps(uid, result["steps"], source="gfit")
+        applied.append("👟 {} шагов".format(result["steps"]))
+
+    if result.get("kcal_burned", 0) > 0:
+        applied.append("🔥 сожжено ~{} ккал".format(result["kcal_burned"]))
+
+    if result.get("weight"):
+        log_w(uid, result["weight"])
+        applied.append("⚖️ вес {} кг".format(result["weight"]))
+
+    if result.get("food_kcal", 0) > 0:
+        log_cal(uid, result["food_kcal"], desc="google fit (питание)", meal_type="other")
+        applied.append("🍽 {} ккал из еды".format(result["food_kcal"]))
+
+    if result.get("activities"):
+        for act in result["activities"]:
+            if act["duration"] > 3:
+                applied.append("💪 {} {}мин".format(act["name"], act["duration"]))
+
+    result["applied"] = applied
+    return result
 
 def today_cal(uid):
     with db() as c:
@@ -752,7 +994,7 @@ def kb_food_meal(pid, grams):
 def kb_goals():
     return KB(
         [("⚖️ цель по весу","goal_weight"), ("💧 норма воды","water_goal_set")],
-        [("🔥 цель по ккал","cal_goal_set")],
+        [("🔥 цель по ккал","cal_goal_set"), ("👟 цель по шагам","steps_goal_set")],
         [("📐 идеальный вес","ideal_weight")],
         [("< назад","settings")],
     )
@@ -769,13 +1011,19 @@ def kb_progress():
         [("< назад","main")],
     )
 
-def kb_settings():
-    return KB(
-        [("📋 план",        "plan_manage"),      ("📤 загрузить план","plan_upload_start")],
-        [("🎯 цели и нормы","goals"),            ("🔔 напоминания",   "reminders")],
-        [("🏠 экран",       "sett_display"),     ("🗑 сбросить",      "sett_reset")],
-        [("< меню",        "main")],
-    )
+def kb_settings(uid=None):
+    rows = [
+        [B("📋 план",        "plan_manage"),      B("📤 загрузить план","plan_upload_start")],
+        [B("🎯 цели и нормы","goals"),            B("🔔 напоминания",   "reminders")],
+        [B("🏠 экран",       "sett_display"),     B("🗑 сбросить",      "sett_reset")],
+    ]
+    if GFIT_ENABLED:
+        if uid and gfit_is_connected(uid):
+            rows.append([B("🔗 google fit  ✅","gfit_settings")])
+        else:
+            rows.append([B("🔗 подключить google fit","gfit_settings")])
+    rows.append([B("< меню","main")])
+    return InlineKeyboardMarkup(inline_keyboard=rows)
 
 def kb_sett_display(uid):
     s=gsett(uid)
@@ -801,13 +1049,8 @@ def kb_sett_reset():
     )
 
 def kb_steps(uid):
-    u = guser(uid); goal = (u["steps_goal"] if u else None) or 8000
     return KB(
-        [("1 000","s1000"), ("3 000","s3000"), ("5 000","s5000"), ("7 000","s7000")],
-        [("8 000","s8000"), ("10 000","s10000"), ("12 000","s12000"), ("15 000","s15000")],
-        [("✏️ своё","steps_custom"), ("↩ удалить","steps_del")],
-        [("🎯 цель: {}".format(goal),"steps_goal_set"), ("📋 история","steps_hist")],
-        [("🔗 подключить приложение","steps_connect")],
+        [("↩ удалить последнее","steps_del")],
         [("< назад","main")],
     )
 
@@ -1257,11 +1500,12 @@ def scr_goals(uid):
                     eta_d=(today_msk()+timedelta(days=days_left)).strftime("%d.%m.%Y")
                     forecast_s="\nпри текущем темпе → <b>{}</b>".format(eta_d)
             except: pass
-    tbl="старт    {}\nсейчас   {}\nцель     {}\nвода     {} мл/д\nккал     {} ккал/д".format(
+    tbl="старт    {}\nсейчас   {}\nцель     {}\nвода     {} мл/д\nккал     {} ккал/д\nшаги     {}/д".format(
         "{:.1f} кг".format(sw) if sw else "—",
         "{:.1f} кг".format(cw) if cw else "—",
         "{:.1f} кг".format(gw) if gw else "—",
-        u["water_goal"] or 2000, u["cal_goal"] or 2000)
+        u["water_goal"] or 2000, u["cal_goal"] or 2000,
+        (u["steps_goal"] if u else None) or 8000)
     return "🎯  <b>цели</b>\n\n<code>{}</code>{}{}".format(tbl,prog,forecast_s), kb_goals()
 
 def scr_profile(uid):
@@ -1329,7 +1573,7 @@ def scr_settings(uid):
     acts=acts_for_day(uid,today_msk())
     total=len(acts); done=sum(1 for a in acts if a.get("completed"))
     plan_s="нет задач" if not total else "{} из {} выполнено".format(done,total)
-    return "⚙️  <b>настройки</b>\n\nплан сегодня: <i>{}</i>".format(plan_s), kb_settings()
+    return "⚙️  <b>настройки</b>\n\nплан сегодня: <i>{}</i>".format(plan_s), kb_settings(uid)
 
 def scr_sett_display(uid):
     s=gsett(uid)
@@ -1660,45 +1904,95 @@ def scr_steps(uid):
     hist = steps_hist(uid, 7)
     hist_lines = []
     for r in hist:
-        d_s = r["d"]; s = r["s"]
+        d_s = r["d"]; sv = r["s"]
         try:
             d = dt_date.fromisoformat(d_s)
             label = "сегодня" if d == today_msk() else d.strftime("%d.%m")
         except:
             label = d_s
-        bar_w = min(10, int(s / goal * 10))
+        bar_w = min(10, int(sv / goal * 10))
         bar_s = "🟩" * bar_w + "⬜" * (10 - bar_w)
-        hist_lines.append("{:8s}  {:>6}  {}".format(label, s, bar_s))
+        hist_lines.append("{:8s}  {:>6}  {}".format(label, sv, bar_s))
     hist_block = "<blockquote>{}</blockquote>".format("\n".join(hist_lines)) if hist_lines else "<i>нет данных</i>"
-    kcal_est = int(today * 0.04)  # ~0.04 ккал/шаг
-    km_est = round(today * 0.0007, 1)  # ~0.7 км / 1000 шагов
-    text = ("👟  <b>шаги</b>\n\n"
-            "<b>{:,} / {:,}</b> шагов\n"
+    kcal_est = int(today * 0.04)
+    km_est = round(today * 0.0007, 1)
+    gfit_s = ""
+    if GFIT_ENABLED and gfit_is_connected(uid):
+        gfit_s = "  <i>🔗 google fit</i>"
+    hint = "\n\n<i>отправь число — запишу шаги</i>" if not today else ""
+    text = ("👟  <b>шаги</b>{}\n\n"
+            "<b>{:,} / {:,}</b>  шагов\n"
             "{} {}%\n\n"
-            "<code>~{} ккал  ·  ~{} км</code>\n\n"
-            "{}").format(
-        today, goal,
+            "<code>~{} ккал сожжено  ·  ~{} км</code>\n\n"
+            "{}{}").format(
+        gfit_s, today, goal,
         pbar(pct, 10, "🟩", "⬜"), pct,
-        kcal_est, km_est,
-        hist_block)
+        kcal_est, km_est, hist_block, hint)
     return text, kb_steps(uid)
 
-def scr_steps_connect():
-    text = ("🔗  <b>подключение шагомера</b>\n\n"
-            "Бот принимает шаги вручную или через автоматизацию.\n\n"
-            "<b>📱 Google Fit / Samsung Health / Apple Health:</b>\n"
-            "Используй <b>IFTTT</b> или <b>Tasker + HTTP Request</b>:\n\n"
-            "<code>POST https://api.telegram.org/bot{TOKEN}/sendMessage\n"
-            "chat_id=ВАШ_ID\n"
-            "text=/steps ЧИСЛО</code>\n\n"
-            "Или используй приложение <b>AutoSync for Google Fit</b> → IFTTT Applet → отправка команды боту.\n\n"
-            "<b>🤖 Пример IFTTT:</b>\n"
-            "If: Google Fit — Daily step goal achieved\n"
-            "Then: Send Telegram message <code>/steps {{StepCount}}</code>\n\n"
-            "<b>⌚ Garmin / Fitbit / Xiaomi Mi Band:</b>\n"
-            "Через IFTTT Webhooks → отправь боту <code>/steps ЧИСЛО</code>\n\n"
-            "<i>Или просто вводи шаги вручную каждый день 👇</i>")
-    return text, KB([("< назад","steps")])
+def scr_gfit_settings(uid):
+    """Единый экран google fit в настройках."""
+    if not GFIT_ENABLED:
+        return (
+            "🔗  <b>google fit</b>\n\n"
+            "для подключения задай переменные окружения на сервере:\n"
+            "<code>GFIT_CLIENT_ID\nGFIT_CLIENT_SECRET\nGFIT_REDIRECT_URI</code>\n\n"
+            "создай проект в google cloud console → включи fitness api → "
+            "создай oauth 2.0 credentials → добавь redirect uri.",
+            KB([("< настройки","settings")])
+        )
+    if not gfit_is_connected(uid):
+        return scr_gfit_connect(uid)
+    return scr_gfit_status(uid)
+
+def scr_gfit_connect(uid):
+    state = gfit_make_state(uid)
+    params = {
+        "client_id":     GFIT_CLIENT_ID,
+        "redirect_uri":  GFIT_REDIRECT_URI,
+        "response_type": "code",
+        "scope":         GFIT_SCOPES,
+        "access_type":   "offline",
+        "prompt":        "consent",
+        "state":         state,
+    }
+    url = GFIT_AUTH_URL + "?" + urlencode(params)
+    text = (
+        "🔗  <b>подключение google fit</b>\n\n"
+        "нажми кнопку ниже, войди в google и разреши доступ.\n\n"
+        "что синхронизируется автоматически каждый час:\n"
+        "  👟 шаги\n"
+        "  🔥 сожжённые калории\n"
+        "  🍽 питание\n"
+        "  💪 тренировки и активности\n"
+        "  ⚖️ вес\n\n"
+        "<i>данные за сегодня загрузятся сразу после подключения</i>"
+    )
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="🔗 войти через google", url=url)],
+        [B("< настройки","settings")],
+    ])
+    return text, kb
+
+def scr_gfit_status(uid):
+    t = gfit_get_token(uid)
+    connected_at = ""
+    try:
+        d = datetime.fromisoformat(t["connected_at"])
+        connected_at = d.strftime("%d.%m.%Y %H:%M")
+    except: pass
+    text = (
+        "🔗  <b>google fit</b>  ✅ подключён\n\n"
+        "<i>подключено: {}</i>\n\n"
+        "синхронизируется автоматически каждый час:\n"
+        "  👟 шаги · 🔥 калории · 💪 тренировки · ⚖️ вес · 🍽 питание\n\n"
+        "<i>нажми «синхронизировать» для немедленного обновления</i>"
+    ).format(connected_at)
+    return text, KB(
+        [("🔄 синхронизировать","gfit_sync")],
+        [("🔌 отключить","gfit_disconnect")],
+        [("< настройки","settings")],
+    )
 
 
 
@@ -1892,6 +2186,7 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
     if data=="main":
         await state.set_state(None)
         card_sessions.pop(uid,None)
+        steps_sessions.pop(uid,None)
         t,m=scr_main(uid); await s(t,m); return
 
     # ── ПЛАН ──────────────────────────────────────────────────────
@@ -2275,30 +2570,44 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
 
     # ── ШАГИ ──────────────────────────────────────────────────────
     if data=="steps":
+        steps_sessions[uid] = True
         t,m=scr_steps(uid); await s(t,m); return
 
     if data=="steps_del":
-        del_last_steps(uid); t,m=scr_steps(uid); await s("↩ удалено\n\n"+t,m); return
+        del_last_steps(uid)
+        steps_sessions[uid] = True
+        t,m=scr_steps(uid); await s("↩ удалено\n\n"+t,m); return
 
-    if data=="steps_hist":
-        t,m=scr_steps(uid); await s(t,m); return
+    # ── GOOGLE FIT ────────────────────────────────────────────────
+    if data=="gfit_settings":
+        t,m=scr_gfit_settings(uid); await s(t,m); return
 
-    if data=="steps_connect":
-        t,m=scr_steps_connect(); await s(t,m); return
+    if data=="gfit_connect":
+        t,m=scr_gfit_connect(uid); await s(t,m); return
+
+    if data=="gfit_status":
+        t,m=scr_gfit_status(uid); await s(t,m); return
+
+    if data=="gfit_disconnect":
+        gfit_disconnect(uid)
+        t,m=scr_settings(uid); await s("🔌 google fit отключён\n\n"+t,m); return
+
+    if data=="gfit_sync":
+        await s("🔄  синхронизация...", KB([("↩ назад","gfit_settings")]))
+        try:
+            res = await asyncio.get_event_loop().run_in_executor(None, gfit_sync, uid)
+        except Exception as e:
+            res = None
+        if not res:
+            t,m=scr_gfit_status(uid); await s("⚠️ ошибка синхронизации\n\n"+t,m); return
+        applied = res.get("applied", [])
+        sync_s = "\n".join(applied) if applied else "<i>данных за сегодня нет</i>"
+        t,m=scr_gfit_status(uid)
+        await s("✅  синхронизировано\n\n{}\n\n".format(sync_s)+t,m); return
 
     if data=="steps_goal_set":
         await state.set_state(St.steps_goal)
-        await s("🎯 введи дневную цель по шагам (например 8000 или 10000):", kb_x("steps")); return
-
-    if data=="steps_custom":
-        await state.set_state(St.steps_custom)
-        await s("👟 введи количество шагов:", kb_x("steps")); return
-
-    _sm = {"s1000":1000,"s3000":3000,"s5000":5000,"s7000":7000,
-           "s8000":8000,"s10000":10000,"s12000":12000,"s15000":15000}
-    if data in _sm:
-        log_steps(uid, _sm[data])
-        t,m=scr_steps(uid); await s("✅ +{:,} шагов\n\n".format(_sm[data])+t,m); return
+        await s("🎯 цель по шагам (например 8000):", kb_x("goals")); return
 
     if data=="reset_steps":
         reset_steps(uid); await s("👟 шаги за день сброшены", kb_sett_reset()); return
@@ -2778,16 +3087,6 @@ async def fh_food_grams(msg: Message, state: FSMContext):
     except: await show(uid,state,"❌ введи количество граммов (например 150)",kb_x("food_add"))
 
 # ── FSM: ШАГИ ────────────────────────────────────────────────────────
-@dp.message(St.steps_custom)
-async def fh_steps_custom(msg: Message, state: FSMContext):
-    uid=msg.from_user.id; await _del(msg)
-    try:
-        steps=int(float(msg.text.replace(",","."))); assert 1<=steps<=100000
-        log_steps(uid, steps)
-        await state.set_state(None)
-        t,m=scr_steps(uid)
-        await show(uid,state,"✅ +{:,} шагов\n\n".format(steps)+t,m)
-    except: await show(uid,state,"❌ введи число от 1 до 100000",kb_x("steps"))
 
 @dp.message(St.steps_goal)
 async def fh_steps_goal(msg: Message, state: FSMContext):
@@ -2796,23 +3095,9 @@ async def fh_steps_goal(msg: Message, state: FSMContext):
         goal=int(float(msg.text.replace(",","."))); assert 100<=goal<=100000
         upd_user(uid, steps_goal=goal)
         await state.set_state(None)
-        t,m=scr_steps(uid)
+        t,m=scr_goals(uid)
         await show(uid,state,"🎯 цель: {:,} шагов\n\n".format(goal)+t,m)
-    except: await show(uid,state,"❌ введи число от 100 до 100000",kb_x("steps"))
-
-# ── /steps команда (для IFTTT/автоматизации) ─────────────────────────
-@dp.message(F.text.regexp(r'^/steps\s+\d+'))
-async def cmd_steps(msg: Message, state: FSMContext):
-    uid=msg.from_user.id
-    upsert(uid, msg.from_user.first_name or "")
-    await _del(msg)
-    try:
-        steps=int(msg.text.split()[1]); assert 1<=steps<=100000
-        log_steps(uid, steps, source="auto")
-        t,m=scr_steps(uid)
-        await show(uid,state,"✅  <b>+{:,} шагов</b> (авто)\n\n".format(steps)+t,m)
-    except:
-        await show(uid,state,"❌ формат: <code>/steps 8500</code>",kb_x("steps"))
+    except: await show(uid,state,"❌ введи число от 100 до 100000",kb_x("goals"))
 
 # ── FALLBACK ────────────────────────────────────────────────────────
 @dp.message(F.text)
@@ -2821,7 +3106,17 @@ async def fallback(msg: Message, state: FSMContext):
     upsert(uid,msg.from_user.first_name or "")
     await _del(msg)
     text=msg.text.strip()
-    # Навигация по карточкам цифрой
+
+    # ── ввод числа шагов (открыт экран 👟) ──────────────────────────
+    if steps_sessions.get(uid) and re.match(r'^\d+$', text):
+        steps = int(text)
+        if 1 <= steps <= 200000:
+            log_steps(uid, steps)
+            t,m=scr_steps(uid)
+            await show(uid,state,"✅  {:,} шагов записано\n\n".format(steps)+t,m)
+            return
+
+    # ── навигация по карточкам цифрой ───────────────────────────────
     sess=card_sessions.get(uid)
     if sess and text.isdigit():
         n=int(text); card_list=sess["card_list"]; idx=n-1
@@ -2833,20 +3128,101 @@ async def fallback(msg: Message, state: FSMContext):
             await show(uid,state,"❌ нет карточки {}\n\n".format(n)+card_text,kb)
         return
     card_sessions.pop(uid,None)
+    steps_sessions.pop(uid,None)
+    await state.set_state(None)
     t,m=scr_main(uid); await show(uid,state,t,m)
+
+# ── GOOGLE FIT: OAUTH CALLBACK SERVER ───────────────────────────────
+async def gfit_oauth_handler(request):
+    """aiohttp обработчик редиректа после OAuth Google."""
+    code  = request.rel_url.query.get("code")
+    state = request.rel_url.query.get("state")
+    error = request.rel_url.query.get("error")
+
+    if error or not code or not state:
+        return aio_web.Response(text="❌ ошибка авторизации: {}".format(error or "нет кода"),
+                                content_type="text/html")
+    uid = gfit_pop_state(state)
+    if not uid:
+        return aio_web.Response(text="❌ неверный state (устарел?)", content_type="text/html")
+
+    # Обмен code → tokens
+    try:
+        r = requests.post(GFIT_TOKEN_URL, data={
+            "code":          code,
+            "client_id":     GFIT_CLIENT_ID,
+            "client_secret": GFIT_CLIENT_SECRET,
+            "redirect_uri":  GFIT_REDIRECT_URI,
+            "grant_type":    "authorization_code",
+        }, timeout=10)
+        d = r.json()
+        if "access_token" not in d:
+            raise ValueError(d.get("error_description", str(d)))
+        gfit_save_token(uid, d["access_token"], d.get("refresh_token",""), d.get("expires_in", 3600))
+    except Exception as e:
+        log.warning("gfit oauth exchange uid=%s: %s", uid, e)
+        try:
+            await bot.send_message(uid, "⚠️ не удалось подключить google fit: {}".format(e),
+                                   parse_mode="HTML")
+        except: pass
+        return aio_web.Response(text="❌ ошибка: {}".format(e), content_type="text/html")
+
+    # Сразу синхронизируем
+    try:
+        res = await asyncio.get_event_loop().run_in_executor(None, gfit_sync, uid)
+        applied = res.get("applied", []) if res else []
+        sync_s = "\n".join(applied) if applied else "<i>данных за сегодня нет</i>"
+        await bot.send_message(uid,
+            "✅  <b>google fit подключён!</b>\n\nданные за сегодня:\n{}\n\n<i>автосинхронизация каждый час</i>".format(sync_s),
+            parse_mode="HTML",
+            reply_markup=KB([("⚙️ настройки","settings")]))
+    except Exception as e:
+        log.warning("gfit first sync uid=%s: %s", uid, e)
+        await bot.send_message(uid, "✅ google fit подключён! автосинхронизация каждый час.",
+                               parse_mode="HTML",
+                               reply_markup=KB([("⚙️ настройки","settings")]))
+
+    return aio_web.Response(
+        text="<html><body><h2>✅ google fit подключён!</h2><p>можно закрыть эту страницу и вернуться в telegram.</p></body></html>",
+        content_type="text/html")
+
+
+async def gfit_autosync():
+    """Каждый час синхронизировать всех подключённых пользователей."""
+    if not GFIT_ENABLED: return
+    for uid in get_all_users():
+        try:
+            if not gfit_is_connected(uid): continue
+            await asyncio.get_event_loop().run_in_executor(None, gfit_sync, uid)
+        except Exception as e:
+            log.debug("gfit_autosync uid=%s: %s", uid, e)
 
 
 # ── MAIN ────────────────────────────────────────────────────────────
 async def main():
     init_db()
     # Планировщик
-    scheduler.add_job(tick_cards,          "interval", seconds=60,  id="tick_cards")
-    scheduler.add_job(check_water_reminders,"interval", seconds=60, id="water_remind")
-    scheduler.add_job(check_weight_reminders,"interval",seconds=60, id="weight_remind")
-    scheduler.add_job(check_weekly_report,  "interval", seconds=60, id="weekly_report")
+    scheduler.add_job(tick_cards,           "interval", seconds=60,   id="tick_cards")
+    scheduler.add_job(check_water_reminders,"interval", seconds=60,   id="water_remind")
+    scheduler.add_job(check_weight_reminders,"interval",seconds=60,   id="weight_remind")
+    scheduler.add_job(check_weekly_report,  "interval", seconds=60,   id="weekly_report")
+    if GFIT_ENABLED:
+        scheduler.add_job(gfit_autosync,    "interval", minutes=60,   id="gfit_autosync")
     scheduler.start()
-    log.info("fitbot v4 запущен ✅")
-    await dp.start_polling(bot, drop_pending_updates=True)
+    log.info("fitbot v8 запущен ✅%s", "  +google fit" if GFIT_ENABLED else "")
+
+    tasks = [dp.start_polling(bot, drop_pending_updates=True)]
+
+    if GFIT_ENABLED:
+        app = aio_web.Application()
+        app.router.add_get("/gfit/callback", gfit_oauth_handler)
+        runner = aio_web.AppRunner(app)
+        await runner.setup()
+        site = aio_web.TCPSite(runner, "0.0.0.0", GFIT_PORT)
+        await site.start()
+        log.info("google fit oauth сервер на :%s", GFIT_PORT)
+
+    await asyncio.gather(*tasks)
 
 if __name__=="__main__":
     asyncio.run(main())
