@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""fitbot v4 — глобальный апгрейд: баги, редизайн, новые функции"""
+"""letify ☀️ — твой путь к лету · трекер веса, воды, питания и тренировок"""
 
 import subprocess, sys
 def _pip(pkg): subprocess.check_call([sys.executable,"-m","pip","install",pkg,"-q"])
@@ -24,7 +24,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 TOKEN = os.environ.get("BOT_TOKEN")
 if not TOKEN:
     raise RuntimeError("BOT_TOKEN не задан")
-DB_PATH = "fitbot.db"
+DB_PATH = "letify.db"
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
@@ -53,18 +53,18 @@ DAYS_CRON = ["mon","tue","wed","thu","fri","sat","sun"]
 
 ACTS = {
     "run":   ("🏃", "бег"),
-    "walk":  ("🚶", "ходьба"),
+    "walk":  ("🚶", "прогулка"),
     "bike":  ("🚴", "велосипед"),
     "gym":   ("💪", "зал"),
     "yoga":  ("🧘", "йога"),
     "swim":  ("🏊", "плавание"),
-    "other": ("✦",  "другое"),
+    "other": ("☀️",  "другое"),
 }
 def aico(t): return ACTS.get(t,("✦",""))[0]
 def anam(t): return ACTS.get(t,("✦",t))[1]
 
-MEALS = {"breakfast":("☀️","завтрак"),"lunch":("🌤","обед"),
-         "dinner":("🌙","ужин"),"snack":("🍫","перекус"),"other":("✦","другое")}
+MEALS = {"breakfast":("🌅","завтрак"),"lunch":("☀️","обед"),
+         "dinner":("🌙","ужин"),"snack":("🍑","перекус"),"other":("🌿","другое")}
 MEAL_ORDER = ["breakfast","lunch","dinner","snack","other"]
 def mico(k): return MEALS.get(k,("✦",""))[0]
 def mnam(k): return MEALS.get(k,("✦",k))[1]
@@ -550,9 +550,9 @@ def get_bar_style(uid):
         r=c.execute("SELECT bar_style FROM user_settings WHERE user_id=?",(uid,)).fetchone()
         return (r["bar_style"] or 0) if r else 0
 def wbar(p,uid=None): return pbar_block(p) if uid and get_bar_style(uid) else pbar(p,8,"🟦","⬜")
-def cbar(p,uid=None): return pbar_block(p) if uid and get_bar_style(uid) else pbar(p,8,"🟧","⬜")
+def cbar(p,uid=None): return pbar_block(p) if uid and get_bar_style(uid) else pbar(p,8,"🟨","⬜")
 def gbar(p,uid=None): return pbar_block(p) if uid and get_bar_style(uid) else pbar(p,8,"🟩","⬜")
-def sbar(q,uid=None): return pbar_block(q*20) if uid and get_bar_style(uid) else pbar(q*20,8,"🟪","⬜")
+def sbar(q,uid=None): return pbar_block(q*20) if uid and get_bar_style(uid) else pbar(q*20,8,"🟣","⬜")
 def bq(t): return "<blockquote>{}</blockquote>".format(t)
 def strike(t): return "<s>{}</s>".format(t)
 
@@ -590,6 +590,30 @@ def fmt_log_weight(rows):
 
 def quality_icon(q):
     return {1:"😫",2:"😴",3:"😑",4:"🙂",5:"🌟"}.get(q,"😑")
+
+def days_to_summer() -> int:
+    """Дней до 1 июня текущего / следующего года."""
+    today = today_msk()
+    summer = dt_date(today.year, 6, 1)
+    if summer <= today:
+        summer = dt_date(today.year + 1, 6, 1)
+    return (summer - today).days
+
+def summer_emoji() -> str:
+    """Эмодзи в зависимости от расстояния до лета."""
+    d = days_to_summer()
+    if d <= 0:   return "🏖️"
+    if d <= 7:   return "🌊"
+    if d <= 30:  return "🌤"
+    if d <= 60:  return "🌸"
+    if d <= 90:  return "🌱"
+    return "❄️"
+
+def summer_line() -> str:
+    d = days_to_summer()
+    if d <= 0:   return "лето уже здесь 🏖️"
+    if d == 1:   return "завтра лето! 🌊"
+    return "до лета  <b>{}</b>  {}".format(d, summer_emoji())
 
 def parse_plan_text(text: str) -> list:
     results = []
@@ -629,9 +653,9 @@ def kb_main(uid):
     plan_label = "📋  план  {}/{}".format(done, total) if total else "📋  план"
     return KB(
         [(plan_label, "plan_cards")],
-        [("⚖️", "weight"), ("💧", "water"), ("🍎", "nutrition")],
-        [("😴", "sleep"),  ("⏱️", "workout_timer"), ("📊", "progress")],
-        [("👤 профиль", "profile"), ("⚙️ настройки", "settings")],
+        [("⚖️", "weight"), ("🌊", "water"), ("🍋", "nutrition")],
+        [("🌙", "sleep"),  ("⏱️", "workout_timer"), ("📊", "progress")],
+        [("🏖️ профиль", "profile"), ("⚙️ настройки", "settings")],
     )
 
 def kb_weight():
@@ -658,7 +682,7 @@ def kb_cal():
 def kb_nutrition():
     return KB(
         [("➕ добавить еду", "food_add")],
-        [("📓 дневник",      "food_diary"),  ("🍎 продукты", "quick_products")],
+        [("📓 дневник",      "food_diary"),  ("🌿 продукты", "quick_products")],
         [("🧮 кбжу",         "kbzhu"),       ("< назад",     "main")],
     )
 
@@ -825,7 +849,7 @@ def kb_water_interval():
 # ── Клавиатура уведомления о воде (приходит в чат) ─────────────────
 def kb_water_notif():
     return KB(
-        [("💧 150","wrlog_150"),("💧 200","wrlog_200"),("💧 250","wrlog_250"),("💧 500","wrlog_500")],
+        [("🌊 150","wrlog_150"),("🌊 200","wrlog_200"),("🌊 250","wrlog_250"),("🌊 500","wrlog_500")],
         [("пропустить","wrlog_skip")],
     )
 
@@ -834,7 +858,7 @@ def kb_sleep():
     return KB(
         [("5ч","sl_5"),("5.5ч","sl_5.5"),("6ч","sl_6"),("6.5ч","sl_6.5")],
         [("7ч","sl_7"),("7.5ч","sl_7.5"),("8ч","sl_8"),("9ч","sl_9")],
-        [("своё","sl_custom"), ("↩ удалить","sleep_del")],
+        [("✏️ своё","sl_custom"), ("↩ удалить","sleep_del")],
         [("📋 история","sleep_hist"), ("< назад","main")],
     )
 
@@ -1064,18 +1088,19 @@ def scr_main(uid):
     streak=water_streak(uid); now=now_msk()
     name=u["name"] or "привет"
 
-    parts=["<b>{}</b>  <i>{}</i>".format(name,now.strftime("%d.%m  %H:%M")),""]
+    parts=["<b>{}</b>  <i>{}</i>".format(name, now.strftime("%d.%m  %H:%M")),""]
+    parts.append("☀️  "+summer_line()); parts.append("")
 
     if s["show_weight"]:
         parts.append("⚖️  <b>{} → {} кг</b>".format(w_s,g_s)); parts.append("")
 
     if s["show_water"]:
         st_s="  🔥 {}д".format(streak) if streak>=2 else ""
-        parts.append("💧  <b>{} / {} мл</b>{}".format(water,wg,st_s))
+        parts.append("🌊  <b>{} / {} мл</b>{}".format(water,wg,st_s))
         parts.append(wbar(wp,uid)+"  {}%".format(wp)); parts.append("")
 
     if s["show_calories"]:
-        parts.append("🔥  <b>{} / {} ккал</b>".format(cal,cg))
+        parts.append("🍋  <b>{} / {} ккал</b>".format(cal,cg))
         parts.append(cbar(cp,uid)+"  {}%".format(cp)); parts.append("")
 
     sl_flag = s["show_sleep"] if "show_sleep" in s.keys() else 1
@@ -1083,7 +1108,7 @@ def scr_main(uid):
         sl_rows=sleep_hist(uid,1)
         if sl_rows:
             sl_r=sl_rows[0]; sl_h=sl_r["hours"]; sl_q=sl_r["quality"] or 3
-            parts.append("😴  <b>{:.1f}ч</b>  {}  {}".format(sl_h,quality_icon(sl_q),sbar(sl_q,uid)))
+            parts.append("🌙  <b>{:.1f}ч</b>  {}  {}".format(sl_h,quality_icon(sl_q),sbar(sl_q,uid)))
             parts.append("")
 
     acts=acts_for_day(uid,today_msk())
@@ -1131,7 +1156,7 @@ def scr_weight(uid):
             try:
                 days_left=int(need/abs(rate)*7)
                 eta_d=(today_msk()+timedelta(days=days_left)).strftime("%d.%m.%Y")
-                forecast="\nпрогноз  <b>{}</b>".format(eta_d)
+                forecast="\nпрогноз  <b>{}</b>  ☀️".format(eta_d)
             except: pass
         prog="\n\n{} {}%{}{}".format(gbar(pct,uid),pct,rate_s,forecast)
     total=len(weight_hist(uid))
@@ -1157,7 +1182,7 @@ def scr_water(uid):
         rows=c.execute(
             "SELECT amount,logged_at FROM water_log WHERE user_id=? AND date(logged_at)=date('now','+3 hours') ORDER BY logged_at DESC LIMIT 10",
             (uid,)).fetchall()
-    text="💧  <b>вода</b>\n\n<b>{} / {} мл</b>{}\n{} {}%\n\n{}".format(
+    text="🌊  <b>вода</b>\n\n<b>{} / {} мл</b>{}\n{} {}%\n\n{}".format(
         today,goal,"  🔥{}д".format(streak) if streak>=2 else "",
         wbar(pct,uid),pct, bq(fmt_log_water(rows)) if rows else "<i>пусто</i>")
     return text, kb_water()
@@ -1169,7 +1194,7 @@ def scr_cal(uid):
         rows=c.execute(
             "SELECT amount,description,logged_at FROM calories_log WHERE user_id=? AND date(logged_at)=date('now','+3 hours') ORDER BY logged_at DESC LIMIT 10",
             (uid,)).fetchall()
-    text="🔥  <b>калории</b>\n\n<b>{} / {} ккал</b>\n{} {}%\n\n{}".format(
+    text="🍋  <b>калории</b>\n\n<b>{} / {} ккал</b>\n{} {}%\n\n{}".format(
         today,goal,cbar(pct,uid),pct,
         bq(fmt_log_cal(rows)) if rows else "<i>пусто</i>")
     return text, kb_cal()
@@ -1192,14 +1217,14 @@ def scr_goals(uid):
                 if rate>0.001:
                     days_left=int(need/rate)
                     eta_d=(today_msk()+timedelta(days=days_left)).strftime("%d.%m.%Y")
-                    forecast_s="\nпри текущем темпе → <b>{}</b>".format(eta_d)
+                    forecast_s="\nпри текущем темпе → <b>{}</b>  ☀️".format(eta_d)
             except: pass
     tbl="старт    {}\nсейчас   {}\nцель     {}\nвода     {} мл/д\nккал     {} ккал/д".format(
         "{:.1f} кг".format(sw) if sw else "—",
         "{:.1f} кг".format(cw) if cw else "—",
         "{:.1f} кг".format(gw) if gw else "—",
         u["water_goal"] or 2000, u["cal_goal"] or 2000)
-    return "🎯  <b>цели</b>\n\n<code>{}</code>{}{}".format(tbl,prog,forecast_s), kb_goals()
+    return "🎯  <b>цели · путь к лету</b>\n\n<code>{}</code>{}{}".format(tbl,prog,forecast_s), kb_goals()
 
 def scr_profile(uid):
     u=guser(uid); lw=weight_hist(uid,1)
@@ -1228,7 +1253,7 @@ def scr_profile(uid):
         "{:.0f} см".format(u["height"]) if u["height"] else "—",
         "{} лет".format(u["age"]) if u["age"] else "—",
         extra)
-    return "👤  <b>профиль</b>\n\n<code>{}</code>".format(tbl), kb_profile()
+    return "🏖️  <b>профиль</b>\n\n<code>{}</code>".format(tbl), kb_profile()
 
 def scr_progress(uid):
     with db() as c:
@@ -1240,9 +1265,9 @@ def scr_progress(uid):
         sl=c.execute("SELECT AVG(hours) a FROM sleep_log WHERE user_id=? AND date(logged_at)>=date('now','+3 hours','-7 days')",(uid,)).fetchone()["a"]
     streak=water_streak(uid)
     sleep_s="{:.1f}ч".format(sl) if sl else "—"
-    tbl="тренировок   {}\nвода всего   {:.1f} л\nсерия вода   {} дн\n─────────────────\nср вода/день {} мл\nср ккал/день {}\nср сон/ночь  {}".format(
-        ta,tw/1000,streak,w7//d7,c7//d7,sleep_s)
-    return "📊  <b>статистика</b>\n\n<code>{}</code>".format(tbl), kb_progress()
+    tbl="тренировок   {}\nвода всего   {:.1f} л\nсерия вода   {} дн\n─────────────────\nср вода/день {} мл\nср ккал/день {}\nср сон/ночь  {}\n─────────────────\n{}".format(
+        ta,tw/1000,streak,w7//d7,c7//d7,sleep_s,summer_line())
+    return "📊  <b>путь к лету</b>\n\n<code>{}</code>".format(tbl), kb_progress()
 
 def scr_week_stats(uid):
     with db() as c:
@@ -1258,13 +1283,13 @@ def scr_week_stats(uid):
     sleep_s="{:.1f}ч".format(sl7["a"]) if sl7["a"] else "—"
     tbl="вода      {} / {} мл\nккал      {} ккал\nтренировок  {}\nсон (ср)   {}{}".format(
         water7,wgoal,cal7,acts7,sleep_s,wdelta)
-    return "📅  <b>неделя</b>\n\n<code>{}</code>\n\n{} {}%".format(tbl,wbar(wp,uid),wp), KB([("< статистика","progress")])
+    return "📅  <b>неделя</b>\n\n<code>{}</code>\n\n{} {}%\n\n<i>{}</i>".format(tbl,wbar(wp,uid),wp,summer_line()), KB([("< статистика","progress")])
 
 def scr_settings(uid):
     acts=acts_for_day(uid,today_msk())
     total=len(acts); done=sum(1 for a in acts if a.get("completed"))
     plan_s="нет задач" if not total else "{} из {} выполнено".format(done,total)
-    return "⚙️  <b>настройки</b>\n\nплан сегодня: <i>{}</i>".format(plan_s), kb_settings()
+    return "⚙️  <b>настройки</b>\n\nплан сегодня: <i>{}</i>\n\n<i>{}</i>".format(plan_s, summer_line()), kb_settings()
 
 def scr_sett_display(uid):
     s=gsett(uid)
@@ -1316,7 +1341,7 @@ def scr_plan_intro(uid):
     acts=acts_for_day(uid,today_msk())
     total=len(acts); done=sum(1 for a in acts if a.get("completed")); now=now_msk()
     if total==0:
-        text="📋  <b>план на сегодня</b>\n\n<i>задач пока нет</i>\n\nдобавь через ⚙️ → управление планом"
+        text="📋  <b>план на сегодня</b>\n\n<i>задач пока нет</i>\n\nдобавь через ⚙️ → управление планом\n\n<i>{}</i>".format(summer_line())
         kb=KB([("⚙️ настройки","settings"),("< назад","main")])
         return text, kb
     lines=[]
@@ -1331,9 +1356,9 @@ def scr_plan_intro(uid):
                else "{}  {}  <i>{}</i>".format(aico(a["type"]),a["name"],time_s)
         lines.append(name_s)
     remaining=total-done
-    if done==0:     status_s="всё впереди 💪";  action_btn=("▶️ начать","plan_cards")
-    elif done==total: status_s="всё выполнено 🏆"; action_btn=("📋 посмотреть","plan_cards")
-    else:           status_s="осталось {} из {}".format(remaining,total); action_btn=("▶️ продолжить","plan_cards")
+    if done==0:     status_s="всё впереди — начнём! 🌱";  action_btn=("▶️ начать","plan_cards")
+    elif done==total: status_s="всё выполнено — ты молодец! 🏆☀️"; action_btn=("📋 посмотреть","plan_cards")
+    else:           status_s="осталось {} из {}  💪".format(remaining,total); action_btn=("▶️ продолжить","plan_cards")
     block="<blockquote expandable>{}</blockquote>".format("\n".join(lines))
     text="📋  <b>план на сегодня</b>\n\n{}\n<i>{}</i>".format(block,status_s)
     return text, KB([action_btn],[("< назад","main")])
@@ -1380,17 +1405,17 @@ def scr_sleep(uid):
         avg_q=sum((r["quality"] or 3) for r in rows)/len(rows)
         avg_s="\n\n<b>среднее</b>  {:.1f}ч  {}".format(avg_h,sbar(avg_q,uid))
     block=bq("\n".join(lines)) if lines else "<i>нет записей</i>"
-    return "😴  <b>сон</b>  <i>последние 7</i>\n\n{}{}\n\n<i>выбери количество часов сна</i>".format(block,avg_s), kb_sleep()
+    return "🌙  <b>сон</b>  <i>последние 7</i>\n\n{}{}\n\n<i>хороший сон — путь к лету 🌟 выбери часов</i>".format(block,avg_s), kb_sleep()
 
 def scr_sleep_hist(uid):
     rows=sleep_hist(uid,30)
-    if not rows: return "😴  <b>история сна</b>\n\n<i>нет записей</i>", KB([("< назад","sleep")])
+    if not rows: return "🌙  <b>история сна</b>\n\n<i>нет записей</i>", KB([("< назад","sleep")])
     lines=[]
     for r in rows:
         d=datetime.fromisoformat(r["logged_at"]).strftime("%d.%m")
         lines.append("{}  {}ч  {}".format(d,r["hours"],quality_icon(r["quality"] or 3)))
     avg_h=sum(r["hours"] for r in rows)/len(rows)
-    return "😴  <b>история сна</b>  <i>30 дней</i>\n\nсреднее: <b>{:.1f}ч</b>\n\n{}".format(
+    return "🌙  <b>история сна</b>  <i>30 дней</i>\n\nсреднее: <b>{:.1f}ч</b>\n\n{}".format(
         avg_h,bq("\n".join(lines))), KB([("< назад","sleep")])
 
 # ── ЭКРАН: ПИТАНИЕ ─────────────────────────────────────────────────
@@ -1405,8 +1430,8 @@ def scr_nutrition(uid):
             kcal,cnt=by_meal[mk]
             rows.append("{}  {}  —  {} ккал  <i>×{}</i>".format(mico(mk),mnam(mk),kcal,cnt))
     meal_s="\n".join(rows) if rows else "<i>сегодня пусто — нажми «добавить еду»</i>"
-    return ("\U0001f37d  <b>\u043f\u0438\u0442\u0430\u043d\u0438\u0435</b>\n\n"
-            "<b>{} / {} \u043a\u043a\u0430\u043b</b>\n{} {}%\n\n{}".format(
+    return ("🍋  <b>питание</b>\n\n"
+            "<b>{} / {} ккал</b>\n{} {}%\n\n{}".format(
             cal,goal,cbar(pct,uid),pct,meal_s)), kb_nutrition()
 
 def scr_food_add(uid):
@@ -1431,26 +1456,26 @@ def scr_food_all(uid, page=0):
 
 def scr_food_grams(pid):
     p=get_product(pid)
-    if not p: return "\u274c \u043f\u0440\u043e\u0434\u0443\u043a\u0442 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d", kb_back("food_add")
-    return ("\U0001f34e  <b>{}</b>\n\n"
-            "<code>{}\u043a\u043a\u0430\u043b  |  \u0411{}  \u0416{}  \u0423{}</code>  \u043d\u0430 100\u0433\n\n"
-            "<i>\u0441\u043a\u043e\u043b\u044c\u043a\u043e \u0433\u0440\u0430\u043c\u043c \u0441\u044a\u0435\u043b?</i>".format(
+    if not p: return "❌ продукт не найден", kb_back("food_add")
+    return ("🌿  <b>{}</b>\n\n"
+            "<code>{}ккал  |  Б{}  Ж{}  У{}</code>  на 100г\n\n"
+            "<i>сколько грамм съел?</i>".format(
             p["name"],p["calories"],
             round(p["protein"],1),round(p["fat"],1),round(p["carbs"],1))), kb_food_grams(pid)
 
 def scr_food_meal(pid, grams):
     p=get_product(pid)
-    if not p: return "\u274c \u043f\u0440\u043e\u0434\u0443\u043a\u0442 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d", kb_back("food_add")
+    if not p: return "❌ продукт не найден", kb_back("food_add")
     kcal=int(p["calories"]*grams/100)
     prot=round(p["protein"]*grams/100,1)
     fat =round(p["fat"]*grams/100,1)
     carb=round(p["carbs"]*grams/100,1)
-    return ("\U0001f34e  <b>{}</b>  {}\u0433\n\n"
-            "<code>\u043a\u043a\u0430\u043b   {}\n"
-            "\u0431\u0435\u043b\u043a\u0438  {}\n"
-            "\u0436\u0438\u0440\u044b   {}\n"
-            "\u0443\u0433\u043b\u0435\u0432. {}</code>\n\n"
-            "<i>\u043a \u043a\u0430\u043a\u043e\u043c\u0443 \u043f\u0440\u0438\u0451\u043c\u0443 \u043e\u0442\u043d\u0435\u0441\u0442\u0438?</i>".format(
+    return ("🌿  <b>{}</b>  {}г\n\n"
+            "<code>ккал   {}\n"
+            "белки  {}\n"
+            "жиры   {}\n"
+            "углев. {}</code>\n\n"
+            "<i>к какому приёму отнести?</i>".format(
             p["name"],grams,kcal,prot,fat,carb)), kb_food_meal(pid,grams)
 
 def scr_food_diary(uid, date_str=None):
@@ -1499,7 +1524,7 @@ def scr_quick_products(uid, page=0):
     page_s = "  <i>стр. {}/{}</i>".format(page+1,total_p) if total_p > 1 else ""
     products_block = "<blockquote expandable>{}</blockquote>".format(
         "\n".join(lines)) if lines else "<i>нет продуктов</i>"
-    text = ("🍎  <b>быстрые продукты</b>  <i>{} шт</i>  стр. {}/{}\n\n"
+    text = ("🌿  <b>продукты</b>  <i>{} шт</i>  стр. {}/{}\n\n"
             "{}\n\n"
             "<i>нажми → логировать  ·  КБЖУ на 100г</i>").format(len(prods), page+1, total_p, products_block)
     return text, kb_quick_products(uid, page)
@@ -1543,19 +1568,19 @@ def scr_workout_timer(uid):
     wt=get_wt(uid)
     t=None
     if not wt:
-        return "⏱  <b>таймер тренировки</b>\n\n<i>нет активной тренировки</i>\n\nзапусти таймер из карточки задачи", kb_workout_timer_empty()
+        return "⏱  <b>таймер</b>\n\n<i>нет активной тренировки</i>\n\nзапусти из карточки задачи 🌱", kb_workout_timer_empty()
     try:
         started=datetime.fromisoformat(wt["started_at"])
         elapsed=int((now_msk()-started).total_seconds()/60)
         dur=wt["duration_planned"] or 30
         rem=dur-elapsed
         pct=min(100,int(elapsed/dur*100))
-        bar=pbar_block(pct) if get_bar_style(uid) else pbar(pct,10,"🟩","⬜")
+        bar=pbar_block(pct) if get_bar_style(uid) else pbar(pct,10,"🟨","⬜")
         name=wt.get("act_name","тренировка")
         if rem>0:
-            status="осталось  <b>{}</b>".format(fmt_dur(rem))
+            status="осталось  <b>{}</b>  💪".format(fmt_dur(rem))
         else:
-            status="⚠️  время вышло  (+{})".format(fmt_dur(-rem))
+            status="⚠️  время вышло  (+{})  — ты превзошёл план! ☀️".format(fmt_dur(-rem))
         text="⏱  <b>{}</b>\n\nпрошло  <b>{}</b>  из  {}\n{} {}%\n\n{}".format(
             name,fmt_dur(elapsed),fmt_dur(dur),bar,pct,status)
     except Exception as e:
@@ -1582,11 +1607,11 @@ def scr_reminders(uid):
         day=r.get("report_day",0); t=sch[0] if sch else "09:00"
         return "{}  {}".format(DAYS_RU[day],t)
     lines=[
-        "💧 вода  {}  {}".format(en(wr),info_w(wr)),
+        "🌊 вода  {}  {}".format(en(wr),info_w(wr)),
         "⚖️ вес   {}  {}".format(en(wgr),info_t(wgr)),
         "📅 отчёт {}  {}".format(en(rep),info_rep(rep)),
     ]
-    return "🔔  <b>напоминания</b>\n\n<code>{}</code>".format("\n".join(lines)), kb_reminders(uid)
+    return "🔔  <b>напоминания</b>\n\n<code>{}</code>\n\n<i>умные уведомления на пути к лету ☀️</i>".format("\n".join(lines)), kb_reminders(uid)
 
 
 
@@ -1681,7 +1706,7 @@ async def check_water_reminders():
                 today=today_water(uid); u=guser(uid)
                 goal=u["water_goal"] if u else 2000
                 pct=min(100,int(today/(goal or 2000)*100))
-                text="💧  <b>время пить воду!</b>\n\n<b>{} / {} мл</b>  {}%\n\n<i>сколько выпил?</i>".format(
+                text="🌊  <b>пора пить воду!</b>\n\n<b>{} / {} мл</b>  {}%\n\n<i>твоё лето ближе с каждым глотком 💙</i>".format(
                     today,goal,pct)
                 m=await bot.send_message(uid,text,reply_markup=kb_water_notif(),parse_mode="HTML")
                 water_remind_msgs[uid]=m.message_id
@@ -1706,7 +1731,7 @@ async def check_weight_reminders():
                     last_s="\n<i>последний раз: {} ({} кг)</i>".format(
                         ld.strftime("%d.%m"),lw[0]["weight"])
                 await bot.send_message(
-                    uid,"⚖️  <b>привет! пора взвеситься</b>{}\n\nотправь своё текущее значение веса".format(last_s),
+                    uid,"⚖️  <b>привет! пора взвеситься</b>{}\n\nкаждый килограмм ближе к летней мечте ☀️\n\nотправь своё текущее значение".format(last_s),
                     parse_mode="HTML",
                     reply_markup=KB([("⚖️ открыть вес","weight")]))
         except Exception as e:
@@ -1740,12 +1765,12 @@ async def check_weekly_report():
             sleep_s="  ср. {:.1f}ч/ночь".format(sl7) if sl7 else ""
             d_start=(today_msk()-timedelta(days=6)).strftime("%d.%m")
             d_end=today_msk().strftime("%d.%m")
-            text="📅  <b>отчёт  {} – {}</b>{}\n\n".format(d_start,d_end,wline)
-            text+="💧 вода   {:.1f} / {:.1f} л  ({}%)\n".format(water7/1000,wgoal/1000,wp)
-            text+="🔥 ккал   {} ккал  (ср. {}/день)\n".format(cal7,cal7//d7)
+            text="🌤  <b>летний отчёт  {} – {}</b>{}\n\n".format(d_start,d_end,wline)
+            text+="🌊 вода   {:.1f} / {:.1f} л  ({}%)\n".format(water7/1000,wgoal/1000,wp)
+            text+="🍋 ккал   {} ккал  (ср. {}/день)\n".format(cal7,cal7//d7)
             text+="💪 трен-к  {} выполнено\n".format(acts7)
-            text+="😴 сон   {}\n".format(sleep_s.strip() or "нет данных")
-            text+="\n{}  {}%".format(wbar(wp,uid),wp)
+            text+="🌙 сон   {}\n".format(sleep_s.strip() or "нет данных")
+            text+="\n{}  {}%\n\n<i>{}</i>".format(wbar(wp,uid),wp,summer_line())
             await bot.send_message(uid,text,parse_mode="HTML",
                                    reply_markup=KB([("📊 открыть статистику","progress")]))
         except Exception as e:
@@ -1756,13 +1781,29 @@ async def check_weekly_report():
 @dp.message(CommandStart())
 async def cmd_start(msg: Message, state: FSMContext):
     uid=msg.from_user.id
-    upsert(uid, msg.from_user.first_name or "")
+    name=msg.from_user.first_name or ""
+    upsert(uid, name)
     await state.clear()
     card_sessions.pop(uid,None)
     await safe_del(msg.chat.id,msg.message_id)
-    t,m=scr_main(uid)
-    sent=await bot.send_message(uid,t,reply_markup=m,parse_mode="HTML")
-    await state.update_data(msg_id=sent.message_id)
+    # Первый запуск — приветствие
+    u=guser(uid)
+    if not u["name"] or not u["start_weight"]:
+        welcome=(
+            "привет{} ☀️  я <b>letify</b>\n\n"
+            "помогу встретить лето лёгким и свободным 🌊\n\n"
+            "<i>{}</i>".format(
+                ", <b>{}</b>".format(name) if name else "",
+                summer_line()
+            )
+        )
+        sent=await bot.send_message(uid,welcome,parse_mode="HTML",
+            reply_markup=KB([("☀️ начать","main")]))
+        await state.update_data(msg_id=sent.message_id)
+    else:
+        t,m=scr_main(uid)
+        sent=await bot.send_message(uid,t,reply_markup=m,parse_mode="HTML")
+        await state.update_data(msg_id=sent.message_id)
 
 
 # ── CALLBACKS ───────────────────────────────────────────────────────
@@ -1860,7 +1901,7 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
     if data in _wm:
         log_water(uid,_wm[data]); t,m=scr_water(uid); await s("+{} мл\n\n".format(_wm[data])+t,m); return
     if data=="water_custom":
-        await state.set_state(St.water_custom); await s("введи количество мл:",kb_x("water")); return
+        await state.set_state(St.water_custom); await s("🌊 сколько мл выпил?",kb_x("water")); return
     if data=="water_goal_set":
         await state.set_state(St.water_goal); await s("дневная норма (мл):",kb_x("settings")); return
     if data=="water_del":
@@ -1885,7 +1926,7 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
                 try:
                     await bot.edit_message_text(
                         chat_id=uid,message_id=mid_notif,
-                        text="✅  <b>+{} мл</b> записано!\n\n💧 сегодня: <b>{} / {} мл</b>  {}%".format(
+                        text="✅  <b>+{} мл</b> записано!\n\n🌊 сегодня: <b>{} / {} мл</b>  {}%\n\n<i>каждый глоток ближе к лету ☀️</i>".format(
                             amt,today,goal,pct),
                         parse_mode="HTML",reply_markup=None)
                 except: pass
@@ -1996,7 +2037,7 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
     if data=="goals":
         t,m=scr_goals(uid); await s(t,m); return
     if data=="goal_weight":
-        await state.set_state(St.goal_weight); await s("целевой вес (кг):",kb_x("goals")); return
+        await state.set_state(St.goal_weight); await s("🏖️ какой вес хочешь к лету? (кг)",kb_x("goals")); return
     if data=="ideal_weight":
         await s(ideal_weight_text(uid),KB([("< назад","goals")])); return
 
@@ -2004,11 +2045,11 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
     if data=="profile":
         t,m=scr_profile(uid); await s(t,m); return
     if data=="pname":
-        await state.set_state(St.pname); await s("введи имя:",kb_x("profile")); return
+        await state.set_state(St.pname); await s("✏️ как тебя зовут?",kb_x("profile")); return
     if data=="pheight":
-        await state.set_state(St.pheight); await s("рост (см):",kb_x("profile")); return
+        await state.set_state(St.pheight); await s("📏 рост (см):",kb_x("profile")); return
     if data=="page_age":
-        await state.set_state(St.page_age); await s("возраст:",kb_x("profile")); return
+        await state.set_state(St.page_age); await s("🎂 сколько лет?",kb_x("profile")); return
 
     # ── СТАТИСТИКА ────────────────────────────────────────────────
     if data=="progress":
@@ -2252,7 +2293,7 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
             stop_wt(uid)
             started=datetime.fromisoformat(t["started_at"])
             elapsed=int((now_msk()-started).total_seconds()/60)
-            await s("✅  <b>тренировка завершена!</b>\n\nвремя: <b>{}</b>".format(fmt_dur(elapsed)),
+            await s("✅  <b>тренировка завершена!</b>\n\nвремя: <b>{}</b>\n\nкаждая тренировка — шаг к лету ☀️".format(fmt_dur(elapsed)),
                 KB([("< назад","main")])); return
         t2,m=scr_main(uid); await s(t2,m); return
 
@@ -2669,7 +2710,7 @@ async def main():
     scheduler.add_job(check_weight_reminders,"interval",seconds=60, id="weight_remind")
     scheduler.add_job(check_weekly_report,  "interval", seconds=60, id="weekly_report")
     scheduler.start()
-    log.info("fitbot v4 запущен ✅")
+    log.info("letify ☀️ запущен — путь к лету начинается!")
     await dp.start_polling(bot, drop_pending_updates=True)
 
 if __name__=="__main__":
