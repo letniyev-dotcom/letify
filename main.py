@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""fitbot v9 — google fit полная синхронизация + улучшенные форматы"""
+"""fitbot v4 — глобальный апгрейд: баги, редизайн, новые функции"""
 
 import subprocess, sys
 def _pip(pkg): subprocess.check_call([sys.executable,"-m","pip","install",pkg,"-q"])
@@ -9,14 +9,9 @@ try:    import apscheduler
 except: _pip("apscheduler")
 try:    import zoneinfo; zoneinfo.ZoneInfo("Europe/Moscow")
 except: _pip("tzdata")
-try:    import aiohttp
-except: _pip("aiohttp")
-try:    import requests as _req_test; del _req_test
-except: _pip("requests")
 
-import asyncio, logging, os, sqlite3, re, json, calendar as _cal_module, requests
+import asyncio, logging, os, sqlite3, re, json, calendar as _cal_module
 from datetime import datetime, timedelta, date as dt_date, time as dt_time
-from urllib.parse import urlencode
 
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import CommandStart
@@ -25,8 +20,6 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-import aiohttp
-from aiohttp import web as aio_web
 
 TOKEN = os.environ.get("BOT_TOKEN")
 if not TOKEN:
@@ -34,39 +27,6 @@ if not TOKEN:
 DB_PATH = "fitbot.db"
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
-
-# ── GOOGLE FIT ───────────────────────────────────────────────────────
-GFIT_CLIENT_ID     = os.environ.get("GFIT_CLIENT_ID", "")
-GFIT_CLIENT_SECRET = os.environ.get("GFIT_CLIENT_SECRET", "")
-GFIT_PORT          = int(os.environ.get("GFIT_PORT", "8080"))
-GFIT_ENABLED       = bool(GFIT_CLIENT_ID and GFIT_CLIENT_SECRET)
-
-def _detect_public_url():
-    """Автоматически определяем публичный IP/URL для callback."""
-    custom = os.environ.get("GFIT_REDIRECT_URI", "")
-    if custom:
-        return custom.rstrip("/")
-    # Пробуем получить публичный IP
-    for svc in ("https://api.ipify.org", "https://ifconfig.me/ip", "https://icanhazip.com"):
-        try:
-            import urllib.request as _ur
-            ip = _ur.urlopen(svc, timeout=4).read().decode().strip()
-            if ip:
-                return "http://{}:{}/gfit/callback".format(ip, GFIT_PORT)
-        except: pass
-    return "http://localhost:{}/gfit/callback".format(GFIT_PORT)
-
-GFIT_REDIRECT_URI = _detect_public_url() if GFIT_ENABLED else ""
-
-GFIT_SCOPES = " ".join([
-    "https://www.googleapis.com/auth/fitness.activity.read",
-    "https://www.googleapis.com/auth/fitness.body.read",
-    "https://www.googleapis.com/auth/fitness.nutrition.read",
-    "https://www.googleapis.com/auth/fitness.sleep.read",
-])
-GFIT_AUTH_URL   = "https://accounts.google.com/o/oauth2/v2/auth"
-GFIT_TOKEN_URL  = "https://oauth2.googleapis.com/token"
-GFIT_API_BASE   = "https://www.googleapis.com/fitness/v1/users/me"
 
 # ── ЧАСОВОЙ ПОЯС ────────────────────────────────────────────────────
 # Бот всегда работает в московском времени (UTC+3)
@@ -127,9 +87,8 @@ DEFAULT_PRODUCTS = [
 
 # ── АКТИВНЫЕ СЕССИИ ──────────────────────────────────────────────────
 card_sessions: dict = {}          # uid -> {card_list, card_idx, msg_id}
-water_remind_msgs: dict = {}      # uid -> msg_id
-workout_timer_msgs: dict = {}     # uid -> msg_id
-steps_sessions: dict = {}         # uid -> True  (открыт экран шагов)
+water_remind_msgs: dict = {}      # uid -> msg_id  (для редактирования уведомления)
+workout_timer_msgs: dict = {}     # uid -> msg_id  (для экрана таймера)
 
 
 # ── FSM СОСТОЯНИЯ ───────────────────────────────────────────────────
@@ -166,9 +125,6 @@ class St(StatesGroup):
     remind_weight_time    = State()
     remind_report_time    = State()
     remind_report_day     = State()
-    # 👟 шаги
-    steps_goal    = State()
-
 
 
 # ── ИНИЦИАЛИЗАЦИЯ БД ────────────────────────────────────────────────
@@ -239,21 +195,6 @@ def init_db():
             duration_planned INTEGER DEFAULT 30,
             is_active INTEGER DEFAULT 1
         );
-        CREATE TABLE IF NOT EXISTS steps_log (
-            id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER,
-            steps INTEGER, source TEXT DEFAULT 'manual',
-            logged_at TEXT DEFAULT (datetime('now','+3 hours'))
-        );
-        CREATE TABLE IF NOT EXISTS gfit_tokens (
-            user_id INTEGER PRIMARY KEY,
-            access_token TEXT, refresh_token TEXT,
-            expires_at TEXT, connected_at TEXT
-        );
-        CREATE TABLE IF NOT EXISTS gfit_oauth_state (
-            state TEXT PRIMARY KEY,
-            user_id INTEGER,
-            created_at TEXT DEFAULT (datetime('now','+3 hours'))
-        );
         """)
         # ── Миграции ─────────────────────────────────────────────────
         ex = {r[1] for r in c.execute("PRAGMA table_info(activities)")}
@@ -261,7 +202,7 @@ def init_db():
             if col not in ex:
                 c.execute("ALTER TABLE activities ADD COLUMN {} {}".format(col, defn))
         ux = {r[1] for r in c.execute("PRAGMA table_info(users)")}
-        for col, defn in [("cal_goal","INTEGER DEFAULT 2000"),("gender","TEXT DEFAULT 'male'"),("steps_goal","INTEGER DEFAULT 8000")]:
+        for col, defn in [("cal_goal","INTEGER DEFAULT 2000"),("gender","TEXT DEFAULT 'male'")]:
             if col not in ux:
                 c.execute("ALTER TABLE users ADD COLUMN {} {}".format(col, defn))
         rx = {r[1] for r in c.execute("PRAGMA table_info(reminders)")}
@@ -272,8 +213,6 @@ def init_db():
             c.execute("ALTER TABLE user_settings ADD COLUMN show_sleep INTEGER DEFAULT 1")
         if "bar_style" not in sx:
             c.execute("ALTER TABLE user_settings ADD COLUMN bar_style INTEGER DEFAULT 0")
-        if "show_steps" not in sx:
-            c.execute("ALTER TABLE user_settings ADD COLUMN show_steps INTEGER DEFAULT 1")
         cx = {r[1] for r in c.execute("PRAGMA table_info(calories_log)")}
         if "meal_type" not in cx:
             c.execute("ALTER TABLE calories_log ADD COLUMN meal_type TEXT DEFAULT 'other'")
@@ -428,282 +367,6 @@ def del_last_cal(uid):
 
 def reset_cal(uid):
     with db() as c: c.execute("DELETE FROM calories_log WHERE user_id=? AND date(logged_at)=date('now','+3 hours')", (uid,))
-
-# ── HELPERS: ШАГИ ────────────────────────────────────────────────────
-def log_steps(uid, steps, source="manual"):
-    with db() as c:
-        # Если уже есть запись за сегодня — суммируем (обновляем последнюю)
-        r = c.execute(
-            "SELECT id FROM steps_log WHERE user_id=? AND date(logged_at)=date('now','+3 hours') AND source=? ORDER BY id DESC LIMIT 1",
-            (uid, source)).fetchone()
-        if r and source != "manual":
-            c.execute("UPDATE steps_log SET steps=? WHERE id=?", (steps, r["id"]))
-        else:
-            c.execute("INSERT INTO steps_log (user_id,steps,source) VALUES (?,?,?)", (uid, steps, source))
-
-def today_steps(uid):
-    with db() as c:
-        r = c.execute(
-            "SELECT COALESCE(SUM(steps),0) t FROM steps_log WHERE user_id=? AND date(logged_at)=date('now','+3 hours')",
-            (uid,)).fetchone()
-        return r["t"] if r else 0
-
-def steps_hist(uid, n=7):
-    with db() as c:
-        return c.execute(
-            "SELECT date(logged_at) d, SUM(steps) s FROM steps_log WHERE user_id=? GROUP BY date(logged_at) ORDER BY d DESC LIMIT ?",
-            (uid, n)).fetchall()
-
-def del_last_steps(uid):
-    with db() as c:
-        r = c.execute("SELECT id FROM steps_log WHERE user_id=? ORDER BY logged_at DESC LIMIT 1", (uid,)).fetchone()
-        if r: c.execute("DELETE FROM steps_log WHERE id=?", (r["id"],))
-
-def reset_steps(uid):
-    with db() as c:
-        c.execute("DELETE FROM steps_log WHERE user_id=? AND date(logged_at)=date('now','+3 hours')", (uid,))
-
-def steps_entries_today(uid):
-    """Все записи шагов за сегодня (индивидуальные строки для отображения +X)."""
-    with db() as c:
-        return c.execute(
-            "SELECT steps, source, logged_at FROM steps_log WHERE user_id=? AND date(logged_at)=date('now','+3 hours') ORDER BY logged_at DESC",
-            (uid,)).fetchall()
-
-# ── HELPERS: GOOGLE FIT ──────────────────────────────────────────────
-import secrets as _secrets
-
-def gfit_save_token(uid, access_token, refresh_token, expires_in):
-    expires_at = (now_msk() + timedelta(seconds=expires_in)).strftime("%Y-%m-%d %H:%M:%S")
-    with db() as c:
-        c.execute(
-            "INSERT OR REPLACE INTO gfit_tokens (user_id,access_token,refresh_token,expires_at,connected_at) VALUES (?,?,?,?,?)",
-            (uid, access_token, refresh_token, expires_at, datetime_now_sql()))
-
-def gfit_get_token(uid):
-    with db() as c:
-        return c.execute("SELECT * FROM gfit_tokens WHERE user_id=?", (uid,)).fetchone()
-
-def gfit_disconnect(uid):
-    with db() as c:
-        c.execute("DELETE FROM gfit_tokens WHERE user_id=?", (uid,))
-
-def gfit_is_connected(uid):
-    t = gfit_get_token(uid)
-    return bool(t and t["refresh_token"])
-
-def gfit_make_state(uid):
-    state = _secrets.token_urlsafe(16)
-    with db() as c:
-        c.execute("INSERT INTO gfit_oauth_state (state,user_id) VALUES (?,?)", (state, uid))
-    return state
-
-def gfit_pop_state(state):
-    with db() as c:
-        r = c.execute("SELECT user_id FROM gfit_oauth_state WHERE state=?", (state,)).fetchone()
-        c.execute("DELETE FROM gfit_oauth_state WHERE state=?", (state,))
-    return r["user_id"] if r else None
-
-def gfit_refresh(uid):
-    """Обновить access_token по refresh_token. Вернуть новый или None."""
-    t = gfit_get_token(uid)
-    if not t or not t["refresh_token"]: return None
-    try:
-        r = requests.post(GFIT_TOKEN_URL, data={
-            "client_id":     GFIT_CLIENT_ID,
-            "client_secret": GFIT_CLIENT_SECRET,
-            "refresh_token": t["refresh_token"],
-            "grant_type":    "refresh_token",
-        }, timeout=10)
-        d = r.json()
-        if "access_token" not in d: return None
-        gfit_save_token(uid, d["access_token"], t["refresh_token"], d.get("expires_in", 3600))
-        return d["access_token"]
-    except Exception as e:
-        log.warning("gfit_refresh uid=%s: %s", uid, e)
-        return None
-
-def gfit_get_access_token(uid):
-    """Вернуть валидный access_token (обновит если нужно)."""
-    t = gfit_get_token(uid)
-    if not t: return None
-    try:
-        exp = datetime.fromisoformat(t["expires_at"])
-        if now_msk() < exp - timedelta(minutes=5):
-            return t["access_token"]
-    except: pass
-    return gfit_refresh(uid)
-
-def _gfit_ns_time(dt_obj):
-    """datetime → наносекунды с эпохи (строка)."""
-    return str(int(dt_obj.timestamp() * 1e9))
-
-def gfit_sync(uid):
-    """
-    Синхронизировать с Google Fit:
-      - шаги за сегодня
-      - сожжённые калории за сегодня
-      - активности (сессии) за сегодня
-      - вес (последний)
-    Возвращает dict с результатами или None при ошибке.
-    """
-    token = gfit_get_access_token(uid)
-    if not token: return None
-    headers = {"Authorization": "Bearer " + token}
-    today = today_msk()
-    start_dt = datetime.combine(today, dt_time.min)
-    end_dt   = datetime.combine(today, dt_time.max)
-    start_ms = int(start_dt.timestamp() * 1000)
-    end_ms   = int(end_dt.timestamp() * 1000)
-    start_ns = _gfit_ns_time(start_dt)
-    end_ns   = _gfit_ns_time(end_dt)
-
-    result = {}
-
-    # ── Шаги ──
-    try:
-        body = {"aggregateBy":[{"dataTypeName":"com.google.step_count.delta"}],
-                "bucketByTime":{"durationMillis": 86400000},
-                "startTimeMillis": start_ms, "endTimeMillis": end_ms}
-        r = requests.post(GFIT_API_BASE+"/dataset:aggregate", json=body, headers=headers, timeout=10)
-        buckets = r.json().get("bucket", [])
-        steps = 0
-        for b in buckets:
-            for ds in b.get("dataset", []):
-                for pt in ds.get("point", []):
-                    for v in pt.get("value", []):
-                        steps += v.get("intVal", 0)
-        result["steps"] = steps
-    except Exception as e:
-        log.warning("gfit steps uid=%s: %s", uid, e)
-
-    # ── Сожжённые калории ──
-    try:
-        body = {"aggregateBy":[{"dataTypeName":"com.google.calories.expended"}],
-                "bucketByTime":{"durationMillis": 86400000},
-                "startTimeMillis": start_ms, "endTimeMillis": end_ms}
-        r = requests.post(GFIT_API_BASE+"/dataset:aggregate", json=body, headers=headers, timeout=10)
-        buckets = r.json().get("bucket", [])
-        kcal = 0.0
-        for b in buckets:
-            for ds in b.get("dataset", []):
-                for pt in ds.get("point", []):
-                    for v in pt.get("value", []):
-                        kcal += v.get("fpVal", 0)
-        result["kcal_burned"] = int(kcal)
-    except Exception as e:
-        log.warning("gfit kcal uid=%s: %s", uid, e)
-
-    # ── Активности (сессии) ──
-    try:
-        url = (GFIT_API_BASE + "/sessions"
-               "?startTime={}&endTime={}&includeDeleted=false").format(
-            start_dt.strftime("%Y-%m-%dT%H:%M:%S.000Z"),
-            end_dt.strftime("%Y-%m-%dT%H:%M:%S.000Z"))
-        r = requests.get(url, headers=headers, timeout=10)
-        sessions = r.json().get("session", [])
-        activities = []
-        ACT_MAP = {
-            7:  ("run",  "бег"),   8: ("walk","ходьба"),
-            1:  ("bike", "велосипед"), 97:("gym","зал"),
-            99: ("yoga", "йога"),  82:("swim","плавание"),
-        }
-        for s in sessions:
-            act_type_id = s.get("activityType", 4)
-            atype, aname = ACT_MAP.get(act_type_id, ("other", s.get("name","активность")))
-            start_ms_ = int(s.get("startTimeMillis", 0))
-            end_ms_   = int(s.get("endTimeMillis", 0))
-            dur_min   = int((end_ms_ - start_ms_) / 60000)
-            activities.append({"type": atype, "name": aname, "duration": dur_min,
-                                "start_ms": start_ms_})
-        result["activities"] = activities
-    except Exception as e:
-        log.warning("gfit sessions uid=%s: %s", uid, e)
-
-    # ── Вес ──
-    try:
-        url = (GFIT_API_BASE +
-               "/dataSources/derived:com.google.weight:com.google.android.gms:merge_weight"
-               "/datasets/{}-{}".format(start_ns, end_ns))
-        r = requests.get(url, headers=headers, timeout=10)
-        pts = r.json().get("point", [])
-        if pts:
-            w = pts[-1]["value"][0].get("fpVal")
-            if w: result["weight"] = round(w, 1)
-    except Exception as e:
-        log.warning("gfit weight uid=%s: %s", uid, e)
-
-    # ── Питание (калории из еды) ──
-    try:
-        body = {"aggregateBy":[{"dataTypeName":"com.google.nutrition"}],
-                "bucketByTime":{"durationMillis": 86400000},
-                "startTimeMillis": start_ms, "endTimeMillis": end_ms}
-        r = requests.post(GFIT_API_BASE+"/dataset:aggregate", json=body, headers=headers, timeout=10)
-        buckets = r.json().get("bucket", [])
-        food_kcal = 0.0
-        for b in buckets:
-            for ds in b.get("dataset", []):
-                for pt in ds.get("point", []):
-                    for v in pt.get("value", []):
-                        for mv in v.get("mapVal", []):
-                            if mv.get("key") == "calories":
-                                food_kcal += mv.get("value", {}).get("fpVal", 0)
-        if food_kcal > 0:
-            result["food_kcal"] = int(food_kcal)
-    except Exception as e:
-        log.warning("gfit nutrition uid=%s: %s", uid, e)
-
-    # ── Сон ──
-    try:
-        body = {"aggregateBy":[{"dataTypeName":"com.google.sleep.segment"}],
-                "bucketByTime":{"durationMillis": 86400000},
-                "startTimeMillis": start_ms, "endTimeMillis": end_ms}
-        r = requests.post(GFIT_API_BASE+"/dataset:aggregate", json=body, headers=headers, timeout=10)
-        buckets = r.json().get("bucket", [])
-        sleep_ms = 0
-        for b in buckets:
-            for ds in b.get("dataset", []):
-                for pt in ds.get("point", []):
-                    # type 72 = SLEEP_LIGHT, 73 = SLEEP_DEEP, 74 = SLEEP_REM, 112 = SLEEP (generic)
-                    seg_type = pt.get("value", [{}])[0].get("intVal", 0) if pt.get("value") else 0
-                    if seg_type in (72, 73, 74, 112):
-                        t_start = int(pt.get("startTimeNanos", 0)) // 1_000_000
-                        t_end   = int(pt.get("endTimeNanos",   0)) // 1_000_000
-                        sleep_ms += max(0, t_end - t_start)
-        if sleep_ms > 0:
-            result["sleep_hours"] = round(sleep_ms / 3_600_000, 1)
-    except Exception as e:
-        log.warning("gfit sleep uid=%s: %s", uid, e)
-
-    # ── Применяем данные ──
-    applied = []
-
-    if result.get("steps", 0) > 0:
-        log_steps(uid, result["steps"], source="gfit")
-        applied.append("👟 {:,} шагов".format(result["steps"]))
-
-    if result.get("kcal_burned", 0) > 0:
-        applied.append("🔥 сожжено ~{} ккал".format(result["kcal_burned"]))
-
-    if result.get("weight"):
-        log_w(uid, result["weight"])
-        applied.append("⚖️ вес {} кг".format(result["weight"]))
-
-    if result.get("food_kcal", 0) > 0:
-        log_cal(uid, result["food_kcal"], desc="google fit (питание)", meal_type="other")
-        applied.append("🍽 {} ккал из еды".format(result["food_kcal"]))
-
-    if result.get("sleep_hours", 0) > 0.5:
-        log_sleep(uid, result["sleep_hours"], quality=3, note="google fit")
-        applied.append("😴 {:.1f}ч сна".format(result["sleep_hours"]))
-
-    if result.get("activities"):
-        for act in result["activities"]:
-            if act["duration"] > 3:
-                applied.append("💪 {} {}мин".format(act["name"], act["duration"]))
-
-    result["applied"] = applied
-    return result
 
 def today_cal(uid):
     with db() as c:
@@ -967,8 +630,8 @@ def kb_main(uid):
     return KB(
         [(plan_label, "plan_cards")],
         [("⚖️", "weight"), ("💧", "water"), ("🍎", "nutrition")],
-        [("😴", "sleep"),  ("👟", "steps"),  ("⏱️", "workout_timer")],
-        [("📊", "progress"), ("👤 профиль", "profile"), ("⚙️", "settings")],
+        [("😴", "sleep"),  ("⏱️", "workout_timer"), ("📊", "progress")],
+        [("👤 профиль", "profile"), ("⚙️ настройки", "settings")],
     )
 
 def kb_weight():
@@ -1047,7 +710,7 @@ def kb_food_meal(pid, grams):
 def kb_goals():
     return KB(
         [("⚖️ цель по весу","goal_weight"), ("💧 норма воды","water_goal_set")],
-        [("🔥 цель по ккал","cal_goal_set"), ("👟 цель по шагам","steps_goal_set")],
+        [("🔥 цель по ккал","cal_goal_set")],
         [("📐 идеальный вес","ideal_weight")],
         [("< назад","settings")],
     )
@@ -1064,37 +727,26 @@ def kb_progress():
         [("< назад","main")],
     )
 
-def kb_settings(uid=None):
-    # Google Fit кнопка ВСЕГДА сверху
-    if GFIT_ENABLED and uid and gfit_is_connected(uid):
-        gfit_btn = B("🔗 google fit  ✅  синхронизировать", "gfit_settings")
-    elif GFIT_ENABLED:
-        gfit_btn = B("🔗 подключить google fit", "gfit_settings")
-    else:
-        gfit_btn = B("🔗 google fit  —  настроить", "gfit_settings")
-    rows = [
-        [gfit_btn],
-        [B("📋 план",        "plan_manage"),      B("📤 загрузить план","plan_upload_start")],
-        [B("🎯 цели и нормы","goals"),            B("🔔 напоминания",   "reminders")],
-        [B("🏠 экран",       "sett_display"),     B("🗑 сбросить",      "sett_reset")],
-        [B("< меню","main")],
-    ]
-    return InlineKeyboardMarkup(inline_keyboard=rows)
+def kb_settings():
+    return KB(
+        [("📋 план",        "plan_manage"),      ("📤 загрузить план","plan_upload_start")],
+        [("🎯 цели и нормы","goals"),            ("🔔 напоминания",   "reminders")],
+        [("🏠 экран",       "sett_display"),     ("🗑 сбросить",      "sett_reset")],
+        [("< меню",        "main")],
+    )
 
 def kb_sett_display(uid):
     s=gsett(uid)
     def ch(v): return "✅" if v else "☐"
     sl=s["show_sleep"] if "show_sleep" in s.keys() else 1
     bs=s["bar_style"]  if "bar_style"  in s.keys() else 0
-    ss=s["show_steps"] if "show_steps" in s.keys() else 1
     bar_lbl="[██░░] блочная" if bs else "🟩⬜ эмодзи"
     return KB(
         [("{} ⚖️ вес".format(ch(s["show_weight"])),      "stog_weight"),
          ("{} 💧 вода".format(ch(s["show_water"])),      "stog_water")],
         [("{} 🔥 калории".format(ch(s["show_calories"])), "stog_calories"),
          ("{} 😴 сон".format(ch(sl)),                    "stog_sleep")],
-        [("{} 👟 шаги".format(ch(ss)),                   "stog_steps"),
-         ("{} полоса: {}".format(ch(bs),bar_lbl),        "stog_bar_style")],
+        [("{} полоса: {}".format(ch(bs),bar_lbl),        "stog_bar_style")],
         [("< настройки","settings")],
     )
 
@@ -1102,14 +754,7 @@ def kb_sett_reset():
     return KB(
         [("💧 вода за день","reset_water"),   ("🔥 ккал за день","reset_cal")],
         [("⚖️ история веса","reset_weight"),  ("😴 история сна","reset_sleep")],
-        [("👟 шаги за день","reset_steps")],
         [("< настройки","settings")],
-    )
-
-def kb_steps(uid):
-    return KB(
-        [("↩ удалить последнее","steps_del")],
-        [("< назад","main")],
     )
 
 def kb_days(sel: set):
@@ -1229,9 +874,8 @@ def kb_qp_delete_mode(uid, page=0):
     for p in chunk:
         rows.append([B("🗑 {}".format(p["name"]), "qp_dodel_{}".format(p["id"]))])
     nav = []
-    if page > 0: nav.append(B("←","qpdm_{}".format(page-1)))
-    nav.append(B("{} из {}".format(page+1, total_p), "noop"))
-    if page < total_p-1: nav.append(B("→","qpdm_{}".format(page+1)))
+    if page > 0: nav.append(B("<","qpdm_{}".format(page-1)))
+    if page < total_p-1: nav.append(B(">","qpdm_{}".format(page+1)))
     if nav: rows.append(nav)
     rows.append([B("< назад","quick_products")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
@@ -1441,16 +1085,6 @@ def scr_main(uid):
             parts.append("😴  <b>{:.1f}ч</b>  {}  {}".format(sl_h,quality_icon(sl_q),sbar(sl_q,uid)))
             parts.append("")
 
-    # шаги
-    sh_steps = s["show_steps"] if "show_steps" in s.keys() else 1
-    if sh_steps:
-        st_today = today_steps(uid)
-        st_goal = (u["steps_goal"] if u else None) or 8000
-        st_pct = min(100, int(st_today / st_goal * 100))
-        parts.append("👟  <b>{:,} / {:,} шагов</b>".format(st_today, st_goal))
-        parts.append(gbar(st_pct, uid) + "  {}%".format(st_pct))
-        parts.append("")
-
     acts=acts_for_day(uid,today_msk())
     if acts:
         plan_lines=[]
@@ -1559,12 +1193,11 @@ def scr_goals(uid):
                     eta_d=(today_msk()+timedelta(days=days_left)).strftime("%d.%m.%Y")
                     forecast_s="\nпри текущем темпе → <b>{}</b>".format(eta_d)
             except: pass
-    tbl="старт    {}\nсейчас   {}\nцель     {}\nвода     {} мл/д\nккал     {} ккал/д\nшаги     {}/д".format(
+    tbl="старт    {}\nсейчас   {}\nцель     {}\nвода     {} мл/д\nккал     {} ккал/д".format(
         "{:.1f} кг".format(sw) if sw else "—",
         "{:.1f} кг".format(cw) if cw else "—",
         "{:.1f} кг".format(gw) if gw else "—",
-        u["water_goal"] or 2000, u["cal_goal"] or 2000,
-        (u["steps_goal"] if u else None) or 8000)
+        u["water_goal"] or 2000, u["cal_goal"] or 2000)
     return "🎯  <b>цели</b>\n\n<code>{}</code>{}{}".format(tbl,prog,forecast_s), kb_goals()
 
 def scr_profile(uid):
@@ -1604,12 +1237,10 @@ def scr_progress(uid):
         c7=c.execute("SELECT COALESCE(SUM(amount),0) t FROM calories_log WHERE user_id=? AND date(logged_at)>=date('now','+3 hours','-7 days')",(uid,)).fetchone()["t"]
         d7=c.execute("SELECT COUNT(DISTINCT date(logged_at)) cnt FROM water_log WHERE user_id=? AND date(logged_at)>=date('now','+3 hours','-7 days')",(uid,)).fetchone()["cnt"] or 1
         sl=c.execute("SELECT AVG(hours) a FROM sleep_log WHERE user_id=? AND date(logged_at)>=date('now','+3 hours','-7 days')",(uid,)).fetchone()["a"]
-        st7=c.execute("SELECT COALESCE(SUM(steps),0) t FROM steps_log WHERE user_id=? AND date(logged_at)>=date('now','+3 hours','-7 days')",(uid,)).fetchone()["t"]
     streak=water_streak(uid)
     sleep_s="{:.1f}ч".format(sl) if sl else "—"
-    steps_s="{:,}".format(st7) if st7 else "—"
-    tbl="тренировок   {}\nвода всего   {:.1f} л\nсерия вода   {} дн\n─────────────────\nср вода/день {} мл\nср ккал/день {}\nср сон/ночь  {}\nшаги за 7д   {}".format(
-        ta,tw/1000,streak,w7//d7,c7//d7,sleep_s,steps_s)
+    tbl="тренировок   {}\nвода всего   {:.1f} л\nсерия вода   {} дн\n─────────────────\nср вода/день {} мл\nср ккал/день {}\nср сон/ночь  {}".format(
+        ta,tw/1000,streak,w7//d7,c7//d7,sleep_s)
     return "📊  <b>статистика</b>\n\n<code>{}</code>".format(tbl), kb_progress()
 
 def scr_week_stats(uid):
@@ -1632,21 +1263,19 @@ def scr_settings(uid):
     acts=acts_for_day(uid,today_msk())
     total=len(acts); done=sum(1 for a in acts if a.get("completed"))
     plan_s="нет задач" if not total else "{} из {} выполнено".format(done,total)
-    return "⚙️  <b>настройки</b>\n\nплан сегодня: <i>{}</i>".format(plan_s), kb_settings(uid)
+    return "⚙️  <b>настройки</b>\n\nплан сегодня: <i>{}</i>".format(plan_s), kb_settings()
 
 def scr_sett_display(uid):
     s=gsett(uid)
     def ch(v): return "✅" if v else "☐"
     sl=s["show_sleep"] if "show_sleep" in s.keys() else 1
     bs=s["bar_style"]  if "bar_style"  in s.keys() else 0
-    ss=s["show_steps"] if "show_steps" in s.keys() else 1
     bar_lbl="[██░░] блочная" if bs else "🟩⬜ эмодзи"
     lines=[
         "{} ⚖️ вес".format(ch(s["show_weight"])),
         "{} 💧 вода".format(ch(s["show_water"])),
         "{} 🔥 калории".format(ch(s["show_calories"])),
         "{} 😴 сон".format(ch(sl)),
-        "{} 👟 шаги".format(ch(ss)),
         "",
         "{} полоса: {}".format(ch(bs),bar_lbl),
     ]
@@ -1958,103 +1587,6 @@ def scr_reminders(uid):
     return "🔔  <b>напоминания</b>\n\n<code>{}</code>".format("\n".join(lines)), kb_reminders(uid)
 
 
-def scr_steps(uid):
-    u = guser(uid); goal = (u["steps_goal"] if u else None) or 8000
-    today = today_steps(uid)
-    pct = min(100, int(today / goal * 100))
-    kcal_est = int(today * 0.04)
-    km_est = round(today * 0.0007, 1)
-    gfit_s = ""
-    if GFIT_ENABLED and gfit_is_connected(uid):
-        gfit_s = "  <i>🔗 google fit</i>"
-    # Записи за сегодня → "+X" в свёрнутом блоке
-    entries = steps_entries_today(uid)
-    if entries:
-        entry_lines = []
-        for e in entries:
-            src_s = "  <i>gfit</i>" if e["source"] == "gfit" else ""
-            entry_lines.append("+{:,}{}".format(e["steps"], src_s))
-        hist_block = "\n\n<blockquote expandable>{}</blockquote>".format("\n".join(entry_lines))
-    else:
-        hist_block = ""
-    hint = "\n\n<i>отправь число — запишу шаги</i>" if not today else ""
-    text = ("👟  <b>шаги</b>{}\n\n"
-            "<b>{:,} / {:,}</b>  шагов\n"
-            "{} {}%\n\n"
-            "<code>~{} ккал сожжено  ·  ~{} км</code>{}{}").format(
-        gfit_s, today, goal,
-        pbar(pct, 10, "🟩", "⬜"), pct,
-        kcal_est, km_est, hist_block, hint)
-    return text, kb_steps(uid)
-
-def scr_gfit_settings(uid):
-    """Единый экран google fit в настройках."""
-    if not GFIT_ENABLED:
-        return (
-            "🔗  <b>google fit</b>\n\n"
-            "⚙️  <b>настройка для владельца бота</b>\n\n"
-            "<b>1.</b> <a href=\"https://console.cloud.google.com/\">Google Cloud Console</a> → новый проект\n"
-            "<b>2.</b> APIs & Services → Library → <b>Fitness API</b> → Enable\n"
-            "<b>3.</b> OAuth consent screen → External → добавь аккаунты в Test users\n"
-            "<b>4.</b> Credentials → Create OAuth client ID → тип: <b>Web application</b>\n"
-            "   Authorized redirect URI: <code>http://ВАШ_IP:{}/gfit/callback</code>\n"
-            "<b>5.</b> Задай переменные окружения:\n"
-            "<code>GFIT_CLIENT_ID=ваш_client_id\n"
-            "GFIT_CLIENT_SECRET=ваш_secret</code>\n\n"
-            "<i>Бот сам определит свой публичный IP и запустит callback-сервер</i>".format(GFIT_PORT),
-            KB([("< настройки","settings")])
-        )
-    if not gfit_is_connected(uid):
-        return scr_gfit_connect(uid)
-    return scr_gfit_status(uid)
-
-def scr_gfit_connect(uid):
-    state_tok = gfit_make_state(uid)
-    params = {
-        "client_id":     GFIT_CLIENT_ID,
-        "redirect_uri":  GFIT_REDIRECT_URI,
-        "response_type": "code",
-        "scope":         GFIT_SCOPES,
-        "access_type":   "offline",
-        "prompt":        "consent",
-        "state":         state_tok,
-    }
-    url = GFIT_AUTH_URL + "?" + urlencode(params)
-    text = (
-        "🔗  <b>подключение google fit</b>\n\n"
-        "нажми кнопку, войди в Google и разреши доступ — "
-        "бот подключится автоматически 🎉\n\n"
-        "что будет синхронизироваться каждый час:\n"
-        "  👟 шаги · 🔥 калории · ⚖️ вес\n"
-        "  🍽 питание · 💪 тренировки · 😴 сон"
-    )
-    kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🔗 войти через Google", url=url)],
-        [B("< настройки","settings")],
-    ])
-    return text, kb
-
-def scr_gfit_status(uid):
-    t = gfit_get_token(uid)
-    connected_at = ""
-    try:
-        d = datetime.fromisoformat(t["connected_at"])
-        connected_at = d.strftime("%d.%m.%Y %H:%M")
-    except: pass
-    text = (
-        "🔗  <b>google fit</b>  ✅ подключён\n\n"
-        "<i>подключено: {}</i>\n\n"
-        "синхронизируется автоматически каждый час:\n"
-        "  👟 шаги · 🔥 калории · 💪 тренировки · ⚖️ вес · 🍽 питание · 😴 сон\n\n"
-        "<i>нажми «синхронизировать» для немедленного обновления</i>"
-    ).format(connected_at)
-    return text, KB(
-        [("🔄 синхронизировать","gfit_sync")],
-        [("🔌 отключить","gfit_disconnect")],
-        [("< настройки","settings")],
-    )
-
-
 
 
 
@@ -2246,7 +1778,6 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
     if data=="main":
         await state.set_state(None)
         card_sessions.pop(uid,None)
-        steps_sessions.pop(uid,None)
         t,m=scr_main(uid); await s(t,m); return
 
     # ── ПЛАН ──────────────────────────────────────────────────────
@@ -2497,7 +2028,7 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
         reset_sleep(uid); await s("😴 история сна сброшена",kb_sett_reset()); return
 
     _tog={"stog_weight":"show_weight","stog_water":"show_water","stog_calories":"show_calories",
-           "stog_sleep":"show_sleep","stog_bar_style":"bar_style","stog_steps":"show_steps"}
+           "stog_sleep":"show_sleep","stog_bar_style":"bar_style"}
     if data in _tog:
         toggle_sett(uid,_tog[data]); t,m=scr_sett_display(uid); await s(t,m); return
 
@@ -2628,51 +2159,6 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
     if data=="sleep_hist":
         t,m=scr_sleep_hist(uid); await s(t,m); return
 
-    # ── ШАГИ ──────────────────────────────────────────────────────
-    if data=="steps":
-        steps_sessions[uid] = True
-        t,m=scr_steps(uid); await s(t,m); return
-
-    if data=="steps_del":
-        del_last_steps(uid)
-        steps_sessions[uid] = True
-        t,m=scr_steps(uid); await s("↩ удалено\n\n"+t,m); return
-
-    # ── GOOGLE FIT ────────────────────────────────────────────────
-    if data=="gfit_settings":
-        await state.set_state(None)
-        t,m=scr_gfit_settings(uid); await s(t,m); return
-
-    if data=="gfit_connect":
-        t,m=scr_gfit_connect(uid); await s(t,m); return
-
-    if data=="gfit_status":
-        t,m=scr_gfit_status(uid); await s(t,m); return
-
-    if data=="gfit_disconnect":
-        gfit_disconnect(uid)
-        t,m=scr_settings(uid); await s("🔌 google fit отключён\n\n"+t,m); return
-
-    if data=="gfit_sync":
-        await s("🔄  синхронизация...", KB([("↩ назад","gfit_settings")]))
-        try:
-            res = await asyncio.get_event_loop().run_in_executor(None, gfit_sync, uid)
-        except Exception as e:
-            res = None
-        if not res:
-            t,m=scr_gfit_status(uid); await s("⚠️ ошибка синхронизации\n\n"+t,m); return
-        applied = res.get("applied", [])
-        sync_s = "\n".join(applied) if applied else "<i>данных за сегодня нет</i>"
-        t,m=scr_gfit_status(uid)
-        await s("✅  синхронизировано\n\n{}\n\n".format(sync_s)+t,m); return
-
-    if data=="steps_goal_set":
-        await state.set_state(St.steps_goal)
-        await s("🎯 цель по шагам (например 8000):", kb_x("goals")); return
-
-    if data=="reset_steps":
-        reset_steps(uid); await s("👟 шаги за день сброшены", kb_sett_reset()); return
-
     # ── БЫСТРЫЕ ПРОДУКТЫ ──────────────────────────────────────────
     if data=="quick_products":
         t,m=scr_quick_products(uid); await s(t,m); return
@@ -2695,16 +2181,12 @@ async def on_cb(call: CallbackQuery, state: FSMContext):
         await s("➕  <b>новый продукт</b>\n\nшаг 1 — название:",kb_x("quick_products")); return
 
     if data=="qp_del_mode":
-        prods = get_products(uid)
-        if not prods:
+        if not get_products(uid):
             t,m=scr_quick_products(uid); await s("список пуст\n\n"+t,m); return
-        ps=5; total_p=max(1,(len(prods)+ps-1)//ps)
-        await s("🗑  <b>удалить продукт</b>\n\nвыбери:  <i>стр. 1 из {}</i>".format(total_p),kb_qp_delete_mode(uid)); return
+        await s("🗑  <b>удалить продукт</b>\n\nвыбери:",kb_qp_delete_mode(uid)); return
 
     if data.startswith("qpdm_"):
-        page=int(data[5:])
-        prods = get_products(uid); ps=5; total_p=max(1,(len(prods)+ps-1)//ps)
-        await s("🗑  <b>удалить продукт</b>\n\nвыбери:  <i>стр. {} из {}</i>".format(page+1,total_p),kb_qp_delete_mode(uid,page)); return
+        page=int(data[5:]); await s("🗑  <b>удалить продукт</b>\n\nвыбери:",kb_qp_delete_mode(uid,page)); return
 
     if data.startswith("qp_dodel_"):
         pid=int(data[9:]); del_product(pid)
@@ -3147,20 +2629,6 @@ async def fh_food_grams(msg: Message, state: FSMContext):
         t,m=scr_food_meal(pid,grams); await show(uid,state,t,m)
     except: await show(uid,state,"❌ введи количество граммов (например 150)",kb_x("food_add"))
 
-
-# ── FSM: ШАГИ ────────────────────────────────────────────────────────
-
-@dp.message(St.steps_goal)
-async def fh_steps_goal(msg: Message, state: FSMContext):
-    uid=msg.from_user.id; await _del(msg)
-    try:
-        goal=int(float(msg.text.replace(",","."))); assert 100<=goal<=100000
-        upd_user(uid, steps_goal=goal)
-        await state.set_state(None)
-        t,m=scr_goals(uid)
-        await show(uid,state,"🎯 цель: {:,} шагов\n\n".format(goal)+t,m)
-    except: await show(uid,state,"❌ введи число от 100 до 100000",kb_x("goals"))
-
 # ── FALLBACK ────────────────────────────────────────────────────────
 @dp.message(F.text)
 async def fallback(msg: Message, state: FSMContext):
@@ -3168,17 +2636,7 @@ async def fallback(msg: Message, state: FSMContext):
     upsert(uid,msg.from_user.first_name or "")
     await _del(msg)
     text=msg.text.strip()
-
-    # ── ввод числа шагов (открыт экран 👟) ──────────────────────────
-    if steps_sessions.get(uid) and re.match(r'^\d+$', text):
-        steps = int(text)
-        if 1 <= steps <= 200000:
-            log_steps(uid, steps)
-            t,m=scr_steps(uid)
-            await show(uid,state,"✅  {:,} шагов записано\n\n".format(steps)+t,m)
-            return
-
-    # ── навигация по карточкам цифрой ───────────────────────────────
+    # Навигация по карточкам цифрой
     sess=card_sessions.get(uid)
     if sess and text.isdigit():
         n=int(text); card_list=sess["card_list"]; idx=n-1
@@ -3190,103 +2648,20 @@ async def fallback(msg: Message, state: FSMContext):
             await show(uid,state,"❌ нет карточки {}\n\n".format(n)+card_text,kb)
         return
     card_sessions.pop(uid,None)
-    steps_sessions.pop(uid,None)
-    await state.set_state(None)
     t,m=scr_main(uid); await show(uid,state,t,m)
-
-# ── GOOGLE FIT: OAUTH CALLBACK SERVER ───────────────────────────────
-async def gfit_oauth_handler(request):
-    """aiohttp обработчик редиректа после OAuth Google."""
-    code  = request.rel_url.query.get("code")
-    state = request.rel_url.query.get("state")
-    error = request.rel_url.query.get("error")
-
-    if error or not code or not state:
-        return aio_web.Response(text="❌ ошибка авторизации: {}".format(error or "нет кода"),
-                                content_type="text/html")
-    uid = gfit_pop_state(state)
-    if not uid:
-        return aio_web.Response(text="❌ неверный state (устарел?)", content_type="text/html")
-
-    # Обмен code → tokens
-    try:
-        r = requests.post(GFIT_TOKEN_URL, data={
-            "code":          code,
-            "client_id":     GFIT_CLIENT_ID,
-            "client_secret": GFIT_CLIENT_SECRET,
-            "redirect_uri":  GFIT_REDIRECT_URI,
-            "grant_type":    "authorization_code",
-        }, timeout=10)
-        d = r.json()
-        if "access_token" not in d:
-            raise ValueError(d.get("error_description", str(d)))
-        gfit_save_token(uid, d["access_token"], d.get("refresh_token",""), d.get("expires_in", 3600))
-    except Exception as e:
-        log.warning("gfit oauth exchange uid=%s: %s", uid, e)
-        try:
-            await bot.send_message(uid, "⚠️ не удалось подключить google fit: {}".format(e),
-                                   parse_mode="HTML")
-        except: pass
-        return aio_web.Response(text="❌ ошибка: {}".format(e), content_type="text/html")
-
-    # Сразу синхронизируем
-    try:
-        res = await asyncio.get_event_loop().run_in_executor(None, gfit_sync, uid)
-        applied = res.get("applied", []) if res else []
-        sync_s = "\n".join(applied) if applied else "<i>данных за сегодня нет</i>"
-        await bot.send_message(uid,
-            "✅  <b>google fit подключён!</b>\n\nданные за сегодня:\n{}\n\n<i>автосинхронизация каждый час</i>".format(sync_s),
-            parse_mode="HTML",
-            reply_markup=KB([("⚙️ настройки","settings")]))
-    except Exception as e:
-        log.warning("gfit first sync uid=%s: %s", uid, e)
-        await bot.send_message(uid, "✅ google fit подключён! автосинхронизация каждый час.",
-                               parse_mode="HTML",
-                               reply_markup=KB([("⚙️ настройки","settings")]))
-
-    return aio_web.Response(
-        text="<html><body><h2>✅ google fit подключён!</h2><p>можно закрыть эту страницу и вернуться в telegram.</p></body></html>",
-        content_type="text/html")
-
-
-async def gfit_autosync():
-    """Каждый час синхронизировать всех подключённых пользователей."""
-    if not GFIT_ENABLED: return
-    for uid in get_all_users():
-        try:
-            if not gfit_is_connected(uid): continue
-            await asyncio.get_event_loop().run_in_executor(None, gfit_sync, uid)
-        except Exception as e:
-            log.debug("gfit_autosync uid=%s: %s", uid, e)
 
 
 # ── MAIN ────────────────────────────────────────────────────────────
 async def main():
     init_db()
     # Планировщик
-    scheduler.add_job(tick_cards,           "interval", seconds=60,   id="tick_cards")
-    scheduler.add_job(check_water_reminders,"interval", seconds=60,   id="water_remind")
-    scheduler.add_job(check_weight_reminders,"interval",seconds=60,   id="weight_remind")
-    scheduler.add_job(check_weekly_report,  "interval", seconds=60,   id="weekly_report")
-    if GFIT_ENABLED:
-        scheduler.add_job(gfit_autosync,    "interval", minutes=60,   id="gfit_autosync")
+    scheduler.add_job(tick_cards,          "interval", seconds=60,  id="tick_cards")
+    scheduler.add_job(check_water_reminders,"interval", seconds=60, id="water_remind")
+    scheduler.add_job(check_weight_reminders,"interval",seconds=60, id="weight_remind")
+    scheduler.add_job(check_weekly_report,  "interval", seconds=60, id="weekly_report")
     scheduler.start()
-
-    tasks = [dp.start_polling(bot, drop_pending_updates=True)]
-
-    if GFIT_ENABLED:
-        # Всегда запускаем callback-сервер когда Google Fit настроен
-        app = aio_web.Application()
-        app.router.add_get("/gfit/callback", gfit_oauth_handler)
-        runner = aio_web.AppRunner(app)
-        await runner.setup()
-        site = aio_web.TCPSite(runner, "0.0.0.0", GFIT_PORT)
-        await site.start()
-        log.info("fitbot v9 ✅  google fit callback: %s  (port %s)", GFIT_REDIRECT_URI, GFIT_PORT)
-    else:
-        log.info("fitbot v9 ✅  (google fit не настроен)")
-
-    await asyncio.gather(*tasks)
+    log.info("fitbot v4 запущен ✅")
+    await dp.start_polling(bot, drop_pending_updates=True)
 
 if __name__=="__main__":
     asyncio.run(main())
