@@ -39,8 +39,8 @@
   --r-lg: 28px;
 
   --nav-h: 76px;
-  --st: max(var(--tg-safe-area-inset-top, 0px), env(safe-area-inset-top, 0px));
-  --sb: max(var(--tg-safe-area-inset-bottom, 0px), env(safe-area-inset-bottom, 0px));
+  --st: max(env(safe-area-inset-top,0px), var(--tg-safe-area-inset-top,0px), 0px);
+  --sb: max(env(safe-area-inset-bottom,0px), var(--tg-safe-area-inset-bottom,0px), 0px);
 
   --shadow: 0 2px 20px rgba(0,0,0,.06);
   --shadow-strong: 0 8px 32px rgba(255,107,53,.22);
@@ -102,7 +102,7 @@ html,body{
   transition:background .3s ease;
 }
 #nav-backdrop.open{
-  background:rgba(0,0,0,.45);
+  background:rgba(0,0,0,.5);
   pointer-events:all;
 }
 
@@ -188,10 +188,8 @@ html,body{
   cursor:pointer;
   pointer-events:none;
   opacity:0;
-  transform:translateX(-50%) translateY(16px);
-  transition:
-    opacity .2s ease,
-    transform .25s ease;
+  transform:translateX(-50%) translateY(14px);
+  transition:opacity .18s ease, transform .22s ease;
   will-change:opacity,transform;
 }
 .fan-item.visible{
@@ -551,6 +549,101 @@ html,body{
    DIVIDER
 ═══════════════════════════════════════════ */
 .divider{height:1px;background:rgba(0,0,0,.05);margin:0 -20px}
+
+/* ── Modal sheet ── */
+.sheet-overlay{
+  position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,.55);
+  opacity:0;pointer-events:none;
+  transition:opacity .25s ease;
+}
+.sheet-overlay.open{opacity:1;pointer-events:all;}
+.sheet{
+  position:fixed;bottom:0;left:0;right:0;z-index:201;
+  background:var(--bg2);
+  border-radius:24px 24px 0 0;
+  padding:0 0 calc(var(--sb) + 24px);
+  transform:translateY(100%);
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+  max-height:88vh;overflow-y:auto;
+}
+.sheet.open{transform:translateY(0);}
+.sheet-handle{
+  width:40px;height:4px;border-radius:99px;
+  background:rgba(0,0,0,.15);
+  margin:14px auto 0;
+}
+.sheet-title{
+  font-size:18px;font-weight:900;
+  padding:16px 20px 8px;
+}
+.sheet-row{
+  display:flex;align-items:center;
+  padding:14px 20px;border-bottom:1px solid rgba(0,0,0,.05);
+  gap:12px;
+}
+.sheet-row:last-child{border-bottom:none;}
+.sheet-label{font-size:14px;font-weight:700;flex:1;}
+.sheet-input{
+  background:rgba(0,0,0,.055);border:none;outline:none;
+  border-radius:10px;padding:9px 14px;
+  font-family:inherit;font-size:15px;font-weight:700;
+  color:var(--text);text-align:right;width:130px;
+}
+.sheet-seg{
+  display:flex;gap:4px;background:rgba(0,0,0,.06);
+  border-radius:10px;padding:3px;
+}
+.sheet-seg-btn{
+  flex:1;padding:8px 6px;font-size:12px;font-weight:800;
+  border:none;border-radius:8px;cursor:pointer;
+  font-family:inherit;background:transparent;color:var(--hint);
+  transition:background .15s,color .15s;
+}
+.sheet-seg-btn.on{background:var(--bg2);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.1);}
+
+/* ── Plan card improved ── */
+.plan-card{
+  background:var(--bg2);border-radius:var(--r);
+  padding:14px 16px;
+  box-shadow:var(--shadow);
+  margin-bottom:10px;
+  transition:opacity .2s;
+}
+.plan-card.done-card{opacity:.45;}
+.plan-card-top{display:flex;align-items:flex-start;gap:12px;}
+.plan-card-ico{
+  width:48px;height:48px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;flex-shrink:0;
+}
+.plan-card-body{flex:1;min-width:0;}
+.plan-card-name{font-size:15px;font-weight:800;margin-bottom:3px;}
+.plan-card-name.done-text{text-decoration:line-through;opacity:.6;}
+.plan-card-time{font-size:12px;font-weight:600;color:var(--hint);}
+.plan-card-actions{display:flex;gap:6px;flex-shrink:0;}
+
+.plan-status-bar{
+  margin-top:10px;
+  height:6px;background:rgba(0,0,0,.07);border-radius:99px;overflow:hidden;
+}
+.plan-status-fill{height:100%;border-radius:99px;transition:width .4s ease;}
+
+.countdown-pill{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:4px 10px;border-radius:99px;
+  font-size:11px;font-weight:800;
+  margin-top:6px;
+}
+.pill-soon{background:rgba(255,107,53,.12);color:var(--sun);}
+.pill-now-active{background:rgba(78,174,229,.15);color:var(--water);}
+.pill-done-g{background:rgba(82,193,119,.12);color:var(--green);}
+.pill-later{background:rgba(0,0,0,.06);color:var(--hint);}
+.pill-late2{background:rgba(244,92,92,.1);color:var(--red);}
+
+/* page top padding fix */
+.pt-safe{padding-top:max(20px, calc(var(--st) + 12px))!important;}
+
 </style>
 </head>
 <body>
@@ -562,7 +655,7 @@ html,body{
 <div class="reveal">
 
 <!-- greeting -->
-<div class="pad" style="padding-top:max(20px, calc(var(--st) + 8px));padding-bottom:0;display:flex;align-items:flex-start;justify-content:space-between">
+<div class="pad" class="pt-safe" style="padding-bottom:0;display:flex;align-items:flex-start;justify-content:space-between">
   <div>
     <div class="t1">Привет, <span class="grad" id="h-name">...</span></div>
     <div class="t5" style="margin-top:4px" id="h-date">сегодня загружается...</div>
@@ -762,9 +855,9 @@ html,body{
   <div id="c-meals"></div>
 </div>
 
-<button class="btn btn-primary" style="margin-top:12px" onclick="botAct('food_add')">
+<button class="btn btn-primary" style="margin-top:12px" onclick="openSheet('sheet-cal')">
   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-  добавить еду через бот
+  добавить еду
 </button>
 
 </div>
@@ -778,8 +871,8 @@ html,body{
   <div id="prod-list"></div>
 </div>
 
-<button class="btn btn-primary" style="margin-top:12px" onclick="botAct('kbzhu')">
-  🧮 калькулятор КБЖУ через бот
+<button class="btn btn-primary" style="margin-top:12px" onclick="openSheet('sheet-cal')">
+  🧮 добавить продукты
 </button>
 </div>
 </div>
@@ -791,7 +884,7 @@ html,body{
 <div class="reveal">
 
 <!-- header + counter -->
-<div class="pad" style="padding-top:20px">
+<div class="pad" class="pt-safe">
   <div class="t2" style="margin-bottom:4px">📋 план</div>
   <div class="t5" id="pl-date">сегодня</div>
 </div>
@@ -822,7 +915,7 @@ html,body{
 <div id="pl-empty" class="empty" style="display:none">
   <div class="empty-ico">🌿</div>
   <div class="empty-t">нет задач на сегодня</div>
-  <div class="empty-s">добавь расписание через бота</div>
+  <div class="empty-s">нажми + чтобы добавить задачу</div>
 </div>
 
 <div class="pad" id="pl-list" style="margin-top:4px"></div>
@@ -862,9 +955,9 @@ html,body{
 </div>
 
 <div class="pad" style="margin-top:8px">
-  <button class="btn btn-primary" onclick="botAct('plan_add')">
+  <button class="btn btn-primary" onclick="openSheet('sheet-act')">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-    добавить задачу через бот
+    добавить задачу
   </button>
 </div>
 
@@ -876,7 +969,7 @@ html,body{
 <div class="page" id="p-sleep">
 <div class="reveal">
 
-<div class="pad" style="padding-top:20px">
+<div class="pad" class="pt-safe">
   <div class="t2" style="margin-bottom:4px">🌙 сон</div>
   <div class="t5">хороший сон — основа всего</div>
 </div>
@@ -898,8 +991,8 @@ html,body{
 </div>
 </div>
 
-<button class="btn btn-primary" style="margin:12px 16px 0;width:calc(100% - 32px)" onclick="botAct('add_sleep')">
-  🌙 записать сон через бот
+<button class="btn btn-primary" style="margin:12px 16px 0;width:calc(100% - 32px)" onclick="openSheet('sheet-sleep')">
+  🌙 записать сон
 </button>
 
 <div class="sec-lbl">последние 7 ночей</div>
@@ -921,7 +1014,7 @@ html,body{
 <div class="page" id="p-progress">
 <div class="reveal">
 
-<div class="pad" style="padding-top:20px">
+<div class="pad" class="pt-safe">
   <div class="t2" style="margin-bottom:4px">📊 прогресс</div>
   <div class="t5">твой путь к лету</div>
 </div>
@@ -961,8 +1054,8 @@ html,body{
   <div class="stat-box"><div class="stat-v" style="color:var(--sleep)" id="pw-sleep">—</div><div class="stat-l">сон ч</div></div>
 </div>
 
-<button class="btn btn-primary" style="margin:12px 16px 0;width:calc(100% - 32px)" onclick="botAct('add_weight')">
-  ⚖️ записать вес через бот
+<button class="btn btn-primary" style="margin:12px 16px 0;width:calc(100% - 32px)" onclick="openSheet('sheet-weight')">
+  ⚖️ записать вес
 </button>
 
 <!-- weight history -->
@@ -1011,7 +1104,7 @@ html,body{
   <div class="srow"><span class="srow-ico">💧</span><span class="srow-lbl">норма воды</span><span class="srow-val" id="pf-gwater">—</span></div>
   <div class="srow"><span class="srow-ico">🍋</span><span class="srow-lbl">норма калорий</span><span class="srow-val" id="pf-gcal">—</span></div>
   <div style="margin-top:12px">
-    <button class="btn btn-primary" onclick="botAct('goals')">🎯 изменить цели через бот</button>
+    <button class="btn btn-primary" onclick="openSheet('sheet-goals')">🎯 изменить цели</button>
   </div>
 </div>
 </div>
@@ -1024,7 +1117,7 @@ html,body{
   <div class="srow"><span class="srow-ico">📏</span><span class="srow-lbl">рост</span><span class="srow-val" id="pf-height">—</span></div>
   <div class="srow"><span class="srow-ico">🎂</span><span class="srow-lbl">возраст</span><span class="srow-val" id="pf-age">—</span></div>
   <div style="margin-top:12px">
-    <button class="btn btn-primary" onclick="botAct('profile_edit')">✏️ изменить в боте</button>
+    <button class="btn btn-primary" onclick="openSheet('sheet-profile')">✏️ изменить профиль</button>
   </div>
 </div>
 </div>
@@ -1048,7 +1141,7 @@ html,body{
   <div class="srow"><span class="srow-ico">⚖️</span><span class="srow-lbl">взвеситься</span><span class="srow-val" id="rem-wg">выкл</span></div>
   <div class="srow"><span class="srow-ico">📅</span><span class="srow-lbl">отчёт</span><span class="srow-val" id="rem-rep">выкл</span></div>
   <div style="margin-top:12px">
-    <button class="btn btn-primary" onclick="botAct('reminders')">🔔 настроить напоминания</button>
+    <button class="btn btn-primary" onclick="openSheet('sheet-remind')">🔔 настроить напоминания</button>
   </div>
 </div>
 </div>
@@ -1056,8 +1149,8 @@ html,body{
 <!-- danger zone -->
 <div class="sec-lbl">сброс данных</div>
 <div class="pad">
-  <button class="btn btn-ghost btn-full" style="width:100%;padding:14px;color:var(--red);background:rgba(244,92,92,.09)" onclick="botAct('reset')">
-    🗑 сбросить данные через бот
+  <button class="btn btn-ghost btn-full" style="width:100%;padding:14px;color:var(--red);background:rgba(244,92,92,.09)" onclick="confirmReset()">
+    🗑 сбросить данные
   </button>
 </div>
 
@@ -1072,6 +1165,162 @@ html,body{
 
 <!-- ── NAV BACKDROP ── -->
 <div id="nav-backdrop" onclick="closeNav()"></div>
+
+<!-- ══════════════ SHEETS ══════════════ -->
+<div class="sheet-overlay" id="overlay" onclick="closeSheet()"></div>
+
+<!-- Sheet: Вес -->
+<div class="sheet" id="sheet-weight">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">⚖️ записать вес</div>
+  <div class="sheet-row">
+    <span class="sheet-label">Вес, кг</span>
+    <input class="sheet-input" id="inp-weight" type="number" step="0.1" min="30" max="250" placeholder="70.5">
+  </div>
+  <div style="padding:16px">
+    <button class="btn btn-primary" onclick="submitWeight()">Сохранить</button>
+  </div>
+</div>
+
+<!-- Sheet: Сон -->
+<div class="sheet" id="sheet-sleep">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">🌙 записать сон</div>
+  <div class="sheet-row">
+    <span class="sheet-label">Часов сна</span>
+    <input class="sheet-input" id="inp-sleep-h" type="number" step="0.5" min="1" max="14" placeholder="8">
+  </div>
+  <div class="sheet-row">
+    <span class="sheet-label">Качество</span>
+    <div class="sheet-seg" id="seg-sleep-q">
+      <button class="sheet-seg-btn" onclick="setSleepQ(1)" data-q="1">😫</button>
+      <button class="sheet-seg-btn" onclick="setSleepQ(2)" data-q="2">😴</button>
+      <button class="sheet-seg-btn on" onclick="setSleepQ(3)" data-q="3">😑</button>
+      <button class="sheet-seg-btn" onclick="setSleepQ(4)" data-q="4">🙂</button>
+      <button class="sheet-seg-btn" onclick="setSleepQ(5)" data-q="5">🌟</button>
+    </div>
+  </div>
+  <div style="padding:16px">
+    <button class="btn btn-primary" onclick="submitSleep()">Сохранить</button>
+  </div>
+</div>
+
+<!-- Sheet: Калории -->
+<div class="sheet" id="sheet-cal">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">🍋 добавить еду</div>
+  <div class="sheet-row">
+    <span class="sheet-label">Приём пищи</span>
+    <div class="sheet-seg" id="seg-meal">
+      <button class="sheet-seg-btn on" onclick="setMeal('breakfast')" data-m="breakfast">Завтрак</button>
+      <button class="sheet-seg-btn" onclick="setMeal('lunch')" data-m="lunch">Обед</button>
+      <button class="sheet-seg-btn" onclick="setMeal('dinner')" data-m="dinner">Ужин</button>
+      <button class="sheet-seg-btn" onclick="setMeal('snack')" data-m="snack">Перекус</button>
+    </div>
+  </div>
+  <div class="sheet-row">
+    <span class="sheet-label">Калорий, ккал</span>
+    <input class="sheet-input" id="inp-cal" type="number" step="10" min="0" max="3000" placeholder="500">
+  </div>
+  <div class="sheet-row">
+    <span class="sheet-label">Название (необязательно)</span>
+    <input class="sheet-input" id="inp-cal-desc" type="text" placeholder="гречка, курица…" style="width:160px;text-align:left">
+  </div>
+  <div style="padding:16px">
+    <button class="btn btn-primary" onclick="submitCal()">Добавить</button>
+  </div>
+</div>
+
+<!-- Sheet: Профиль -->
+<div class="sheet" id="sheet-profile">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">👤 профиль</div>
+  <div class="sheet-row">
+    <span class="sheet-label">Имя</span>
+    <input class="sheet-input" id="inp-pname" type="text" placeholder="Алексей" style="text-align:left">
+  </div>
+  <div class="sheet-row">
+    <span class="sheet-label">Рост, см</span>
+    <input class="sheet-input" id="inp-height" type="number" min="100" max="250" placeholder="175">
+  </div>
+  <div class="sheet-row">
+    <span class="sheet-label">Возраст</span>
+    <input class="sheet-input" id="inp-age" type="number" min="10" max="100" placeholder="25">
+  </div>
+  <div class="sheet-row">
+    <span class="sheet-label">Пол</span>
+    <div class="sheet-seg" id="seg-gender">
+      <button class="sheet-seg-btn on" onclick="setGender('male')" data-g="male">♂ муж</button>
+      <button class="sheet-seg-btn" onclick="setGender('female')" data-g="female">♀ жен</button>
+    </div>
+  </div>
+  <div style="padding:16px">
+    <button class="btn btn-primary" onclick="submitProfile()">Сохранить</button>
+  </div>
+</div>
+
+<!-- Sheet: Цели -->
+<div class="sheet" id="sheet-goals">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">🎯 цели</div>
+  <div class="sheet-row">
+    <span class="sheet-label">Целевой вес, кг</span>
+    <input class="sheet-input" id="inp-gw" type="number" step="0.5" placeholder="70">
+  </div>
+  <div class="sheet-row">
+    <span class="sheet-label">Норма воды, мл</span>
+    <input class="sheet-input" id="inp-gwat" type="number" step="100" placeholder="2000">
+  </div>
+  <div class="sheet-row">
+    <span class="sheet-label">Норма калорий</span>
+    <input class="sheet-input" id="inp-gcal" type="number" step="50" placeholder="2000">
+  </div>
+  <div style="padding:16px">
+    <button class="btn btn-primary" onclick="submitGoals()">Сохранить</button>
+  </div>
+</div>
+
+<!-- Sheet: Добавить активность -->
+<div class="sheet" id="sheet-act">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">📋 новая задача</div>
+  <div class="sheet-row">
+    <span class="sheet-label">Название</span>
+    <input class="sheet-input" id="inp-aname" type="text" placeholder="Пробежка" style="text-align:left;width:160px">
+  </div>
+  <div class="sheet-row">
+    <span class="sheet-label">Тип</span>
+    <div class="sheet-seg" id="seg-atype" style="flex-wrap:wrap;width:200px">
+      <button class="sheet-seg-btn on" onclick="setActType('run')" data-t="run">🏃 бег</button>
+      <button class="sheet-seg-btn" onclick="setActType('gym')" data-t="gym">💪 зал</button>
+      <button class="sheet-seg-btn" onclick="setActType('yoga')" data-t="yoga">🧘 йога</button>
+      <button class="sheet-seg-btn" onclick="setActType('walk')" data-t="walk">🚶 ходьба</button>
+    </div>
+  </div>
+  <div class="sheet-row">
+    <span class="sheet-label">Время</span>
+    <input class="sheet-input" id="inp-atime" type="time" value="08:00">
+  </div>
+  <div class="sheet-row">
+    <span class="sheet-label">Длительность, мин</span>
+    <input class="sheet-input" id="inp-adur" type="number" min="5" max="300" step="5" value="30">
+  </div>
+  <div style="padding:16px">
+    <button class="btn btn-primary" onclick="submitAct()">Добавить</button>
+  </div>
+</div>
+
+<!-- Sheet: Напоминания (упрощённо) -->
+<div class="sheet" id="sheet-remind">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">🔔 напоминания</div>
+  <div style="padding:20px;text-align:center;color:var(--hint);font-size:14px;font-weight:600">
+    Напоминания настраиваются через Telegram-бота.<br>Напишите боту /reminders
+  </div>
+  <div style="padding:0 16px 8px">
+    <button class="btn btn-primary" onclick="closeSheet()">Понятно</button>
+  </div>
+</div>
 
 <!-- ── FAB + RADIAL MENU ── -->
 <div id="fab-wrap">
@@ -1140,20 +1389,23 @@ html,body{
 ═══════════════════════════════════════════ */
 const tg = window.Telegram?.WebApp;
 if(tg){
-  tg.ready(); tg.expand();
+  tg.ready();
+  tg.expand();
   if(typeof tg.requestFullscreen === 'function') tg.requestFullscreen();
   if(typeof tg.disableVerticalSwipes === 'function') tg.disableVerticalSwipes();
+  if(typeof tg.setHeaderColor === 'function') tg.setHeaderColor('bg_color');
+  if(typeof tg.setBackgroundColor === 'function') tg.setBackgroundColor('bg_color');
   tg.onEvent('themeChanged', applyTheme);
-  // Обновляем safe area после изменений viewport
-  tg.onEvent('viewportChanged', fixSafeArea);
-  tg.onEvent('safeAreaChanged', fixSafeArea);
-  setTimeout(fixSafeArea, 300);
+  tg.onEvent('viewportChanged', _applySafeArea);
+  tg.onEvent('safeAreaChanged', _applySafeArea);
+  setTimeout(_applySafeArea, 100);
+  setTimeout(_applySafeArea, 500);
 }
-function fixSafeArea(){
-  const top = tg?.safeAreaInset?.top ?? 0;
-  const bottom = tg?.safeAreaInset?.bottom ?? 0;
+function _applySafeArea(){
+  const top = tg?.safeAreaInset?.top ?? tg?.contentSafeAreaInset?.top ?? 0;
+  const bot = tg?.safeAreaInset?.bottom ?? tg?.contentSafeAreaInset?.bottom ?? 0;
   if(top > 0) document.documentElement.style.setProperty('--st', top + 'px');
-  if(bottom > 0) document.documentElement.style.setProperty('--sb', bottom + 'px');
+  if(bot > 0) document.documentElement.style.setProperty('--sb', bot + 'px');
 }
 function applyTheme(){
   const p = tg?.themeParams || {};
@@ -1585,6 +1837,184 @@ function cancelTimer(){
 }
 
 /* ═══════════════════════════════════════════
+   SHEET LOGIC
+═══════════════════════════════════════════ */
+let _currentSheet = null;
+let _sleepQ = 3, _mealType = 'breakfast', _actType = 'run', _gender = 'male';
+
+function openSheet(id){
+  closeNav();
+  const u = getUser();
+  if(id === 'sheet-profile'){
+    const ni = $('inp-pname'); if(ni) ni.value = u.name||'';
+    const hi = $('inp-height'); if(hi) hi.value = u.height||'';
+    const ai = $('inp-age'); if(ai) ai.value = u.age||'';
+    _gender = u.gender||'male';
+    document.querySelectorAll('#seg-gender .sheet-seg-btn').forEach(b=>b.classList.toggle('on', b.dataset.g===_gender));
+  }
+  if(id === 'sheet-goals'){
+    const gwi=$('inp-gw'); if(gwi) gwi.value=u.goal_weight||'';
+    const gwati=$('inp-gwat'); if(gwati) gwati.value=u.water_goal||2000;
+    const gcali=$('inp-gcal'); if(gcali) gcali.value=u.cal_goal||2000;
+  }
+  if(id === 'sheet-weight'){
+    const wl=getWLog();
+    const wi=$('inp-weight'); if(wi&&wl.length) wi.value=wl[wl.length-1].weight||'';
+  }
+  _currentSheet = id;
+  const ov = $('overlay'), sh = $(id);
+  if(ov) ov.classList.add('open');
+  if(sh) sh.classList.add('open');
+  tg?.HapticFeedback?.impactOccurred('light');
+  setTimeout(()=>{ const inp = sh?.querySelector('input'); if(inp) inp.focus(); }, 300);
+}
+
+function closeSheet(){
+  const ov = $('overlay'), sh = _currentSheet ? $(_currentSheet) : null;
+  if(ov) ov.classList.remove('open');
+  if(sh) sh.classList.remove('open');
+  _currentSheet = null;
+}
+
+function setSleepQ(q){
+  _sleepQ = q;
+  document.querySelectorAll('#seg-sleep-q .sheet-seg-btn').forEach(b=>b.classList.toggle('on', +b.dataset.q===q));
+}
+function setMeal(m){
+  _mealType = m;
+  document.querySelectorAll('#seg-meal .sheet-seg-btn').forEach(b=>b.classList.toggle('on', b.dataset.m===m));
+}
+function setGender(g){
+  _gender = g;
+  document.querySelectorAll('#seg-gender .sheet-seg-btn').forEach(b=>b.classList.toggle('on', b.dataset.g===g));
+}
+function setActType(at){
+  _actType = at;
+  document.querySelectorAll('#seg-atype .sheet-seg-btn').forEach(b=>b.classList.toggle('on', b.dataset.t===at));
+}
+
+async function submitWeight(){
+  const v = parseFloat($('inp-weight')?.value);
+  if(!v||v<30||v>300){ toast('⚠️ введи корректный вес'); return; }
+  closeSheet();
+  _cache.weight_log = [...(_cache.weight_log||[]), {weight:v, logged_at: TODAY}];
+  if(!_cache.user.start_weight) _cache.user.start_weight = v;
+  renderProgress(); renderHome();
+  toast(`⚖️ вес ${v} кг записан!`);
+  tg?.HapticFeedback?.notificationOccurred('success');
+  await apiPost('/api/weight', {weight:v});
+  await reload();
+}
+
+async function submitSleep(){
+  const hrs = parseFloat($('inp-sleep-h')?.value);
+  if(!hrs||hrs<0.5||hrs>20){ toast('⚠️ введи часы сна'); return; }
+  closeSheet();
+  _cache.sleep_log = [...(_cache.sleep_log||[]), {hours:hrs, quality:_sleepQ, logged_at: TODAY}];
+  renderSleep(); renderHome();
+  toast(`🌙 сон ${hrs} ч записан!`);
+  tg?.HapticFeedback?.notificationOccurred('success');
+  await apiPost('/api/sleep', {hours:hrs, quality:_sleepQ});
+  await reload();
+}
+
+async function submitCal(){
+  const cal = parseInt($('inp-cal')?.value);
+  const desc = $('inp-cal-desc')?.value || '';
+  if(!cal||cal<1){ toast('⚠️ введи калории'); return; }
+  closeSheet();
+  if(!_cache.calories) _cache.calories = {};
+  _cache.calories[_mealType] = (_cache.calories[_mealType]||0) + cal;
+  renderTrack('cal'); renderHome();
+  toast(`🍋 +${cal} ккал добавлено!`);
+  tg?.HapticFeedback?.notificationOccurred('success');
+  await apiPost('/api/calories', {amount:cal, meal_type:_mealType, description:desc});
+  await reload();
+}
+
+async function submitProfile(){
+  const name = $('inp-pname')?.value?.trim();
+  const height = parseInt($('inp-height')?.value);
+  const age = parseInt($('inp-age')?.value);
+  if(!name){ toast('⚠️ введи имя'); return; }
+  closeSheet();
+  _cache.user = {..._cache.user, name, height:height||0, age:age||0, gender:_gender};
+  renderProfile(); renderHome();
+  toast('👤 профиль обновлён!');
+  tg?.HapticFeedback?.notificationOccurred('success');
+  await apiPost('/api/profile', {name, height:height||0, age:age||0, gender:_gender});
+  await reload();
+}
+
+async function submitGoals(){
+  const gw = parseFloat($('inp-gw')?.value)||0;
+  const gwat = parseInt($('inp-gwat')?.value)||2000;
+  const gcal = parseInt($('inp-gcal')?.value)||2000;
+  closeSheet();
+  _cache.user = {..._cache.user, goal_weight:gw, water_goal:gwat, cal_goal:gcal};
+  renderProfile(); renderHome();
+  toast('🎯 цели обновлены!');
+  tg?.HapticFeedback?.notificationOccurred('success');
+  await apiPost('/api/goals', {goal_weight:gw, water_goal:gwat, cal_goal:gcal});
+  await reload();
+}
+
+async function submitAct(){
+  const name = $('inp-aname')?.value?.trim();
+  const time = $('inp-atime')?.value || '08:00';
+  const dur = parseInt($('inp-adur')?.value)||30;
+  if(!name){ toast('⚠️ введи название'); return; }
+  closeSheet();
+  const fakeId = Date.now();
+  _cache.acts_today = [...(_cache.acts_today||[]), {
+    id:fakeId, name, type:_actType,
+    scheduled_at:`${TODAY}T${time}:00`,
+    duration:dur, completed:0, days_of_week:''
+  }];
+  renderPlan(); renderHome();
+  toast(`📋 ${name} добавлено!`);
+  tg?.HapticFeedback?.notificationOccurred('success');
+  await apiPost('/api/activity/create', {name, type:_actType, time, duration:dur});
+  await reload();
+}
+
+function confirmReset(){
+  if(!confirm('Сбросить все данные? Это нельзя отменить.')) return;
+  localStorage.clear();
+  _cache = {user:{name:'…',water_goal:2000,cal_goal:2000},settings:{show_weight:1,show_water:1,show_calories:1,show_sleep:1},water:{total:0,entries:[],streak:0},calories:{},weight_log:[],sleep_log:[],acts_today:[],products:[]};
+  renderHome(); renderProfile();
+  toast('🗑 данные сброшены');
+}
+
+/* ═══════════════════════════════════════════
+   COUNTDOWN HELPERS
+═══════════════════════════════════════════ */
+function getActivityStatus(a){
+  const now = new Date();
+  const [hh,mm] = (a.time||'00:00').split(':').map(Number);
+  const start = new Date(); start.setHours(hh,mm,0,0);
+  const end = new Date(start.getTime() + (a.duration||30)*60000);
+  if(a.completed) return {state:'done', label:'✓ выполнено'};
+  if(now > end) return {state:'late', label:'просрочено'};
+  if(now >= start && now <= end){
+    const elapsed = Math.round((now-start)/60000);
+    const remain = Math.round((end-now)/60000);
+    return {state:'active', label:`▶ идёт · осталось ${remain} мин`, progress:(now-start)/(end-start)};
+  }
+  const diffStart = Math.round((start-now)/60000);
+  if(diffStart <= 30) return {state:'soon', label:`⏰ через ${diffStart} мин`};
+  if(diffStart <= 120) return {state:'later', label:`в ${a.time}`};
+  return {state:'later', label:`в ${a.time}`};
+}
+
+function formatTimeRange(a){
+  const [hh,mm] = (a.time||'00:00').split(':').map(Number);
+  const endH = hh + Math.floor((mm+(a.duration||30))/60);
+  const endM = (mm+(a.duration||30))%60;
+  return `${a.time} – ${String(endH%24).padStart(2,'0')}:${String(endM).padStart(2,'0')}`;
+}
+
+/* ═══════════════════════════════════════════
    TOAST
 ═══════════════════════════════════════════ */
 let toastTm;
@@ -1772,7 +2202,7 @@ function renderProds(){
 }
 
 /* ═══════════════════════════════════════════
-   RENDER: PLAN
+   RENDER: PLAN — с отсчётом времени
 ═══════════════════════════════════════════ */
 function renderPlan(){
   const acts=getActs();
@@ -1780,48 +2210,48 @@ function renderPlan(){
   const mons=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
   t('pl-date','сегодня · '+now.getDate()+' '+mons[now.getMonth()]);
 
-  const done=acts.filter(a=>a.completed).length, total=acts.length;
-  t('pl-cnt',total?`${done}/${total}`:'0/0');
+  const doneCnt=acts.filter(a=>a.completed).length, total=acts.length;
+  t('pl-cnt',total?`${doneCnt}/${total}`:'0/0');
   setTimeout(()=>{
     const ring=$('pl-ring');
-    if(ring) ring.setAttribute('stroke-dashoffset',150.8*(1-(total?done/total:0)));
+    if(ring) ring.setAttribute('stroke-dashoffset',150.8*(1-(total?doneCnt/total:0)));
   },80);
 
   const empty=$('pl-empty'), list=$('pl-list');
   if(!acts.length){ if(empty)empty.style.display=''; if(list){list.innerHTML='';list.style.display='none';} return; }
   if(empty)empty.style.display='none'; if(list)list.style.display='';
 
-  const nowT=new Date();
-  list.innerHTML=acts.map(a=>{
-    const ico=ACT_ICO[a.type]||'☀️', col=ACT_COL[a.type]||'#FF9800';
-    const done=a.completed;
-    const [hh,mm]=(a.time||'00:00').split(':').map(Number);
-    const at=new Date(); at.setHours(hh,mm,0,0);
-    const et=new Date(at.getTime()+(a.duration||30)*60000);
-    const ts=`${a.time}–${String(et.getHours()).padStart(2,'0')}:${String(et.getMinutes()).padStart(2,'0')}`;
-    const late=!done&&nowT>et;
-    const active=!done&&nowT>=at&&nowT<=et;
-    const isTm=timerSt.id===a.id;
-    const badge=done?`<span class="pill pill-ok">✓</span>`
-      :active?`<span class="pill pill-now">▶ сейчас</span>`
-      :late?`<span class="pill pill-late">просрочено</span>`
-      :`<span class="pill pill-up">${ts}</span>`;
-    return `<div class="act-card${done?' done':''}">
-      <div class="act-ico" style="background:${col}18;font-size:${done?16:22}px">${done?'✅':ico}</div>
-      <div class="act-info">
-        <div class="act-name">${a.name}</div>
-        <div class="act-time">${ts} · ${a.duration} мин${isTm?' · <span style="color:var(--sun);font-weight:800">⏱ идёт</span>':''}</div>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
-        ${badge}
-        <div style="display:flex;gap:5px">
-          <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px;border-radius:9px" onclick="completeAct(${a.id})">${done?'↩':'✓'}</button>
-          ${!done?`<button class="btn btn-primary" style="padding:6px 12px;font-size:12px;border-radius:9px;width:auto" onclick="startTimer(${a.id},'${a.name.replace(/'/g,"\\'")}',${a.duration})">▶</button>`:''}
+  list.innerHTML = acts.map(a=>{
+    const ico = ACT_ICO[a.type]||'☀️';
+    const col = ACT_COL[a.type]||'#FF9800';
+    const st = getActivityStatus(a);
+    const timeRange = formatTimeRange(a);
+    const isTiming = timerSt.id === a.id;
+    const pillClass = {done:'pill-done-g',active:'pill-now-active',soon:'pill-soon',late:'pill-late2',later:'pill-later'}[st.state]||'pill-later';
+    const progressPct = st.state==='active' ? Math.round((st.progress||0)*100) : st.state==='done' ? 100 : 0;
+    const barColor = st.state==='done' ? 'var(--green)' : st.state==='active' ? 'var(--water)' : 'rgba(255,107,53,.3)';
+    const showBar = ['done','active','soon'].includes(st.state);
+    const barWidth = st.state==='soon' ? 80 : progressPct;
+    const escapedName = a.name.replace(/'/g,"\\'");
+    return `<div class="plan-card ${a.completed?'done-card':''}">
+      <div class="plan-card-top">
+        <div class="plan-card-ico" style="background:${col}18">${a.completed?'✅':ico}</div>
+        <div class="plan-card-body">
+          <div class="plan-card-name ${a.completed?'done-text':''}">${a.name}</div>
+          <div class="plan-card-time">${timeRange} · ${a.duration} мин${isTiming?' · <span style="color:var(--sun)">⏱</span>':''}</div>
+          <span class="countdown-pill ${pillClass}">${st.label}</span>
+        </div>
+        <div class="plan-card-actions">
+          <button class="btn btn-ghost" style="padding:8px 12px;font-size:12px;border-radius:10px" onclick="completeAct(${a.id})">${a.completed?'↩':'✓'}</button>
+          ${!a.completed?`<button class="btn btn-primary" style="padding:8px 12px;font-size:12px;border-radius:10px;width:auto" onclick="startTimer(${a.id},'${escapedName}',${a.duration})">▶</button>`:''}
         </div>
       </div>
+      ${showBar?`<div class="plan-status-bar"><div class="plan-status-fill" style="width:${barWidth}%;background:${barColor}"></div></div>`:''}
     </div>`;
   }).join('');
 }
+// Авто-обновление каждые 30 сек для живых счётчиков
+setInterval(()=>{ if(curTab==='plan') renderPlan(); }, 30000);
 
 /* ═══════════════════════════════════════════
    RENDER: SLEEP
