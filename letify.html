@@ -1,0 +1,1964 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<title>letify</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900;1000&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   RESET & TOKENS
+═══════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;
+  -webkit-tap-highlight-color:transparent!important;
+  -webkit-touch-callout:none;
+  tap-highlight-color:transparent!important;
+}
+:root{
+  /* Telegram theme tokens with warm fallbacks */
+  --bg:        var(--tg-theme-bg-color,       #FAF7F2);
+  --bg2:       var(--tg-theme-secondary-bg-color,#FFFFFF);
+  --text:      var(--tg-theme-text-color,      #1C1608);
+  --hint:      var(--tg-theme-hint-color,      #A89F90);
+  --link:      var(--tg-theme-link-color,      #FF6B35);
+  --btn:       var(--tg-theme-button_color,    #FF6B35);
+  --btntxt:    var(--tg-theme-button_text_color,#FFFFFF);
+
+  /* Brand */
+  --sun:   #FF6B35;
+  --sun2:  #FFAB40;
+  --water: #4EAEE5;
+  --cal:   #F4814A;
+  --sleep: #8B7FD4;
+  --green: #52C177;
+  --red:   #F45C5C;
+
+  --r: 20px;
+  --r-sm: 12px;
+  --r-lg: 28px;
+
+  --nav-h: 76px;
+  --st: env(safe-area-inset-top, 0px);
+  --sb: env(safe-area-inset-bottom, 0px);
+
+  --shadow: 0 2px 20px rgba(0,0,0,.06);
+  --shadow-strong: 0 8px 32px rgba(255,107,53,.22);
+}
+
+html,body{
+  height:100%;overflow:hidden;
+  font-family:'Nunito',system-ui,sans-serif;
+  background:var(--bg);color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  overscroll-behavior:none;
+  user-select:none;
+}
+
+/* ═══════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════ */
+#root{
+  position:fixed;inset:0;
+  padding-top:var(--st);
+  display:flex;flex-direction:column;
+}
+
+#pages{
+  flex:1;overflow:hidden;position:relative;
+}
+
+.page{
+  position:absolute;inset:0;
+  overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  padding:0 0 calc(var(--nav-h) + var(--sb) + 16px);
+
+  /* invisible by default */
+  opacity:0;pointer-events:none;
+  transform:translateY(24px) scale(.98);
+  transform-origin:top center;
+  transition:
+    opacity .32s cubic-bezier(.4,0,.2,1),
+    transform .36s cubic-bezier(.34,1.3,.64,1);
+  will-change:transform,opacity;
+}
+.page::-webkit-scrollbar{display:none}
+.page.active{
+  opacity:1;pointer-events:all;
+  transform:translateY(0) scale(1);
+}
+
+/* ═══════════════════════════════════════════
+   FAB NAV BUTTON + RADIAL MENU
+═══════════════════════════════════════════ */
+
+/* Backdrop overlay */
+#nav-backdrop{
+  position:fixed;inset:0;z-index:98;
+  background:transparent;
+  pointer-events:none;
+  transition:background .3s ease;
+}
+#nav-backdrop.open{
+  background:rgba(0,0,0,.35);
+  pointer-events:all;
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+}
+
+/* FAB wrapper */
+#fab-wrap{
+  position:fixed;
+  bottom:calc(var(--sb) + 22px);
+  left:50%;
+  transform:translateX(-50%);
+  z-index:100;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* Main FAB button */
+#fab{
+  width:62px;height:62px;border-radius:22px;
+  background:linear-gradient(145deg,var(--sun),var(--sun2));
+  box-shadow:
+    0 8px 28px rgba(255,107,53,.5),
+    0 2px 0 rgba(255,255,255,.3) inset;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  position:relative;z-index:2;
+  transition:
+    transform .22s cubic-bezier(.34,1.56,.64,1),
+    box-shadow .22s ease,
+    border-radius .3s cubic-bezier(.34,1.2,.64,1);
+  will-change:transform;
+}
+#fab:active{transform:scale(.84)}
+#fab.open{
+  border-radius:50%;
+  transform:rotate(45deg) scale(1.08);
+  box-shadow:0 12px 36px rgba(255,107,53,.6),0 2px 0 rgba(255,255,255,.3) inset;
+}
+
+/* FAB icon layers */
+#fab-icon-nav{
+  position:absolute;
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .2s ease, transform .25s cubic-bezier(.34,1.56,.64,1);
+}
+#fab-icon-close{
+  position:absolute;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;
+  transition:opacity .2s ease, transform .25s cubic-bezier(.34,1.56,.64,1);
+  transform:scale(.5) rotate(-90deg);
+}
+#fab.open #fab-icon-nav{opacity:0;transform:scale(.4) rotate(90deg)}
+#fab.open #fab-icon-close{opacity:1;transform:scale(1) rotate(0deg)}
+
+/* Current tab label pill above FAB */
+#fab-label{
+  position:absolute;
+  bottom:calc(100% + 10px);
+  left:50%;transform:translateX(-50%);
+  background:var(--bg2);
+  color:var(--text);
+  font-size:11px;font-weight:800;letter-spacing:.04em;
+  padding:5px 12px;border-radius:99px;
+  white-space:nowrap;
+  box-shadow:0 2px 12px rgba(0,0,0,.1);
+  opacity:1;
+  transition:opacity .2s ease,transform .2s ease;
+  pointer-events:none;
+}
+#fab-wrap.menu-open #fab-label{opacity:0;transform:translateX(-50%) translateY(6px)}
+
+/* Radial menu items container */
+#nav-fan{
+  position:absolute;
+  bottom:calc(100% + 16px);
+  left:50%;
+  width:0;height:0;
+  pointer-events:none;
+}
+
+/* Each fan item */
+.fan-item{
+  position:absolute;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  cursor:pointer;
+  pointer-events:none;
+  opacity:0;
+  transform:translateX(-50%) translateY(20px) scale(.7);
+  transition:
+    opacity .28s cubic-bezier(.4,0,.2,1),
+    transform .38s cubic-bezier(.34,1.5,.64,1);
+  will-change:transform,opacity;
+}
+.fan-item.visible{
+  opacity:1;
+  transform:translateX(-50%) translateY(0) scale(1);
+  pointer-events:all;
+}
+.fan-item:active .fan-ico{transform:scale(.8)!important}
+
+.fan-ico{
+  width:54px;height:54px;border-radius:18px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 20px rgba(0,0,0,.18);
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1), box-shadow .2s ease;
+  position:relative;
+}
+.fan-ico svg{width:24px;height:24px;color:#fff}
+.fan-ico::after{
+  content:'';
+  position:absolute;inset:0;border-radius:18px;
+  background:rgba(255,255,255,.2);
+  border-top:1px solid rgba(255,255,255,.35);
+}
+
+.fan-lbl{
+  font-size:11px;font-weight:800;letter-spacing:.03em;
+  color:#fff;
+  text-shadow:0 1px 6px rgba(0,0,0,.4);
+  white-space:nowrap;
+  background:rgba(0,0,0,.22);
+  padding:3px 10px;border-radius:99px;
+  backdrop-filter:blur(8px);
+}
+
+/* active item highlight ring */
+.fan-item.cur-tab .fan-ico::before{
+  content:'';position:absolute;inset:-3px;border-radius:21px;
+  border:2.5px solid #fff;
+  opacity:.6;
+}
+
+/* ═══════════════════════════════════════════
+   TYPOGRAPHY SYSTEM
+═══════════════════════════════════════════ */
+.t1{font-size:30px;font-weight:900;line-height:1.1;letter-spacing:-.02em}
+.t2{font-size:22px;font-weight:900;letter-spacing:-.015em}
+.t3{font-size:17px;font-weight:800}
+.t4{font-size:14px;font-weight:700}
+.t5{font-size:12px;font-weight:600;color:var(--hint)}
+.tnum{font-size:44px;font-weight:900;line-height:1;letter-spacing:-.03em}
+.tnum-sm{font-size:28px;font-weight:900;letter-spacing:-.02em}
+.grad{background:linear-gradient(105deg,var(--sun),var(--sun2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+/* ═══════════════════════════════════════════
+   CARDS
+═══════════════════════════════════════════ */
+.card{
+  background:var(--bg2);
+  border-radius:var(--r-lg);
+  padding:20px;
+  box-shadow:var(--shadow);
+  position:relative;overflow:hidden;
+}
+.card + .card{margin-top:12px}
+.pad{padding:0 16px}
+
+/* section labels */
+.sec-lbl{
+  font-size:11px;font-weight:800;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--hint);
+  padding:20px 20px 8px;
+}
+
+/* ═══════════════════════════════════════════
+   PROGRESS ARCS (SVG-based)
+═══════════════════════════════════════════ */
+.arc-wrap{position:relative;display:inline-flex;align-items:center;justify-content:center}
+.arc-inner{position:absolute;text-align:center}
+
+/* ═══════════════════════════════════════════
+   PROGRESS BAR
+═══════════════════════════════════════════ */
+.pbar{height:6px;background:rgba(0,0,0,.07);border-radius:99px;overflow:hidden;margin-top:12px}
+.pbar-fill{height:100%;border-radius:99px;transition:width 1.2s cubic-bezier(.34,1.1,.64,1)}
+.pbar-sun{background:linear-gradient(90deg,var(--sun),var(--sun2))}
+.pbar-water{background:var(--water)}
+.pbar-sleep{background:var(--sleep)}
+
+/* ═══════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  border:none;cursor:pointer;font-family:inherit;font-weight:800;
+  border-radius:var(--r-sm);
+  transition:transform .15s cubic-bezier(.34,1.56,.64,1),opacity .15s ease,box-shadow .15s ease;
+}
+.btn:active{transform:scale(.88);opacity:.82}
+
+.btn-primary{
+  background:linear-gradient(135deg,var(--sun),var(--sun2));
+  color:#fff;padding:15px 22px;font-size:15px;border-radius:var(--r);
+  box-shadow:var(--shadow-strong);width:100%;
+}
+.btn-ghost{
+  background:rgba(0,0,0,.055);color:var(--text);
+  padding:11px 18px;font-size:13px;border-radius:var(--r-sm);
+}
+.btn-water{background:rgba(78,174,229,.14);color:var(--water);padding:13px 10px;font-size:14px;border-radius:var(--r-sm);flex:1}
+.btn-icon{
+  width:44px;height:44px;border-radius:13px;
+  background:rgba(0,0,0,.055);color:var(--text);font-size:18px;
+  flex-shrink:0;
+}
+.btn-row{display:flex;gap:8px}
+
+/* ═══════════════════════════════════════════
+   TOGGLE
+═══════════════════════════════════════════ */
+.tog{
+  width:50px;height:28px;border-radius:99px;
+  position:relative;cursor:pointer;flex-shrink:0;
+  transition:background .25s ease;
+}
+.tog::after{
+  content:'';position:absolute;
+  width:22px;height:22px;border-radius:50%;
+  background:#fff;top:3px;
+  transition:left .28s cubic-bezier(.34,1.5,.64,1);
+  box-shadow:0 1px 6px rgba(0,0,0,.18);
+}
+.tog.on{background:var(--sun)}
+.tog.off{background:rgba(0,0,0,.18)}
+.tog.on::after{left:25px}
+.tog.off::after{left:3px}
+
+/* ═══════════════════════════════════════════
+   ACTIVITY CARDS  (workout plan)
+═══════════════════════════════════════════ */
+.act-card{
+  background:var(--bg2);border-radius:var(--r);
+  padding:15px 16px;
+  display:flex;align-items:center;gap:14px;
+  box-shadow:var(--shadow);
+  transition:transform .2s ease,opacity .25s ease,box-shadow .2s ease;
+}
+.act-card + .act-card{margin-top:10px}
+.act-card.done{opacity:.45}
+.act-card.done .act-name{text-decoration:line-through}
+.act-ico{
+  width:50px;height:50px;border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;flex-shrink:0;
+}
+.act-info{flex:1;min-width:0}
+.act-name{font-size:15px;font-weight:800;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.act-time{font-size:12px;color:var(--hint);font-weight:600}
+
+/* status dot */
+.act-status{
+  width:8px;height:8px;border-radius:50%;flex-shrink:0;
+}
+
+/* ═══════════════════════════════════════════
+   PILL BADGE
+═══════════════════════════════════════════ */
+.pill{
+  display:inline-flex;align-items:center;gap:3px;
+  padding:3px 10px;border-radius:99px;
+  font-size:11px;font-weight:800;white-space:nowrap;
+}
+.pill-ok{background:rgba(82,193,119,.15);color:var(--green)}
+.pill-late{background:rgba(244,92,92,.12);color:var(--red)}
+.pill-up{background:rgba(255,107,53,.12);color:var(--sun)}
+.pill-now{background:rgba(78,174,229,.14);color:var(--water)}
+
+/* ═══════════════════════════════════════════
+   SLEEP QUALITY DOTS
+═══════════════════════════════════════════ */
+.sq{display:flex;gap:3px}
+.sq-d{width:18px;height:5px;border-radius:99px;background:rgba(0,0,0,.08);transition:background .35s ease}
+.sq-d.on{background:var(--sleep)}
+
+/* ═══════════════════════════════════════════
+   HISTORY LIST
+═══════════════════════════════════════════ */
+.hrow{
+  display:flex;align-items:center;padding:12px 0;
+  border-bottom:1px solid rgba(0,0,0,.05);
+  gap:12px;
+}
+.hrow:last-child{border-bottom:none;padding-bottom:0}
+.hrow-date{font-size:12px;color:var(--hint);font-weight:700;min-width:52px}
+.hrow-val{font-size:16px;font-weight:900;flex:1}
+.hrow-diff{font-size:12px;font-weight:800}
+.diff-pos{color:var(--red)}
+.diff-neg{color:var(--green)}
+
+/* ═══════════════════════════════════════════
+   PROFILE AVATAR
+═══════════════════════════════════════════ */
+.pav{
+  width:80px;height:80px;border-radius:26px;
+  background:linear-gradient(135deg,var(--sun),var(--sun2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:34px;font-weight:900;color:#fff;
+  box-shadow:0 10px 36px rgba(255,107,53,.36);
+}
+
+/* ═══════════════════════════════════════════
+   STAT GRID
+═══════════════════════════════════════════ */
+.stat-row{display:flex;gap:10px}
+.stat-box{
+  flex:1;background:var(--bg2);border-radius:var(--r);
+  padding:16px;box-shadow:var(--shadow);text-align:center;
+}
+.stat-v{font-size:22px;font-weight:900;margin-bottom:3px}
+.stat-l{font-size:11px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.06em}
+
+/* ═══════════════════════════════════════════
+   SUMMER BANNER
+═══════════════════════════════════════════ */
+.sbanner{
+  background:linear-gradient(130deg,#FF6B35,#FFAB40);
+  border-radius:var(--r-lg);padding:18px 20px;
+  color:#fff;position:relative;overflow:hidden;
+}
+.sbanner::after{
+  content:'☀️';position:absolute;
+  right:-10px;top:-14px;font-size:96px;opacity:.14;
+  transform:rotate(15deg);pointer-events:none;
+}
+.sbanner::before{
+  content:'🌊';position:absolute;
+  right:48px;bottom:-18px;font-size:62px;opacity:.14;
+  pointer-events:none;
+}
+
+/* ═══════════════════════════════════════════
+   TIMER RING
+═══════════════════════════════════════════ */
+#timer-ring-fill{
+  stroke-dasharray:282.7;
+  stroke-dashoffset:282.7;
+  transition:stroke-dashoffset .6s cubic-bezier(.34,1.1,.64,1);
+}
+
+/* ═══════════════════════════════════════════
+   WATER WAVE  (decorative svg overlay)
+═══════════════════════════════════════════ */
+.water-card{background:linear-gradient(160deg,rgba(78,174,229,.08) 0%,var(--bg2) 80%)}
+
+/* ═══════════════════════════════════════════
+   MEAL ROW
+═══════════════════════════════════════════ */
+.meal-row{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 0;border-bottom:1px solid rgba(0,0,0,.05);
+}
+.meal-row:last-child{border-bottom:none;padding-bottom:0}
+.meal-ico{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.meal-name{font-size:14px;font-weight:700;flex:1}
+.meal-kcal{font-size:16px;font-weight:900}
+
+/* ═══════════════════════════════════════════
+   ANIMATED NUMBER  (JS class .counting added/removed)
+═══════════════════════════════════════════ */
+@keyframes numPop{0%{transform:scale(1.18)translateY(-3px)}100%{transform:scale(1)translateY(0)}}
+.num-pop{animation:numPop .28s cubic-bezier(.34,1.56,.64,1)}
+
+/* ═══════════════════════════════════════════
+   REVEAL ANIMATIONS
+═══════════════════════════════════════════ */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.reveal > *{
+  opacity:0;
+  animation:fadeUp .42s cubic-bezier(.34,1.3,.64,1) both;
+}
+.reveal > *:nth-child(1){animation-delay:.04s}
+.reveal > *:nth-child(2){animation-delay:.09s}
+.reveal > *:nth-child(3){animation-delay:.14s}
+.reveal > *:nth-child(4){animation-delay:.19s}
+.reveal > *:nth-child(5){animation-delay:.24s}
+.reveal > *:nth-child(6){animation-delay:.29s}
+.reveal > *:nth-child(7){animation-delay:.34s}
+.reveal > *:nth-child(8){animation-delay:.39s}
+
+/* ═══════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════ */
+#toast{
+  position:fixed;
+  bottom:calc(var(--nav-h) + var(--sb) + 16px);
+  left:50%;
+  transform:translateX(-50%) translateY(12px);
+  background:rgba(28,22,8,.88);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  color:#fff;
+  padding:11px 24px;border-radius:99px;
+  font-size:13px;font-weight:800;white-space:nowrap;
+  z-index:200;pointer-events:none;
+  opacity:0;
+  transition:opacity .26s ease,transform .26s cubic-bezier(.34,1.56,.64,1);
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ═══════════════════════════════════════════
+   INLINE ICON (SVG Solar-style inline)
+═══════════════════════════════════════════ */
+.ico{display:inline-flex;vertical-align:middle}
+
+/* ═══════════════════════════════════════════
+   PRODUCTS LIST
+═══════════════════════════════════════════ */
+.prod-row{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 0;border-bottom:1px solid rgba(0,0,0,.05);
+}
+.prod-row:last-child{border-bottom:none;padding-bottom:0}
+.prod-name{font-size:13px;font-weight:700;flex:1}
+.prod-meta{font-size:11px;color:var(--hint);font-weight:600;margin-top:1px}
+.prod-kcal{font-size:14px;font-weight:900;color:var(--cal)}
+
+/* ═══════════════════════════════════════════
+   SETTINGS ROW
+═══════════════════════════════════════════ */
+.srow{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 0;border-bottom:1px solid rgba(0,0,0,.05);
+}
+.srow:last-child{border-bottom:none;padding-bottom:0}
+.srow-ico{font-size:18px;width:24px;text-align:center;flex-shrink:0}
+.srow-lbl{font-size:14px;font-weight:700;flex:1}
+.srow-val{font-size:13px;font-weight:600;color:var(--hint)}
+
+/* ═══════════════════════════════════════════
+   EMPTY STATE
+═══════════════════════════════════════════ */
+.empty{
+  display:flex;flex-direction:column;align-items:center;
+  padding:48px 24px;gap:10px;color:var(--hint);text-align:center;
+}
+.empty-ico{font-size:52px;opacity:.5}
+.empty-t{font-size:16px;font-weight:800}
+.empty-s{font-size:13px;font-weight:600;max-width:220px}
+
+/* ═══════════════════════════════════════════
+   CHART
+═══════════════════════════════════════════ */
+#wchart{overflow:visible}
+
+/* ═══════════════════════════════════════════
+   DIVIDER
+═══════════════════════════════════════════ */
+.divider{height:1px;background:rgba(0,0,0,.05);margin:0 -20px}
+</style>
+</head>
+<body>
+<div id="root">
+<div id="pages">
+
+<!-- ═══════════════════ PAGE: HOME ═══════════════════ -->
+<div class="page active" id="p-home">
+<div class="reveal">
+
+<!-- greeting -->
+<div class="pad" style="padding-top:20px;padding-bottom:0;display:flex;align-items:flex-start;justify-content:space-between">
+  <div>
+    <div class="t1">Привет, <span class="grad" id="h-name">...</span></div>
+    <div class="t5" style="margin-top:4px" id="h-date">сегодня загружается...</div>
+  </div>
+  <div style="text-align:right;padding-top:6px">
+    <div class="t5">до лета</div>
+    <div style="font-size:26px;font-weight:900;color:var(--sun);line-height:1.1" id="h-days">—</div>
+    <div class="t5" id="h-dunit">дней</div>
+  </div>
+</div>
+
+<!-- summer banner -->
+<div class="pad" style="margin-top:14px">
+<div class="sbanner">
+  <div style="font-size:15px;font-weight:800;opacity:.9;margin-bottom:4px">путь к лету ☀️</div>
+  <div style="font-size:32px;font-weight:900;line-height:1.1"><span id="h-ddays">—</span> дней</div>
+  <div style="font-size:12px;font-weight:600;opacity:.75;margin-top:4px">ты делаешь это каждый день!</div>
+</div>
+</div>
+
+<!-- three arcs row -->
+<div class="pad" style="margin-top:14px">
+<div class="card" style="padding:22px 10px 18px">
+  <div style="display:flex;align-items:center;justify-content:space-around">
+
+    <!-- water arc -->
+    <div style="text-align:center;cursor:pointer" onclick="goTab('track')">
+      <div class="arc-wrap">
+        <svg width="82" height="82" viewBox="0 0 82 82">
+          <circle cx="41" cy="41" r="34" fill="none" stroke="rgba(78,174,229,.15)" stroke-width="7"/>
+          <circle cx="41" cy="41" r="34" fill="none" stroke="var(--water)" stroke-width="7"
+            stroke-linecap="round" stroke-dasharray="213.6"
+            id="arc-w" stroke-dashoffset="213.6"
+            transform="rotate(-90 41 41)"
+            style="transition:stroke-dashoffset 1.1s cubic-bezier(.34,1.1,.64,1)"/>
+        </svg>
+        <div class="arc-inner">
+          <div style="font-size:18px;font-weight:900;color:var(--water)" id="arc-wpct">0%</div>
+          <div style="font-size:9px;font-weight:800;color:var(--hint)">вода</div>
+        </div>
+      </div>
+      <div style="font-size:13px;font-weight:900;margin-top:6px" id="arc-wml">0</div>
+      <div class="t5">из <span id="arc-wgoal">2000</span> мл</div>
+    </div>
+
+    <!-- calories arc -->
+    <div style="text-align:center;cursor:pointer" onclick="goTab('track')">
+      <div class="arc-wrap">
+        <svg width="100" height="100" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(244,129,74,.15)" stroke-width="8"/>
+          <circle cx="50" cy="50" r="42" fill="none" stroke="var(--cal)" stroke-width="8"
+            stroke-linecap="round" stroke-dasharray="263.9"
+            id="arc-c" stroke-dashoffset="263.9"
+            transform="rotate(-90 50 50)"
+            style="transition:stroke-dashoffset 1.1s cubic-bezier(.34,1.1,.64,1)"/>
+        </svg>
+        <div class="arc-inner">
+          <div style="font-size:20px;font-weight:900;color:var(--cal)" id="arc-cpct">0%</div>
+          <div style="font-size:10px;font-weight:800;color:var(--hint)">ккал</div>
+        </div>
+      </div>
+      <div style="font-size:15px;font-weight:900;margin-top:6px" id="arc-cval">0</div>
+      <div class="t5">из <span id="arc-cgoal">2000</span></div>
+    </div>
+
+    <!-- sleep arc -->
+    <div style="text-align:center;cursor:pointer" onclick="goTab('sleep')">
+      <div class="arc-wrap">
+        <svg width="82" height="82" viewBox="0 0 82 82">
+          <circle cx="41" cy="41" r="34" fill="none" stroke="rgba(139,127,212,.15)" stroke-width="7"/>
+          <circle cx="41" cy="41" r="34" fill="none" stroke="var(--sleep)" stroke-width="7"
+            stroke-linecap="round" stroke-dasharray="213.6"
+            id="arc-s" stroke-dashoffset="213.6"
+            transform="rotate(-90 41 41)"
+            style="transition:stroke-dashoffset 1.1s cubic-bezier(.34,1.1,.64,1)"/>
+        </svg>
+        <div class="arc-inner">
+          <div style="font-size:18px;font-weight:900;color:var(--sleep)" id="arc-sh">—</div>
+          <div style="font-size:9px;font-weight:800;color:var(--hint)">сон</div>
+        </div>
+      </div>
+      <div style="font-size:13px;font-weight:900;margin-top:6px" id="arc-sq" class="sq" style="justify-content:center"></div>
+      <div class="t5">часов</div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- weight card -->
+<div class="pad" style="margin-top:12px">
+<div class="card" style="cursor:pointer" onclick="goTab('progress')">
+  <div style="display:flex;align-items:center;justify-content:space-between">
+    <div>
+      <div class="t5" style="margin-bottom:5px">⚖️ вес</div>
+      <div style="display:flex;align-items:baseline;gap:6px">
+        <span class="tnum-sm" id="h-wcur">—</span>
+        <span class="t5">→ <b style="color:var(--text)" id="h-wgoal">—</b> кг</span>
+      </div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:28px;font-weight:900;color:var(--sun)" id="h-wpct">—%</div>
+      <div class="t5">к цели</div>
+    </div>
+  </div>
+  <div class="pbar"><div class="pbar-fill pbar-sun" id="h-wbar" style="width:0%"></div></div>
+</div>
+</div>
+
+<!-- today plan preview -->
+<div id="h-plan-sec">
+<div class="sec-lbl">план на сегодня</div>
+<div class="pad" id="h-plan-list"></div>
+</div>
+
+<!-- streak -->
+<div class="pad" id="h-streak-wrap" style="margin-top:12px;display:none">
+  <div style="background:linear-gradient(90deg,rgba(255,107,53,.1),rgba(255,171,64,.08));border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;gap:12px">
+    <span style="font-size:24px">🔥</span>
+    <div>
+      <div style="font-size:15px;font-weight:900" id="h-sval">7 дней подряд</div>
+      <div class="t5">серия воды не прерывается!</div>
+    </div>
+  </div>
+</div>
+
+<div style="height:8px"></div>
+</div><!-- /reveal -->
+</div>
+
+<!-- ═══════════════════ PAGE: TRACK ═══════════════════ -->
+<div class="page" id="p-track">
+
+<!-- inner tabs -->
+<div style="position:sticky;top:0;background:var(--bg);z-index:10;padding:14px 16px 0">
+  <div style="display:flex;gap:6px;background:rgba(0,0,0,.06);border-radius:14px;padding:4px">
+    <button class="btn" id="tt-water" onclick="setTrackTab('water')"
+      style="flex:1;padding:9px 4px;font-size:13px;border-radius:10px;background:var(--bg2);color:var(--text);box-shadow:var(--shadow)">
+      💧 Вода
+    </button>
+    <button class="btn" id="tt-cal" onclick="setTrackTab('cal')"
+      style="flex:1;padding:9px 4px;font-size:13px;border-radius:10px;background:transparent;color:var(--hint);box-shadow:none">
+      🍋 Калории
+    </button>
+    <button class="btn" id="tt-prod" onclick="setTrackTab('prod')"
+      style="flex:1;padding:9px 4px;font-size:13px;border-radius:10px;background:transparent;color:var(--hint);box-shadow:none">
+      🌿 КБЖУ
+    </button>
+  </div>
+</div>
+
+<!-- water tab -->
+<div id="tt-water-body">
+<div class="pad reveal">
+
+<div class="card water-card" style="margin-top:14px;text-align:center;padding:28px 20px">
+  <div class="t5">выпито сегодня</div>
+  <div style="font-size:64px;font-weight:900;color:var(--water);line-height:1.1;margin:8px 0" id="w-total">0</div>
+  <div class="t5">из <span id="w-goal">2000</span> мл</div>
+  <div class="pbar" style="margin-top:16px;height:8px"><div class="pbar-fill pbar-water" id="w-bar" style="width:0%"></div></div>
+  <div id="w-streak" style="margin-top:12px"></div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+  <button class="btn btn-water" onclick="addW(150)">+150 мл</button>
+  <button class="btn btn-water" onclick="addW(200)">+200 мл</button>
+  <button class="btn btn-water" onclick="addW(250)">+250 мл</button>
+  <button class="btn btn-water" onclick="addW(500)">+500 мл 🌊</button>
+</div>
+
+<button class="btn btn-ghost btn-full" style="margin-top:8px;width:100%;padding:13px" onclick="undoW()">
+  ↩ отменить последнее
+</button>
+
+<div style="margin-top:14px">
+  <div class="t5" style="margin-bottom:8px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em">история сегодня</div>
+  <div class="card" id="w-entries" style="padding:14px 16px"></div>
+</div>
+
+</div>
+</div>
+
+<!-- calories tab -->
+<div id="tt-cal-body" style="display:none">
+<div class="pad reveal">
+
+<div class="card" style="margin-top:14px;text-align:center;padding:26px 20px">
+  <div class="t5">калорий сегодня</div>
+  <div style="font-size:60px;font-weight:900;color:var(--cal);line-height:1.1;margin:8px 0" id="c-total">0</div>
+  <div class="t5">из <span id="c-goal">2000</span> ккал</div>
+  <div class="pbar" style="margin-top:16px;height:8px">
+    <div class="pbar-fill pbar-sun" id="c-bar" style="width:0%"></div>
+  </div>
+</div>
+
+<div class="card" style="margin-top:12px">
+  <div id="c-meals"></div>
+</div>
+
+<button class="btn btn-primary" style="margin-top:12px" onclick="botAct('food_add')">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+  добавить еду через бот
+</button>
+
+</div>
+</div>
+
+<!-- products tab -->
+<div id="tt-prod-body" style="display:none">
+<div class="pad reveal">
+
+<div class="card" style="margin-top:14px">
+  <div id="prod-list"></div>
+</div>
+
+<button class="btn btn-primary" style="margin-top:12px" onclick="botAct('kbzhu')">
+  🧮 калькулятор КБЖУ через бот
+</button>
+</div>
+</div>
+
+</div><!-- /p-track -->
+
+<!-- ═══════════════════ PAGE: PLAN ═══════════════════ -->
+<div class="page" id="p-plan">
+<div class="reveal">
+
+<!-- header + counter -->
+<div class="pad" style="padding-top:20px">
+  <div class="t2" style="margin-bottom:4px">📋 план</div>
+  <div class="t5" id="pl-date">сегодня</div>
+</div>
+
+<!-- progress card -->
+<div class="pad" style="margin-top:12px">
+<div class="card">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <div>
+      <div style="font-size:38px;font-weight:900;line-height:1" id="pl-cnt">0/0</div>
+      <div class="t5" style="margin-top:3px">задач выполнено</div>
+    </div>
+    <div style="width:60px;height:60px">
+      <svg viewBox="0 0 60 60" width="60" height="60">
+        <circle cx="30" cy="30" r="24" fill="none" stroke="rgba(0,0,0,.07)" stroke-width="5"/>
+        <circle cx="30" cy="30" r="24" fill="none" stroke="var(--sun)" stroke-width="5"
+          stroke-linecap="round" stroke-dasharray="150.8"
+          id="pl-ring" stroke-dashoffset="150.8"
+          transform="rotate(-90 30 30)"
+          style="transition:stroke-dashoffset .8s cubic-bezier(.34,1.1,.64,1)"/>
+      </svg>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- list -->
+<div id="pl-empty" class="empty" style="display:none">
+  <div class="empty-ico">🌿</div>
+  <div class="empty-t">нет задач на сегодня</div>
+  <div class="empty-s">добавь расписание через бота</div>
+</div>
+
+<div class="pad" id="pl-list" style="margin-top:4px"></div>
+
+<!-- timer -->
+<div class="sec-lbl">⏱ таймер</div>
+<div class="pad">
+<div class="card" id="timer-card" style="text-align:center;padding:24px">
+  <div id="tm-idle">
+    <div style="font-size:42px;margin-bottom:8px;opacity:.4">⏱</div>
+    <div class="t5">нажми ▶️ у задачи чтобы начать</div>
+  </div>
+  <div id="tm-active" style="display:none">
+    <div class="t5" id="tm-name" style="margin-bottom:6px">—</div>
+    <!-- ring timer -->
+    <div style="display:flex;justify-content:center;margin-bottom:16px">
+      <div style="position:relative;display:inline-flex;align-items:center;justify-content:center">
+        <svg width="130" height="130" viewBox="0 0 130 130">
+          <circle cx="65" cy="65" r="55" fill="none" stroke="rgba(0,0,0,.07)" stroke-width="7"/>
+          <circle cx="65" cy="65" r="55" fill="none" stroke="var(--sun)" stroke-width="7"
+            stroke-linecap="round" stroke-dasharray="345.6"
+            id="timer-ring-fill"
+            transform="rotate(-90 65 65)"/>
+        </svg>
+        <div style="position:absolute;text-align:center">
+          <div style="font-size:30px;font-weight:900;font-variant-numeric:tabular-nums" id="timer-num">00:00</div>
+          <div class="t5" id="timer-plan-s">0 мин</div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row" style="justify-content:center;gap:10px">
+      <button class="btn btn-ghost" onclick="cancelTimer()" style="padding:12px 20px;font-size:13px">✕ отмена</button>
+      <button class="btn btn-primary" onclick="finishTimer()" style="padding:12px 24px;font-size:14px;width:auto">✅ завершить</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="pad" style="margin-top:8px">
+  <button class="btn btn-primary" onclick="botAct('plan_add')">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+    добавить задачу через бот
+  </button>
+</div>
+
+<div style="height:8px"></div>
+</div>
+</div><!-- /p-plan -->
+
+<!-- ═══════════════════ PAGE: SLEEP ═══════════════════ -->
+<div class="page" id="p-sleep">
+<div class="reveal">
+
+<div class="pad" style="padding-top:20px">
+  <div class="t2" style="margin-bottom:4px">🌙 сон</div>
+  <div class="t5">хороший сон — основа всего</div>
+</div>
+
+<!-- last night big card -->
+<div class="pad" style="margin-top:14px">
+<div class="card" id="sl-last">
+  <div class="t5" style="margin-bottom:8px">прошлая ночь</div>
+  <div style="display:flex;align-items:center;gap:20px">
+    <div>
+      <div style="font-size:56px;font-weight:900;line-height:1;color:var(--sleep)" id="sl-h">—</div>
+      <div class="t5" style="margin-top:4px">часов</div>
+    </div>
+    <div>
+      <div style="font-size:40px" id="sl-qico">—</div>
+      <div class="sq" id="sl-dots" style="margin-top:6px"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<button class="btn btn-primary" style="margin:12px 16px 0;width:calc(100% - 32px)" onclick="botAct('add_sleep')">
+  🌙 записать сон через бот
+</button>
+
+<div class="sec-lbl">последние 7 ночей</div>
+<div class="pad">
+<div class="card" id="sl-hist"></div>
+</div>
+
+<div class="sec-lbl">среднее за неделю</div>
+<div class="pad stat-row">
+  <div class="stat-box"><div class="stat-v" id="sl-avg-h" style="color:var(--sleep)">—</div><div class="stat-l">часов</div></div>
+  <div class="stat-box"><div class="stat-v" id="sl-avg-q">—</div><div class="stat-l">качество</div></div>
+</div>
+
+<div style="height:8px"></div>
+</div>
+</div>
+
+<!-- ═══════════════════ PAGE: PROGRESS ═══════════════════ -->
+<div class="page" id="p-progress">
+<div class="reveal">
+
+<div class="pad" style="padding-top:20px">
+  <div class="t2" style="margin-bottom:4px">📊 прогресс</div>
+  <div class="t5">твой путь к лету</div>
+</div>
+
+<!-- weight block -->
+<div class="pad" style="margin-top:14px">
+<div class="card">
+  <div class="t5" style="margin-bottom:8px">⚖️ прогресс веса</div>
+  <div style="display:flex;align-items:flex-end;gap:8px;margin-bottom:4px">
+    <span style="font-size:42px;font-weight:900;line-height:1" id="pr-wcur">—</span>
+    <span class="t5" style="padding-bottom:6px">кг · цель <b style="color:var(--text)" id="pr-wgoal">—</b></span>
+  </div>
+  <div class="t5" id="pr-winfo" style="margin-bottom:12px"></div>
+  <div class="pbar" style="height:10px"><div class="pbar-fill pbar-sun" id="pr-wbar" style="width:0%;height:100%"></div></div>
+  <div style="display:flex;justify-content:space-between;margin-top:6px">
+    <span class="t5" id="pr-wstart">—</span>
+    <span style="font-size:13px;font-weight:900;color:var(--sun)" id="pr-wpct">0%</span>
+    <span class="t5" id="pr-wgoal2">—</span>
+  </div>
+  <div id="pr-forecast" style="margin-top:10px;font-size:12px;font-weight:800;color:var(--green)"></div>
+</div>
+</div>
+
+<!-- chart -->
+<div class="pad" style="margin-top:12px">
+<div class="card" style="padding:16px">
+  <div class="t5" style="margin-bottom:12px">динамика · последние записи</div>
+  <svg id="wchart" height="110" style="width:100%;overflow:visible;display:block"></svg>
+</div>
+</div>
+
+<!-- week stats -->
+<div class="sec-lbl">эта неделя</div>
+<div class="pad stat-row">
+  <div class="stat-box"><div class="stat-v" style="color:var(--water)" id="pw-water">—</div><div class="stat-l">вода мл</div></div>
+  <div class="stat-box"><div class="stat-v" style="color:var(--cal)" id="pw-cal">—</div><div class="stat-l">ккал</div></div>
+  <div class="stat-box"><div class="stat-v" style="color:var(--sleep)" id="pw-sleep">—</div><div class="stat-l">сон ч</div></div>
+</div>
+
+<button class="btn btn-primary" style="margin:12px 16px 0;width:calc(100% - 32px)" onclick="botAct('add_weight')">
+  ⚖️ записать вес через бот
+</button>
+
+<!-- weight history -->
+<div class="sec-lbl">история веса</div>
+<div class="pad"><div class="card" id="pr-whist" style="padding:14px 16px"></div></div>
+
+<!-- all time -->
+<div class="sec-lbl">за всё время</div>
+<div class="pad stat-row">
+  <div class="stat-box"><div class="stat-v grad" id="at-t">0</div><div class="stat-l">тренировок</div></div>
+  <div class="stat-box"><div class="stat-v grad" id="at-w">0</div><div class="stat-l">воды л</div></div>
+  <div class="stat-box"><div class="stat-v grad" id="at-s">0</div><div class="stat-l">серия дн</div></div>
+</div>
+
+<div style="height:8px"></div>
+</div>
+</div><!-- /p-progress -->
+
+<!-- ═══════════════════ PAGE: PROFILE ═══════════════════ -->
+<div class="page" id="p-profile">
+<div class="reveal">
+
+<!-- avatar area -->
+<div style="display:flex;align-items:center;gap:18px;padding:20px 16px 0">
+  <div class="pav" id="pf-av">А</div>
+  <div>
+    <div class="t2" id="pf-name">—</div>
+    <div class="t5" id="pf-meta" style="margin-top:4px">—</div>
+  </div>
+</div>
+
+<!-- bmi stats -->
+<div id="pf-bmi-row" style="margin-top:14px;padding:0 16px;display:none">
+<div class="stat-row">
+  <div class="stat-box"><div class="stat-v" id="pf-bmi">—</div><div class="stat-l">ИМТ</div></div>
+  <div class="stat-box"><div class="stat-v" id="pf-ideal">—</div><div class="stat-l">идеальный кг</div></div>
+  <div class="stat-box"><div class="stat-v" id="pf-bmr">—</div><div class="stat-l">BMR ккал</div></div>
+</div>
+</div>
+
+<!-- goals -->
+<div class="sec-lbl">цели</div>
+<div class="pad">
+<div class="card">
+  <div class="srow"><span class="srow-ico">⚖️</span><span class="srow-lbl">цель по весу</span><span class="srow-val" id="pf-gw">—</span></div>
+  <div class="srow"><span class="srow-ico">💧</span><span class="srow-lbl">норма воды</span><span class="srow-val" id="pf-gwater">—</span></div>
+  <div class="srow"><span class="srow-ico">🍋</span><span class="srow-lbl">норма калорий</span><span class="srow-val" id="pf-gcal">—</span></div>
+  <div style="margin-top:12px">
+    <button class="btn btn-primary" onclick="botAct('goals')">🎯 изменить цели через бот</button>
+  </div>
+</div>
+</div>
+
+<!-- profile data -->
+<div class="sec-lbl">данные профиля</div>
+<div class="pad">
+<div class="card">
+  <div class="srow"><span class="srow-ico">👤</span><span class="srow-lbl">имя</span><span class="srow-val" id="pf-pname">—</span></div>
+  <div class="srow"><span class="srow-ico">📏</span><span class="srow-lbl">рост</span><span class="srow-val" id="pf-height">—</span></div>
+  <div class="srow"><span class="srow-ico">🎂</span><span class="srow-lbl">возраст</span><span class="srow-val" id="pf-age">—</span></div>
+  <div style="margin-top:12px">
+    <button class="btn btn-primary" onclick="botAct('profile_edit')">✏️ изменить в боте</button>
+  </div>
+</div>
+</div>
+
+<!-- display toggles -->
+<div class="sec-lbl">главный экран</div>
+<div class="pad">
+<div class="card">
+  <div class="srow"><span class="srow-ico">⚖️</span><span class="srow-lbl">вес</span><div class="tog on" id="tog-w" onclick="toggleSett('w')"></div></div>
+  <div class="srow"><span class="srow-ico">💧</span><span class="srow-lbl">вода</span><div class="tog on" id="tog-water" onclick="toggleSett('water')"></div></div>
+  <div class="srow"><span class="srow-ico">🍋</span><span class="srow-lbl">калории</span><div class="tog on" id="tog-cal" onclick="toggleSett('cal')"></div></div>
+  <div class="srow"><span class="srow-ico">🌙</span><span class="srow-lbl">сон</span><div class="tog on" id="tog-sleep" onclick="toggleSett('sleep')"></div></div>
+</div>
+</div>
+
+<!-- reminders info -->
+<div class="sec-lbl">напоминания</div>
+<div class="pad">
+<div class="card">
+  <div class="srow"><span class="srow-ico">💧</span><span class="srow-lbl">вода</span><span class="srow-val" id="rem-w">выкл</span></div>
+  <div class="srow"><span class="srow-ico">⚖️</span><span class="srow-lbl">взвеситься</span><span class="srow-val" id="rem-wg">выкл</span></div>
+  <div class="srow"><span class="srow-ico">📅</span><span class="srow-lbl">отчёт</span><span class="srow-val" id="rem-rep">выкл</span></div>
+  <div style="margin-top:12px">
+    <button class="btn btn-primary" onclick="botAct('reminders')">🔔 настроить напоминания</button>
+  </div>
+</div>
+</div>
+
+<!-- danger zone -->
+<div class="sec-lbl">сброс данных</div>
+<div class="pad">
+  <button class="btn btn-ghost btn-full" style="width:100%;padding:14px;color:var(--red);background:rgba(244,92,92,.09)" onclick="botAct('reset')">
+    🗑 сбросить данные через бот
+  </button>
+</div>
+
+<div style="text-align:center;padding:20px 16px 8px">
+  <div class="t5">letify ☀️ · ver 2.0</div>
+</div>
+
+</div>
+</div><!-- /p-profile -->
+
+</div><!-- /pages -->
+
+<!-- ── NAV BACKDROP ── -->
+<div id="nav-backdrop" onclick="closeNav()"></div>
+
+<!-- ── FAB + RADIAL MENU ── -->
+<div id="fab-wrap">
+
+  <!-- Fan menu items (positioned via JS) -->
+  <div id="nav-fan">
+    <div class="fan-item" id="fi-home" onclick="navTo('home')">
+      <div class="fan-ico" style="background:linear-gradient(145deg,#FF6B35,#FFAB40)">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      </div>
+      <span class="fan-lbl">Главная</span>
+    </div>
+    <div class="fan-item" id="fi-track" onclick="navTo('track')">
+      <div class="fan-ico" style="background:linear-gradient(145deg,#F4814A,#FF6B35)">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.5 3.5L18 2l-1.5 1.5L15 2l-1.5 1.5L12 2l-1.5 1.5L9 2 7.5 3.5 6 2 4.5 3.5 3 2v20l1.5-1.5L6 22l1.5-1.5L9 22l1.5-1.5L12 22l1.5-1.5L15 22l1.5-1.5L18 22l1.5-1.5L21 22V2l-1.5 1.5zM19 19.09H5V4.91h14v14.18zM6 15h12v2H6zm0-4h12v2H6zm0-4h12v2H6z"/></svg>
+      </div>
+      <span class="fan-lbl">Трекеры</span>
+    </div>
+    <div class="fan-item" id="fi-plan" onclick="navTo('plan')">
+      <div class="fan-ico" style="background:linear-gradient(145deg,#4EAEE5,#2196F3)">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg>
+      </div>
+      <span class="fan-lbl">План</span>
+    </div>
+    <div class="fan-item" id="fi-sleep" onclick="navTo('sleep')">
+      <div class="fan-ico" style="background:linear-gradient(145deg,#8B7FD4,#6C63FF)">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>
+      </div>
+      <span class="fan-lbl">Сон</span>
+    </div>
+    <div class="fan-item" id="fi-progress" onclick="navTo('progress')">
+      <div class="fan-ico" style="background:linear-gradient(145deg,#52C177,#00B09B)">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4zm2.5 2.1h-15V5h15v14.1zm0-16.1h-15c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+      </div>
+      <span class="fan-lbl">Прогресс</span>
+    </div>
+    <div class="fan-item" id="fi-profile" onclick="navTo('profile')">
+      <div class="fan-ico" style="background:linear-gradient(145deg,#667EEA,#764BA2)">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      </div>
+      <span class="fan-lbl">Профиль</span>
+    </div>
+  </div>
+
+  <!-- Current tab label -->
+  <div id="fab-label">Главная</div>
+
+  <!-- The FAB itself -->
+  <div id="fab" onclick="toggleNav()">
+    <div id="fab-icon-nav">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+    </div>
+    <div id="fab-icon-close">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M19 13H5v-2h14v2z"/><path d="M12 5v14" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+
+</div>
+</div><!-- /root -->
+
+<div id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════
+   TELEGRAM INIT
+═══════════════════════════════════════════ */
+const tg = window.Telegram?.WebApp;
+if(tg){
+  tg.ready(); tg.expand();
+  if(typeof tg.requestFullscreen === 'function') tg.requestFullscreen();
+  if(typeof tg.disableVerticalSwipes === 'function') tg.disableVerticalSwipes();
+  tg.onEvent('themeChanged', applyTheme);
+}
+function applyTheme(){
+  const p = tg?.themeParams || {};
+  const m = {
+    '--bg':   p.bg_color,
+    '--bg2':  p.secondary_bg_color || p.bg_color,
+    '--text': p.text_color,
+    '--hint': p.hint_color,
+    '--link': p.link_color,
+  };
+  for(const [k,v] of Object.entries(m)) if(v) document.documentElement.style.setProperty(k,v);
+}
+applyTheme();
+
+/* ═══════════════════════════════════════════
+   API — синхронизация с сервером
+   Если открыто не из Telegram — работает
+   на демо-данных из localStorage
+═══════════════════════════════════════════ */
+
+// URL сервера — подставь свой домен от bothost!
+// Если файл открыт с того же сервера — оставь пустым ''
+const API_BASE = 'https://letify-production.up.railway.app';
+
+const tgUser = tg?.initDataUnsafe?.user;
+const UID = tgUser?.id || null;   // null = demo режим
+
+// Глобальный кэш данных (заполняется при загрузке)
+let _cache = {
+  user:       {name:'…',height:0,age:0,start_weight:0,goal_weight:0,water_goal:2000,cal_goal:2000,gender:'male'},
+  settings:   {show_weight:1,show_water:1,show_calories:1,show_sleep:1},
+  water:      {total:0,entries:[],streak:0},
+  calories:   {},
+  weight_log: [],
+  sleep_log:  [],
+  acts_today: [],
+  products:   [],
+};
+let _loaded = false;
+
+// Загрузить все данные с сервера
+async function loadData(){
+  if(!UID){
+    // Демо-режим: используем localStorage
+    _useDemoData();
+    _loaded = true;
+    return;
+  }
+  try{
+    const r = await fetch(`${API_BASE}/api/data?uid=${UID}`);
+    if(!r.ok) throw new Error('http '+r.status);
+    const data = await r.json();
+    _cache.user       = data.user       || _cache.user;
+    _cache.settings   = data.settings   || _cache.settings;
+    _cache.water      = data.water      || _cache.water;
+    _cache.calories   = data.calories   || _cache.calories;
+    _cache.weight_log = data.weight_log || _cache.weight_log;
+    _cache.sleep_log  = data.sleep_log  || _cache.sleep_log;
+    _cache.acts_today = data.acts_today || _cache.acts_today;
+    _cache.products   = data.products   || _cache.products;
+    _loaded = true;
+  }catch(e){
+    console.warn('API недоступен, демо-режим:', e);
+    _useDemoData();
+    _loaded = true;
+  }
+}
+
+function _useDemoData(){
+  const TODAY = new Date().toLocaleDateString('en-CA');
+  const g = k => { try{ const r=localStorage.getItem('lf2_'+k); return r?JSON.parse(r):null; }catch{return null;} };
+  const s = (k,v) => { try{ localStorage.setItem('lf2_'+k,JSON.stringify(v)); }catch{} };
+  if(!g('demo_seeded')){
+    s('user',{name:tgUser?.first_name||'Алекс',height:175,age:27,start_weight:85,goal_weight:75,water_goal:2500,cal_goal:2000,gender:'male'});
+    const wl=[]; const now=new Date();
+    for(let i=13;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);wl.push({weight:+(85-((13-i)*0.25)+(Math.random()-.5)*.3).toFixed(1),logged_at:d.toLocaleDateString('en-CA')});}
+    s('wlog',wl);
+    const sl=[];
+    for(let i=6;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);sl.push({hours:+(6.5+Math.random()*2).toFixed(1),quality:3+Math.floor(Math.random()*3),logged_at:d.toLocaleDateString('en-CA')});}
+    s('slog',sl);
+    s('wd_'+TODAY,{total:1350,entries:[250,200,150,250,200,150,150]});
+    s('cd_'+TODAY,{breakfast:420,lunch:680,dinner:0,snack:185,other:0});
+    s('streak',7);
+    s('acts_'+TODAY,[{id:1,name:'Пробежка',type:'run',scheduled_at:'2024-01-01T07:00',duration:30,completed:1},{id:2,name:'Зал',type:'gym',scheduled_at:'2024-01-01T18:30',duration:60,completed:0},{id:3,name:'Йога',type:'yoga',scheduled_at:'2024-01-01T21:00',duration:25,completed:0}]);
+    s('demo_seeded',true);
+  }
+  const u = g('user') || {};
+  const wd = g('wd_'+TODAY) || {total:0,entries:[]};
+  const cd = g('cd_'+TODAY) || {};
+  _cache.user       = u;
+  _cache.settings   = {show_weight:1,show_water:1,show_calories:1,show_sleep:1};
+  _cache.water      = {total:wd.total||0,entries:wd.entries||[],streak:g('streak')||0};
+  _cache.calories   = cd;
+  _cache.weight_log = g('wlog')||[];
+  _cache.sleep_log  = g('slog')||[];
+  _cache.acts_today = g('acts_'+TODAY)||[];
+  _cache.products   = [
+    {id:1,name:'банан',calories:89,protein:1.1,fat:0.3,carbs:23.0},
+    {id:2,name:'яблоко',calories:52,protein:0.3,fat:0.2,carbs:14.0},
+    {id:3,name:'куриная грудка',calories:165,protein:31,fat:3.6,carbs:0},
+    {id:4,name:'яйцо',calories:155,protein:13,fat:11,carbs:1.1},
+    {id:5,name:'творог 5%',calories:121,protein:17,fat:5,carbs:3},
+    {id:6,name:'гречка варёная',calories:92,protein:3.4,fat:1,carbs:20},
+  ];
+}
+
+// Геттеры из кэша
+const getUser    = () => _cache.user;
+const getSetts   = () => ({w:!!_cache.settings?.show_weight, water:!!_cache.settings?.show_water, cal:!!_cache.settings?.show_calories, sleep:!!_cache.settings?.show_sleep});
+const getWLog    = () => _cache.weight_log.map(r=>({weight:r.weight,logged_at:(r.logged_at||'').slice(0,10)}));
+const getSLog    = () => _cache.sleep_log.map(r=>({hours:r.hours,quality:r.quality,logged_at:(r.logged_at||'').slice(0,10)}));
+const getWD      = () => _cache.water;
+const getCD      = () => _cache.calories;
+const getActs    = () => _cache.acts_today.map(a=>({...a, time:(a.scheduled_at||'').slice(11,16)||'00:00', completed:!!a.completed}));
+const getProds   = () => _cache.products;
+const getStreak  = () => _cache.water.streak || 0;
+
+// Отправить запрос на сервер (если есть UID)
+async function apiPost(path, body){
+  if(!UID) return; // demo mode — только localStorage
+  try{
+    await fetch(`${API_BASE}${path}`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({uid:UID,...body})
+    });
+  }catch(e){ console.warn('API ошибка:', path, e); }
+}
+
+// Перезагрузить данные и перерисовать текущую страницу
+async function reload(){
+  await loadData();
+  const renders = {home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};
+  if(renders[curTab]) renders[curTab]();
+}
+
+const TODAY = new Date().toLocaleDateString('en-CA');
+
+/* ═══════════════════════════════════════════
+   NAVIGATION — FAB + RADIAL MENU
+═══════════════════════════════════════════ */
+const TABS = ['home','track','plan','sleep','progress','profile'];
+let curTab = 'home';
+let trackTab = 'water';
+let navOpen = false;
+
+const tabPageMap = {
+  home:'p-home', track:'p-track', plan:'p-plan',
+  sleep:'p-sleep', progress:'p-progress', profile:'p-profile'
+};
+
+const TAB_LABELS = {
+  home:'Главная', track:'Трекеры', plan:'План',
+  sleep:'Сон', progress:'Прогресс', profile:'Профиль'
+};
+
+// Fan positions: arc from left to right, above the FAB
+// 6 items spread in a 180° arc
+const FAN_ITEMS = ['home','track','plan','sleep','progress','profile'];
+// Positions relative to fan center (px): x offset, y offset (negative = up)
+const FAN_POS = [
+  {x:-145, y:-50},
+  {x:-92,  y:-118},
+  {x:-30,  y:-148},
+  {x: 34,  y:-148},
+  {x: 96,  y:-118},
+  {x: 149, y:-50},
+];
+
+function positionFanItems(){
+  FAN_ITEMS.forEach((tab, i) => {
+    const el = document.getElementById('fi-'+tab);
+    if(!el) return;
+    el.style.left = FAN_POS[i].x + 'px';
+    el.style.top  = FAN_POS[i].y + 'px';
+  });
+}
+
+function toggleNav(){
+  navOpen ? closeNav() : openNav();
+}
+
+function openNav(){
+  navOpen = true;
+  const fab = document.getElementById('fab');
+  const wrap = document.getElementById('fab-wrap');
+  const bd = document.getElementById('nav-backdrop');
+  fab.classList.add('open');
+  wrap.classList.add('menu-open');
+  bd.classList.add('open');
+  tg?.HapticFeedback?.impactOccurred('medium');
+
+  // update current tab marker
+  FAN_ITEMS.forEach(tab => {
+    const el = document.getElementById('fi-'+tab);
+    if(el) el.classList.toggle('cur-tab', tab === curTab);
+  });
+
+  // stagger in items
+  FAN_ITEMS.forEach((tab, i) => {
+    const el = document.getElementById('fi-'+tab);
+    if(!el) return;
+    el.style.transitionDelay = (i * 36) + 'ms';
+    requestAnimationFrame(()=> el.classList.add('visible'));
+  });
+}
+
+function closeNav(){
+  if(!navOpen) return;
+  navOpen = false;
+  const fab = document.getElementById('fab');
+  const wrap = document.getElementById('fab-wrap');
+  const bd = document.getElementById('nav-backdrop');
+  fab.classList.remove('open');
+  wrap.classList.remove('menu-open');
+  bd.classList.remove('open');
+
+  FAN_ITEMS.forEach((tab, i) => {
+    const el = document.getElementById('fi-'+tab);
+    if(!el) return;
+    const rev = FAN_ITEMS.length - 1 - i;
+    el.style.transitionDelay = (rev * 22) + 'ms';
+    el.classList.remove('visible');
+  });
+}
+
+function navTo(tab){
+  closeNav();
+  setTimeout(()=> goTab(tab), 60);
+}
+
+function goTab(tab){
+  if(tab === curTab && !navOpen) return;
+  curTab = tab;
+
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+
+  const pg = document.getElementById(tabPageMap[tab]);
+  if(pg){
+    pg.scrollTop = 0;
+    const rev = pg.querySelector('.reveal');
+    if(rev){ rev.classList.remove('reveal'); void rev.offsetWidth; rev.classList.add('reveal'); }
+    pg.classList.add('active');
+  }
+
+  // Update FAB icon and label to match current tab
+  updateFabIcon(tab);
+
+  const renders = {
+    home:renderHome, track:()=>renderTrack(trackTab), plan:renderPlan,
+    sleep:renderSleep, progress:renderProgress, profile:renderProfile
+  };
+  if(renders[tab]) renders[tab]();
+  tg?.HapticFeedback?.selectionChanged();
+}
+
+const TAB_ICONS_SVG = {
+  home:`<path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>`,
+  track:`<path d="M19.5 3.5L18 2l-1.5 1.5L15 2l-1.5 1.5L12 2l-1.5 1.5L9 2 7.5 3.5 6 2 4.5 3.5 3 2v20l1.5-1.5L6 22l1.5-1.5L9 22l1.5-1.5L12 22l1.5-1.5L15 22l1.5-1.5L18 22l1.5-1.5L21 22V2l-1.5 1.5zM19 19.09H5V4.91h14v14.18zM6 15h12v2H6zm0-4h12v2H6zm0-4h12v2H6z"/>`,
+  plan:`<path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>`,
+  sleep:`<path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/>`,
+  progress:`<path d="M9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4zm2.5 2.1h-15V5h15v14.1zm0-16.1h-15c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>`,
+  profile:`<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>`
+};
+const TAB_GRADS = {
+  home:'linear-gradient(145deg,#FF6B35,#FFAB40)',
+  track:'linear-gradient(145deg,#F4814A,#FF6B35)',
+  plan:'linear-gradient(145deg,#4EAEE5,#2196F3)',
+  sleep:'linear-gradient(145deg,#8B7FD4,#6C63FF)',
+  progress:'linear-gradient(145deg,#52C177,#00B09B)',
+  profile:'linear-gradient(145deg,#667EEA,#764BA2)'
+};
+
+function updateFabIcon(tab){
+  const navIco = document.getElementById('fab-icon-nav');
+  const lbl = document.getElementById('fab-label');
+  const fab = document.getElementById('fab');
+  if(navIco) navIco.innerHTML = `<svg width="26" height="26" viewBox="0 0 24 24" fill="#fff">${TAB_ICONS_SVG[tab]||TAB_ICONS_SVG.home}</svg>`;
+  if(lbl) lbl.textContent = TAB_LABELS[tab] || '';
+  if(fab) fab.style.background = TAB_GRADS[tab] || TAB_GRADS.home;
+  // Update FAB shadow color
+  const shadowColors = {
+    home:'rgba(255,107,53,.5)', track:'rgba(244,129,74,.5)',
+    plan:'rgba(78,174,229,.5)', sleep:'rgba(139,127,212,.5)',
+    progress:'rgba(82,193,119,.5)', profile:'rgba(102,126,234,.5)'
+  };
+  if(fab) fab.style.boxShadow = `0 8px 28px ${shadowColors[tab]||shadowColors.home}, 0 2px 0 rgba(255,255,255,.3) inset`;
+}
+
+function setTrackTab(t){
+  trackTab = t;
+  ['water','cal','prod'].forEach(k=>{
+    const btn = document.getElementById('tt-'+k);
+    const body = document.getElementById('tt-'+k+'-body');
+    const isAct = k === t;
+    if(btn){
+      btn.style.background = isAct ? 'var(--bg2)' : 'transparent';
+      btn.style.color = isAct ? 'var(--text)' : 'var(--hint)';
+      btn.style.boxShadow = isAct ? 'var(--shadow)' : 'none';
+    }
+    if(body) body.style.display = isAct ? '' : 'none';
+  });
+  renderTrack(t);
+}
+
+/* ═══════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════ */
+const $ = id => document.getElementById(id);
+const t = (id,v) => { const e=$(id); if(e) e.textContent=v; };
+const h = (id,v) => { const e=$(id); if(e) e.innerHTML=v; };
+
+function daysToSummer(){
+  const n=new Date(), y=n.getMonth()>=5?n.getFullYear()+1:n.getFullYear();
+  return Math.ceil((new Date(y,5,1)-n)/86400000);
+}
+function plurD(n){const a=Math.abs(n)%100;if(a>=11&&a<=19)return'дней';if(a%10===1)return'день';if(a%10>=2&&a%10<=4)return'дня';return'дней';}
+function fmtDate(s){
+  if(!s)return'—'; try{
+    const d=new Date(s+'T00:00:00');
+    const m=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+    return d.getDate()+' '+m[d.getMonth()];
+  }catch{return s;}
+}
+function fmtDateMD(s){try{const d=new Date(s+'T00:00:00');return (d.getMonth()+1)+'/'+(d.getDate());}catch{return '';}}
+function qIco(q){return['','😫','😴','😑','🙂','🌟'][q]||'😑';}
+function totalCal(){return Object.values(getCD()).reduce((a,b)=>a+b,0);}
+
+const ACT_ICO = {run:'🏃',walk:'🚶',bike:'🚴',gym:'💪',yoga:'🧘',swim:'🏊',other:'☀️'};
+const ACT_COL = {run:'#FF6B35',walk:'#52C177',bike:'#4EAEE5',gym:'#E91E63',yoga:'#8B7FD4',swim:'#00BCD4',other:'#FFAB40'};
+
+function numPop(id){
+  const e=$(id); if(!e)return;
+  e.classList.remove('num-pop'); void e.offsetWidth; e.classList.add('num-pop');
+}
+
+/* ═══════════════════════════════════════════
+   ACTIONS — отправляем на сервер
+═══════════════════════════════════════════ */
+async function addW(ml){
+  // Оптимистичное обновление кэша
+  _cache.water.total = (_cache.water.total||0) + ml;
+  _cache.water.entries = [...(_cache.water.entries||[]), ml];
+  renderTrack('water'); renderHome();
+  toast(`+${ml} мл 💧`);
+  tg?.HapticFeedback?.impactOccurred('light');
+  // Отправляем на сервер, потом перезагружаем
+  await apiPost('/api/water', {amount: ml});
+  await reload();
+}
+
+async function undoW(){
+  if(!_cache.water.entries?.length){ toast('нечего отменять'); return; }
+  const last = _cache.water.entries.pop();
+  _cache.water.total = Math.max(0, (_cache.water.total||0) - last);
+  renderTrack('water'); renderHome();
+  toast(`↩ −${last} мл`);
+  await apiPost('/api/water/undo', {});
+  await reload();
+}
+
+async function completeAct(id){
+  const acts = getActs();
+  const a = acts.find(x => x.id === id);
+  if(!a) return;
+  const newState = !a.completed;
+  // Оптимистично
+  _cache.acts_today = _cache.acts_today.map(x => x.id===id ? {...x, completed: newState?1:0} : x);
+  if(newState && timerSt.id===id) cancelTimer();
+  renderPlan(); renderHome();
+  toast(newState ? '✅ выполнено!' : '↩ отменено');
+  tg?.HapticFeedback?.notificationOccurred(newState ? 'success' : 'warning');
+  const endpoint = newState ? '/api/activity/complete' : '/api/activity/uncomplete';
+  await apiPost(endpoint, {act_id: id});
+  await reload();
+}
+
+function botAct(action){
+  const msgs={add_weight:'Записать вес',food_add:'Добавить еду',goals:'Изменить цели',
+    reminders:'Настроить напоминания',plan_add:'Добавить задачу',
+    add_sleep:'Записать сон',reset:'Сбросить данные',kbzhu:'Калькулятор КБЖУ',profile_edit:'Изменить профиль'};
+  if(tg?.sendData) tg.sendData(JSON.stringify({action, msg:msgs[action]||action}));
+  else toast('📱 отправлено боту');
+}
+
+function toggleSett(key){
+  const ss = getSetts();
+  const newVal = !ss[key];
+  const fieldMap = {w:'show_weight', water:'show_water', cal:'show_calories', sleep:'show_sleep'};
+  if(fieldMap[key]) _cache.settings[fieldMap[key]] = newVal ? 1 : 0;
+  const tog = $('tog-'+key);
+  if(tog){ tog.classList.toggle('on', newVal); tog.classList.toggle('off', !newVal); }
+  toast(newVal ? '👁 отображается' : '🙈 скрыто');
+  apiPost('/api/settings', {[fieldMap[key]]: newVal ? 1 : 0});
+}
+
+/* ═══════════════════════════════════════════
+   TIMER
+═══════════════════════════════════════════ */
+const timerSt={id:null,name:null,start:null,dur:0,iv:null};
+function startTimer(id,name,dur){
+  if(timerSt.iv)clearInterval(timerSt.iv);
+  Object.assign(timerSt,{id,name,dur,start:Date.now()});
+  t('tm-name',name); t('timer-plan-s',dur+' мин');
+  $('tm-idle').style.display='none'; $('tm-active').style.display='';
+  timerSt.iv=setInterval(tickTimer,1000); tickTimer();
+  toast('▶️ таймер запущен');
+  tg?.HapticFeedback?.impactOccurred('medium');
+}
+function tickTimer(){
+  const el=$('timer-num'); if(!el)return;
+  const sec=Math.floor((Date.now()-timerSt.start)/1000);
+  el.textContent=String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0');
+  const ring=$('timer-ring-fill');
+  if(ring){
+    const pct=Math.min(1,sec/(timerSt.dur*60));
+    ring.setAttribute('stroke-dashoffset',345.6*(1-pct));
+    ring.style.stroke=pct>=1?'var(--green)':'var(--sun)';
+  }
+}
+function finishTimer(){
+  if(timerSt.id!==null)completeAct(timerSt.id);
+  cancelTimer(); toast('🎉 тренировка завершена!');
+}
+function cancelTimer(){
+  if(timerSt.iv)clearInterval(timerSt.iv);
+  timerSt.id=null;
+  $('tm-idle').style.display=''; $('tm-active').style.display='none';
+}
+
+/* ═══════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════ */
+let toastTm;
+function toast(msg){
+  const el=$('toast'); el.textContent=msg; el.classList.add('show');
+  clearTimeout(toastTm); toastTm=setTimeout(()=>el.classList.remove('show'),2200);
+}
+
+/* ═══════════════════════════════════════════
+   CHART
+═══════════════════════════════════════════ */
+function drawChart(data){
+  const svg=$('wchart'); if(!svg)return;
+  const W=svg.parentElement?.offsetWidth||270, H=110;
+  svg.setAttribute('width',W); svg.setAttribute('height',H); svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  if(data.length<2){svg.innerHTML=`<text x="${W/2}" y="55" text-anchor="middle" fill="var(--hint)" font-size="12" font-family="Nunito" font-weight="700">нет данных</text>`;return;}
+  const ws=data.map(d=>d.weight);
+  const mn=Math.min(...ws)-.6, mx=Math.max(...ws)+.6, rng=mx-mn||1;
+  const pl={l:8,r:8,t:20,b:24};
+  const xs=(W-pl.l-pl.r)/(data.length-1);
+  const yf=w=>pl.t+(1-(w-mn)/rng)*(H-pl.t-pl.b);
+  const pts=data.map((d,i)=>[pl.l+i*xs,yf(d.weight)]);
+  let lp=`M${pts[0][0]},${pts[0][1]}`;
+  for(let i=0;i<pts.length-1;i++){
+    const cx=(pts[i][0]+pts[i+1][0])/2;
+    lp+=` C${cx},${pts[i][1]} ${cx},${pts[i+1][1]} ${pts[i+1][0]},${pts[i+1][1]}`;
+  }
+  const ap=lp+` L${pts[pts.length-1][0]},${H} L${pts[0][0]},${H} Z`;
+  svg.innerHTML=`<defs>
+    <linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="var(--sun)" stop-opacity=".22"/>
+      <stop offset="100%" stop-color="var(--sun)" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <path d="${ap}" fill="url(#cg)"/>
+  <path d="${lp}" fill="none" stroke="var(--sun)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  ${pts.map((p,i)=>`
+    <circle cx="${p[0]}" cy="${p[1]}" r="4.5" fill="var(--sun)" stroke="var(--bg2)" stroke-width="2"/>
+    <text x="${p[0]}" y="${H-4}" text-anchor="middle" font-size="9" fill="var(--hint)" font-family="Nunito" font-weight="700">${fmtDateMD(data[i].logged_at)}</text>
+    <text x="${p[0]}" y="${p[1]-10}" text-anchor="middle" font-size="10" fill="var(--sun)" font-weight="900" font-family="Nunito">${data[i].weight}</text>
+  `).join('')}`;
+}
+
+/* ═══════════════════════════════════════════
+   RENDER: HOME
+═══════════════════════════════════════════ */
+function renderHome(){
+  const u=getUser(), ss=getSetts(), wl=getWLog(), sl=getSLog();
+  const wd=getWD(), cal=getCD(), acts=getActs();
+
+  // greeting
+  t('h-name', u.name||'—');
+  const now=new Date();
+  const days=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
+  const mons=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+  t('h-date', days[now.getDay()]+', '+now.getDate()+' '+mons[now.getMonth()]);
+  const dsl=daysToSummer();
+  t('h-days',dsl); t('h-dunit',plurD(dsl));
+  t('h-ddays',dsl);
+
+  // water arc
+  const wt=wd.total||0, wg=u.water_goal||2000, wp=Math.min(1,wt/wg);
+  t('arc-wpct',Math.round(wp*100)+'%');
+  t('arc-wml',wt); t('arc-wgoal',wg);
+  setTimeout(()=>{
+    const arc=$('arc-w'); if(arc) arc.setAttribute('stroke-dashoffset',213.6*(1-wp));
+  },80);
+
+  // cal arc
+  const ct=totalCal(), cg=u.cal_goal||2000, cp=Math.min(1,ct/cg);
+  t('arc-cpct',Math.round(cp*100)+'%');
+  t('arc-cval',ct); t('arc-cgoal',cg);
+  setTimeout(()=>{ const arc=$('arc-c'); if(arc) arc.setAttribute('stroke-dashoffset',263.9*(1-cp)); },80);
+
+  // sleep arc
+  const streak=getStreak();
+  const sws=$('h-streak-wrap');
+  if(sws){ sws.style.display=streak>=2?'':'none'; }
+  t('h-sval',streak+' дней подряд');
+  if(sl.length>0){
+    const last=sl[sl.length-1];
+    const sq=document.getElementById('arc-sq');
+    if(sq){ sq.className='sq'; sq.style.justifyContent='center';
+      sq.innerHTML=Array.from({length:5},(_,i)=>`<div class="sq-d${i<last.quality?' on':''}"></div>`).join(''); }
+    const sp=Math.min(1,last.hours/9);
+    setTimeout(()=>{ const arc=$('arc-s'); if(arc) arc.setAttribute('stroke-dashoffset',213.6*(1-sp)); },80);
+    t('arc-sh',last.hours.toFixed(1));
+  }
+
+  // weight
+  if(wl.length>0){
+    const cw=wl[wl.length-1].weight, sw=u.start_weight||wl[0].weight||cw, gw=u.goal_weight;
+    t('h-wcur',cw.toFixed(1)); t('h-wgoal',gw?gw.toFixed(1):'—');
+    const tot=Math.abs(sw-gw||1), lost=sw-cw;
+    const pct=gw?Math.min(100,Math.max(0,Math.round(lost/tot*100))):0;
+    t('h-wpct',pct+'%');
+    setTimeout(()=>{ const b=$('h-wbar'); if(b) b.style.width=pct+'%'; },80);
+  }
+
+  // plan preview
+  const plSec=$('h-plan-sec'), plList=$('h-plan-list');
+  if(plSec&&plList){
+    if(!acts.length){ plSec.style.display='none'; }
+    else{
+      plSec.style.display='';
+      const nowT=new Date();
+      plList.innerHTML=acts.map(a=>{
+        const ico=ACT_ICO[a.type]||'☀️', col=ACT_COL[a.type]||'#FF9800';
+        const done=a.completed;
+        const [hh,mm]=(a.time||'00:00').split(':').map(Number);
+        const at=new Date(); at.setHours(hh,mm,0,0);
+        const et=new Date(at.getTime()+(a.duration||30)*60000);
+        const ts=`${a.time}–${String(et.getHours()).padStart(2,'0')}:${String(et.getMinutes()).padStart(2,'0')}`;
+        const late=!done&&nowT>et;
+        const badge=done?`<span class="pill pill-ok">✓</span>`
+          :late?`<span class="pill pill-late">⚠️</span>`
+          :`<span class="pill pill-up">${a.time}</span>`;
+        return `<div class="act-card${done?' done':''}">
+          <div class="act-ico" style="background:${col}18">${done?'✅':ico}</div>
+          <div class="act-info">
+            <div class="act-name">${a.name}</div>
+            <div class="act-time">${ts} · ${a.duration} мин</div>
+          </div>
+          <div>${badge}</div>
+        </div>`;
+      }).join('');
+    }
+  }
+}
+
+/* ═══════════════════════════════════════════
+   RENDER: TRACK
+═══════════════════════════════════════════ */
+function renderTrack(tab){
+  if(tab==='water') renderWater();
+  else if(tab==='cal') renderCal();
+  else renderProds();
+}
+
+function renderWater(){
+  const u=getUser(), wd=getWD();
+  const wt=wd.total||0, wg=u.water_goal||2000, wp=Math.min(100,Math.round(wt/wg*100));
+  t('w-total',wt); t('w-goal',wg);
+  setTimeout(()=>{ const b=$('w-bar'); if(b) b.style.width=wp+'%'; },80);
+  const st=getStreak();
+  h('w-streak', st>=2?`<div style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,107,53,.12);color:var(--sun);padding:5px 14px;border-radius:99px;font-size:12px;font-weight:800;">🔥 ${st} дней подряд</div>`:'');
+  const entries=wd.entries||[];
+  h('w-entries', entries.length
+    ? [...entries].reverse().slice(0,8).map((e,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(0,0,0,.05)${i===0?';border-bottom:none':''}">
+        <span style="font-size:13px;font-weight:700;color:var(--water)">+${e} мл</span>
+        <span style="font-size:12px;color:var(--hint);font-weight:600">стакан ${entries.length-i}</span>
+      </div>`).join('')
+    : '<div style="text-align:center;padding:16px;color:var(--hint);font-size:13px;font-weight:600">ещё ничего не записано</div>');
+}
+
+function renderCal(){
+  const u=getUser(), cd=getCD();
+  const ct=totalCal(), cg=u.cal_goal||2000, cp=Math.min(100,Math.round(ct/cg*100));
+  t('c-total',ct); t('c-goal',cg);
+  setTimeout(()=>{ const b=$('c-bar'); if(b) b.style.width=cp+'%'; },80);
+  const MEALS=[
+    {k:'breakfast',i:'🌅',n:'Завтрак',col:'#FF9800'},
+    {k:'lunch',i:'☀️',n:'Обед',col:'#FF6B35'},
+    {k:'dinner',i:'🌙',n:'Ужин',col:'#8B7FD4'},
+    {k:'snack',i:'🍑',n:'Перекус',col:'#52C177'},
+    {k:'other',i:'🌿',n:'Другое',col:'#607D8B'},
+  ];
+  h('c-meals', MEALS.map(m=>`
+    <div class="meal-row">
+      <div class="meal-ico" style="background:${m.col}18;color:${m.col}">${m.i}</div>
+      <div style="flex:1"><div class="meal-name">${m.n}</div>${!cd[m.k]?`<div style="font-size:11px;color:var(--hint);font-weight:600">не записано</div>`:''}</div>
+      <div class="meal-kcal" style="${cd[m.k]?'color:var(--cal)':'color:var(--hint)'}">${cd[m.k]||'—'} ${cd[m.k]?'ккал':''}</div>
+    </div>`).join(''));
+}
+
+function renderProds(){
+  h('prod-list', getProds().slice(0,10).map(p=>`
+    <div class="prod-row">
+      <div>
+        <div class="prod-name">${p.name}</div>
+        <div class="prod-meta">Б${p.protein} · Ж${p.fat} · У${p.carbs}</div>
+      </div>
+      <div class="prod-kcal">${p.calories}</div>
+    </div>`).join(''));
+}
+
+/* ═══════════════════════════════════════════
+   RENDER: PLAN
+═══════════════════════════════════════════ */
+function renderPlan(){
+  const acts=getActs();
+  const now=new Date();
+  const mons=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+  t('pl-date','сегодня · '+now.getDate()+' '+mons[now.getMonth()]);
+
+  const done=acts.filter(a=>a.completed).length, total=acts.length;
+  t('pl-cnt',total?`${done}/${total}`:'0/0');
+  setTimeout(()=>{
+    const ring=$('pl-ring');
+    if(ring) ring.setAttribute('stroke-dashoffset',150.8*(1-(total?done/total:0)));
+  },80);
+
+  const empty=$('pl-empty'), list=$('pl-list');
+  if(!acts.length){ if(empty)empty.style.display=''; if(list){list.innerHTML='';list.style.display='none';} return; }
+  if(empty)empty.style.display='none'; if(list)list.style.display='';
+
+  const nowT=new Date();
+  list.innerHTML=acts.map(a=>{
+    const ico=ACT_ICO[a.type]||'☀️', col=ACT_COL[a.type]||'#FF9800';
+    const done=a.completed;
+    const [hh,mm]=(a.time||'00:00').split(':').map(Number);
+    const at=new Date(); at.setHours(hh,mm,0,0);
+    const et=new Date(at.getTime()+(a.duration||30)*60000);
+    const ts=`${a.time}–${String(et.getHours()).padStart(2,'0')}:${String(et.getMinutes()).padStart(2,'0')}`;
+    const late=!done&&nowT>et;
+    const active=!done&&nowT>=at&&nowT<=et;
+    const isTm=timerSt.id===a.id;
+    const badge=done?`<span class="pill pill-ok">✓</span>`
+      :active?`<span class="pill pill-now">▶ сейчас</span>`
+      :late?`<span class="pill pill-late">просрочено</span>`
+      :`<span class="pill pill-up">${ts}</span>`;
+    return `<div class="act-card${done?' done':''}">
+      <div class="act-ico" style="background:${col}18;font-size:${done?16:22}px">${done?'✅':ico}</div>
+      <div class="act-info">
+        <div class="act-name">${a.name}</div>
+        <div class="act-time">${ts} · ${a.duration} мин${isTm?' · <span style="color:var(--sun);font-weight:800">⏱ идёт</span>':''}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
+        ${badge}
+        <div style="display:flex;gap:5px">
+          <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px;border-radius:9px" onclick="completeAct(${a.id})">${done?'↩':'✓'}</button>
+          ${!done?`<button class="btn btn-primary" style="padding:6px 12px;font-size:12px;border-radius:9px;width:auto" onclick="startTimer(${a.id},'${a.name.replace(/'/g,"\\'")}',${a.duration})">▶</button>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════════
+   RENDER: SLEEP
+═══════════════════════════════════════════ */
+function renderSleep(){
+  const sl=getSLog();
+  if(sl.length){
+    const last=sl[sl.length-1];
+    t('sl-h',last.hours.toFixed(1));
+    t('sl-qico',qIco(last.quality));
+    h('sl-dots',Array.from({length:5},(_,i)=>`<div class="sq-d${i<last.quality?' on':''}"></div>`).join(''));
+  } else { t('sl-h','—'); t('sl-qico','—'); h('sl-dots',''); }
+
+  const last7=sl.slice(-7).reverse();
+  h('sl-hist', last7.length?last7.map(e=>`
+    <div class="hrow">
+      <div class="hrow-date">${fmtDate(e.logged_at)}</div>
+      <div style="display:flex;align-items:center;gap:8px;flex:1">
+        <div class="hrow-val">${e.hours.toFixed(1)} ч</div>
+        <div class="sq">${Array.from({length:5},(_,i)=>`<div class="sq-d${i<e.quality?' on':''}"></div>`).join('')}</div>
+      </div>
+      <div style="font-size:18px">${qIco(e.quality)}</div>
+    </div>`).join('')
+    :'<div style="text-align:center;padding:20px;color:var(--hint);font-size:13px;font-weight:600">нет записей</div>');
+
+  if(last7.length){
+    const ah=+(last7.reduce((a,b)=>a+b.hours,0)/last7.length).toFixed(1);
+    const aq=+(last7.reduce((a,b)=>a+(b.quality||3),0)/last7.length).toFixed(1);
+    t('sl-avg-h',ah); t('sl-avg-q',qIco(Math.round(aq))+' '+aq);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   RENDER: PROGRESS
+═══════════════════════════════════════════ */
+function renderProgress(){
+  const u=getUser(), wl=getWLog(), sl=getSLog(), wd=getWD();
+  const acts=getActs();
+
+  if(wl.length){
+    const cw=wl[wl.length-1].weight, sw=u.start_weight||wl[0].weight||cw, gw=u.goal_weight;
+    t('pr-wcur',cw.toFixed(1)); t('pr-wgoal',gw?gw.toFixed(1)+' кг':'—');
+    t('pr-wgoal2',gw?gw.toFixed(1):'—'); t('pr-wstart',sw.toFixed(1));
+    const tot=Math.abs(sw-(gw||sw))||1, lost=sw-cw;
+    const pct=gw?Math.min(100,Math.max(0,Math.round(lost/tot*100))):0;
+    t('pr-wpct',pct+'%'); t('pr-winfo',`потеряно ${Math.abs(lost).toFixed(1)} кг · осталось ${Math.max(0,cw-(gw||cw)).toFixed(1)} кг`);
+    setTimeout(()=>{ const b=$('pr-wbar'); if(b) b.style.width=pct+'%'; },80);
+    if(wl.length>=2&&gw&&cw>gw){
+      try{
+        const d1=new Date(wl[0].logged_at+'T00:00:00'), d2=new Date(wl[wl.length-1].logged_at+'T00:00:00');
+        const ddays=Math.max(1,(d2-d1)/86400000);
+        const rate=(wl[0].weight-wl[wl.length-1].weight)/ddays*7;
+        if(rate>0.01){
+          const dl=Math.ceil((cw-gw)/rate*7), eta=new Date(); eta.setDate(eta.getDate()+dl);
+          const mons=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+          t('pr-forecast',`☀️ прогноз: ${eta.getDate()} ${mons[eta.getMonth()]} · темп ${rate.toFixed(2)} кг/нед`);
+        }
+      }catch{}
+    }
+  }
+
+  drawChart(wl.slice(-7));
+
+  t('pw-water',wd.total||0);
+  t('pw-cal',totalCal());
+  if(sl.length){ t('pw-sleep',+(sl.slice(-7).reduce((a,b)=>a+b.hours,0)/Math.min(7,sl.length)).toFixed(1)); }
+  else t('pw-sleep','—');
+
+  const last6=wl.slice(-6).reverse();
+  h('pr-whist', last6.length?last6.map((e,i)=>{
+    const prev=last6[i+1];
+    const diff=prev?+(e.weight-prev.weight).toFixed(1):0;
+    return `<div class="hrow">
+      <div class="hrow-date">${fmtDate(e.logged_at)}</div>
+      <div class="hrow-val">${e.weight.toFixed(1)} кг</div>
+      ${diff?`<div class="hrow-diff ${diff<0?'diff-neg':'diff-pos'}">${diff>0?'+':''}${diff}</div>`:'<div></div>'}
+    </div>`;}).join('')
+    :'<div style="text-align:center;padding:16px;color:var(--hint);font-size:13px;font-weight:600">нет записей</div>');
+
+  t('at-t',acts.filter(a=>a.completed).length);
+  t('at-w',+((wd.total||0)/1000).toFixed(1));
+  t('at-s',getStreak());
+}
+
+/* ═══════════════════════════════════════════
+   RENDER: PROFILE
+═══════════════════════════════════════════ */
+function renderProfile(){
+  const u=getUser(), ss=getSetts(), wl=getWLog();
+  const av=$('pf-av'); if(av) av.textContent=(u.name||'?').charAt(0).toUpperCase();
+  t('pf-name',u.name||'—');
+  const meta=[]; if(u.age)meta.push(u.age+' лет'); if(u.height)meta.push(u.height+' см');
+  if(u.gender)meta.push(u.gender==='male'?'♂ мужской':'♀ женский');
+  t('pf-meta',meta.join(' · ')||'—');
+
+  t('pf-gw',u.goal_weight?u.goal_weight+' кг':'—');
+  t('pf-gwater',(u.water_goal||2000)+' мл');
+  t('pf-gcal',(u.cal_goal||2000)+' ккал');
+  t('pf-pname',u.name||'—');
+  t('pf-height',u.height?u.height+' см':'—');
+  t('pf-age',u.age?u.age+' лет':'—');
+
+  const bmiRow=$('pf-bmi-row');
+  if(u.height&&wl.length){
+    const cw=wl[wl.length-1].weight, h2=u.height/100;
+    const bmi=+(cw/h2/h2).toFixed(1);
+    const ideal=+((u.height-100)*.9).toFixed(1);
+    const bmr=Math.round(u.gender==='female'?10*cw+6.25*u.height-5*(u.age||25)-161:10*cw+6.25*u.height-5*(u.age||25)+5);
+    if(bmiRow) bmiRow.style.display='';
+    t('pf-bmi',bmi); t('pf-ideal',ideal); t('pf-bmr',bmr);
+  } else if(bmiRow) bmiRow.style.display='none';
+
+  [['w'],['water'],['cal'],['sleep']].forEach(([k])=>{
+    const tog=$('tog-'+k), on=ss[k]!==false;
+    if(tog){tog.classList.toggle('on',on);tog.classList.toggle('off',!on);}
+  });
+}
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', async ()=>{
+  positionFanItems();
+  updateFabIcon('home');
+
+  // Показываем skeleton пока грузится
+  const isDark = tg?.colorScheme === 'dark' ||
+    (window.matchMedia && window.matchMedia('(prefers-color-scheme:dark)').matches);
+  if(isDark) document.body.classList.add('tg-dark');
+  tg?.onEvent('themeChanged', ()=>{
+    document.body.classList.toggle('tg-dark', tg?.colorScheme === 'dark');
+  });
+
+  // Загружаем данные с сервера
+  await loadData();
+  renderHome();
+  setTimeout(()=>renderHome(), 150);
+
+  setInterval(async ()=>{
+    if(curTab==='home'){
+      await loadData();
+      renderHome();
+    }
+  }, 30000);
+});
+</script>
+</body>
+</html>
