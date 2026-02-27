@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>letify</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -15,8 +18,8 @@
   --sun:#FF6B35;--sun2:#FFAB40;--water:#4EAEE5;--cal:#F4814A;
   --sleep:#8B7FD4;--green:#52C177;--red:#F45C5C;
   --r:16px;--r-lg:20px;
-  --st:max(env(safe-area-inset-top,0px),0px);
-  --sb:max(env(safe-area-inset-bottom,0px),0px);
+  --st:0px;
+  --sb:0px;
   --sh:0 2px 12px rgba(0,0,0,.07);
   --page-bot:calc(80px + var(--sb) + 20px);
   --page-top:calc(var(--st) + 14px);
@@ -85,21 +88,24 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
 /* ── ISLAND NAV ── */
 #nav{
   position:fixed;
-  bottom:calc(var(--sb)+12px);
-  left:50%;transform:translateX(-50%);
-  z-index:50;
+  bottom:12px;
+  left:0;right:0;
+  margin:0 auto;
+  width:fit-content;
+  z-index:9999;
   display:flex;align-items:center;gap:4px;
   padding:6px;
-  background:rgba(255,255,255,.82);
+  background:rgba(255,255,255,.92);
   backdrop-filter:blur(30px) saturate(2);
   -webkit-backdrop-filter:blur(30px) saturate(2);
   border:1px solid rgba(255,255,255,.9);
   border-radius:26px;
   box-shadow:0 8px 30px rgba(0,0,0,.13),0 2px 6px rgba(0,0,0,.06);
-  transition:transform .3s cubic-bezier(.4,0,.2,1),opacity .3s;
+  transition:bottom .3s,opacity .3s;
+  transform:none !important;
 }
-.tg-dark #nav{background:rgba(28,22,14,.84);border-color:rgba(255,255,255,.08)}
-#nav.gone{transform:translateX(-50%) translateY(calc(100% + 20px));opacity:0;pointer-events:none}
+.tg-dark #nav{background:rgba(28,22,14,.92);border-color:rgba(255,255,255,.08)}
+#nav.gone{bottom:calc(-100px - var(--sb));opacity:0;pointer-events:none}
 .nt{
   width:52px;height:52px;border-radius:18px;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
@@ -255,10 +261,10 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
 .wp-ft{position:absolute;left:0;right:0;height:88px;pointer-events:none;z-index:2}
 .wp-ft-t{top:0;background:linear-gradient(to bottom,var(--bg2) 0%,transparent 100%)}
 .wp-ft-b{bottom:0;background:linear-gradient(to top,var(--bg2) 0%,transparent 100%)}
-.wp-row{display:flex;justify-content:center;gap:8px;padding:0 20px 8px}
-.wp-col{display:flex;flex-direction:column;align-items:center;gap:4px}
-.wp-lbl{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--hint)}
-.wp-sep{font-size:22px;font-weight:900;color:var(--hint);line-height:44px;align-self:center;padding-top:20px}
+.wp-row{display:flex;justify-content:center;gap:8px;padding:0 4px 8px;align-items:flex-start}
+.wp-col{display:flex;flex-direction:column;align-items:stretch;gap:4px;flex:1;min-width:0}
+.wp-lbl{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--hint);text-align:center}
+.wp-sep{font-size:22px;font-weight:900;color:var(--hint);line-height:44px;align-self:center;padding-top:20px;flex:none}
 
 /* ── FORM FIELDS (screens) ── */
 .f-row{display:flex;align-items:center;justify-content:space-between;padding:0 0 14px}
@@ -266,7 +272,7 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
 .f-inp{border:none;outline:none;background:var(--bg3);border-radius:10px;padding:10px 13px;font-family:inherit;font-size:15px;font-weight:800;color:var(--text);text-align:right;width:130px;-webkit-appearance:none}
 .f-inp-wide{width:100%;text-align:left;margin-top:8px;display:block}
 .seg{display:flex;gap:3px;background:rgba(0,0,0,.05);border-radius:10px;padding:3px;margin-top:8px}
-.seg-btn{flex:1;padding:8px 4px;font-size:12px;font-weight:800;border:none;border-radius:7px;cursor:pointer;font-family:inherit;background:transparent;color:var(--hint);transition:background .14s,color .14s}
+.seg-btn{flex:1;padding:8px 4px;font-size:18px;font-weight:800;border:none;border-radius:7px;cursor:pointer;font-family:inherit;background:transparent;color:var(--hint);transition:background .14s,color .14s;line-height:1.3}
 .seg-btn.on{background:var(--bg2);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.09)}
 
 /* ── EMPTY ── */
@@ -888,6 +894,8 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
 
 </div><!-- /root -->
 
+<!-- nav moved outside root to avoid stacking context issues -->
+
 <script>
 /* ════ TG INIT ════ */
 const tg=window.Telegram?.WebApp;
@@ -906,8 +914,12 @@ if(tg){
 function _applySA(){
   const top=tg?.safeAreaInset?.top??tg?.contentSafeAreaInset?.top??0;
   const bot=tg?.safeAreaInset?.bottom??tg?.contentSafeAreaInset?.bottom??0;
-  if(top>0)document.documentElement.style.setProperty('--st',top+'px');
-  if(bot>0)document.documentElement.style.setProperty('--sb',bot+'px');
+  const st=Math.min(Math.max(top,0),80);
+  const sb=Math.min(Math.max(bot,0),80);
+  document.documentElement.style.setProperty('--st',st+'px');
+  document.documentElement.style.setProperty('--sb',sb+'px');
+  const nav=document.getElementById('nav');
+  if(nav&&!nav.classList.contains('gone'))nav.style.bottom=(12+sb)+'px';
 }
 function applyTheme(){
   const p=tg?.themeParams||{};
@@ -1027,6 +1039,10 @@ function closeScr(doNav=true){
   if(scr)scr.classList.remove('open');
   curScr=null;
   document.getElementById('nav')?.classList.remove('gone');
+  // восстанавливаем позицию nav
+  const sb=Math.min(Math.max(tg?.safeAreaInset?.bottom??0,0),80);
+  const navEl=document.getElementById('nav');
+  if(navEl)navEl.style.bottom=(12+sb)+'px';
   if(tg?.BackButton){tg.BackButton.hide();tg.BackButton.offClick(closeScr);}
 }
 function _populateScr(id){
@@ -1132,7 +1148,7 @@ function initWeightPicker(){
   const intItems=Array.from({length:171},(_,i)=>({l:String(30+i),v:30+i}));
   const decItems=Array.from({length:10},(_,i)=>({l:'.'+i,v:i/10}));
   const wrap=document.getElementById('wp-weight-wrap');
-  wrap.innerHTML='<div class="wp-col"><div class="wp-lbl">кг</div><div id="wpi-i"></div></div><div class="wp-sep"> </div><div class="wp-col"><div class="wp-lbl">.X</div><div id="wpi-d"></div></div>';
+  wrap.innerHTML='<div class="wp-col" style="flex:3"><div class="wp-lbl">кг</div><div id="wpi-i"></div></div><div class="wp-sep"> </div><div class="wp-col" style="flex:1;min-width:80px"><div class="wp-lbl">.X</div><div id="wpi-d"></div></div>';
   PKR.wi=mkPicker(document.getElementById('wpi-i'),intItems,ii);
   PKR.wd=mkPicker(document.getElementById('wpi-d'),decItems,id/10);
   PKR.wi.setIdx(intItems.findIndex(x=>x.v===ii));
@@ -1145,7 +1161,7 @@ function initSleepPicker(){
   const hItems=Array.from({length:14},(_,i)=>({l:String(1+i),v:1+i}));
   const dItems=[{l:'.0',v:0},{l:'.5',v:.5}];
   const wrap=document.getElementById('wp-sleep-wrap');
-  wrap.innerHTML='<div class="wp-col"><div class="wp-lbl">часов</div><div id="wps-h"></div></div><div class="wp-col"><div class="wp-lbl">.X</div><div id="wps-d"></div></div>';
+  wrap.innerHTML='<div class="wp-col" style="flex:3"><div class="wp-lbl">часов</div><div id="wps-h"></div></div><div class="wp-col" style="flex:1;min-width:70px"><div class="wp-lbl">.X</div><div id="wps-d"></div></div>';
   PKR.sh=mkPicker(document.getElementById('wps-h'),hItems,ihh);
   PKR.sd=mkPicker(document.getElementById('wps-d'),dItems,idd===1?.5:0);
   PKR.sh.setIdx(hItems.findIndex(x=>x.v===ihh));
