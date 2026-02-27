@@ -2834,12 +2834,89 @@ def start_flask():
             with _db() as c: c.execute("UPDATE activities SET completed=0,ended_at=NULL WHERE id=? AND user_id=?",(aid,uid))
             return jsonify({"ok":True})
 
+        # ── Профиль ───────────────────────────────────────────────────
+        @flask_app.route("/api/profile", methods=["POST"])
+        def _update_profile():
+            d = request.json or {}
+            uid = d.get("uid")
+            if not uid: return jsonify({"error":"uid required"}),400
+            fields = {}
+            if "name" in d: fields["name"] = d["name"]
+            if "height" in d: fields["height"] = d["height"]
+            if "age" in d: fields["age"] = d["age"]
+            if "gender" in d: fields["gender"] = d["gender"]
+            if not fields: return jsonify({"ok":True})
+            sets = ", ".join(f"{k}=?" for k in fields)
+            with _db() as c:
+                # ensure user exists
+                c.execute("INSERT OR IGNORE INTO users (user_id) VALUES (?)", (uid,))
+                c.execute(f"UPDATE users SET {sets} WHERE user_id=?", list(fields.values())+[uid])
+            return jsonify({"ok":True})
+
+        # ── Цели ─────────────────────────────────────────────────────
+        @flask_app.route("/api/goals", methods=["POST"])
+        def _update_goals():
+            d = request.json or {}
+            uid = d.get("uid")
+            if not uid: return jsonify({"error":"uid required"}),400
+            fields = {}
+            if "goal_weight" in d: fields["goal_weight"] = d["goal_weight"]
+            if "water_goal" in d: fields["water_goal"] = d["water_goal"]
+            if "cal_goal" in d: fields["cal_goal"] = d["cal_goal"]
+            if not fields: return jsonify({"ok":True})
+            sets = ", ".join(f"{k}=?" for k in fields)
+            with _db() as c:
+                c.execute("INSERT OR IGNORE INTO users (user_id) VALUES (?)", (uid,))
+                c.execute(f"UPDATE users SET {sets} WHERE user_id=?", list(fields.values())+[uid])
+            return jsonify({"ok":True})
+
+        # ── Калории (добавить приём пищи) ────────────────────────────
+        @flask_app.route("/api/calories", methods=["POST"])
+        def _add_calories():
+            d = request.json or {}
+            uid, amt, meal_type, desc = d.get("uid"), d.get("amount"), d.get("meal_type","other"), d.get("description","")
+            if not uid or amt is None: return jsonify({"error":"uid and amount required"}),400
+            with _db() as c: c.execute("INSERT INTO calories_log (user_id,amount,description,meal_type) VALUES (?,?,?,?)",(uid, amt, desc, meal_type))
+            return jsonify({"ok":True})
+
+        # ── Создать активность ────────────────────────────────────────
+        @flask_app.route("/api/activity/create", methods=["POST"])
+        def _create_act():
+            d = request.json or {}
+            uid = d.get("uid")
+            if not uid: return jsonify({"error":"uid required"}),400
+            name = d.get("name","Тренировка")
+            atype = d.get("type","other")
+            time_str = d.get("time","08:00")
+            dur = d.get("duration",30)
+            today = _today()
+            scheduled = f"{today}T{time_str}:00"
+            with _db() as c:
+                c.execute("INSERT INTO activities (user_id,name,type,scheduled_at,duration,days_of_week) VALUES (?,?,?,?,?,'')",
+                          (uid, name, atype, scheduled, dur))
+            return jsonify({"ok":True})
+
+        # ── Настройки отображения ─────────────────────────────────────
+        @flask_app.route("/api/settings", methods=["POST"])
+        def _update_settings():
+            d = request.json or {}
+            uid = d.get("uid")
+            if not uid: return jsonify({"error":"uid required"}),400
+            fields = {k:v for k,v in d.items() if k in ("show_weight","show_water","show_calories","show_sleep")}
+            if not fields: return jsonify({"ok":True})
+            sets = ", ".join(f"{k}=?" for k in fields)
+            with _db() as c:
+                c.execute("INSERT OR IGNORE INTO user_settings (user_id) VALUES (?)", (uid,))
+                c.execute(f"UPDATE user_settings SET {sets} WHERE user_id=?", list(fields.values())+[uid])
+            return jsonify({"ok":True})
+
         port = int(_os.environ.get("PORT", 5000))
         t = threading.Thread(target=lambda: flask_app.run(host="0.0.0.0", port=port, debug=False, use_reloader=False), daemon=True)
         t.start()
         log.info(f"🌐 Mini App API запущен на порту {port}")
     except Exception as e:
         log.error(f"Flask не запустился: {e}")
+
 
 
 # ── MAIN ────────────────────────────────────────────────────────────
