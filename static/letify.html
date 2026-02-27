@@ -5,2495 +5,1555 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
 <title>letify</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-/* ════════════════════════════════════════
-   RESET & TOKENS
-════════════════════════════════════════ */
-*,*::before,*::after{
-  box-sizing:border-box;margin:0;padding:0;
-  -webkit-tap-highlight-color:transparent!important;
-  -webkit-touch-callout:none;
-}
+/* ── RESET ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
 :root{
-  --bg:        var(--tg-theme-bg-color,       #FAF7F2);
-  --bg2:       var(--tg-theme-secondary-bg-color,#FFFFFF);
-  --text:      var(--tg-theme-text-color,      #1C1608);
-  --hint:      var(--tg-theme-hint-color,      #A89F90);
-  --sun:       #FF6B35;
-  --sun2:      #FFAB40;
-  --water:     #4EAEE5;
-  --cal:       #F4814A;
-  --sleep:     #8B7FD4;
-  --green:     #52C177;
-  --red:       #F45C5C;
-  --r:         16px;
-  --r-sm:      10px;
-  --r-lg:      24px;
-  --nav-h:     64px;
-  --st:        max(env(safe-area-inset-top,0px), 0px);
-  --sb:        max(env(safe-area-inset-bottom,0px), 0px);
-  --shadow:    0 2px 16px rgba(0,0,0,.06);
-  --page-top:  calc(var(--st) + 16px);
-  --page-bot:  calc(var(--nav-h) + var(--sb) + 16px);
+  --bg:#FAF7F2;--bg2:#fff;--bg3:rgba(0,0,0,.05);
+  --text:#1C1608;--hint:#A89F90;--brd:rgba(0,0,0,.06);
+  --sun:#FF6B35;--sun2:#FFAB40;--water:#4EAEE5;--cal:#F4814A;
+  --sleep:#8B7FD4;--green:#52C177;--red:#F45C5C;
+  --r:16px;--r-lg:20px;
+  --st:max(env(safe-area-inset-top,0px),0px);
+  --sb:max(env(safe-area-inset-bottom,0px),0px);
+  --sh:0 2px 12px rgba(0,0,0,.07);
+  --page-bot:calc(80px + var(--sb) + 20px);
+  --page-top:calc(var(--st) + 14px);
 }
+html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overscroll-behavior:none;user-select:none}
 
-html,body{
-  height:100%;overflow:hidden;
-  font-family:'Nunito',system-ui,sans-serif;
-  background:var(--bg);color:var(--text);
-  -webkit-font-smoothing:antialiased;
-  overscroll-behavior:none;
-  user-select:none;
-}
+/* ── LAYOUT ── */
+#root{position:fixed;inset:0}
+#pages{position:absolute;inset:0}
 
-/* ════════════════════════════════════════
-   ROOT LAYOUT
-════════════════════════════════════════ */
-#root{
-  position:fixed;inset:0;
-  display:flex;flex-direction:column;
-  overflow:hidden;
-}
-#pages{
-  flex:1;overflow:hidden;position:relative;
-}
-
-/* ════════════════════════════════════════
-   MAIN PAGES
-════════════════════════════════════════ */
+/* ── PAGES ── */
 .page{
   position:absolute;inset:0;
   overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
+  touch-action:pan-y;
   scrollbar-width:none;
   padding-top:var(--page-top);
   padding-bottom:var(--page-bot);
   opacity:0;pointer-events:none;
-  transform:translateY(20px) scale(.98);
-  transform-origin:top center;
-  transition:
-    opacity .28s cubic-bezier(.4,0,.2,1),
-    transform .32s cubic-bezier(.34,1.2,.64,1);
-  will-change:transform,opacity;
+  transform:translateY(14px);
+  transition:opacity .24s cubic-bezier(.4,0,.2,1),transform .28s cubic-bezier(.4,0,.2,1);
+  contain:layout style;
 }
 .page::-webkit-scrollbar{display:none}
-.page.active{
-  opacity:1;pointer-events:all;
-  transform:translateY(0) scale(1);
-}
+.page.active{opacity:1;pointer-events:all;transform:none}
 
-/* ════════════════════════════════════════
-   SUB-PAGE LAYER
-════════════════════════════════════════ */
-#sub-layer{
-  position:fixed;inset:0;
-  z-index:60;
+/* ── SCREEN LAYER (full-screen input screens) ── */
+#slayer{position:fixed;inset:0;z-index:70;pointer-events:none}
+.scr{
+  position:absolute;inset:0;background:var(--bg);
+  overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
+  touch-action:pan-y;scrollbar-width:none;
   pointer-events:none;
-}
-.sub-page{
-  position:absolute;inset:0;
-  background:var(--bg);
-  overflow-y:auto;overflow-x:hidden;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:none;
-  pointer-events:none;
-  transform:translateX(100%);
-  transition:transform .32s cubic-bezier(.4,0,.2,1);
-  will-change:transform;
-  padding-bottom:calc(var(--sb) + 24px);
-}
-.sub-page::-webkit-scrollbar{display:none}
-.sub-page.open{
-  transform:translateX(0);
-  pointer-events:all;
-}
-.sp-header{
-  position:sticky;top:0;z-index:5;
-  background:var(--bg);
-  padding:calc(var(--st) + 10px) 16px 12px;
-  display:flex;align-items:center;gap:12px;
-  border-bottom:1px solid rgba(0,0,0,.04);
-}
-.sp-back-btn{
-  width:38px;height:38px;border-radius:12px;
-  background:rgba(0,0,0,.06);
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;flex-shrink:0;
-  transition:transform .15s cubic-bezier(.34,1.56,.64,1),background .15s;
-}
-.sp-back-btn:active{transform:scale(.85)}
-.sp-title{font-size:17px;font-weight:900;letter-spacing:-.01em;flex:1}
-
-/* ════════════════════════════════════════
-   BOTTOM NAVIGATION
-════════════════════════════════════════ */
-#bottom-nav{
-  position:relative;z-index:50;
-  height:calc(var(--nav-h) + var(--sb));
-  padding-bottom:var(--sb);
-  background:rgba(250,247,242,.9);
-  backdrop-filter:blur(24px) saturate(1.6);
-  -webkit-backdrop-filter:blur(24px) saturate(1.6);
-  border-top:1px solid rgba(0,0,0,.06);
-  display:flex;
-  flex-shrink:0;
-  transition:transform .3s cubic-bezier(.4,0,.2,1), opacity .3s;
-}
-#bottom-nav.hidden{
-  transform:translateY(100%);
-  opacity:0;
-  pointer-events:none;
-}
-.nav-tab{
-  flex:1;
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  gap:3px;padding:6px 2px;
-  cursor:pointer;
-  color:var(--hint);
-  transition:color .2s ease;
-  position:relative;
-}
-.nav-tab.active{color:var(--sun)}
-.nav-tab-ico{
-  width:28px;height:28px;
-  display:flex;align-items:center;justify-content:center;
-  border-radius:9px;
-  transition:
-    background .2s ease,
-    transform .2s cubic-bezier(.34,1.56,.64,1);
-  position:relative;
-}
-.nav-tab.active .nav-tab-ico{
-  background:rgba(255,107,53,.14);
-  transform:scale(1.1);
-}
-.nav-tab-ico svg{
-  width:20px;height:20px;
-  transition:stroke .2s, fill .2s;
-}
-.nav-tab-lbl{
-  font-size:10px;font-weight:800;
-  letter-spacing:.02em;
-  transition:color .2s;
-  white-space:nowrap;
-}
-.nav-tab:active .nav-tab-ico{transform:scale(.85)!important}
-
-/* Nav active indicator */
-#nav-indicator{
-  position:absolute;
-  top:0;height:2px;
-  background:linear-gradient(90deg,var(--sun),var(--sun2));
-  border-radius:0 0 2px 2px;
-  transition:left .3s cubic-bezier(.34,1.1,.64,1), width .3s cubic-bezier(.34,1.1,.64,1);
-  pointer-events:none;
-}
-
-/* ════════════════════════════════════════
-   TYPOGRAPHY
-════════════════════════════════════════ */
-.t1{font-size:28px;font-weight:900;line-height:1.1;letter-spacing:-.02em}
-.t2{font-size:20px;font-weight:900;letter-spacing:-.015em}
-.t3{font-size:16px;font-weight:800}
-.t4{font-size:13px;font-weight:700}
-.t5{font-size:12px;font-weight:600;color:var(--hint)}
-.tnum{font-size:42px;font-weight:900;line-height:1;letter-spacing:-.03em}
-.tnum-sm{font-size:26px;font-weight:900;letter-spacing:-.02em}
-.grad{
-  background:linear-gradient(105deg,var(--sun),var(--sun2));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  background-clip:text;
-}
-
-/* ════════════════════════════════════════
-   MD3 CARDS & SURFACES
-════════════════════════════════════════ */
-.card{
-  background:var(--bg2);
-  border-radius:var(--r-lg);
-  padding:18px;
-  box-shadow:var(--shadow);
-  position:relative;overflow:hidden;
-}
-.card+.card{margin-top:10px}
-.pad{padding:0 16px}
-.sec-lbl{
-  font-size:11px;font-weight:800;letter-spacing:.08em;
-  text-transform:uppercase;color:var(--hint);
-  padding:18px 20px 8px;
-}
-
-/* Settings row (MD3 list tile style) */
-.srow{
-  display:flex;align-items:center;gap:14px;
-  padding:13px 0;
-  border-bottom:1px solid rgba(0,0,0,.04);
-  cursor:pointer;
-  transition:background .15s;
-}
-.srow:last-child{border-bottom:none;padding-bottom:0}
-.srow:first-child{padding-top:0}
-.srow:active{background:rgba(0,0,0,.03)}
-.srow-ico{
-  font-size:20px;width:36px;height:36px;
-  background:rgba(0,0,0,.05);border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
-}
-.srow-lbl{flex:1;font-size:14px;font-weight:700}
-.srow-val{font-size:13px;color:var(--hint);font-weight:600;flex-shrink:0}
-.srow-chev{
-  color:var(--hint);opacity:.5;
-  font-size:16px;flex-shrink:0;
-}
-
-/* ════════════════════════════════════════
-   BUTTONS
-════════════════════════════════════════ */
-.btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:6px;
-  border:none;cursor:pointer;font-family:inherit;font-weight:800;
-  border-radius:var(--r-sm);
-  transition:transform .15s cubic-bezier(.34,1.56,.64,1), opacity .15s ease;
-}
-.btn:active{transform:scale(.88);opacity:.82}
-.btn-primary{
-  background:linear-gradient(135deg,var(--sun),var(--sun2));
-  color:#fff;padding:14px 20px;font-size:15px;border-radius:var(--r);
-  box-shadow:0 6px 24px rgba(255,107,53,.3);width:100%;
-}
-.btn-ghost{
-  background:rgba(0,0,0,.055);color:var(--text);
-  padding:11px 18px;font-size:13px;border-radius:var(--r-sm);
-}
-.btn-water{
-  background:rgba(78,174,229,.12);color:var(--water);
-  padding:13px 10px;font-size:14px;border-radius:var(--r-sm);flex:1;
-}
-.btn-icon{
-  width:42px;height:42px;border-radius:12px;
-  background:rgba(0,0,0,.055);color:var(--text);font-size:18px;
-  flex-shrink:0;
-}
-.btn-row{display:flex;gap:8px}
-
-/* ════════════════════════════════════════
-   TOGGLE
-════════════════════════════════════════ */
-.tog{
-  width:50px;height:28px;border-radius:99px;
-  position:relative;cursor:pointer;flex-shrink:0;
-  transition:background .25s ease;
-}
-.tog::after{
-  content:'';position:absolute;
-  width:22px;height:22px;border-radius:50%;
-  background:#fff;top:3px;
-  transition:left .28s cubic-bezier(.34,1.5,.64,1);
-  box-shadow:0 1px 6px rgba(0,0,0,.18);
-}
-.tog.on{background:var(--sun)}
-.tog.off{background:rgba(0,0,0,.18)}
-.tog.on::after{left:25px}
-.tog.off::after{left:3px}
-
-/* ════════════════════════════════════════
-   PROGRESS BARS & ARCS
-════════════════════════════════════════ */
-.pbar{
-  height:6px;background:rgba(0,0,0,.06);
-  border-radius:99px;overflow:hidden;margin-top:10px;
-}
-.pbar-fill{
-  height:100%;border-radius:99px;
-  transition:width 1.2s cubic-bezier(.34,1.1,.64,1);
-}
-.pbar-sun{background:linear-gradient(90deg,var(--sun),var(--sun2))}
-.pbar-water{background:var(--water)}
-.pbar-sleep{background:var(--sleep)}
-.arc-wrap{position:relative;display:inline-flex;align-items:center;justify-content:center}
-.arc-inner{position:absolute;text-align:center}
-
-/* ════════════════════════════════════════
-   STAT BOX
-════════════════════════════════════════ */
-.stat-row{display:flex;gap:8px}
-.stat-box{
-  flex:1;background:var(--bg2);border-radius:var(--r);
-  padding:14px;box-shadow:var(--shadow);text-align:center;
-}
-.stat-v{font-size:20px;font-weight:900;margin-bottom:3px}
-.stat-l{font-size:10px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.06em}
-
-/* ════════════════════════════════════════
-   SUMMER BANNER
-════════════════════════════════════════ */
-.sbanner{
-  background:linear-gradient(130deg,#FF6B35,#FFAB40);
-  border-radius:var(--r-lg);padding:18px;
-  color:#fff;position:relative;overflow:hidden;
-}
-.sbanner::after{
-  content:'☀️';position:absolute;
-  right:-8px;top:-10px;font-size:88px;
-  opacity:.14;transform:rotate(15deg);pointer-events:none;
-}
-
-/* ════════════════════════════════════════
-   ACTIVITY CARDS
-════════════════════════════════════════ */
-.act-card{
-  background:var(--bg2);border-radius:var(--r);
-  padding:13px 14px;
-  display:flex;align-items:center;gap:12px;
-  box-shadow:var(--shadow);
-  transition:transform .2s ease,opacity .25s ease;
-}
-.act-card+.act-card{margin-top:8px}
-.act-card.done{opacity:.45}
-.act-card.done .act-name{text-decoration:line-through}
-.act-ico{
-  width:46px;height:46px;border-radius:14px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:20px;flex-shrink:0;
-}
-.act-info{flex:1;min-width:0}
-.act-name{font-size:14px;font-weight:800;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.act-time{font-size:11px;color:var(--hint);font-weight:600}
-
-/* ════════════════════════════════════════
-   PILL BADGE
-════════════════════════════════════════ */
-.pill{
-  display:inline-flex;align-items:center;gap:3px;
-  padding:3px 9px;border-radius:99px;
-  font-size:11px;font-weight:800;white-space:nowrap;
-}
-.pill-ok{background:rgba(82,193,119,.15);color:var(--green)}
-.pill-late{background:rgba(244,92,92,.12);color:var(--red)}
-.pill-up{background:rgba(255,107,53,.12);color:var(--sun)}
-.pill-now{background:rgba(78,174,229,.14);color:var(--water)}
-
-/* ════════════════════════════════════════
-   SLEEP QUALITY DOTS
-════════════════════════════════════════ */
-.sq{display:flex;gap:3px}
-.sq-d{width:16px;height:4px;border-radius:99px;background:rgba(0,0,0,.08);transition:background .35s}
-.sq-d.on{background:var(--sleep)}
-
-/* ════════════════════════════════════════
-   HISTORY ROWS
-════════════════════════════════════════ */
-.hrow{
-  display:flex;align-items:center;padding:11px 0;
-  border-bottom:1px solid rgba(0,0,0,.05);gap:10px;
-}
-.hrow:last-child{border-bottom:none;padding-bottom:0}
-.hrow:first-child{padding-top:0}
-.hrow-date{font-size:11px;color:var(--hint);font-weight:700;min-width:48px}
-.hrow-val{font-size:15px;font-weight:900;flex:1}
-.hrow-diff{font-size:12px;font-weight:800}
-.diff-pos{color:var(--red)}
-.diff-neg{color:var(--green)}
-
-/* ════════════════════════════════════════
-   PLAN CARDS
-════════════════════════════════════════ */
-.plan-card{
-  background:var(--bg2);border-radius:var(--r);
-  padding:13px 14px;
-  box-shadow:var(--shadow);margin-bottom:8px;
-  transition:opacity .2s;
-}
-.plan-card.done-card{opacity:.4}
-.plan-card-top{display:flex;align-items:flex-start;gap:10px}
-.plan-card-ico{
-  width:44px;height:44px;border-radius:13px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:20px;flex-shrink:0;
-}
-.plan-card-body{flex:1;min-width:0}
-.plan-card-name{font-size:14px;font-weight:800;margin-bottom:2px}
-.plan-card-name.done-text{text-decoration:line-through;opacity:.6}
-.plan-card-time{font-size:11px;font-weight:600;color:var(--hint)}
-.plan-card-actions{display:flex;gap:5px;flex-shrink:0}
-.plan-status-bar{
-  margin-top:8px;height:5px;
-  background:rgba(0,0,0,.06);border-radius:99px;overflow:hidden;
-}
-.plan-status-fill{height:100%;border-radius:99px;transition:width .4s ease}
-.countdown-pill{
-  display:inline-flex;align-items:center;gap:4px;
-  padding:3px 9px;border-radius:99px;
-  font-size:11px;font-weight:800;margin-top:5px;
-}
-.pill-soon{background:rgba(255,107,53,.12);color:var(--sun)}
-.pill-now-active{background:rgba(78,174,229,.15);color:var(--water)}
-.pill-done-g{background:rgba(82,193,119,.12);color:var(--green)}
-.pill-later{background:rgba(0,0,0,.06);color:var(--hint)}
-.pill-late2{background:rgba(244,92,92,.1);color:var(--red)}
-
-/* ════════════════════════════════════════
-   PROFILE AVATAR
-════════════════════════════════════════ */
-.pav{
-  width:72px;height:72px;border-radius:22px;
-  background:linear-gradient(135deg,var(--sun),var(--sun2));
-  display:flex;align-items:center;justify-content:center;
-  font-size:30px;font-weight:900;color:#fff;
-  box-shadow:0 8px 28px rgba(255,107,53,.3);
-}
-
-/* ════════════════════════════════════════
-   MEAL ROWS
-════════════════════════════════════════ */
-.meal-row{
-  display:flex;align-items:center;gap:12px;
-  padding:11px 0;
-  border-bottom:1px solid rgba(0,0,0,.04);
-}
-.meal-row:last-child{border-bottom:none;padding-bottom:0}
-.meal-row:first-child{padding-top:0}
-.meal-ico{
-  width:38px;height:38px;border-radius:11px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:18px;flex-shrink:0;
-}
-.meal-name{font-size:14px;font-weight:800}
-.meal-kcal{font-size:14px;font-weight:900;flex-shrink:0}
-
-/* ════════════════════════════════════════
-   PRODUCT ROWS
-════════════════════════════════════════ */
-.prod-row{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:10px 0;border-bottom:1px solid rgba(0,0,0,.04);
-}
-.prod-row:last-child{border-bottom:none;padding-bottom:0}
-.prod-row:first-child{padding-top:0}
-.prod-name{font-size:14px;font-weight:800}
-.prod-meta{font-size:11px;color:var(--hint);font-weight:600;margin-top:1px}
-.prod-kcal{font-size:16px;font-weight:900;color:var(--cal)}
-
-/* ════════════════════════════════════════
-   EMPTY STATE
-════════════════════════════════════════ */
-.empty{text-align:center;padding:48px 24px}
-.empty-ico{font-size:48px;margin-bottom:12px}
-.empty-t{font-size:16px;font-weight:800;margin-bottom:6px}
-.empty-s{font-size:13px;color:var(--hint);font-weight:600}
-
-/* ════════════════════════════════════════
-   TRACK TAB SELECTOR
-════════════════════════════════════════ */
-.track-tabs{
-  display:flex;gap:4px;
-  background:rgba(0,0,0,.05);
-  border-radius:12px;padding:3px;
-}
-.track-tab{
-  flex:1;padding:8px 4px;
-  font-size:12px;font-weight:800;
-  border:none;border-radius:9px;
-  cursor:pointer;font-family:inherit;
-  background:transparent;color:var(--hint);
-  transition:background .2s,color .2s,box-shadow .2s;
-}
-.track-tab.on{
-  background:var(--bg2);color:var(--text);
-  box-shadow:0 1px 6px rgba(0,0,0,.08);
-}
-
-/* ════════════════════════════════════════
-   SHEET (BOTTOM DRAWER)
-════════════════════════════════════════ */
-.sheet-overlay{
-  position:fixed;inset:0;z-index:70;
-  background:transparent;
-  pointer-events:none;
-  transition:background .25s ease;
-}
-.sheet-overlay.open{
-  background:rgba(0,0,0,.4);
-  pointer-events:all;
-}
-.sheet{
-  position:fixed;bottom:0;left:0;right:0;z-index:80;
-  background:var(--bg2);
-  border-radius:24px 24px 0 0;
-  padding-bottom:calc(var(--sb) + 8px);
   transform:translateY(100%);
   transition:transform .3s cubic-bezier(.4,0,.2,1);
-  will-change:transform;
-  max-height:88vh;
-  overflow-y:auto;
-  scrollbar-width:none;
+  contain:layout style;
 }
-.sheet::-webkit-scrollbar{display:none}
-.sheet.open{transform:translateY(0)}
-.sheet-handle{
-  width:36px;height:4px;border-radius:99px;
-  background:rgba(0,0,0,.12);
-  margin:10px auto 0;
+.scr::-webkit-scrollbar{display:none}
+.scr.open{transform:none;pointer-events:all}
+.scr-hdr{
+  position:sticky;top:0;z-index:5;
+  background:var(--bg);
+  padding:calc(var(--st)+10px) 16px 12px;
+  display:flex;align-items:center;gap:12px;
+  border-bottom:1px solid var(--brd);
 }
-.sheet-title{
-  font-size:18px;font-weight:900;
-  padding:14px 20px 4px;
-}
-.sheet-subtitle{
-  font-size:12px;color:var(--hint);font-weight:600;
-  padding:0 20px 14px;
-}
-
-/* ════════════════════════════════════════
-   DRUM / WHEEL PICKER
-════════════════════════════════════════ */
-.wp-wrap{
-  display:flex;gap:6px;justify-content:center;
-  padding:0 20px;margin:12px 0;
-}
-.wp-col{
-  display:flex;flex-direction:column;
-  align-items:center;gap:6px;
-}
-.wp-label{
-  font-size:11px;font-weight:800;
-  text-transform:uppercase;letter-spacing:.06em;
-  color:var(--hint);
-}
-.wheel-picker{
-  position:relative;
-  width:100px;height:220px;
-  overflow:hidden;
-  border-radius:16px;
-  background:rgba(0,0,0,.04);
-  cursor:grab;
-  touch-action:none;
-}
-.wheel-picker.wide{width:140px}
-.wheel-picker:active{cursor:grabbing}
-.wp-track{
-  position:absolute;top:0;left:0;right:0;
-  will-change:transform;
-}
-.wp-item{
-  height:44px;
+.scr-back{
+  width:36px;height:36px;border-radius:11px;background:var(--bg3);
   display:flex;align-items:center;justify-content:center;
-  font-size:20px;font-weight:800;
-  color:var(--hint);
-  transition:color .15s, font-size .15s, font-weight .15s;
-  user-select:none;
-  pointer-events:none;
+  cursor:pointer;color:var(--text);flex-shrink:0;
+  transition:transform .14s cubic-bezier(.34,1.56,.64,1);
 }
-.wp-item.selected{
-  color:var(--text);
-  font-size:24px;
-  font-weight:900;
+.scr-back:active{transform:scale(.82)}
+.scr-title{font-size:17px;font-weight:900;flex:1;letter-spacing:-.01em}
+.scr-btn{
+  height:35px;padding:0 16px;border-radius:11px;
+  background:linear-gradient(135deg,var(--sun),var(--sun2));
+  color:#fff;font-size:13px;font-weight:800;font-family:inherit;
+  border:none;cursor:pointer;flex-shrink:0;
+  transition:transform .14s cubic-bezier(.34,1.56,.64,1),opacity .14s;
 }
-.wp-item.wp-pad{height:44px}
-/* Center selector highlight */
-.wp-selector{
-  position:absolute;
-  top:50%;left:8px;right:8px;
-  height:44px;
-  transform:translateY(-50%);
-  background:rgba(255,107,53,.1);
-  border-radius:10px;
-  pointer-events:none;
-  border:1.5px solid rgba(255,107,53,.2);
-}
-/* Fade gradients */
-.wp-fade-top{
-  position:absolute;top:0;left:0;right:0;height:88px;
-  background:linear-gradient(to bottom, rgba(250,247,242,1) 0%, rgba(250,247,242,0) 100%);
-  pointer-events:none;z-index:2;
-}
-.wp-fade-bot{
-  position:absolute;bottom:0;left:0;right:0;height:88px;
-  background:linear-gradient(to top, rgba(250,247,242,1) 0%, rgba(250,247,242,0) 100%);
-  pointer-events:none;z-index:2;
-}
-.tg-dark .wp-fade-top{background:linear-gradient(to bottom, var(--bg2) 0%, transparent 100%)}
-.tg-dark .wp-fade-bot{background:linear-gradient(to top, var(--bg2) 0%, transparent 100%)}
-.wp-sep{
-  font-size:24px;font-weight:900;color:var(--hint);
-  align-self:center;padding-top:0;
-  line-height:44px;
-}
+.scr-btn:active{transform:scale(.88);opacity:.82}
+.scr-body{padding:16px 16px 32px}
 
-/* ════════════════════════════════════════
-   SHEET SEGMENT CONTROL
-════════════════════════════════════════ */
-.sheet-seg-wrap{
-  padding:4px 20px;
-}
-.sheet-seg{
-  display:flex;gap:4px;background:rgba(0,0,0,.05);
-  border-radius:10px;padding:3px;
-}
-.sheet-seg-btn{
-  flex:1;padding:8px 4px;font-size:12px;font-weight:800;
-  border:none;border-radius:7px;cursor:pointer;
-  font-family:inherit;background:transparent;color:var(--hint);
-  transition:background .15s,color .15s;
-}
-.sheet-seg-btn.on{
-  background:var(--bg2);color:var(--text);
-  box-shadow:0 1px 4px rgba(0,0,0,.1);
-}
-.sheet-row{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:10px 20px;
-}
-.sheet-label{
-  font-size:14px;font-weight:700;color:var(--text);flex-shrink:0;
-}
-.sheet-input{
-  border:none;outline:none;
-  background:rgba(0,0,0,.05);
-  border-radius:10px;
-  padding:10px 14px;
-  font-family:inherit;font-size:15px;font-weight:800;
-  color:var(--text);
-  text-align:right;width:130px;
-  -webkit-appearance:none;appearance:none;
-}
-
-/* ════════════════════════════════════════
-   TOAST
-════════════════════════════════════════ */
-#toast{
+/* ── ISLAND NAV ── */
+#nav{
   position:fixed;
-  bottom:calc(var(--nav-h) + var(--sb) + 12px);
-  left:50%;transform:translateX(-50%) translateY(12px);
-  background:rgba(30,24,18,.88);
-  color:#fff;padding:10px 20px;
-  border-radius:99px;
-  font-size:13px;font-weight:800;
-  white-space:nowrap;
-  z-index:200;
-  opacity:0;pointer-events:none;
-  transition:opacity .22s ease, transform .22s cubic-bezier(.34,1.2,.64,1);
+  bottom:calc(var(--sb)+12px);
+  left:50%;transform:translateX(-50%);
+  z-index:50;
+  display:flex;align-items:center;gap:4px;
+  padding:6px;
+  background:rgba(255,255,255,.82);
+  backdrop-filter:blur(30px) saturate(2);
+  -webkit-backdrop-filter:blur(30px) saturate(2);
+  border:1px solid rgba(255,255,255,.9);
+  border-radius:26px;
+  box-shadow:0 8px 30px rgba(0,0,0,.13),0 2px 6px rgba(0,0,0,.06);
+  transition:transform .3s cubic-bezier(.4,0,.2,1),opacity .3s;
+}
+.tg-dark #nav{background:rgba(28,22,14,.84);border-color:rgba(255,255,255,.08)}
+#nav.gone{transform:translateX(-50%) translateY(calc(100% + 20px));opacity:0;pointer-events:none}
+.nt{
+  width:52px;height:52px;border-radius:18px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  cursor:pointer;color:var(--hint);
+  transition:color .18s,background .18s,transform .16s cubic-bezier(.34,1.56,.64,1);
+  -webkit-tap-highlight-color:transparent;
+}
+.nt.on{color:var(--sun);background:rgba(255,107,53,.11)}
+.nt:active{transform:scale(.8)!important}
+.nt svg{width:22px;height:22px;flex-shrink:0}
+.nt-dot{width:4px;height:4px;border-radius:50%;background:var(--sun);opacity:0;transition:opacity .18s;margin-top:-1px}
+.nt.on .nt-dot{opacity:1}
+
+/* ── TYPOGRAPHY ── */
+.t1{font-size:25px;font-weight:900;line-height:1.1;letter-spacing:-.02em}
+.t2{font-size:18px;font-weight:900;letter-spacing:-.015em}
+.t3{font-size:14px;font-weight:800}
+.t5{font-size:12px;font-weight:600;color:var(--hint)}
+.tnum-sm{font-size:24px;font-weight:900;letter-spacing:-.02em}
+.grad{background:linear-gradient(105deg,var(--sun),var(--sun2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+/* ── CARDS ── */
+.card{background:var(--bg2);border-radius:var(--r-lg);padding:16px;box-shadow:var(--sh);position:relative;overflow:hidden}
+.pad{padding:0 16px}
+.gap{margin-top:10px}
+.sec{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--hint);padding:16px 20px 8px}
+
+/* ── LIST TILE ── */
+.lt{
+  display:flex;align-items:center;gap:12px;
+  padding:11px 0;border-bottom:1px solid var(--brd);
+  cursor:pointer;transition:opacity .12s;-webkit-tap-highlight-color:transparent;
+}
+.lt:last-child{border-bottom:none;padding-bottom:0}
+.lt:first-child{padding-top:0}
+.lt:active{opacity:.55}
+.lt-ic{
+  width:32px;height:32px;border-radius:10px;background:var(--bg3);
+  display:flex;align-items:center;justify-content:center;color:var(--hint);flex-shrink:0;
+}
+.lt-lbl{flex:1;font-size:14px;font-weight:700}
+.lt-val{font-size:12px;color:var(--hint);font-weight:600;flex-shrink:0}
+.lt-chev{color:var(--hint);opacity:.45;flex-shrink:0}
+
+/* ── PROGRESS BAR ── */
+.pb{height:6px;background:rgba(0,0,0,.06);border-radius:99px;overflow:hidden;margin-top:10px}
+.pbf{height:100%;border-radius:99px;transition:width 1.1s cubic-bezier(.34,1.1,.64,1)}
+.pb-sun{background:linear-gradient(90deg,var(--sun),var(--sun2))}
+.pb-water{background:var(--water)}
+.pb-sleep{background:var(--sleep)}
+
+/* ── ARC ── */
+.aw{position:relative;display:inline-flex;align-items:center;justify-content:center}
+.ai{position:absolute;text-align:center;pointer-events:none}
+
+/* ── STAT BOX ── */
+.sb-row{display:flex;gap:8px}
+.sbox{flex:1;background:var(--bg2);border-radius:var(--r);padding:13px;box-shadow:var(--sh);text-align:center}
+.sv{font-size:19px;font-weight:900;margin-bottom:2px}
+.sl{font-size:10px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.06em}
+
+/* ── BANNER ── */
+.banner{background:linear-gradient(130deg,#FF6B35,#FFAB40);border-radius:var(--r-lg);padding:16px;color:#fff;position:relative;overflow:hidden}
+.banner::after{content:'';position:absolute;right:-10px;top:-10px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.1);pointer-events:none}
+
+/* ── ACT CARD (plan) ── */
+.ac{background:var(--bg2);border-radius:var(--r);padding:12px 14px;display:flex;align-items:flex-start;gap:10px;box-shadow:var(--sh);margin-bottom:8px;transition:opacity .18s}
+.ac.done{opacity:.42}
+.ac-ico{width:42px;height:42px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.ac-body{flex:1;min-width:0}
+.ac-name{font-size:14px;font-weight:800;margin-bottom:2px}
+.ac-name.done-text{text-decoration:line-through;opacity:.6}
+.ac-sub{font-size:11px;color:var(--hint);font-weight:600}
+.pill{display:inline-flex;align-items:center;padding:3px 9px;border-radius:99px;font-size:10px;font-weight:800;white-space:nowrap;margin-top:5px}
+.p-ok{background:rgba(82,193,119,.13);color:var(--green)}
+.p-late{background:rgba(244,92,92,.1);color:var(--red)}
+.p-soon{background:rgba(255,107,53,.1);color:var(--sun)}
+.p-now{background:rgba(78,174,229,.12);color:var(--water)}
+.p-later{background:rgba(0,0,0,.05);color:var(--hint)}
+.ac-bar{margin-top:7px;height:4px;background:rgba(0,0,0,.06);border-radius:99px;overflow:hidden}
+.ac-barf{height:100%;border-radius:99px;transition:width .4s ease}
+
+/* ── SLEEP DOTS ── */
+.sq{display:flex;gap:3px}
+.sqd{width:15px;height:4px;border-radius:99px;background:rgba(0,0,0,.07);transition:background .3s}
+.sqd.on{background:var(--sleep)}
+
+/* ── HISTORY ROW ── */
+.hr{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid var(--brd);gap:10px}
+.hr:last-child{border-bottom:none;padding-bottom:0}
+.hr:first-child{padding-top:0}
+.hr-d{font-size:11px;color:var(--hint);font-weight:700;min-width:46px}
+.hr-v{font-size:15px;font-weight:900;flex:1}
+.hr-diff{font-size:11px;font-weight:800}
+.d-neg{color:var(--green)}.d-pos{color:var(--red)}
+
+/* ── MEAL ROW ── */
+.mr{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--brd)}
+.mr:last-child{border-bottom:none;padding-bottom:0}
+.mr:first-child{padding-top:0}
+.mr-ico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.mr-name{font-size:13px;font-weight:800}
+.mr-kcal{font-size:13px;font-weight:900;flex-shrink:0}
+
+/* ── PROD ROW ── */
+.pr{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--brd)}
+.pr:last-child{border-bottom:none;padding-bottom:0}
+.pr:first-child{padding-top:0}
+.pr-name{font-size:13px;font-weight:800}
+.pr-meta{font-size:10px;color:var(--hint);font-weight:600}
+.pr-kcal{font-size:15px;font-weight:900;color:var(--cal)}
+
+/* ── BTNS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;cursor:pointer;font-family:inherit;font-weight:800;transition:transform .14s cubic-bezier(.34,1.56,.64,1),opacity .14s}
+.btn:active{transform:scale(.87);opacity:.8}
+.btn-p{background:linear-gradient(135deg,var(--sun),var(--sun2));color:#fff;padding:14px 20px;font-size:14px;border-radius:var(--r);box-shadow:0 5px 20px rgba(255,107,53,.28);width:100%}
+.btn-g{background:var(--bg3);color:var(--text);padding:11px 16px;font-size:13px;border-radius:11px}
+.btn-water{background:rgba(78,174,229,.11);color:var(--water);padding:13px 8px;font-size:13px;border-radius:11px;flex:1}
+
+/* ── TOGGLE ── */
+.tog{width:48px;height:26px;border-radius:99px;position:relative;cursor:pointer;flex-shrink:0;transition:background .22s}
+.tog::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:3px;transition:left .24s cubic-bezier(.34,1.5,.64,1);box-shadow:0 1px 5px rgba(0,0,0,.16)}
+.tog.on{background:var(--sun)}.tog.off{background:rgba(0,0,0,.16)}
+.tog.on::after{left:25px}.tog.off::after{left:3px}
+
+/* ── TRACK TABS ── */
+.ttabs{display:flex;gap:3px;background:rgba(0,0,0,.05);border-radius:12px;padding:3px}
+.ttab{flex:1;padding:8px 4px;font-size:12px;font-weight:800;border:none;border-radius:9px;cursor:pointer;font-family:inherit;background:transparent;color:var(--hint);transition:background .16s,color .16s,box-shadow .16s}
+.ttab.on{background:var(--bg2);color:var(--text);box-shadow:0 1px 5px rgba(0,0,0,.08)}
+
+/* ── AVATAR ── */
+.pav{width:68px;height:68px;border-radius:20px;background:linear-gradient(135deg,var(--sun),var(--sun2));display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;color:#fff;box-shadow:0 6px 22px rgba(255,107,53,.28);flex-shrink:0}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;bottom:calc(90px + var(--sb) + 14px);left:50%;
+  transform:translateX(-50%) translateY(10px);
+  background:rgba(28,22,14,.86);color:#fff;
+  padding:9px 18px;border-radius:99px;font-size:13px;font-weight:800;
+  white-space:nowrap;z-index:200;opacity:0;pointer-events:none;
   backdrop-filter:blur(12px);
+  transition:opacity .2s,transform .2s cubic-bezier(.34,1.2,.64,1);
 }
-#toast.show{
-  opacity:1;transform:translateX(-50%) translateY(0);
-}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* ════════════════════════════════════════
-   ANIMATIONS
-════════════════════════════════════════ */
-@keyframes numPop{
-  0%{transform:scale(1)}
-  40%{transform:scale(1.18)}
-  100%{transform:scale(1)}
-}
-.num-pop{animation:numPop .35s cubic-bezier(.34,1.56,.64,1)}
+/* ── WHEEL PICKER ── */
+.wp{position:relative;overflow:hidden;border-radius:14px;background:var(--bg3);cursor:grab;touch-action:none}
+.wp:active{cursor:grabbing}
+.wp-track{position:absolute;top:0;left:0;right:0;will-change:transform}
+.wp-item{height:44px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:var(--hint);pointer-events:none;user-select:none}
+.wp-item.sel{color:var(--text);font-size:24px}
+.wp-sel{position:absolute;top:50%;left:6px;right:6px;height:44px;transform:translateY(-50%);background:rgba(255,107,53,.09);border-radius:9px;border:1.5px solid rgba(255,107,53,.18);pointer-events:none}
+.wp-ft{position:absolute;left:0;right:0;height:88px;pointer-events:none;z-index:2}
+.wp-ft-t{top:0;background:linear-gradient(to bottom,var(--bg2) 0%,transparent 100%)}
+.wp-ft-b{bottom:0;background:linear-gradient(to top,var(--bg2) 0%,transparent 100%)}
+.wp-row{display:flex;justify-content:center;gap:8px;padding:0 20px 8px}
+.wp-col{display:flex;flex-direction:column;align-items:center;gap:4px}
+.wp-lbl{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--hint)}
+.wp-sep{font-size:22px;font-weight:900;color:var(--hint);line-height:44px;align-self:center;padding-top:20px}
 
-@keyframes fadeUp{
-  from{opacity:0;transform:translateY(12px)}
-  to{opacity:1;transform:translateY(0)}
-}
-.reveal>*{
-  animation:fadeUp .3s cubic-bezier(.4,0,.2,1) both;
-}
-.reveal>*:nth-child(1){animation-delay:.02s}
-.reveal>*:nth-child(2){animation-delay:.06s}
-.reveal>*:nth-child(3){animation-delay:.10s}
-.reveal>*:nth-child(4){animation-delay:.14s}
-.reveal>*:nth-child(5){animation-delay:.18s}
-.reveal>*:nth-child(6){animation-delay:.22s}
-.reveal>*:nth-child(7){animation-delay:.26s}
-.reveal>*:nth-child(8){animation-delay:.30s}
-.reveal>*:nth-child(n+9){animation-delay:.34s}
+/* ── FORM FIELDS (screens) ── */
+.f-row{display:flex;align-items:center;justify-content:space-between;padding:0 0 14px}
+.f-lbl{font-size:14px;font-weight:700}
+.f-inp{border:none;outline:none;background:var(--bg3);border-radius:10px;padding:10px 13px;font-family:inherit;font-size:15px;font-weight:800;color:var(--text);text-align:right;width:130px;-webkit-appearance:none}
+.f-inp-wide{width:100%;text-align:left;margin-top:8px;display:block}
+.seg{display:flex;gap:3px;background:rgba(0,0,0,.05);border-radius:10px;padding:3px;margin-top:8px}
+.seg-btn{flex:1;padding:8px 4px;font-size:12px;font-weight:800;border:none;border-radius:7px;cursor:pointer;font-family:inherit;background:transparent;color:var(--hint);transition:background .14s,color .14s}
+.seg-btn.on{background:var(--bg2);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.09)}
 
-/* ════════════════════════════════════════
-   DARK THEME
-════════════════════════════════════════ */
-.tg-dark #bottom-nav{background:rgba(18,15,12,.9)}
-.tg-dark .wp-fade-top,.tg-dark .wp-fade-bot{
-  background:none;
-}
-.tg-dark .wheel-picker{background:rgba(255,255,255,.06)}
-.tg-dark .wp-fade-top{
-  background:linear-gradient(to bottom, var(--bg2) 0%, transparent 100%);
-}
-.tg-dark .wp-fade-bot{
-  background:linear-gradient(to top, var(--bg2) 0%, transparent 100%);
-}
+/* ── EMPTY ── */
+.empty{text-align:center;padding:44px 24px}
+.empty svg{opacity:.25;margin-bottom:12px}
+.empty-t{font-size:15px;font-weight:800;margin-bottom:5px}
+.empty-s{font-size:12px;color:var(--hint);font-weight:600}
 
-/* ════════════════════════════════════════
-   MISC UTILITY
-════════════════════════════════════════ */
-.water-card{background:linear-gradient(160deg,rgba(78,174,229,.08),rgba(78,174,229,.03))}
+/* ── DARK ── */
+.tg-dark .wp-ft-t{background:linear-gradient(to bottom,var(--bg2) 0%,transparent 100%)}
+.tg-dark .wp-ft-b{background:linear-gradient(to top,var(--bg2) 0%,transparent 100%)}
+.tg-dark .wp-ft-t,.tg-dark .wp-ft-b{opacity:1}
+
+/* ── ANIMATIONS ── */
+@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.page.active .reveal{animation:fu .28s cubic-bezier(.4,0,.2,1) both}
 </style>
 </head>
 <body>
 <div id="root">
-
-<!-- ════════════════════════════════════════
-     SUB-PAGE LAYER
-════════════════════════════════════════ -->
-<div id="sub-layer">
-
-  <!-- Sub: Данные профиля -->
-  <div class="sub-page" id="sp-profile-data">
-    <div class="sp-header">
-      <div class="sp-back-btn" onclick="closeSubPage()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-      </div>
-      <div class="sp-title">Данные профиля</div>
-    </div>
-    <div style="padding:8px 16px 0">
-      <div class="card">
-        <div class="sec-lbl" style="padding:0 0 10px">Личные данные</div>
-        <div class="sheet-row" style="padding:0 0 12px">
-          <span class="sheet-label">Имя</span>
-          <input class="sheet-input" id="inp-pname" type="text" placeholder="Алексей" style="text-align:left">
-        </div>
-        <div class="sheet-row" style="padding:0 0 12px">
-          <span class="sheet-label">Рост, см</span>
-          <input class="sheet-input" id="inp-height" type="number" min="100" max="250" placeholder="175">
-        </div>
-        <div class="sheet-row" style="padding:0 0 12px">
-          <span class="sheet-label">Возраст</span>
-          <input class="sheet-input" id="inp-age" type="number" min="10" max="100" placeholder="25">
-        </div>
-        <div style="margin-bottom:4px">
-          <div class="t5" style="margin-bottom:6px">Пол</div>
-          <div class="sheet-seg" id="seg-gender">
-            <button class="sheet-seg-btn on" onclick="setGender('male')" data-g="male">♂ мужской</button>
-            <button class="sheet-seg-btn" onclick="setGender('female')" data-g="female">♀ женский</button>
-          </div>
-        </div>
-      </div>
-      <button class="btn btn-primary" style="margin-top:14px" onclick="submitProfile()">Сохранить изменения</button>
-    </div>
-  </div>
-
-  <!-- Sub: Цели -->
-  <div class="sub-page" id="sp-goals">
-    <div class="sp-header">
-      <div class="sp-back-btn" onclick="closeSubPage()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-      </div>
-      <div class="sp-title">Цели</div>
-    </div>
-    <div style="padding:8px 16px 0">
-      <div class="card">
-        <div class="sec-lbl" style="padding:0 0 10px">Целевые показатели</div>
-        <div class="sheet-row" style="padding:0 0 12px">
-          <span class="sheet-label">Целевой вес, кг</span>
-          <input class="sheet-input" id="inp-gw" type="number" step="0.5" placeholder="70">
-        </div>
-        <div class="sheet-row" style="padding:0 0 12px">
-          <span class="sheet-label">Норма воды, мл</span>
-          <input class="sheet-input" id="inp-gwat" type="number" step="100" placeholder="2000">
-        </div>
-        <div class="sheet-row" style="padding:0">
-          <span class="sheet-label">Норма калорий</span>
-          <input class="sheet-input" id="inp-gcal" type="number" step="50" placeholder="2000">
-        </div>
-      </div>
-      <button class="btn btn-primary" style="margin-top:14px" onclick="submitGoals()">Сохранить цели</button>
-    </div>
-  </div>
-
-  <!-- Sub: Главный экран -->
-  <div class="sub-page" id="sp-display">
-    <div class="sp-header">
-      <div class="sp-back-btn" onclick="closeSubPage()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-      </div>
-      <div class="sp-title">Главный экран</div>
-    </div>
-    <div style="padding:8px 16px 0">
-      <div class="t5" style="margin-bottom:8px">Выбери, что показывать на главном экране</div>
-      <div class="card">
-        <div class="srow">
-          <div class="srow-ico">⚖️</div>
-          <span class="srow-lbl">Вес</span>
-          <div class="tog on" id="tog-w" onclick="toggleSett('w')"></div>
-        </div>
-        <div class="srow">
-          <div class="srow-ico">💧</div>
-          <span class="srow-lbl">Вода</span>
-          <div class="tog on" id="tog-water" onclick="toggleSett('water')"></div>
-        </div>
-        <div class="srow">
-          <div class="srow-ico">🍋</div>
-          <span class="srow-lbl">Калории</span>
-          <div class="tog on" id="tog-cal" onclick="toggleSett('cal')"></div>
-        </div>
-        <div class="srow" style="padding-bottom:0;border:none">
-          <div class="srow-ico">🌙</div>
-          <span class="srow-lbl">Сон</span>
-          <div class="tog on" id="tog-sleep" onclick="toggleSett('sleep')"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Sub: Напоминания -->
-  <div class="sub-page" id="sp-reminders">
-    <div class="sp-header">
-      <div class="sp-back-btn" onclick="closeSubPage()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-      </div>
-      <div class="sp-title">Напоминания</div>
-    </div>
-    <div style="padding:8px 16px 0">
-      <div class="card" style="margin-bottom:12px">
-        <div class="srow"><div class="srow-ico">💧</div><span class="srow-lbl">Вода</span><span class="srow-val" id="rem-w">выкл</span></div>
-        <div class="srow"><div class="srow-ico">⚖️</div><span class="srow-lbl">Взвеситься</span><span class="srow-val" id="rem-wg">выкл</span></div>
-        <div class="srow" style="padding-bottom:0;border:none"><div class="srow-ico">📅</div><span class="srow-lbl">Отчёт</span><span class="srow-val" id="rem-rep">выкл</span></div>
-      </div>
-      <div class="card" style="padding:16px;text-align:center">
-        <div style="font-size:36px;margin-bottom:10px">🤖</div>
-        <div class="t3" style="margin-bottom:6px">Настройка через бота</div>
-        <div class="t5">Напоминания настраиваются через Telegram-бота.<br>Напишите <b>/reminders</b></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Sub: О приложении -->
-  <div class="sub-page" id="sp-about">
-    <div class="sp-header">
-      <div class="sp-back-btn" onclick="closeSubPage()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-      </div>
-      <div class="sp-title">О приложении</div>
-    </div>
-    <div style="padding:8px 16px 0">
-      <div class="card" style="text-align:center;padding:28px">
-        <div style="font-size:56px;margin-bottom:12px">☀️</div>
-        <div style="font-size:24px;font-weight:900;letter-spacing:-.02em;margin-bottom:4px">letify</div>
-        <div class="t5" style="margin-bottom:16px">версия 2.0 · путь к лету</div>
-        <div class="t4" style="line-height:1.6;color:var(--hint);font-weight:600">
-          Трекер здорового образа жизни.<br>
-          Следи за водой, питанием, сном и весом каждый день.
-        </div>
-      </div>
-      <div class="card" style="margin-top:10px">
-        <div class="srow">
-          <div class="srow-ico">🌊</div>
-          <span class="srow-lbl">Трекер воды</span>
-          <span class="srow-val">💧</span>
-        </div>
-        <div class="srow">
-          <div class="srow-ico">🍋</div>
-          <span class="srow-lbl">Трекер калорий</span>
-          <span class="srow-val">🔥</span>
-        </div>
-        <div class="srow">
-          <div class="srow-ico">🌙</div>
-          <span class="srow-lbl">Трекер сна</span>
-          <span class="srow-val">💤</span>
-        </div>
-        <div class="srow" style="padding-bottom:0;border:none">
-          <div class="srow-ico">⚖️</div>
-          <span class="srow-lbl">Трекер веса</span>
-          <span class="srow-val">📊</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</div><!-- /sub-layer -->
-
-<!-- ════════════════════════════════════════
-     MAIN PAGES
-════════════════════════════════════════ -->
 <div id="pages">
 
-<!-- ══ PAGE: HOME ══ -->
+<!-- ══════════ HOME ══════════ -->
 <div class="page active" id="p-home">
 <div class="reveal">
 
-<div class="pad" style="display:flex;align-items:flex-start;justify-content:space-between;padding-bottom:0">
+<div class="pad" style="display:flex;align-items:flex-start;justify-content:space-between">
   <div>
-    <div class="t1">Привет, <span class="grad" id="h-name">...</span></div>
-    <div class="t5" style="margin-top:3px" id="h-date">загружается...</div>
+    <div class="t1">Привет, <span class="grad" id="h-name">…</span></div>
+    <div class="t5" style="margin-top:3px" id="h-date">загружается…</div>
   </div>
-  <div style="text-align:right;padding-top:4px">
+  <div style="text-align:right;padding-top:3px">
     <div class="t5">до лета</div>
-    <div style="font-size:24px;font-weight:900;color:var(--sun);line-height:1.1" id="h-days">—</div>
+    <div style="font-size:22px;font-weight:900;color:var(--sun);line-height:1.1" id="h-days">—</div>
     <div class="t5" id="h-dunit">дней</div>
   </div>
 </div>
 
-<div class="pad" style="margin-top:12px">
-<div class="sbanner">
-  <div style="font-size:14px;font-weight:800;opacity:.9;margin-bottom:3px">путь к лету ☀️</div>
-  <div style="font-size:30px;font-weight:900;line-height:1.1"><span id="h-ddays">—</span> дней</div>
-  <div style="font-size:11px;font-weight:600;opacity:.75;margin-top:4px">ты делаешь это каждый день!</div>
-</div>
+<div class="pad gap">
+  <div class="banner">
+    <div style="font-size:13px;font-weight:800;opacity:.88;margin-bottom:2px">путь к лету</div>
+    <div style="font-size:28px;font-weight:900;line-height:1.1"><span id="h-ddays">—</span> дней</div>
+    <div style="font-size:11px;opacity:.72;font-weight:600;margin-top:3px">ты делаешь это каждый день</div>
+  </div>
 </div>
 
-<div class="pad" style="margin-top:12px">
-<div class="card" style="padding:18px 8px 14px">
-  <div style="display:flex;align-items:center;justify-content:space-around">
+<div class="pad gap">
+<div class="card" style="padding:16px 6px 12px">
+  <div style="display:flex;justify-content:space-around;align-items:center">
+    <!-- water -->
     <div style="text-align:center;cursor:pointer" onclick="navTo('track')">
-      <div class="arc-wrap">
-        <svg width="76" height="76" viewBox="0 0 76 76">
-          <circle cx="38" cy="38" r="30" fill="none" stroke="rgba(78,174,229,.15)" stroke-width="6"/>
-          <circle cx="38" cy="38" r="30" fill="none" stroke="var(--water)" stroke-width="6"
-            stroke-linecap="round" stroke-dasharray="188.5"
-            id="arc-w" stroke-dashoffset="188.5"
-            transform="rotate(-90 38 38)"
-            style="transition:stroke-dashoffset 1.1s cubic-bezier(.34,1.1,.64,1)"/>
+      <div class="aw">
+        <svg width="72" height="72" viewBox="0 0 72 72">
+          <circle cx="36" cy="36" r="28" fill="none" stroke="rgba(78,174,229,.15)" stroke-width="5.5"/>
+          <circle cx="36" cy="36" r="28" fill="none" stroke="var(--water)" stroke-width="5.5"
+            stroke-linecap="round" stroke-dasharray="175.9" id="arc-w" stroke-dashoffset="175.9"
+            transform="rotate(-90 36 36)" style="transition:stroke-dashoffset 1s cubic-bezier(.34,1.1,.64,1)"/>
         </svg>
-        <div class="arc-inner">
-          <div style="font-size:16px;font-weight:900;color:var(--water)" id="arc-wpct">0%</div>
-          <div style="font-size:9px;font-weight:800;color:var(--hint)">вода</div>
-        </div>
+        <div class="ai"><div style="font-size:14px;font-weight:900;color:var(--water)" id="arc-wpct">0%</div></div>
       </div>
-      <div style="font-size:12px;font-weight:900;margin-top:5px" id="arc-wml">0</div>
-      <div class="t5">из <span id="arc-wgoal">2000</span></div>
+      <div style="font-size:11px;font-weight:900;margin-top:4px" id="arc-wml">0</div>
+      <div class="t5" style="font-size:10px">мл</div>
     </div>
+    <!-- cal -->
     <div style="text-align:center;cursor:pointer" onclick="navTo('track')">
-      <div class="arc-wrap">
-        <svg width="92" height="92" viewBox="0 0 92 92">
-          <circle cx="46" cy="46" r="38" fill="none" stroke="rgba(244,129,74,.15)" stroke-width="7"/>
-          <circle cx="46" cy="46" r="38" fill="none" stroke="var(--cal)" stroke-width="7"
-            stroke-linecap="round" stroke-dasharray="238.8"
-            id="arc-c" stroke-dashoffset="238.8"
-            transform="rotate(-90 46 46)"
-            style="transition:stroke-dashoffset 1.1s cubic-bezier(.34,1.1,.64,1)"/>
+      <div class="aw">
+        <svg width="86" height="86" viewBox="0 0 86 86">
+          <circle cx="43" cy="43" r="35" fill="none" stroke="rgba(244,129,74,.15)" stroke-width="6.5"/>
+          <circle cx="43" cy="43" r="35" fill="none" stroke="var(--cal)" stroke-width="6.5"
+            stroke-linecap="round" stroke-dasharray="219.9" id="arc-c" stroke-dashoffset="219.9"
+            transform="rotate(-90 43 43)" style="transition:stroke-dashoffset 1s cubic-bezier(.34,1.1,.64,1)"/>
         </svg>
-        <div class="arc-inner">
-          <div style="font-size:18px;font-weight:900;color:var(--cal)" id="arc-cpct">0%</div>
-          <div style="font-size:9px;font-weight:800;color:var(--hint)">ккал</div>
-        </div>
+        <div class="ai"><div style="font-size:16px;font-weight:900;color:var(--cal)" id="arc-cpct">0%</div></div>
       </div>
-      <div style="font-size:14px;font-weight:900;margin-top:5px" id="arc-cval">0</div>
-      <div class="t5">из <span id="arc-cgoal">2000</span></div>
+      <div style="font-size:13px;font-weight:900;margin-top:4px" id="arc-cval">0</div>
+      <div class="t5" style="font-size:10px">ккал</div>
     </div>
+    <!-- sleep -->
     <div style="text-align:center;cursor:pointer" onclick="navTo('sleep')">
-      <div class="arc-wrap">
-        <svg width="76" height="76" viewBox="0 0 76 76">
-          <circle cx="38" cy="38" r="30" fill="none" stroke="rgba(139,127,212,.15)" stroke-width="6"/>
-          <circle cx="38" cy="38" r="30" fill="none" stroke="var(--sleep)" stroke-width="6"
-            stroke-linecap="round" stroke-dasharray="188.5"
-            id="arc-s" stroke-dashoffset="188.5"
-            transform="rotate(-90 38 38)"
-            style="transition:stroke-dashoffset 1.1s cubic-bezier(.34,1.1,.64,1)"/>
+      <div class="aw">
+        <svg width="72" height="72" viewBox="0 0 72 72">
+          <circle cx="36" cy="36" r="28" fill="none" stroke="rgba(139,127,212,.15)" stroke-width="5.5"/>
+          <circle cx="36" cy="36" r="28" fill="none" stroke="var(--sleep)" stroke-width="5.5"
+            stroke-linecap="round" stroke-dasharray="175.9" id="arc-s" stroke-dashoffset="175.9"
+            transform="rotate(-90 36 36)" style="transition:stroke-dashoffset 1s cubic-bezier(.34,1.1,.64,1)"/>
         </svg>
-        <div class="arc-inner">
-          <div style="font-size:16px;font-weight:900;color:var(--sleep)" id="arc-sh">—</div>
-          <div style="font-size:9px;font-weight:800;color:var(--hint)">сон</div>
-        </div>
+        <div class="ai"><div style="font-size:14px;font-weight:900;color:var(--sleep)" id="arc-sh">—</div></div>
       </div>
-      <div class="sq" id="arc-sq" style="justify-content:center;margin-top:5px"></div>
-      <div class="t5">часов</div>
+      <div class="sq" id="arc-sq" style="justify-content:center;margin-top:4px"></div>
+      <div class="t5" style="font-size:10px;margin-top:2px">часов</div>
     </div>
   </div>
 </div>
 </div>
 
-<div class="pad" style="margin-top:10px">
+<div class="pad gap">
 <div class="card" style="cursor:pointer" onclick="navTo('progress')">
   <div style="display:flex;align-items:center;justify-content:space-between">
     <div>
-      <div class="t5" style="margin-bottom:4px">⚖️ вес</div>
+      <div class="t5" style="margin-bottom:3px">Вес</div>
       <div style="display:flex;align-items:baseline;gap:5px">
         <span class="tnum-sm" id="h-wcur">—</span>
         <span class="t5">→ <b style="color:var(--text)" id="h-wgoal">—</b> кг</span>
       </div>
     </div>
     <div style="text-align:right">
-      <div style="font-size:26px;font-weight:900;color:var(--sun)" id="h-wpct">—%</div>
+      <div style="font-size:24px;font-weight:900;color:var(--sun)" id="h-wpct">—</div>
       <div class="t5">к цели</div>
     </div>
   </div>
-  <div class="pbar"><div class="pbar-fill pbar-sun" id="h-wbar" style="width:0%"></div></div>
+  <div class="pb gap"><div class="pbf pb-sun" id="h-wbar" style="width:0%"></div></div>
 </div>
 </div>
 
 <div id="h-plan-sec" style="display:none">
-<div class="sec-lbl">план на сегодня</div>
-<div class="pad" id="h-plan-list"></div>
+  <div class="sec">Сегодня</div>
+  <div class="pad" id="h-plan-list"></div>
 </div>
 
-<div class="pad" id="h-streak-wrap" style="margin-top:10px;display:none">
-  <div style="background:linear-gradient(90deg,rgba(255,107,53,.1),rgba(255,171,64,.08));border-radius:var(--r);padding:13px 16px;display:flex;align-items:center;gap:10px">
-    <span style="font-size:22px">🔥</span>
+<div class="pad" id="h-streak-w" style="margin-top:10px;display:none">
+  <div style="background:linear-gradient(90deg,rgba(255,107,53,.08),rgba(255,171,64,.06));border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;gap:10px">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="var(--sun)"><path d="M12 2c0 5.5-5 7-5 11a5 5 0 0 0 10 0c0-4-5-5.5-5-11z"/></svg>
     <div>
-      <div style="font-size:14px;font-weight:900" id="h-sval">7 дней подряд</div>
-      <div class="t5">серия воды не прерывается!</div>
+      <div style="font-size:13px;font-weight:900" id="h-sval">7 дней подряд</div>
+      <div class="t5">серия воды не прерывается</div>
     </div>
   </div>
 </div>
-
 <div style="height:8px"></div>
-</div></div>
+</div>
+</div>
 
-<!-- ══ PAGE: TRACK ══ -->
+<!-- ══════════ TRACK ══════════ -->
 <div class="page" id="p-track">
-<div style="position:sticky;top:0;background:var(--bg);z-index:10;padding:calc(var(--st) + 10px) 16px 10px">
-  <div class="track-tabs">
-    <button class="track-tab on" id="tt-water" onclick="setTrackTab('water')">💧 Вода</button>
-    <button class="track-tab" id="tt-cal" onclick="setTrackTab('cal')">🍋 Калории</button>
-    <button class="track-tab" id="tt-prod" onclick="setTrackTab('prod')">🌿 КБЖУ</button>
+<div style="position:sticky;top:0;background:var(--bg);z-index:10;padding:calc(var(--st)+10px) 16px 10px">
+  <div class="ttabs">
+    <button class="ttab on" id="tt-water" onclick="setTTab('water')">Вода</button>
+    <button class="ttab" id="tt-cal" onclick="setTTab('cal')">Калории</button>
+    <button class="ttab" id="tt-prod" onclick="setTTab('prod')">КБЖУ</button>
   </div>
 </div>
 
 <div id="tt-water-body">
 <div class="pad reveal">
-<div class="card water-card" style="margin-top:6px;text-align:center;padding:24px 18px">
+<div class="card" style="margin-top:6px;text-align:center;padding:22px 16px;background:linear-gradient(160deg,rgba(78,174,229,.07),rgba(78,174,229,.02))">
   <div class="t5">выпито сегодня</div>
-  <div style="font-size:58px;font-weight:900;color:var(--water);line-height:1.1;margin:6px 0" id="w-total">0</div>
+  <div style="font-size:54px;font-weight:900;color:var(--water);line-height:1.1;margin:5px 0" id="w-total">0</div>
   <div class="t5">из <span id="w-goal">2000</span> мл</div>
-  <div class="pbar" style="margin-top:14px;height:8px"><div class="pbar-fill pbar-water" id="w-bar" style="width:0%"></div></div>
-  <div id="w-streak" style="margin-top:10px"></div>
+  <div class="pb" style="margin-top:12px;height:7px"><div class="pbf pb-water" id="w-bar" style="width:0%"></div></div>
+  <div id="w-streak" style="margin-top:9px"></div>
 </div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px">
   <button class="btn btn-water" onclick="addW(150)">+150 мл</button>
   <button class="btn btn-water" onclick="addW(200)">+200 мл</button>
   <button class="btn btn-water" onclick="addW(250)">+250 мл</button>
-  <button class="btn btn-water" onclick="addW(500)">+500 мл 🌊</button>
+  <button class="btn btn-water" onclick="addW(500)">+500 мл</button>
 </div>
-<button class="btn btn-ghost" style="margin-top:8px;width:100%;padding:12px" onclick="undoW()">↩ отменить последнее</button>
+<button class="btn btn-g" style="margin-top:7px;width:100%;padding:12px" onclick="undoW()">Отменить последнее</button>
 <div style="margin-top:12px">
-  <div class="t5" style="margin-bottom:7px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em">история сегодня</div>
-  <div class="card" id="w-entries" style="padding:12px 14px"></div>
+  <div class="t5" style="margin-bottom:6px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em">История сегодня</div>
+  <div class="card" id="w-entries" style="padding:10px 12px"></div>
 </div>
 </div>
 </div>
 
 <div id="tt-cal-body" style="display:none">
 <div class="pad reveal">
-<div class="card" style="margin-top:6px;text-align:center;padding:22px 18px">
+<div class="card" style="margin-top:6px;text-align:center;padding:20px 16px">
   <div class="t5">калорий сегодня</div>
-  <div style="font-size:54px;font-weight:900;color:var(--cal);line-height:1.1;margin:6px 0" id="c-total">0</div>
+  <div style="font-size:50px;font-weight:900;color:var(--cal);line-height:1.1;margin:5px 0" id="c-total">0</div>
   <div class="t5">из <span id="c-goal">2000</span> ккал</div>
-  <div class="pbar" style="margin-top:14px;height:8px"><div class="pbar-fill pbar-sun" id="c-bar" style="width:0%"></div></div>
+  <div class="pb" style="margin-top:12px;height:7px"><div class="pbf pb-sun" id="c-bar" style="width:0%"></div></div>
 </div>
-<div class="card" style="margin-top:10px;padding:14px 16px">
-  <div id="c-meals"></div>
-</div>
-<button class="btn btn-primary" style="margin-top:10px" onclick="openSheet('sheet-cal')">
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-  добавить еду
-</button>
+<div class="card gap" style="padding:12px 14px"><div id="c-meals"></div></div>
+<button class="btn btn-p gap" onclick="openScr('scr-cal')">Добавить еду</button>
 </div>
 </div>
 
 <div id="tt-prod-body" style="display:none">
 <div class="pad reveal">
-<div class="card" style="margin-top:6px;padding:12px 14px"><div id="prod-list"></div></div>
-<button class="btn btn-primary" style="margin-top:10px" onclick="openSheet('sheet-cal')">🧮 добавить продукты</button>
+<div class="card" style="margin-top:6px;padding:10px 12px"><div id="prod-list"></div></div>
+<button class="btn btn-p gap" onclick="openScr('scr-cal')">Добавить продукт</button>
 </div>
 </div>
 </div>
 
-<!-- ══ PAGE: PLAN ══ -->
+<!-- ══════════ PLAN ══════════ -->
 <div class="page" id="p-plan">
 <div class="reveal">
 <div class="pad">
-  <div class="t2" style="margin-bottom:2px">📋 план</div>
+  <div class="t2" style="margin-bottom:1px">План</div>
   <div class="t5" id="pl-date">сегодня</div>
 </div>
-<div class="pad" style="margin-top:12px">
+<div class="pad gap">
 <div class="card">
   <div style="display:flex;align-items:center;justify-content:space-between">
     <div>
-      <div style="font-size:36px;font-weight:900;line-height:1" id="pl-cnt">0/0</div>
+      <div style="font-size:34px;font-weight:900;line-height:1" id="pl-cnt">0/0</div>
       <div class="t5" style="margin-top:2px">задач выполнено</div>
     </div>
-    <div style="width:56px;height:56px">
-      <svg viewBox="0 0 56 56" width="56" height="56">
-        <circle cx="28" cy="28" r="22" fill="none" stroke="rgba(0,0,0,.07)" stroke-width="5"/>
-        <circle cx="28" cy="28" r="22" fill="none" stroke="var(--sun)" stroke-width="5"
-          stroke-linecap="round" stroke-dasharray="138.2"
-          id="pl-ring" stroke-dashoffset="138.2"
-          transform="rotate(-90 28 28)"
-          style="transition:stroke-dashoffset .8s cubic-bezier(.34,1.1,.64,1)"/>
-      </svg>
-    </div>
+    <svg width="52" height="52" viewBox="0 0 52 52">
+      <circle cx="26" cy="26" r="20" fill="none" stroke="rgba(0,0,0,.06)" stroke-width="4.5"/>
+      <circle cx="26" cy="26" r="20" fill="none" stroke="var(--sun)" stroke-width="4.5"
+        stroke-linecap="round" stroke-dasharray="125.7"
+        id="pl-ring" stroke-dashoffset="125.7"
+        transform="rotate(-90 26 26)"
+        style="transition:stroke-dashoffset .7s cubic-bezier(.34,1.1,.64,1)"/>
+    </svg>
   </div>
 </div>
 </div>
 
 <div id="pl-empty" class="empty" style="display:none">
-  <div class="empty-ico">🌿</div>
-  <div class="empty-t">нет задач на сегодня</div>
-  <div class="empty-s">нажми кнопку ниже чтобы добавить</div>
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
+  <div class="empty-t">Нет задач на сегодня</div>
+  <div class="empty-s">Нажми кнопку ниже чтобы добавить</div>
 </div>
 
 <div class="pad" id="pl-list" style="margin-top:4px"></div>
 
-<div class="sec-lbl">⏱ таймер</div>
-<div class="pad">
-<div class="card" id="timer-card" style="text-align:center;padding:22px">
-  <div id="tm-idle">
-    <div style="font-size:38px;margin-bottom:8px;opacity:.4">⏱</div>
-    <div class="t5">нажми ▶ у задачи чтобы начать</div>
-  </div>
-  <div id="tm-active" style="display:none">
-    <div class="t5" id="tm-name" style="margin-bottom:6px">—</div>
-    <div style="display:flex;justify-content:center;margin-bottom:14px">
-      <div style="position:relative;display:inline-flex;align-items:center;justify-content:center">
-        <svg width="120" height="120" viewBox="0 0 120 120">
-          <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(0,0,0,.07)" stroke-width="6"/>
-          <circle cx="60" cy="60" r="50" fill="none" stroke="var(--sun)" stroke-width="6"
-            stroke-linecap="round" stroke-dasharray="314.2"
-            id="timer-ring-fill"
-            transform="rotate(-90 60 60)"/>
-        </svg>
-        <div style="position:absolute;text-align:center">
-          <div style="font-size:28px;font-weight:900;font-variant-numeric:tabular-nums" id="timer-num">00:00</div>
-          <div class="t5" id="timer-plan-s">0 мин</div>
-        </div>
-      </div>
-    </div>
-    <div class="btn-row" style="justify-content:center;gap:8px">
-      <button class="btn btn-ghost" onclick="cancelTimer()" style="padding:11px 18px;font-size:13px">✕ отмена</button>
-      <button class="btn btn-primary" onclick="finishTimer()" style="padding:11px 22px;font-size:14px;width:auto">✅ завершить</button>
-    </div>
-  </div>
-</div>
-</div>
-<div class="pad" style="margin-top:8px">
-  <button class="btn btn-primary" onclick="openSheet('sheet-act')">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-    добавить задачу
-  </button>
+<div class="pad gap">
+  <button class="btn btn-p" onclick="openScr('scr-act')">Добавить задачу</button>
 </div>
 <div style="height:8px"></div>
-</div></div>
+</div>
+</div>
 
-<!-- ══ PAGE: SLEEP ══ -->
+<!-- ══════════ SLEEP ══════════ -->
 <div class="page" id="p-sleep">
 <div class="reveal">
 <div class="pad">
-  <div class="t2" style="margin-bottom:2px">🌙 сон</div>
+  <div class="t2" style="margin-bottom:1px">Сон</div>
   <div class="t5">хороший сон — основа всего</div>
 </div>
-<div class="pad" style="margin-top:12px">
-<div class="card" id="sl-last">
-  <div class="t5" style="margin-bottom:8px">прошлая ночь</div>
-  <div style="display:flex;align-items:center;gap:18px">
+<div class="pad gap">
+<div class="card">
+  <div class="t5" style="margin-bottom:7px">Прошлая ночь</div>
+  <div style="display:flex;align-items:center;gap:16px">
     <div>
-      <div style="font-size:52px;font-weight:900;line-height:1;color:var(--sleep)" id="sl-h">—</div>
-      <div class="t5" style="margin-top:3px">часов</div>
+      <div style="font-size:48px;font-weight:900;line-height:1;color:var(--sleep)" id="sl-h">—</div>
+      <div class="t5" style="margin-top:2px">часов</div>
     </div>
     <div>
-      <div style="font-size:36px" id="sl-qico">—</div>
-      <div class="sq" id="sl-dots" style="margin-top:5px"></div>
+      <div style="font-size:34px" id="sl-qico">—</div>
+      <div class="sq" id="sl-dots" style="margin-top:4px"></div>
     </div>
   </div>
 </div>
 </div>
-<button class="btn btn-primary" style="margin:10px 16px 0;width:calc(100% - 32px)" onclick="openSheet('sheet-sleep')">
-  🌙 записать сон
-</button>
-<div class="sec-lbl">последние 7 ночей</div>
-<div class="pad"><div class="card" id="sl-hist" style="padding:12px 14px"></div></div>
-<div class="sec-lbl">среднее за неделю</div>
-<div class="pad stat-row">
-  <div class="stat-box"><div class="stat-v" id="sl-avg-h" style="color:var(--sleep)">—</div><div class="stat-l">часов</div></div>
-  <div class="stat-box"><div class="stat-v" id="sl-avg-q">—</div><div class="stat-l">качество</div></div>
+<button class="btn btn-p" style="margin:10px 16px 0;width:calc(100% - 32px)" onclick="openScr('scr-sleep')">Записать сон</button>
+<div class="sec">Последние 7 ночей</div>
+<div class="pad"><div class="card" id="sl-hist" style="padding:10px 12px"></div></div>
+<div class="sec">Среднее за неделю</div>
+<div class="pad sb-row">
+  <div class="sbox"><div class="sv" id="sl-avg-h" style="color:var(--sleep)">—</div><div class="sl">часов</div></div>
+  <div class="sbox"><div class="sv" id="sl-avg-q">—</div><div class="sl">качество</div></div>
 </div>
 <div style="height:8px"></div>
-</div></div>
+</div>
+</div>
 
-<!-- ══ PAGE: PROGRESS ══ -->
+<!-- ══════════ PROGRESS ══════════ -->
 <div class="page" id="p-progress">
 <div class="reveal">
 <div class="pad">
-  <div class="t2" style="margin-bottom:2px">📊 прогресс</div>
+  <div class="t2" style="margin-bottom:1px">Прогресс</div>
   <div class="t5">твой путь к лету</div>
 </div>
-<div class="pad" style="margin-top:12px">
+<div class="pad gap">
 <div class="card">
-  <div class="t5" style="margin-bottom:6px">⚖️ прогресс веса</div>
-  <div style="display:flex;align-items:flex-end;gap:8px;margin-bottom:3px">
-    <span style="font-size:40px;font-weight:900;line-height:1" id="pr-wcur">—</span>
-    <span class="t5" style="padding-bottom:5px">кг · цель <b style="color:var(--text)" id="pr-wgoal">—</b></span>
+  <div class="t5" style="margin-bottom:5px">Прогресс веса</div>
+  <div style="display:flex;align-items:flex-end;gap:7px;margin-bottom:3px">
+    <span style="font-size:38px;font-weight:900;line-height:1" id="pr-wcur">—</span>
+    <span class="t5" style="padding-bottom:4px">кг · цель <b style="color:var(--text)" id="pr-wgoal">—</b></span>
   </div>
-  <div class="t5" id="pr-winfo" style="margin-bottom:10px"></div>
-  <div class="pbar" style="height:9px"><div class="pbar-fill pbar-sun" id="pr-wbar" style="width:0%;height:100%"></div></div>
-  <div style="display:flex;justify-content:space-between;margin-top:5px">
+  <div class="t5" id="pr-winfo" style="margin-bottom:8px"></div>
+  <div class="pb" style="height:8px"><div class="pbf pb-sun" id="pr-wbar" style="width:0%;height:100%"></div></div>
+  <div style="display:flex;justify-content:space-between;margin-top:4px">
     <span class="t5" id="pr-wstart">—</span>
-    <span style="font-size:12px;font-weight:900;color:var(--sun)" id="pr-wpct">0%</span>
+    <span style="font-size:11px;font-weight:900;color:var(--sun)" id="pr-wpct">0%</span>
     <span class="t5" id="pr-wgoal2">—</span>
   </div>
-  <div id="pr-forecast" style="margin-top:8px;font-size:12px;font-weight:800;color:var(--green)"></div>
+  <div id="pr-forecast" style="margin-top:7px;font-size:11px;font-weight:800;color:var(--green)"></div>
 </div>
 </div>
-<div class="pad" style="margin-top:10px">
+
+<div class="pad gap">
 <div class="card" style="padding:14px">
-  <div class="t5" style="margin-bottom:10px">динамика · последние записи</div>
-  <svg id="wchart" height="100" style="width:100%;overflow:visible;display:block"></svg>
+  <div class="t5" style="margin-bottom:8px">Динамика веса</div>
+  <canvas id="wchart" height="90" style="width:100%;display:block"></canvas>
 </div>
 </div>
-<div class="sec-lbl">эта неделя</div>
-<div class="pad stat-row">
-  <div class="stat-box"><div class="stat-v" style="color:var(--water)" id="pw-water">—</div><div class="stat-l">вода мл</div></div>
-  <div class="stat-box"><div class="stat-v" style="color:var(--cal)" id="pw-cal">—</div><div class="stat-l">ккал</div></div>
-  <div class="stat-box"><div class="stat-v" style="color:var(--sleep)" id="pw-sleep">—</div><div class="stat-l">сон ч</div></div>
+
+<div class="sec">Эта неделя</div>
+<div class="pad sb-row">
+  <div class="sbox"><div class="sv" style="color:var(--water)" id="pw-water">—</div><div class="sl">вода мл</div></div>
+  <div class="sbox"><div class="sv" style="color:var(--cal)" id="pw-cal">—</div><div class="sl">ккал</div></div>
+  <div class="sbox"><div class="sv" style="color:var(--sleep)" id="pw-sleep">—</div><div class="sl">сон ч</div></div>
 </div>
-<button class="btn btn-primary" style="margin:10px 16px 0;width:calc(100% - 32px)" onclick="openSheet('sheet-weight')">
-  ⚖️ записать вес
-</button>
-<div class="sec-lbl">история веса</div>
-<div class="pad"><div class="card" id="pr-whist" style="padding:12px 14px"></div></div>
-<div class="sec-lbl">за всё время</div>
-<div class="pad stat-row">
-  <div class="stat-box"><div class="stat-v grad" id="at-t">0</div><div class="stat-l">тренировок</div></div>
-  <div class="stat-box"><div class="stat-v grad" id="at-w">0</div><div class="stat-l">воды л</div></div>
-  <div class="stat-box"><div class="stat-v grad" id="at-s">0</div><div class="stat-l">серия дн</div></div>
+
+<button class="btn btn-p" style="margin:10px 16px 0;width:calc(100% - 32px)" onclick="openScr('scr-weight')">Записать вес</button>
+
+<div class="sec">История веса</div>
+<div class="pad"><div class="card" id="pr-whist" style="padding:10px 12px"></div></div>
+
+<div class="sec">За всё время</div>
+<div class="pad sb-row">
+  <div class="sbox"><div class="sv grad" id="at-t">0</div><div class="sl">тренировок</div></div>
+  <div class="sbox"><div class="sv grad" id="at-w">0</div><div class="sl">воды л</div></div>
+  <div class="sbox"><div class="sv grad" id="at-s">0</div><div class="sl">серия дн</div></div>
 </div>
 <div style="height:8px"></div>
-</div></div>
+</div>
+</div>
 
-<!-- ══ PAGE: PROFILE ══ -->
+<!-- ══════════ PROFILE ══════════ -->
 <div class="page" id="p-profile">
 <div class="reveal">
 
-<div style="display:flex;align-items:center;gap:16px;padding:6px 16px 0">
+<div style="display:flex;align-items:center;gap:14px;padding:4px 16px 0">
   <div class="pav" id="pf-av">А</div>
   <div>
     <div class="t2" id="pf-name">—</div>
-    <div class="t5" id="pf-meta" style="margin-top:3px">—</div>
+    <div class="t5" id="pf-meta" style="margin-top:2px">—</div>
   </div>
 </div>
 
 <div id="pf-bmi-row" style="margin-top:12px;padding:0 16px;display:none">
-<div class="stat-row">
-  <div class="stat-box"><div class="stat-v" id="pf-bmi">—</div><div class="stat-l">ИМТ</div></div>
-  <div class="stat-box"><div class="stat-v" id="pf-ideal">—</div><div class="stat-l">идеал кг</div></div>
-  <div class="stat-box"><div class="stat-v" id="pf-bmr">—</div><div class="stat-l">BMR</div></div>
-</div>
+  <div class="sb-row">
+    <div class="sbox"><div class="sv" id="pf-bmi">—</div><div class="sl">ИМТ</div></div>
+    <div class="sbox"><div class="sv" id="pf-ideal">—</div><div class="sl">идеал кг</div></div>
+    <div class="sbox"><div class="sv" id="pf-bmr">—</div><div class="sl">BMR</div></div>
+  </div>
 </div>
 
-<div class="sec-lbl">Настройки</div>
+<div class="sec">Настройки</div>
 <div class="pad">
 <div class="card">
-  <div class="srow" onclick="openSubPage('sp-profile-data')">
-    <div class="srow-ico">👤</div>
-    <span class="srow-lbl">Данные профиля</span>
-    <span class="srow-val"><span id="pf-pname-preview">—</span></span>
-    <span class="srow-chev">›</span>
+  <div class="lt" onclick="openScr('scr-pdata')">
+    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
+    <span class="lt-lbl">Данные профиля</span>
+    <span class="lt-val" id="pf-pname">—</span>
+    <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
   </div>
-  <div class="srow" onclick="openSubPage('sp-goals')">
-    <div class="srow-ico">🎯</div>
-    <span class="srow-lbl">Цели</span>
-    <span class="srow-val"><span id="pf-gw">—</span></span>
-    <span class="srow-chev">›</span>
+  <div class="lt" onclick="openScr('scr-goals')">
+    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg></div>
+    <span class="lt-lbl">Цели</span>
+    <span class="lt-val"><span id="pf-gw">—</span></span>
+    <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
   </div>
-  <div class="srow" onclick="openSubPage('sp-display')">
-    <div class="srow-ico">👁</div>
-    <span class="srow-lbl">Главный экран</span>
-    <span class="srow-val">виджеты</span>
-    <span class="srow-chev">›</span>
+  <div class="lt" onclick="openScr('scr-display')">
+    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+    <span class="lt-lbl">Главный экран</span>
+    <span class="lt-val">виджеты</span>
+    <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
   </div>
-  <div class="srow" onclick="openSubPage('sp-reminders')">
-    <div class="srow-ico">🔔</div>
-    <span class="srow-lbl">Напоминания</span>
-    <span class="srow-val">настроить</span>
-    <span class="srow-chev">›</span>
-  </div>
-  <div class="srow" style="padding-bottom:0;border:none" onclick="openSubPage('sp-about')">
-    <div class="srow-ico">ℹ️</div>
-    <span class="srow-lbl">О приложении</span>
-    <span class="srow-val">ver 2.0</span>
-    <span class="srow-chev">›</span>
+  <div class="lt" onclick="openScr('scr-remind')">
+    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+    <span class="lt-lbl">Уведомления</span>
+    <span class="lt-val">настроить</span>
+    <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
   </div>
 </div>
 </div>
 
-<div class="sec-lbl">Данные</div>
+<div class="sec">Физические данные</div>
 <div class="pad">
 <div class="card">
-  <div class="srow">
-    <div class="srow-ico">📏</div>
-    <span class="srow-lbl">Рост</span>
-    <span class="srow-val" id="pf-height">—</span>
+  <div class="lt">
+    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+    <span class="lt-lbl">Рост</span>
+    <span class="lt-val" id="pf-height">—</span>
   </div>
-  <div class="srow">
-    <div class="srow-ico">🎂</div>
-    <span class="srow-lbl">Возраст</span>
-    <span class="srow-val" id="pf-age">—</span>
+  <div class="lt">
+    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM12 12h.01M8 12h.01M16 12h.01"/></svg></div>
+    <span class="lt-lbl">Возраст</span>
+    <span class="lt-val" id="pf-age">—</span>
   </div>
-  <div class="srow" style="padding-bottom:0;border:none">
-    <div class="srow-ico">💧</div>
-    <span class="srow-lbl">Норма воды</span>
-    <span class="srow-val" id="pf-gwater">—</span>
+  <div class="lt" style="padding-bottom:0;border:none">
+    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM8 12h8M12 8v8"/></svg></div>
+    <span class="lt-lbl">Норма воды</span>
+    <span class="lt-val" id="pf-gwater">—</span>
   </div>
 </div>
 </div>
 
-<div class="sec-lbl">Опасная зона</div>
+<div class="sec">Опасная зона</div>
 <div class="pad">
-  <button class="btn btn-ghost" style="width:100%;padding:13px;color:var(--red);background:rgba(244,92,92,.08)" onclick="confirmReset()">
-    🗑 сбросить все данные
-  </button>
+  <button class="btn btn-g" style="width:100%;padding:13px;color:var(--red);background:rgba(244,92,92,.07)" onclick="confirmReset()">Сбросить все данные</button>
 </div>
-<div style="text-align:center;padding:18px 16px 8px">
-  <div class="t5">letify ☀️ · ver 2.0</div>
+<div style="text-align:center;padding:16px 16px 6px">
+  <div class="t5">letify · ver 2.0</div>
 </div>
-
-</div></div>
+</div>
+</div>
 
 </div><!-- /pages -->
 
-<!-- ════════════════════════════════════════
-     SHEETS
-════════════════════════════════════════ -->
-<div class="sheet-overlay" id="overlay" onclick="closeSheet()"></div>
+<!-- ══════════ SCREEN LAYER ══════════ -->
+<div id="slayer">
 
-<!-- Sheet: Вес -->
-<div class="sheet" id="sheet-weight">
-  <div class="sheet-handle"></div>
-  <div class="sheet-title">⚖️ записать вес</div>
-  <div class="sheet-subtitle">выбери свой текущий вес</div>
-  <div class="wp-wrap" id="wp-weight-container">
-    <!-- Built by JS -->
+<!-- Scr: Вес -->
+<div class="scr" id="scr-weight">
+  <div class="scr-hdr">
+    <div class="scr-back" onclick="closeScr()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></div>
+    <div class="scr-title">Записать вес</div>
+    <button class="scr-btn" onclick="submitWeight()">Сохранить</button>
   </div>
-  <div style="padding:4px 20px 16px">
-    <button class="btn btn-primary" onclick="submitWeight()">Сохранить</button>
-  </div>
-</div>
-
-<!-- Sheet: Сон -->
-<div class="sheet" id="sheet-sleep">
-  <div class="sheet-handle"></div>
-  <div class="sheet-title">🌙 записать сон</div>
-  <div class="sheet-subtitle">сколько ты спал этой ночью?</div>
-  <div class="wp-wrap" id="wp-sleep-container">
-    <!-- Built by JS -->
-  </div>
-  <div class="sheet-row">
-    <span class="sheet-label">Качество сна</span>
-  </div>
-  <div style="padding:0 20px">
-    <div class="sheet-seg" id="seg-sleep-q">
-      <button class="sheet-seg-btn" onclick="setSleepQ(1)" data-q="1">😫</button>
-      <button class="sheet-seg-btn" onclick="setSleepQ(2)" data-q="2">😴</button>
-      <button class="sheet-seg-btn on" onclick="setSleepQ(3)" data-q="3">😑</button>
-      <button class="sheet-seg-btn" onclick="setSleepQ(4)" data-q="4">🙂</button>
-      <button class="sheet-seg-btn" onclick="setSleepQ(5)" data-q="5">🌟</button>
+  <div class="scr-body">
+    <div class="card" style="padding:16px">
+      <div class="t5" style="text-align:center;margin-bottom:6px">Текущий вес</div>
+      <div class="wp-row" id="wp-weight-wrap"></div>
     </div>
   </div>
-  <div style="padding:16px 20px">
-    <button class="btn btn-primary" onclick="submitSleep()">Сохранить</button>
-  </div>
 </div>
 
-<!-- Sheet: Калории -->
-<div class="sheet" id="sheet-cal">
-  <div class="sheet-handle"></div>
-  <div class="sheet-title">🍋 добавить еду</div>
-  <div style="padding:0 20px 8px">
-    <div class="sheet-seg" id="seg-meal">
-      <button class="sheet-seg-btn on" onclick="setMeal('breakfast')" data-m="breakfast">Завтрак</button>
-      <button class="sheet-seg-btn" onclick="setMeal('lunch')" data-m="lunch">Обед</button>
-      <button class="sheet-seg-btn" onclick="setMeal('dinner')" data-m="dinner">Ужин</button>
-      <button class="sheet-seg-btn" onclick="setMeal('snack')" data-m="snack">Перекус</button>
+<!-- Scr: Сон -->
+<div class="scr" id="scr-sleep">
+  <div class="scr-hdr">
+    <div class="scr-back" onclick="closeScr()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></div>
+    <div class="scr-title">Записать сон</div>
+    <button class="scr-btn" onclick="submitSleep()">Сохранить</button>
+  </div>
+  <div class="scr-body">
+    <div class="card" style="padding:16px;margin-bottom:12px">
+      <div class="t5" style="text-align:center;margin-bottom:6px">Часов сна</div>
+      <div class="wp-row" id="wp-sleep-wrap"></div>
+    </div>
+    <div class="card" style="padding:16px">
+      <div class="f-lbl" style="margin-bottom:10px">Качество сна</div>
+      <div class="seg" id="seg-sleepq">
+        <button class="seg-btn" onclick="setSleepQ(1)" data-q="1">😫</button>
+        <button class="seg-btn" onclick="setSleepQ(2)" data-q="2">😴</button>
+        <button class="seg-btn on" onclick="setSleepQ(3)" data-q="3">😑</button>
+        <button class="seg-btn" onclick="setSleepQ(4)" data-q="4">🙂</button>
+        <button class="seg-btn" onclick="setSleepQ(5)" data-q="5">🌟</button>
+      </div>
     </div>
   </div>
-  <div class="sheet-row">
-    <span class="sheet-label">Калорий, ккал</span>
-    <input class="sheet-input" id="inp-cal" type="number" step="10" min="0" max="3000" placeholder="500">
-  </div>
-  <div class="sheet-row">
-    <span class="sheet-label">Название (необяз.)</span>
-    <input class="sheet-input" id="inp-cal-desc" type="text" placeholder="гречка, курица…" style="text-align:left">
-  </div>
-  <div style="padding:8px 20px 16px">
-    <button class="btn btn-primary" onclick="submitCal()">Добавить</button>
-  </div>
 </div>
 
-<!-- Sheet: Активность -->
-<div class="sheet" id="sheet-act">
-  <div class="sheet-handle"></div>
-  <div class="sheet-title">📋 новая задача</div>
-  <div class="sheet-row">
-    <span class="sheet-label">Название</span>
-    <input class="sheet-input" id="inp-aname" type="text" placeholder="Пробежка" style="text-align:left;width:160px">
+<!-- Scr: Калории -->
+<div class="scr" id="scr-cal">
+  <div class="scr-hdr">
+    <div class="scr-back" onclick="closeScr()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></div>
+    <div class="scr-title">Добавить еду</div>
+    <button class="scr-btn" onclick="submitCal()">Добавить</button>
   </div>
-  <div style="padding:0 20px 10px">
-    <div class="t5" style="margin-bottom:6px">Тип активности</div>
-    <div class="sheet-seg" id="seg-atype" style="flex-wrap:wrap">
-      <button class="sheet-seg-btn on" onclick="setActType('run')" data-t="run">🏃 бег</button>
-      <button class="sheet-seg-btn" onclick="setActType('gym')" data-t="gym">💪 зал</button>
-      <button class="sheet-seg-btn" onclick="setActType('yoga')" data-t="yoga">🧘 йога</button>
-      <button class="sheet-seg-btn" onclick="setActType('walk')" data-t="walk">🚶 ходьба</button>
+  <div class="scr-body">
+    <div class="card" style="padding:16px;margin-bottom:12px">
+      <div class="f-lbl" style="margin-bottom:8px">Приём пищи</div>
+      <div class="seg" id="seg-meal">
+        <button class="seg-btn on" onclick="setMeal('breakfast')" data-m="breakfast">Завтрак</button>
+        <button class="seg-btn" onclick="setMeal('lunch')" data-m="lunch">Обед</button>
+        <button class="seg-btn" onclick="setMeal('dinner')" data-m="dinner">Ужин</button>
+        <button class="seg-btn" onclick="setMeal('snack')" data-m="snack">Перекус</button>
+      </div>
+    </div>
+    <div class="card" style="padding:16px">
+      <div class="f-row">
+        <span class="f-lbl">Калорий, ккал</span>
+        <input class="f-inp" id="inp-cal" type="number" step="10" min="0" max="3000" placeholder="500">
+      </div>
+      <div style="padding-bottom:4px">
+        <span class="f-lbl">Название</span>
+        <input class="f-inp f-inp-wide" id="inp-cal-desc" type="text" placeholder="гречка, курица…">
+      </div>
     </div>
   </div>
-  <div class="sheet-row">
-    <span class="sheet-label">Время начала</span>
+</div>
+
+<!-- Scr: Активность -->
+<div class="scr" id="scr-act">
+  <div class="scr-hdr">
+    <div class="scr-back" onclick="closeScr()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></div>
+    <div class="scr-title">Новая задача</div>
+    <button class="scr-btn" onclick="submitAct()">Добавить</button>
   </div>
-  <div class="wp-wrap" id="wp-time-container">
-    <!-- Built by JS -->
-  </div>
-  <div class="sheet-row">
-    <span class="sheet-label">Длительность, мин</span>
-  </div>
-  <div class="wp-wrap" id="wp-dur-container">
-    <!-- Built by JS -->
-  </div>
-  <div style="padding:8px 20px 16px">
-    <button class="btn btn-primary" onclick="submitAct()">Добавить задачу</button>
+  <div class="scr-body">
+    <div class="card" style="padding:16px;margin-bottom:12px">
+      <div style="padding-bottom:4px">
+        <span class="f-lbl">Название</span>
+        <input class="f-inp f-inp-wide" id="inp-aname" type="text" placeholder="Пробежка, йога…">
+      </div>
+    </div>
+    <div class="card" style="padding:16px;margin-bottom:12px">
+      <div class="f-lbl" style="margin-bottom:8px">Тип активности</div>
+      <div class="seg" id="seg-atype" style="flex-wrap:wrap;gap:3px 3px">
+        <button class="seg-btn on" onclick="setActType('run')" data-t="run" style="flex:1;min-width:calc(50% - 2px)">Бег</button>
+        <button class="seg-btn" onclick="setActType('gym')" data-t="gym" style="flex:1;min-width:calc(50% - 2px)">Зал</button>
+        <button class="seg-btn" onclick="setActType('yoga')" data-t="yoga" style="flex:1;min-width:calc(50% - 2px)">Йога</button>
+        <button class="seg-btn" onclick="setActType('walk')" data-t="walk" style="flex:1;min-width:calc(50% - 2px)">Ходьба</button>
+      </div>
+    </div>
+    <div class="card" style="padding:16px;margin-bottom:12px">
+      <div class="t5" style="text-align:center;margin-bottom:4px">Время начала</div>
+      <div class="wp-row" id="wp-time-wrap"></div>
+    </div>
+    <div class="card" style="padding:16px">
+      <div class="t5" style="text-align:center;margin-bottom:4px">Длительность</div>
+      <div class="wp-row" id="wp-dur-wrap"></div>
+    </div>
   </div>
 </div>
 
-<!-- Toast -->
+<!-- Scr: Данные профиля -->
+<div class="scr" id="scr-pdata">
+  <div class="scr-hdr">
+    <div class="scr-back" onclick="closeScr()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></div>
+    <div class="scr-title">Данные профиля</div>
+    <button class="scr-btn" onclick="submitProfile()">Сохранить</button>
+  </div>
+  <div class="scr-body">
+    <div class="card" style="padding:16px;margin-bottom:12px">
+      <div class="f-row"><span class="f-lbl">Имя</span><input class="f-inp" id="inp-pname" type="text" placeholder="Алексей" style="text-align:left"></div>
+      <div class="f-row"><span class="f-lbl">Рост, см</span><input class="f-inp" id="inp-height" type="number" min="100" max="250" placeholder="175"></div>
+      <div class="f-row" style="padding-bottom:0"><span class="f-lbl">Возраст</span><input class="f-inp" id="inp-age" type="number" min="10" max="100" placeholder="25"></div>
+    </div>
+    <div class="card" style="padding:16px">
+      <div class="f-lbl" style="margin-bottom:8px">Пол</div>
+      <div class="seg" id="seg-gender">
+        <button class="seg-btn on" onclick="setGender('male')" data-g="male">Мужской</button>
+        <button class="seg-btn" onclick="setGender('female')" data-g="female">Женский</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Scr: Цели -->
+<div class="scr" id="scr-goals">
+  <div class="scr-hdr">
+    <div class="scr-back" onclick="closeScr()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></div>
+    <div class="scr-title">Цели</div>
+    <button class="scr-btn" onclick="submitGoals()">Сохранить</button>
+  </div>
+  <div class="scr-body">
+    <div class="card" style="padding:16px">
+      <div class="f-row"><span class="f-lbl">Целевой вес, кг</span><input class="f-inp" id="inp-gw" type="number" step="0.5" placeholder="70"></div>
+      <div class="f-row"><span class="f-lbl">Норма воды, мл</span><input class="f-inp" id="inp-gwat" type="number" step="100" placeholder="2000"></div>
+      <div class="f-row" style="padding-bottom:0"><span class="f-lbl">Норма калорий</span><input class="f-inp" id="inp-gcal" type="number" step="50" placeholder="2000"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Scr: Главный экран -->
+<div class="scr" id="scr-display">
+  <div class="scr-hdr">
+    <div class="scr-back" onclick="closeScr()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></div>
+    <div class="scr-title">Главный экран</div>
+  </div>
+  <div class="scr-body">
+    <div class="t5" style="margin-bottom:10px">Выбери, что показывать</div>
+    <div class="card">
+      <div class="lt"><div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M6 3v3M18 3v3"/><rect x="3" y="9" width="18" height="12" rx="2"/></svg></div><span class="lt-lbl">Вес</span><div class="tog on" id="tog-w" onclick="toggleSett('w')"></div></div>
+      <div class="lt"><div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 0 8c-3 0-6 2-6 5v1h16v-1c0-3-3-5-6-5a4 4 0 0 1-4-8z"/></svg></div><span class="lt-lbl">Вода</span><div class="tog on" id="tog-water" onclick="toggleSett('water')"></div></div>
+      <div class="lt"><div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2c0 5.5-5 7-5 11a5 5 0 0 0 10 0c0-4-5-5.5-5-11z"/></svg></div><span class="lt-lbl">Калории</span><div class="tog on" id="tog-cal" onclick="toggleSett('cal')"></div></div>
+      <div class="lt" style="padding-bottom:0;border:none"><div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div><span class="lt-lbl">Сон</span><div class="tog on" id="tog-sleep" onclick="toggleSett('sleep')"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Scr: Уведомления -->
+<div class="scr" id="scr-remind">
+  <div class="scr-hdr">
+    <div class="scr-back" onclick="closeScr()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></div>
+    <div class="scr-title">Уведомления</div>
+  </div>
+  <div class="scr-body">
+    <div class="card" style="margin-bottom:12px">
+      <div class="lt"><div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 0 8c-3 0-6 2-6 5v1h16v-1c0-3-3-5-6-5a4 4 0 0 1-4-8z"/></svg></div><span class="lt-lbl">Вода</span><span class="lt-val" id="rem-w">выкл</span></div>
+      <div class="lt"><div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M6 3v3M18 3v3"/><rect x="3" y="9" width="18" height="12" rx="2"/></svg></div><span class="lt-lbl">Взвеситься</span><span class="lt-val" id="rem-wg">выкл</span></div>
+      <div class="lt" style="padding-bottom:0;border:none"><div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div><span class="lt-lbl">Отчёт</span><span class="lt-val" id="rem-rep">выкл</span></div>
+    </div>
+    <div class="card" style="padding:20px;text-align:center">
+      <div style="width:44px;height:44px;border-radius:14px;background:var(--bg3);display:flex;align-items:center;justify-content:center;margin:0 auto 10px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+      <div class="t3" style="margin-bottom:5px">Настройка через бота</div>
+      <div class="t5" style="line-height:1.5">Управление уведомлениями<br>доступно в Telegram-боте<br><b style="color:var(--text)">/reminders</b></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /slayer -->
+
 <div id="toast"></div>
 
-<!-- ════════════════════════════════════════
-     BOTTOM NAV
-════════════════════════════════════════ -->
-<nav id="bottom-nav">
-  <div id="nav-indicator"></div>
-  <div class="nav-tab active" id="nav-home" onclick="navTo('home')">
-    <div class="nav-tab-ico">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-    </div>
-    <span class="nav-tab-lbl">Главная</span>
+<!-- ══════════ ISLAND NAV ══════════ -->
+<nav id="nav">
+  <!-- Home -->
+  <div class="nt on" id="nt-home" onclick="navTo('home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
+    <div class="nt-dot"></div>
   </div>
-  <div class="nav-tab" id="nav-track" onclick="navTo('track')">
-    <div class="nav-tab-ico">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.5 3.5L18 2l-1.5 1.5L15 2l-1.5 1.5L12 2l-1.5 1.5L9 2 7.5 3.5 6 2 4.5 3.5 3 2v20l1.5-1.5L6 22l1.5-1.5L9 22l1.5-1.5L12 22l1.5-1.5L15 22l1.5-1.5L18 22l1.5-1.5L21 22V2l-1.5 1.5zM19 19.09H5V4.91h14v14.18zM6 15h12v2H6zm0-4h12v2H6zm0-4h12v2H6z"/></svg>
-    </div>
-    <span class="nav-tab-lbl">Трекеры</span>
+  <!-- Track -->
+  <div class="nt" id="nt-track" onclick="navTo('track')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>
+    <div class="nt-dot"></div>
   </div>
-  <div class="nav-tab" id="nav-plan" onclick="navTo('plan')">
-    <div class="nav-tab-ico">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg>
-    </div>
-    <span class="nav-tab-lbl">План</span>
+  <!-- Plan -->
+  <div class="nt" id="nt-plan" onclick="navTo('plan')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/></svg>
+    <div class="nt-dot"></div>
   </div>
-  <div class="nav-tab" id="nav-sleep" onclick="navTo('sleep')">
-    <div class="nav-tab-ico">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>
-    </div>
-    <span class="nav-tab-lbl">Сон</span>
+  <!-- Sleep -->
+  <div class="nt" id="nt-sleep" onclick="navTo('sleep')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    <div class="nt-dot"></div>
   </div>
-  <div class="nav-tab" id="nav-progress" onclick="navTo('progress')">
-    <div class="nav-tab-ico">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4zm2.5 2.1h-15V5h15v14.1zm0-16.1h-15c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
-    </div>
-    <span class="nav-tab-lbl">Прогресс</span>
+  <!-- Progress -->
+  <div class="nt" id="nt-progress" onclick="navTo('progress')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-4 4 4 4-6"/></svg>
+    <div class="nt-dot"></div>
   </div>
-  <div class="nav-tab" id="nav-profile" onclick="navTo('profile')">
-    <div class="nav-tab-ico">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-    </div>
-    <span class="nav-tab-lbl">Профиль</span>
+  <!-- Profile -->
+  <div class="nt" id="nt-profile" onclick="navTo('profile')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    <div class="nt-dot"></div>
   </div>
 </nav>
 
 </div><!-- /root -->
 
 <script>
-/* ════════════════════════════════════════
-   TELEGRAM INIT
-════════════════════════════════════════ */
-const tg = window.Telegram?.WebApp;
+/* ════ TG INIT ════ */
+const tg=window.Telegram?.WebApp;
 if(tg){
-  tg.ready();
-  tg.expand();
-  if(typeof tg.requestFullscreen === 'function') tg.requestFullscreen();
-  if(typeof tg.disableVerticalSwipes === 'function') tg.disableVerticalSwipes();
-  if(typeof tg.setHeaderColor === 'function') tg.setHeaderColor('bg_color');
-  if(typeof tg.setBackgroundColor === 'function') tg.setBackgroundColor('bg_color');
-  tg.onEvent('themeChanged', applyTheme);
-  tg.onEvent('viewportChanged', _applySafeArea);
-  tg.onEvent('safeAreaChanged', _applySafeArea);
-  tg.onEvent('fullscreenChanged', _applySafeArea);
-  setTimeout(_applySafeArea, 100);
-  setTimeout(_applySafeArea, 500);
+  tg.ready();tg.expand();
+  if(typeof tg.requestFullscreen==='function')tg.requestFullscreen();
+  if(typeof tg.disableVerticalSwipes==='function')tg.disableVerticalSwipes();
+  if(typeof tg.setHeaderColor==='function')tg.setHeaderColor('bg_color');
+  if(typeof tg.setBackgroundColor==='function')tg.setBackgroundColor('bg_color');
+  tg.onEvent('themeChanged',applyTheme);
+  tg.onEvent('viewportChanged',_applySA);
+  tg.onEvent('safeAreaChanged',_applySA);
+  tg.onEvent('fullscreenChanged',_applySA);
+  setTimeout(_applySA,120);setTimeout(_applySA,600);
 }
-function _applySafeArea(){
-  const top = tg?.safeAreaInset?.top ?? tg?.contentSafeAreaInset?.top ?? 0;
-  const bot = tg?.safeAreaInset?.bottom ?? tg?.contentSafeAreaInset?.bottom ?? 0;
-  if(top > 0) document.documentElement.style.setProperty('--st', top + 'px');
-  if(bot > 0) document.documentElement.style.setProperty('--sb', bot + 'px');
+function _applySA(){
+  const top=tg?.safeAreaInset?.top??tg?.contentSafeAreaInset?.top??0;
+  const bot=tg?.safeAreaInset?.bottom??tg?.contentSafeAreaInset?.bottom??0;
+  if(top>0)document.documentElement.style.setProperty('--st',top+'px');
+  if(bot>0)document.documentElement.style.setProperty('--sb',bot+'px');
 }
 function applyTheme(){
-  const p = tg?.themeParams || {};
-  const m = {
-    '--bg':   p.bg_color,
-    '--bg2':  p.secondary_bg_color || p.bg_color,
-    '--text': p.text_color,
-    '--hint': p.hint_color,
-  };
-  for(const [k,v] of Object.entries(m)) if(v) document.documentElement.style.setProperty(k,v);
-  const isDark = tg?.colorScheme === 'dark' ||
-    window.matchMedia?.('(prefers-color-scheme:dark)').matches;
-  document.body.classList.toggle('tg-dark', isDark);
+  const p=tg?.themeParams||{};
+  const m={'--bg':p.bg_color,'--bg2':p.secondary_bg_color||p.bg_color,'--text':p.text_color,'--hint':p.hint_color};
+  for(const[k,v]of Object.entries(m))if(v)document.documentElement.style.setProperty(k,v);
+  const dark=tg?.colorScheme==='dark'||window.matchMedia?.('(prefers-color-scheme:dark)').matches;
+  document.body.classList.toggle('tg-dark',dark);
 }
 applyTheme();
 
-/* ════════════════════════════════════════
-   API
-════════════════════════════════════════ */
-const API_BASE = 'https://letify-production.up.railway.app';
-const tgUser = tg?.initDataUnsafe?.user;
-const UID = tgUser?.id || null;
+/* ════ API ════ */
+const API_BASE='https://letify-production.up.railway.app';
+const tgUser=tg?.initDataUnsafe?.user;
+const UID=tgUser?.id||null;
+const TODAY=new Date().toLocaleDateString('en-CA');
 
-let _cache = {
+let C={
   user:{name:'…',height:0,age:0,start_weight:0,goal_weight:0,water_goal:2000,cal_goal:2000,gender:'male'},
   settings:{show_weight:1,show_water:1,show_calories:1,show_sleep:1},
-  water:{total:0,entries:[],streak:0},
-  calories:{},
-  weight_log:[],
-  sleep_log:[],
-  acts_today:[],
-  products:[],
+  water:{total:0,entries:[],streak:0},calories:{},
+  weight_log:[],sleep_log:[],acts_today:[],products:[]
 };
-let _loaded = false;
 
 async function loadData(){
-  if(!UID){ _useDemoData(); _loaded=true; return; }
+  if(!UID){_demo();return;}
   try{
-    const r = await fetch(`${API_BASE}/api/data?uid=${UID}`);
-    if(!r.ok) throw new Error('http '+r.status);
-    const data = await r.json();
-    _cache.user       = data.user       || _cache.user;
-    _cache.settings   = data.settings   || _cache.settings;
-    _cache.water      = data.water      || _cache.water;
-    _cache.calories   = data.calories   || _cache.calories;
-    _cache.weight_log = data.weight_log || _cache.weight_log;
-    _cache.sleep_log  = data.sleep_log  || _cache.sleep_log;
-    _cache.acts_today = data.acts_today || _cache.acts_today;
-    _cache.products   = data.products   || _cache.products;
-    _loaded = true;
-  }catch(e){
-    console.warn('API недоступен, демо-режим:', e);
-    _useDemoData(); _loaded=true;
-  }
+    const r=await fetch(`${API_BASE}/api/data?uid=${UID}`);
+    if(!r.ok)throw 0;
+    const d=await r.json();
+    C.user=d.user||C.user;C.settings=d.settings||C.settings;
+    C.water=d.water||C.water;C.calories=d.calories||C.calories;
+    C.weight_log=d.weight_log||C.weight_log;C.sleep_log=d.sleep_log||C.sleep_log;
+    C.acts_today=d.acts_today||C.acts_today;C.products=d.products||C.products;
+  }catch{_demo();}
 }
-
-function _useDemoData(){
-  const TODAY = new Date().toLocaleDateString('en-CA');
-  const g = k => { try{ const r=localStorage.getItem('lf2_'+k); return r?JSON.parse(r):null; }catch{return null;} };
-  const s = (k,v) => { try{ localStorage.setItem('lf2_'+k,JSON.stringify(v)); }catch{} };
-  if(!g('demo_seeded')){
+function _demo(){
+  const g=k=>{try{const r=localStorage.getItem('lf2_'+k);return r?JSON.parse(r):null}catch{return null}};
+  const s=(k,v)=>{try{localStorage.setItem('lf2_'+k,JSON.stringify(v))}catch{}};
+  if(!g('ds')){
     s('user',{name:tgUser?.first_name||'Алекс',height:175,age:27,start_weight:85,goal_weight:75,water_goal:2500,cal_goal:2000,gender:'male'});
-    const wl=[]; const now=new Date();
-    for(let i=13;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);wl.push({weight:+(85-((13-i)*0.25)+(Math.random()-.5)*.3).toFixed(1),logged_at:d.toLocaleDateString('en-CA')});}
-    s('wlog',wl);
-    const sl=[];
+    const now=new Date(),wl=[],sl=[];
+    for(let i=13;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);wl.push({weight:+(85-((13-i)*.25)+(Math.random()-.5)*.3).toFixed(1),logged_at:d.toLocaleDateString('en-CA')});}
     for(let i=6;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);sl.push({hours:+(6.5+Math.random()*2).toFixed(1),quality:3+Math.floor(Math.random()*3),logged_at:d.toLocaleDateString('en-CA')});}
-    s('slog',sl);
-    s('wd_'+TODAY,{total:1350,entries:[250,200,150,250,200,150,150]});
-    s('cd_'+TODAY,{breakfast:420,lunch:680,dinner:0,snack:185,other:0});
-    s('streak',7);
+    s('wlog',wl);s('slog',sl);s('wd_'+TODAY,{total:1350,entries:[250,200,150,250,200,150,150]});
+    s('cd_'+TODAY,{breakfast:420,lunch:680,dinner:0,snack:185,other:0});s('streak',7);
     s('acts_'+TODAY,[{id:1,name:'Пробежка',type:'run',scheduled_at:'2024-01-01T07:00',duration:30,completed:1},{id:2,name:'Зал',type:'gym',scheduled_at:'2024-01-01T18:30',duration:60,completed:0},{id:3,name:'Йога',type:'yoga',scheduled_at:'2024-01-01T21:00',duration:25,completed:0}]);
-    s('demo_seeded',true);
+    s('ds',1);
   }
-  const u=g('user')||{};
-  const wd=g('wd_'+TODAY)||{total:0,entries:[]};
-  const cd=g('cd_'+TODAY)||{};
-  _cache.user       = u;
-  _cache.settings   = {show_weight:1,show_water:1,show_calories:1,show_sleep:1};
-  _cache.water      = {total:wd.total||0,entries:wd.entries||[],streak:g('streak')||0};
-  _cache.calories   = cd;
-  _cache.weight_log = g('wlog')||[];
-  _cache.sleep_log  = g('slog')||[];
-  _cache.acts_today = g('acts_'+TODAY)||[];
-  _cache.products   = [
-    {id:1,name:'банан',calories:89,protein:1.1,fat:0.3,carbs:23.0},
-    {id:2,name:'яблоко',calories:52,protein:0.3,fat:0.2,carbs:14.0},
-    {id:3,name:'куриная грудка',calories:165,protein:31,fat:3.6,carbs:0},
-    {id:4,name:'яйцо',calories:155,protein:13,fat:11,carbs:1.1},
-    {id:5,name:'творог 5%',calories:121,protein:17,fat:5,carbs:3},
-    {id:6,name:'гречка варёная',calories:92,protein:3.4,fat:1,carbs:20},
-  ];
+  const u=g('user')||{},wd=g('wd_'+TODAY)||{total:0,entries:[]},cd=g('cd_'+TODAY)||{};
+  C.user=u;C.settings={show_weight:1,show_water:1,show_calories:1,show_sleep:1};
+  C.water={total:wd.total||0,entries:wd.entries||[],streak:g('streak')||0};
+  C.calories=cd;C.weight_log=g('wlog')||[];C.sleep_log=g('slog')||[];
+  C.acts_today=g('acts_'+TODAY)||[];
+  C.products=[{id:1,name:'банан',calories:89,protein:1.1,fat:0.3,carbs:23},{id:2,name:'яблоко',calories:52,protein:0.3,fat:0.2,carbs:14},{id:3,name:'куриная грудка',calories:165,protein:31,fat:3.6,carbs:0},{id:4,name:'яйцо',calories:155,protein:13,fat:11,carbs:1.1},{id:5,name:'творог 5%',calories:121,protein:17,fat:5,carbs:3},{id:6,name:'гречка',calories:92,protein:3.4,fat:1,carbs:20}];
 }
-
-const getUser   = () => _cache.user;
-const getSetts  = () => ({w:!!_cache.settings?.show_weight, water:!!_cache.settings?.show_water, cal:!!_cache.settings?.show_calories, sleep:!!_cache.settings?.show_sleep});
-const getWLog   = () => _cache.weight_log.map(r=>({weight:r.weight,logged_at:(r.logged_at||'').slice(0,10)}));
-const getSLog   = () => _cache.sleep_log.map(r=>({hours:r.hours,quality:r.quality,logged_at:(r.logged_at||'').slice(0,10)}));
-const getWD     = () => _cache.water;
-const getCD     = () => _cache.calories;
-const getActs   = () => _cache.acts_today.map(a=>({...a, time:(a.scheduled_at||'').slice(11,16)||'00:00', completed:!!a.completed}));
-const getProds  = () => _cache.products;
-const getStreak = () => _cache.water.streak || 0;
-
-async function apiPost(path, body){
-  if(!UID) return;
-  try{ await fetch(`${API_BASE}${path}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uid:UID,...body})}); }
-  catch(e){ console.warn('API:', path, e); }
+async function apiPost(path,body){
+  if(!UID)return;
+  try{await fetch(`${API_BASE}${path}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uid:UID,...body})});}
+  catch{}
 }
-
 async function reload(){
   await loadData();
-  const renders={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};
-  if(renders[curTab]) renders[curTab]();
+  const rMap={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};
+  rMap[curTab]?.();
 }
+const gU=()=>C.user;
+const gSS=()=>({w:!!C.settings?.show_weight,water:!!C.settings?.show_water,cal:!!C.settings?.show_calories,sleep:!!C.settings?.show_sleep});
+const gWL=()=>C.weight_log.map(r=>({weight:r.weight,logged_at:(r.logged_at||'').slice(0,10)}));
+const gSL=()=>C.sleep_log.map(r=>({hours:r.hours,quality:r.quality,logged_at:(r.logged_at||'').slice(0,10)}));
+const gWD=()=>C.water;
+const gCD=()=>C.calories;
+const gActs=()=>C.acts_today.map(a=>({...a,time:(a.scheduled_at||'').slice(11,16)||'00:00',completed:!!a.completed}));
+const gProds=()=>C.products;
+const gStreak=()=>C.water.streak||0;
+const totalCal=()=>Object.values(gCD()).reduce((a,b)=>a+b,0);
 
-const TODAY = new Date().toLocaleDateString('en-CA');
-
-/* ════════════════════════════════════════
-   NAVIGATION
-════════════════════════════════════════ */
-const TABS = ['home','track','plan','sleep','progress','profile'];
-let curTab = 'home';
-let trackTab = 'water';
-let currentSubPage = null;
-
-const tabPageMap = {home:'p-home',track:'p-track',plan:'p-plan',sleep:'p-sleep',progress:'p-progress',profile:'p-profile'};
-const TAB_LABELS = {home:'Главная',track:'Трекеры',plan:'План',sleep:'Сон',progress:'Прогресс',profile:'Профиль'};
+/* ════ NAVIGATION ════ */
+const TABS=['home','track','plan','sleep','progress','profile'];
+let curTab='home',trackTab='water',curScr=null;
 
 function navTo(tab){
-  if(tab === curTab) return;
-  closeSubPage(false); // close without animation if switching tabs
-  curTab = tab;
-
+  if(tab===curTab&&!curScr)return;
+  if(curScr)closeScr(false);
+  curTab=tab;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  const pg = document.getElementById(tabPageMap[tab]);
-  if(pg){ pg.scrollTop=0; pg.classList.add('active'); }
-
-  TABS.forEach(t=>{
-    const el = document.getElementById('nav-'+t);
-    if(el) el.classList.toggle('active', t===tab);
-  });
-  updateNavIndicator(tab);
-
+  const pg=document.getElementById('p-'+tab);
+  if(pg){pg.scrollTop=0;pg.classList.add('active');}
+  TABS.forEach(t=>{const el=document.getElementById('nt-'+t);if(el)el.classList.toggle('on',t===tab);});
   const renders={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};
-  if(renders[tab]) renders[tab]();
+  renders[tab]?.();
   tg?.HapticFeedback?.selectionChanged();
 }
 
-function updateNavIndicator(tab){
-  const tabEl = document.getElementById('nav-'+tab);
-  const navEl = document.getElementById('bottom-nav');
-  const ind = document.getElementById('nav-indicator');
-  if(!tabEl || !ind) return;
-  const navRect = navEl.getBoundingClientRect();
-  const tabRect = tabEl.getBoundingClientRect();
-  ind.style.left = (tabRect.left - navRect.left) + 'px';
-  ind.style.width = tabRect.width + 'px';
-}
-
-function setTrackTab(t){
-  trackTab = t;
+function setTTab(t){
+  trackTab=t;
   ['water','cal','prod'].forEach(k=>{
-    const btn=document.getElementById('tt-'+k);
-    const body=document.getElementById('tt-'+k+'-body');
-    const on = k===t;
-    if(btn) btn.classList.toggle('on', on);
-    if(body) body.style.display = on ? '' : 'none';
+    document.getElementById('tt-'+k)?.classList.toggle('on',k===t);
+    const b=document.getElementById('tt-'+k+'-body');if(b)b.style.display=k===t?'':'none';
   });
   renderTrack(t);
 }
 
-/* ════════════════════════════════════════
-   SUB-PAGE NAVIGATION
-════════════════════════════════════════ */
-function openSubPage(id){
-  currentSubPage = id;
-  const sp = document.getElementById(id);
-  if(!sp) return;
-  // Populate sub-page data
-  populateSubPage(id);
-  sp.classList.add('open');
-  // Hide bottom nav
-  document.getElementById('bottom-nav').classList.add('hidden');
-  // Telegram back button
-  if(tg?.BackButton){
-    tg.BackButton.show();
-    tg.BackButton.onClick(closeSubPage);
-  }
+/* ════ SCREENS ════ */
+function openScr(id){
+  curScr=id;
+  const nav=document.getElementById('nav');
+  nav?.classList.add('gone');
+  _populateScr(id);
+  const scr=document.getElementById(id);
+  if(scr)scr.classList.add('open');
+  if(tg?.BackButton){tg.BackButton.show();tg.BackButton.onClick(closeScr);}
   tg?.HapticFeedback?.impactOccurred('light');
 }
-
-function closeSubPage(animated = true){
-  if(!currentSubPage) return;
-  const sp = document.getElementById(currentSubPage);
-  if(sp) sp.classList.remove('open');
-  currentSubPage = null;
-  // Show bottom nav
-  document.getElementById('bottom-nav').classList.remove('hidden');
-  // Hide TG back button
-  if(tg?.BackButton){
-    tg.BackButton.hide();
-    tg.BackButton.offClick(closeSubPage);
-  }
+function closeScr(doNav=true){
+  if(!curScr)return;
+  const scr=document.getElementById(curScr);
+  if(scr)scr.classList.remove('open');
+  curScr=null;
+  document.getElementById('nav')?.classList.remove('gone');
+  if(tg?.BackButton){tg.BackButton.hide();tg.BackButton.offClick(closeScr);}
 }
-
-function populateSubPage(id){
-  const u = getUser();
-  const ss = getSetts();
-  if(id === 'sp-profile-data'){
-    const ni=document.getElementById('inp-pname'); if(ni) ni.value=u.name||'';
-    const hi=document.getElementById('inp-height'); if(hi) hi.value=u.height||'';
-    const ai=document.getElementById('inp-age'); if(ai) ai.value=u.age||'';
-    _gender = u.gender||'male';
-    document.querySelectorAll('#seg-gender .sheet-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.g===_gender));
+function _populateScr(id){
+  const u=gU(),ss=gSS();
+  if(id==='scr-pdata'){
+    const ni=document.getElementById('inp-pname');if(ni)ni.value=u.name||'';
+    const hi=document.getElementById('inp-height');if(hi)hi.value=u.height||'';
+    const ai=document.getElementById('inp-age');if(ai)ai.value=u.age||'';
+    _gender=u.gender||'male';
+    document.querySelectorAll('#seg-gender .seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.g===_gender));
   }
-  if(id === 'sp-goals'){
-    const gwi=document.getElementById('inp-gw'); if(gwi) gwi.value=u.goal_weight||'';
-    const gwati=document.getElementById('inp-gwat'); if(gwati) gwati.value=u.water_goal||2000;
-    const gcali=document.getElementById('inp-gcal'); if(gcali) gcali.value=u.cal_goal||2000;
+  if(id==='scr-goals'){
+    const gi=document.getElementById('inp-gw');if(gi)gi.value=u.goal_weight||'';
+    const wi=document.getElementById('inp-gwat');if(wi)wi.value=u.water_goal||2000;
+    const ci=document.getElementById('inp-gcal');if(ci)ci.value=u.cal_goal||2000;
   }
-  if(id === 'sp-display'){
-    [['w'],['water'],['cal'],['sleep']].forEach(([k])=>{
-      const tog=document.getElementById('tog-'+k), on=ss[k]!==false;
+  if(id==='scr-display'){
+    ['w','water','cal','sleep'].forEach(k=>{
+      const tog=document.getElementById('tog-'+k),on=ss[k]!==false;
       if(tog){tog.classList.toggle('on',on);tog.classList.toggle('off',!on);}
     });
   }
+  // Init pickers after layout
+  if(id==='scr-weight')requestAnimationFrame(()=>initWeightPicker());
+  if(id==='scr-sleep')requestAnimationFrame(()=>initSleepPicker());
+  if(id==='scr-act')requestAnimationFrame(()=>{initTimePicker();initDurPicker();});
 }
 
-/* ════════════════════════════════════════
-   WHEEL PICKER
-════════════════════════════════════════ */
-function buildWheelPicker(container, items, initialValue, widthClass){
-  const ITEM_H = 44;
-  const PAD = 2;
+/* ════ WHEEL PICKER ════ */
+const PKR={};
+const ITEM_H=44;
 
-  let selectedIndex = Math.max(0, items.findIndex(it => String(it.value) === String(initialValue)));
+function mkPicker(container,items,initVal){
+  container.innerHTML='';
+  container.className='wp';
+  container.style.width='100%';container.style.height=(ITEM_H*5)+'px';
 
-  container.innerHTML = '';
-  container.className = 'wheel-picker' + (widthClass ? ' '+widthClass : '');
+  let selIdx=Math.max(0,items.findIndex(it=>String(it.v)===String(initVal)));
 
-  // Build inner HTML
-  container.innerHTML = `
-    <div class="wp-selector"></div>
-    <div class="wp-fade-top"></div>
-    <div class="wp-fade-bot"></div>
-    <div class="wp-track"></div>
-  `;
+  container.innerHTML=`<div class="wp-sel"></div>
+    <div class="wp-ft wp-ft-t"></div>
+    <div class="wp-ft wp-ft-b"></div>
+    <div class="wp-track"></div>`;
 
-  const track = container.querySelector('.wp-track');
+  const track=container.querySelector('.wp-track');
 
-  // Render all items (with padding)
-  function renderItems(){
-    let html = '';
-    for(let i=0;i<PAD;i++) html += `<div class="wp-item wp-pad"></div>`;
-    items.forEach((it, i) => {
-      html += `<div class="wp-item${i===selectedIndex?' selected':''}">${it.label}</div>`;
-    });
-    for(let i=0;i<PAD;i++) html += `<div class="wp-item wp-pad"></div>`;
-    track.innerHTML = html;
+  function render(){
+    const pads=2;
+    let h='';
+    for(let i=0;i<pads;i++)h+=`<div class="wp-item"></div>`;
+    items.forEach((it,i)=>h+=`<div class="wp-item${i===selIdx?' sel':''}">${it.l}</div>`);
+    for(let i=0;i<pads;i++)h+=`<div class="wp-item"></div>`;
+    track.innerHTML=h;
   }
+  render();
 
-  renderItems();
-
-  function getItemEls(){
-    return Array.from(track.querySelectorAll('.wp-item:not(.wp-pad)'));
+  function setY(y,anim){
+    track.style.transition=anim?'transform .25s cubic-bezier(.25,.46,.45,.94)':'none';
+    track.style.transform=`translateY(${y}px)`;
   }
+  function yFor(idx){return -idx*ITEM_H;}
+  let curY=yFor(selIdx);
+  setY(curY,false);
 
+  function clampY(y){return Math.max(-( items.length-1)*ITEM_H,Math.min(0,y));}
   function updateHighlight(){
-    getItemEls().forEach((el,i) => el.classList.toggle('selected', i===selectedIndex));
+    track.querySelectorAll('.wp-item:not([class~="wp-item wp-item"])');//no-op
+    Array.from(track.children).slice(2,items.length+2).forEach((el,i)=>el.classList.toggle('sel',i===selIdx));
   }
 
-  function applyY(y, animated){
-    track.style.transition = animated ? 'transform 0.28s cubic-bezier(0.25,0.46,0.45,0.94)' : 'none';
-    track.style.transform = `translateY(${y}px)`;
-  }
-
-  function yForIndex(idx){
-    return -(idx) * ITEM_H; // paddingTop handled by PAD items before
-  }
-
-  let currentY = yForIndex(selectedIndex);
-  applyY(currentY, false);
-
-  // Touch handling
-  let startY = null, startOffset, lastY, lastTime, vel;
-
-  function clampY(y){
-    const minY = -(items.length - 1) * ITEM_H;
-    const maxY = 0;
-    return Math.max(minY, Math.min(maxY, y));
-  }
-
-  container.addEventListener('pointerdown', e => {
-    startY = e.clientY;
-    startOffset = currentY;
-    lastY = e.clientY;
-    lastTime = Date.now();
-    vel = 0;
-    track.style.transition = 'none';
+  let sy=null,so,ly,lt,vel=0;
+  container.addEventListener('pointerdown',e=>{
+    sy=e.clientY;so=curY;ly=e.clientY;lt=Date.now();vel=0;
+    track.style.transition='none';
     container.setPointerCapture(e.pointerId);
     e.preventDefault();
-  }, {passive: false});
-
-  container.addEventListener('pointermove', e => {
-    if(startY === null) return;
-    const dy = e.clientY - startY;
-    const now = Date.now();
-    const dt = Math.max(1, now - lastTime);
-    vel = (e.clientY - lastY) / dt * 16;
-    lastY = e.clientY; lastTime = now;
-    const rawY = startOffset + dy;
-    currentY = clampY(rawY);
-    track.style.transform = `translateY(${currentY}px)`;
-    // Live update selection
-    const liveIdx = Math.max(0, Math.min(Math.round(-currentY / ITEM_H), items.length-1));
-    if(liveIdx !== selectedIndex){ selectedIndex=liveIdx; updateHighlight(); }
-  }, {passive: false});
-
+  },{passive:false});
+  container.addEventListener('pointermove',e=>{
+    if(sy===null)return;
+    const now=Date.now(),dt=Math.max(1,now-lt);
+    vel=(e.clientY-ly)/dt*16;ly=e.clientY;lt=now;
+    curY=clampY(so+(e.clientY-sy));
+    track.style.transform=`translateY(${curY}px)`;
+    const li=Math.max(0,Math.min(Math.round(-curY/ITEM_H),items.length-1));
+    if(li!==selIdx){selIdx=li;updateHighlight();}
+  },{passive:false});
   function snap(){
-    if(startY === null) return;
-    startY = null;
-    const projected = currentY + vel * 4;
-    selectedIndex = Math.max(0, Math.min(Math.round(-projected / ITEM_H), items.length-1));
-    currentY = yForIndex(selectedIndex);
-    applyY(currentY, true);
-    updateHighlight();
+    if(sy===null)return;sy=null;
+    selIdx=Math.max(0,Math.min(Math.round(-(curY+vel*4)/ITEM_H),items.length-1));
+    curY=yFor(selIdx);setY(curY,true);updateHighlight();
     tg?.HapticFeedback?.selectionChanged();
   }
+  container.addEventListener('pointerup',snap);
+  container.addEventListener('pointercancel',snap);
 
-  container.addEventListener('pointerup', snap);
-  container.addEventListener('pointercancel', snap);
-
-  return {
-    getValue: () => items[selectedIndex],
-    setIndex: (idx) => {
-      selectedIndex = Math.max(0, Math.min(idx, items.length-1));
-      currentY = yForIndex(selectedIndex);
-      applyY(currentY, false);
-      updateHighlight();
-    }
-  };
+  return{get:()=>items[selIdx],setIdx(i){selIdx=Math.max(0,Math.min(i,items.length-1));curY=yFor(selIdx);setY(curY,false);updateHighlight();}};
 }
-
-/* ════════════════════════════════════════
-   PICKER STATE
-════════════════════════════════════════ */
-const pickers = {};
 
 function initWeightPicker(){
-  const wl = getWLog();
-  const initW = wl.length ? wl[wl.length-1].weight : 70.0;
-  const initInt = Math.floor(initW);
-  const initDec = Math.round((initW - initInt) * 10);
-
-  const intItems = Array.from({length:171},(_,i)=>({label:String(30+i),value:30+i}));
-  const decItems = Array.from({length:10},(_,i)=>({label:'.'+i,value:i/10}));
-
-  const wrap = document.getElementById('wp-weight-container');
-  wrap.innerHTML = `
-    <div class="wp-col">
-      <div class="wp-label">кг</div>
-      <div id="wpi-int"></div>
-    </div>
-    <div class="wp-sep" style="align-self:center;padding-bottom:8px"> </div>
-    <div class="wp-col">
-      <div class="wp-label">.X</div>
-      <div id="wpi-dec"></div>
-    </div>
-  `;
-
-  pickers.weightInt = buildWheelPicker(document.getElementById('wpi-int'), intItems, initInt);
-  pickers.weightDec = buildWheelPicker(document.getElementById('wpi-dec'), decItems, initDec/10);
-  pickers.weightInt.setIndex(intItems.findIndex(it=>it.value===initInt));
-  pickers.weightDec.setIndex(decItems.findIndex(it=>Math.round(it.value*10)===Math.round(initDec)));
+  const wl=gWL();
+  const iw=wl.length?wl[wl.length-1].weight:70;
+  const ii=Math.floor(iw),id=Math.round((iw-ii)*10);
+  const intItems=Array.from({length:171},(_,i)=>({l:String(30+i),v:30+i}));
+  const decItems=Array.from({length:10},(_,i)=>({l:'.'+i,v:i/10}));
+  const wrap=document.getElementById('wp-weight-wrap');
+  wrap.innerHTML='<div class="wp-col"><div class="wp-lbl">кг</div><div id="wpi-i"></div></div><div class="wp-sep"> </div><div class="wp-col"><div class="wp-lbl">.X</div><div id="wpi-d"></div></div>';
+  PKR.wi=mkPicker(document.getElementById('wpi-i'),intItems,ii);
+  PKR.wd=mkPicker(document.getElementById('wpi-d'),decItems,id/10);
+  PKR.wi.setIdx(intItems.findIndex(x=>x.v===ii));
+  PKR.wd.setIdx(id);
 }
-
 function initSleepPicker(){
-  const sl = getSLog();
-  const initH = sl.length ? sl[sl.length-1].hours : 8;
-  const initHInt = Math.floor(initH);
-  const initHDec = (initH - initHInt) >= 0.5 ? 1 : 0;
-
-  const hItems = Array.from({length:14},(_,i)=>({label:String(1+i),value:1+i}));
-  const dItems = [{label:'.0',value:0},{label:'.5',value:0.5}];
-
-  const wrap = document.getElementById('wp-sleep-container');
-  wrap.innerHTML = `
-    <div class="wp-col">
-      <div class="wp-label">часов</div>
-      <div id="wps-h"></div>
-    </div>
-    <div class="wp-col">
-      <div class="wp-label">.X</div>
-      <div id="wps-d"></div>
-    </div>
-  `;
-
-  pickers.sleepH = buildWheelPicker(document.getElementById('wps-h'), hItems, initHInt);
-  pickers.sleepD = buildWheelPicker(document.getElementById('wps-d'), dItems, initHDec===1?0.5:0);
-  pickers.sleepH.setIndex(hItems.findIndex(it=>it.value===initHInt));
-  pickers.sleepD.setIndex(initHDec);
+  const sl=gSL();
+  const ih=sl.length?sl[sl.length-1].hours:8;
+  const ihh=Math.floor(ih),idd=ih-ihh>=0.5?1:0;
+  const hItems=Array.from({length:14},(_,i)=>({l:String(1+i),v:1+i}));
+  const dItems=[{l:'.0',v:0},{l:'.5',v:.5}];
+  const wrap=document.getElementById('wp-sleep-wrap');
+  wrap.innerHTML='<div class="wp-col"><div class="wp-lbl">часов</div><div id="wps-h"></div></div><div class="wp-col"><div class="wp-lbl">.X</div><div id="wps-d"></div></div>';
+  PKR.sh=mkPicker(document.getElementById('wps-h'),hItems,ihh);
+  PKR.sd=mkPicker(document.getElementById('wps-d'),dItems,idd===1?.5:0);
+  PKR.sh.setIdx(hItems.findIndex(x=>x.v===ihh));
+  PKR.sd.setIdx(idd);
+}
+function initTimePicker(){
+  const hItems=Array.from({length:24},(_,i)=>({l:String(i).padStart(2,'0'),v:i}));
+  const mItems=Array.from({length:12},(_,i)=>({l:String(i*5).padStart(2,'0'),v:i*5}));
+  const wrap=document.getElementById('wp-time-wrap');
+  wrap.innerHTML='<div class="wp-col"><div class="wp-lbl">ч</div><div id="wpt-h"></div></div><div class="wp-sep">:</div><div class="wp-col"><div class="wp-lbl">мин</div><div id="wpt-m"></div></div>';
+  PKR.th=mkPicker(document.getElementById('wpt-h'),hItems,8);
+  PKR.tm=mkPicker(document.getElementById('wpt-m'),mItems,0);
+  PKR.th.setIdx(8);PKR.tm.setIdx(0);
+}
+function initDurPicker(){
+  const dItems=[5,10,15,20,25,30,40,45,60,75,90,120].map(v=>({l:v+' мин',v}));
+  const wrap=document.getElementById('wp-dur-wrap');
+  wrap.innerHTML='<div class="wp-col" style="width:100%"><div class="wp-lbl">длительность</div><div id="wpt-dur" style="width:100%"></div></div>';
+  PKR.dur=mkPicker(document.getElementById('wpt-dur'),dItems,30);
+  PKR.dur.setIdx(5);
 }
 
-function initTimePicker(initialTime){
-  const [hh, mm] = (initialTime || '08:00').split(':').map(Number);
-  const hItems = Array.from({length:24},(_,i)=>({label:String(i).padStart(2,'0'),value:i}));
-  const mItems = Array.from({length:12},(_,i)=>({label:String(i*5).padStart(2,'0'),value:i*5}));
-
-  const wrap = document.getElementById('wp-time-container');
-  wrap.innerHTML = `
-    <div class="wp-col">
-      <div class="wp-label">часы</div>
-      <div id="wpt-h"></div>
-    </div>
-    <div class="wp-sep">:</div>
-    <div class="wp-col">
-      <div class="wp-label">минуты</div>
-      <div id="wpt-m"></div>
-    </div>
-  `;
-
-  pickers.timeH = buildWheelPicker(document.getElementById('wpt-h'), hItems, hh);
-  pickers.timeM = buildWheelPicker(document.getElementById('wpt-m'), mItems, Math.round(mm/5)*5);
-  pickers.timeH.setIndex(hh);
-  pickers.timeM.setIndex(Math.round(mm/5));
-}
-
-function initDurPicker(initialDur){
-  const dur = initialDur || 30;
-  const dItems = [5,10,15,20,25,30,40,45,60,75,90,120].map(v=>({label:v+' мин',value:v}));
-  const wrap = document.getElementById('wp-dur-container');
-  wrap.innerHTML = `
-    <div class="wp-col">
-      <div class="wp-label">длительность</div>
-      <div id="wpt-dur"></div>
-    </div>
-  `;
-  pickers.dur = buildWheelPicker(document.getElementById('wpt-dur'), dItems, dur, 'wide');
-  const idx = dItems.findIndex(it=>it.value===dur);
-  pickers.dur.setIndex(idx>=0?idx:5);
-}
-
-/* ════════════════════════════════════════
-   HELPERS
-════════════════════════════════════════ */
-const $ = id => document.getElementById(id);
-const t = (id,v) => { const e=$(id); if(e) e.textContent=v; };
-const h = (id,v) => { const e=$(id); if(e) e.innerHTML=v; };
-
-function daysToSummer(){
-  const n=new Date(),y=n.getMonth()>=5?n.getFullYear()+1:n.getFullYear();
-  return Math.ceil((new Date(y,5,1)-n)/86400000);
-}
-function plurD(n){const a=Math.abs(n)%100;if(a>=11&&a<=19)return'дней';if(a%10===1)return'день';if(a%10>=2&&a%10<=4)return'дня';return'дней';}
-function fmtDate(s){
-  if(!s)return'—'; try{const d=new Date(s+'T00:00:00');const m=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];return d.getDate()+' '+m[d.getMonth()];}catch{return s;}
-}
-function fmtDateMD(s){try{const d=new Date(s+'T00:00:00');return(d.getMonth()+1)+'/'+(d.getDate());}catch{return'';}}
+/* ════ HELPERS ════ */
+const $=id=>document.getElementById(id);
+const T=(id,v)=>{const e=$(id);if(e)e.textContent=v;};
+const H=(id,v)=>{const e=$(id);if(e)e.innerHTML=v;};
+function dts(){const n=new Date(),y=n.getMonth()>=5?n.getFullYear()+1:n.getFullYear();return Math.ceil((new Date(y,5,1)-n)/86400000);}
+function pD(n){const a=Math.abs(n)%100;if(a>=11&&a<=19)return'дней';if(a%10===1)return'день';if(a%10>=2&&a%10<=4)return'дня';return'дней';}
+function fmtD(s){if(!s)return'—';try{const d=new Date(s+'T00:00:00');const m=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];return d.getDate()+' '+m[d.getMonth()];}catch{return s;}}
+function fmtMD(s){try{const d=new Date(s+'T00:00:00');return(d.getMonth()+1)+'/'+(d.getDate());}catch{return'';}}
 function qIco(q){return['','😫','😴','😑','🙂','🌟'][q]||'😑';}
-function totalCal(){return Object.values(getCD()).reduce((a,b)=>a+b,0);}
 
-const ACT_ICO={run:'🏃',walk:'🚶',bike:'🚴',gym:'💪',yoga:'🧘',swim:'🏊',other:'☀️'};
+const ACT_ICO={run:'🏃',walk:'🚶',bike:'🚴',gym:'💪',yoga:'🧘',swim:'🏊',other:'✨'};
 const ACT_COL={run:'#FF6B35',walk:'#52C177',bike:'#4EAEE5',gym:'#E91E63',yoga:'#8B7FD4',swim:'#00BCD4',other:'#FFAB40'};
 
-/* ════════════════════════════════════════
-   ACTIONS
-════════════════════════════════════════ */
+/* ════ ACTIONS ════ */
 async function addW(ml){
-  _cache.water.total=(_cache.water.total||0)+ml;
-  _cache.water.entries=[...(_cache.water.entries||[]),ml];
-  renderTrack('water'); renderHome();
-  toast(`+${ml} мл 💧`);
+  C.water.total=(C.water.total||0)+ml;
+  C.water.entries=[...(C.water.entries||[]),ml];
+  renderTrack('water');renderHome();
+  toast('+'+ml+' мл');
   tg?.HapticFeedback?.impactOccurred('light');
   await apiPost('/api/water',{amount:ml});
   await reload();
 }
-
 async function undoW(){
-  if(!_cache.water.entries?.length){toast('нечего отменять');return;}
-  const last=_cache.water.entries.pop();
-  _cache.water.total=Math.max(0,(_cache.water.total||0)-last);
-  renderTrack('water'); renderHome();
-  toast(`↩ −${last} мл`);
-  await apiPost('/api/water/undo',{});
-  await reload();
+  if(!C.water.entries?.length){toast('Нечего отменять');return;}
+  const last=C.water.entries.pop();
+  C.water.total=Math.max(0,(C.water.total||0)-last);
+  renderTrack('water');renderHome();toast('Отменено −'+last+' мл');
+  await apiPost('/api/water/undo',{});await reload();
 }
-
 async function completeAct(id){
-  const a=getActs().find(x=>x.id===id);
-  if(!a)return;
+  const a=gActs().find(x=>x.id===id);if(!a)return;
   const ns=!a.completed;
-  _cache.acts_today=_cache.acts_today.map(x=>x.id===id?{...x,completed:ns?1:0}:x);
-  if(ns&&timerSt.id===id)cancelTimer();
+  C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:ns?1:0}:x);
   renderPlan();renderHome();
-  toast(ns?'✅ выполнено!':'↩ отменено');
+  toast(ns?'Выполнено':'Отменено');
   tg?.HapticFeedback?.notificationOccurred(ns?'success':'warning');
   await apiPost(ns?'/api/activity/complete':'/api/activity/uncomplete',{act_id:id});
   await reload();
 }
-
 function toggleSett(key){
-  const ss=getSetts();
-  const newVal=!ss[key];
+  const ss=gSS();const nv=!ss[key];
   const fm={w:'show_weight',water:'show_water',cal:'show_calories',sleep:'show_sleep'};
-  if(fm[key]) _cache.settings[fm[key]]=newVal?1:0;
-  const tog=$('tog-'+key);
-  if(tog){tog.classList.toggle('on',newVal);tog.classList.toggle('off',!newVal);}
-  toast(newVal?'👁 отображается':'🙈 скрыто');
-  apiPost('/api/settings',{[fm[key]]:newVal?1:0});
+  if(fm[key])C.settings[fm[key]]=nv?1:0;
+  const tog=$('tog-'+key);if(tog){tog.classList.toggle('on',nv);tog.classList.toggle('off',!nv);}
+  toast(nv?'Показывается':'Скрыто');
+  apiPost('/api/settings',{[fm[key]]:nv?1:0});
 }
 
-/* ════════════════════════════════════════
-   TIMER
-════════════════════════════════════════ */
-const timerSt={id:null,name:null,start:null,dur:0,iv:null};
-function startTimer(id,name,dur){
-  if(timerSt.iv)clearInterval(timerSt.iv);
-  Object.assign(timerSt,{id,name,dur,start:Date.now()});
-  t('tm-name',name); t('timer-plan-s',dur+' мин');
-  $('tm-idle').style.display='none'; $('tm-active').style.display='';
-  timerSt.iv=setInterval(tickTimer,1000); tickTimer();
-  toast('▶️ таймер запущен');
-  tg?.HapticFeedback?.impactOccurred('medium');
-}
-function tickTimer(){
-  const el=$('timer-num'); if(!el)return;
-  const sec=Math.floor((Date.now()-timerSt.start)/1000);
-  el.textContent=String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0');
-  const ring=$('timer-ring-fill');
-  if(ring){const pct=Math.min(1,sec/(timerSt.dur*60));ring.setAttribute('stroke-dashoffset',314.2*(1-pct));ring.style.stroke=pct>=1?'var(--green)':'var(--sun)';}
-}
-function finishTimer(){if(timerSt.id!==null)completeAct(timerSt.id);cancelTimer();toast('🎉 тренировка завершена!');}
-function cancelTimer(){if(timerSt.iv)clearInterval(timerSt.iv);timerSt.id=null;$('tm-idle').style.display='';$('tm-active').style.display='none';}
-
-/* ════════════════════════════════════════
-   SHEETS
-════════════════════════════════════════ */
-let _currentSheet=null;
 let _sleepQ=3,_mealType='breakfast',_actType='run',_gender='male';
-
-function openSheet(id){
-  _currentSheet=id;
-  const ov=$('overlay'),sh=$(id);
-  if(ov)ov.classList.add('open');
-  if(sh)sh.classList.add('open');
-  // Init pickers
-  if(id==='sheet-weight') setTimeout(()=>initWeightPicker(),50);
-  if(id==='sheet-sleep') setTimeout(()=>initSleepPicker(),50);
-  if(id==='sheet-act') setTimeout(()=>{initTimePicker('08:00');initDurPicker(30);},50);
-  tg?.HapticFeedback?.impactOccurred('light');
-}
-
-function closeSheet(){
-  const ov=$('overlay'),sh=_currentSheet?$(_currentSheet):null;
-  if(ov)ov.classList.remove('open');
-  if(sh)sh.classList.remove('open');
-  _currentSheet=null;
-}
-
-function setSleepQ(q){
-  _sleepQ=q;
-  document.querySelectorAll('#seg-sleep-q .sheet-seg-btn').forEach(b=>b.classList.toggle('on',+b.dataset.q===q));
-}
-function setMeal(m){
-  _mealType=m;
-  document.querySelectorAll('#seg-meal .sheet-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
-}
-function setGender(g){
-  _gender=g;
-  document.querySelectorAll('#seg-gender .sheet-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.g===g));
-}
-function setActType(at){
-  _actType=at;
-  document.querySelectorAll('#seg-atype .sheet-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.t===at));
-}
+function setSleepQ(q){_sleepQ=q;document.querySelectorAll('#seg-sleepq .seg-btn').forEach(b=>b.classList.toggle('on',+b.dataset.q===q));}
+function setMeal(m){_mealType=m;document.querySelectorAll('#seg-meal .seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.m===m));}
+function setGender(g){_gender=g;document.querySelectorAll('#seg-gender .seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.g===g));}
+function setActType(at){_actType=at;document.querySelectorAll('#seg-atype .seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.t===at));}
 
 async function submitWeight(){
-  const intV = pickers.weightInt?.getValue();
-  const decV = pickers.weightDec?.getValue();
-  const v = intV && decV ? intV.value + decV.value : null;
-  if(!v||v<30||v>300){toast('⚠️ выбери вес');return;}
-  closeSheet();
-  _cache.weight_log=[...(_cache.weight_log||[]),{weight:v,logged_at:TODAY}];
-  if(!_cache.user.start_weight)_cache.user.start_weight=v;
+  const iv=PKR.wi?.get(),dv=PKR.wd?.get();
+  const v=iv&&dv!=null?iv.v+dv.v:null;
+  if(!v||v<30||v>300){toast('Выбери вес');return;}
+  closeScr();
+  C.weight_log=[...(C.weight_log||[]),{weight:v,logged_at:TODAY}];
+  if(!C.user.start_weight)C.user.start_weight=v;
   renderProgress();renderHome();
-  toast(`⚖️ вес ${v.toFixed(1)} кг записан!`);
+  toast('Вес '+v.toFixed(1)+' кг сохранён');
   tg?.HapticFeedback?.notificationOccurred('success');
-  await apiPost('/api/weight',{weight:v});
-  await reload();
+  await apiPost('/api/weight',{weight:v});await reload();
 }
-
 async function submitSleep(){
-  const hV = pickers.sleepH?.getValue();
-  const dV = pickers.sleepD?.getValue();
-  const hrs = hV && dV !== undefined ? hV.value + (dV?.value || 0) : null;
-  if(!hrs||hrs<0.5||hrs>20){toast('⚠️ выбери время сна');return;}
-  closeSheet();
-  _cache.sleep_log=[...(_cache.sleep_log||[]),{hours:hrs,quality:_sleepQ,logged_at:TODAY}];
+  const hv=PKR.sh?.get(),dv=PKR.sd?.get();
+  const hrs=hv&&dv!=null?hv.v+(dv?.v||0):null;
+  if(!hrs||hrs<.5||hrs>20){toast('Выбери часы сна');return;}
+  closeScr();
+  C.sleep_log=[...(C.sleep_log||[]),{hours:hrs,quality:_sleepQ,logged_at:TODAY}];
   renderSleep();renderHome();
-  toast(`🌙 сон ${hrs} ч записан!`);
+  toast('Сон '+hrs+' ч сохранён');
   tg?.HapticFeedback?.notificationOccurred('success');
-  await apiPost('/api/sleep',{hours:hrs,quality:_sleepQ});
-  await reload();
+  await apiPost('/api/sleep',{hours:hrs,quality:_sleepQ});await reload();
 }
-
 async function submitCal(){
   const cal=parseInt($('inp-cal')?.value);
   const desc=$('inp-cal-desc')?.value||'';
-  if(!cal||cal<1){toast('⚠️ введи калории');return;}
-  closeSheet();
-  if(!_cache.calories)_cache.calories={};
-  _cache.calories[_mealType]=(_cache.calories[_mealType]||0)+cal;
+  if(!cal||cal<1){toast('Введи калории');return;}
+  closeScr();
+  if(!C.calories)C.calories={};
+  C.calories[_mealType]=(C.calories[_mealType]||0)+cal;
   renderTrack('cal');renderHome();
-  toast(`🍋 +${cal} ккал добавлено!`);
+  toast('+'+cal+' ккал');
   tg?.HapticFeedback?.notificationOccurred('success');
-  await apiPost('/api/calories',{amount:cal,meal_type:_mealType,description:desc});
-  await reload();
+  await apiPost('/api/calories',{amount:cal,meal_type:_mealType,description:desc});await reload();
 }
-
 async function submitProfile(){
   const name=$('inp-pname')?.value?.trim();
   const height=parseInt($('inp-height')?.value);
   const age=parseInt($('inp-age')?.value);
-  if(!name){toast('⚠️ введи имя');return;}
-  closeSubPage();
-  _cache.user={..._cache.user,name,height:height||0,age:age||0,gender:_gender};
-  renderProfile();renderHome();
-  toast('👤 профиль обновлён!');
+  if(!name){toast('Введи имя');return;}
+  closeScr();
+  C.user={...C.user,name,height:height||0,age:age||0,gender:_gender};
+  renderProfile();renderHome();toast('Профиль обновлён');
   tg?.HapticFeedback?.notificationOccurred('success');
-  await apiPost('/api/profile',{name,height:height||0,age:age||0,gender:_gender});
-  await reload();
+  await apiPost('/api/profile',{name,height:height||0,age:age||0,gender:_gender});await reload();
 }
-
 async function submitGoals(){
   const gw=parseFloat($('inp-gw')?.value)||0;
   const gwat=parseInt($('inp-gwat')?.value)||2000;
   const gcal=parseInt($('inp-gcal')?.value)||2000;
-  closeSubPage();
-  _cache.user={..._cache.user,goal_weight:gw,water_goal:gwat,cal_goal:gcal};
-  renderProfile();renderHome();
-  toast('🎯 цели обновлены!');
+  closeScr();
+  C.user={...C.user,goal_weight:gw,water_goal:gwat,cal_goal:gcal};
+  renderProfile();renderHome();toast('Цели обновлены');
   tg?.HapticFeedback?.notificationOccurred('success');
-  await apiPost('/api/goals',{goal_weight:gw,water_goal:gwat,cal_goal:gcal});
-  await reload();
+  await apiPost('/api/goals',{goal_weight:gw,water_goal:gwat,cal_goal:gcal});await reload();
 }
-
 async function submitAct(){
   const name=$('inp-aname')?.value?.trim();
-  const hV = pickers.timeH?.getValue();
-  const mV = pickers.timeM?.getValue();
-  const dV = pickers.dur?.getValue();
-  const time = hV && mV ? String(hV.value).padStart(2,'0')+':'+String(mV.value).padStart(2,'0') : '08:00';
-  const dur = dV ? dV.value : 30;
-  if(!name){toast('⚠️ введи название');return;}
-  closeSheet();
-  const fakeId=Date.now();
-  _cache.acts_today=[...(_cache.acts_today||[]),{id:fakeId,name,type:_actType,scheduled_at:`${TODAY}T${time}:00`,duration:dur,completed:0,days_of_week:''}];
-  renderPlan();renderHome();
-  toast(`📋 ${name} добавлено!`);
+  const hv=PKR.th?.get(),mv=PKR.tm?.get(),dv=PKR.dur?.get();
+  const time=hv&&mv?String(hv.v).padStart(2,'0')+':'+String(mv.v).padStart(2,'0'):'08:00';
+  const dur=dv?dv.v:30;
+  if(!name){toast('Введи название');return;}
+  closeScr();
+  const fid=Date.now();
+  C.acts_today=[...(C.acts_today||[]),{id:fid,name,type:_actType,scheduled_at:`${TODAY}T${time}:00`,duration:dur,completed:0}];
+  renderPlan();renderHome();toast(name+' добавлено');
   tg?.HapticFeedback?.notificationOccurred('success');
-  await apiPost('/api/activity/create',{name,type:_actType,time,duration:dur});
-  await reload();
+  await apiPost('/api/activity/create',{name,type:_actType,time,duration:dur});await reload();
 }
-
 function confirmReset(){
-  if(!confirm('Сбросить все данные? Это нельзя отменить.'))return;
+  if(!confirm('Сбросить все данные?'))return;
   localStorage.clear();
-  _cache={user:{name:'…',water_goal:2000,cal_goal:2000},settings:{show_weight:1,show_water:1,show_calories:1,show_sleep:1},water:{total:0,entries:[],streak:0},calories:{},weight_log:[],sleep_log:[],acts_today:[],products:[]};
-  renderHome();renderProfile();
-  toast('🗑 данные сброшены');
+  C={user:{name:'…',water_goal:2000,cal_goal:2000},settings:{show_weight:1,show_water:1,show_calories:1,show_sleep:1},water:{total:0,entries:[],streak:0},calories:{},weight_log:[],sleep_log:[],acts_today:[],products:[]};
+  renderHome();renderProfile();toast('Данные сброшены');
 }
 
-/* ════════════════════════════════════════
-   COUNTDOWN HELPERS
-════════════════════════════════════════ */
-function getActivityStatus(a){
-  const now=new Date();
-  const [hh,mm]=(a.time||'00:00').split(':').map(Number);
-  const start=new Date();start.setHours(hh,mm,0,0);
-  const end=new Date(start.getTime()+(a.duration||30)*60000);
-  if(a.completed)return{state:'done',label:'✓ выполнено'};
-  if(now>end)return{state:'late',label:'просрочено'};
-  if(now>=start&&now<=end){
-    const remain=Math.round((end-now)/60000);
-    return{state:'active',label:`▶ идёт · осталось ${remain} мин`,progress:(now-start)/(end-start)};
-  }
-  const diff=Math.round((start-now)/60000);
-  if(diff<=30)return{state:'soon',label:`⏰ через ${diff} мин`};
-  return{state:'later',label:`в ${a.time}`};
+/* ════ ACTIVITY STATUS ════ */
+function actStatus(a){
+  const now=new Date(),[hh,mm]=(a.time||'00:00').split(':').map(Number);
+  const st=new Date();st.setHours(hh,mm,0,0);
+  const en=new Date(st.getTime()+(a.duration||30)*60000);
+  if(a.completed)return{s:'done',l:'Выполнено'};
+  if(now>en)return{s:'late',l:'Просрочено'};
+  if(now>=st&&now<=en){const r=Math.round((en-now)/60000);return{s:'now',l:'Идёт · ещё '+r+' мин',p:(now-st)/(en-st)};}
+  const df=Math.round((st-now)/60000);
+  if(df<=30)return{s:'soon',l:'Через '+df+' мин'};
+  return{s:'later',l:'В '+a.time};
 }
-function formatTimeRange(a){
-  const [hh,mm]=(a.time||'00:00').split(':').map(Number);
-  const endH=hh+Math.floor((mm+(a.duration||30))/60);
-  const endM=(mm+(a.duration||30))%60;
-  return`${a.time} – ${String(endH%24).padStart(2,'0')}:${String(endM).padStart(2,'0')}`;
+function fmtRange(a){
+  const[hh,mm]=(a.time||'00:00').split(':').map(Number);
+  const eh=hh+Math.floor((mm+(a.duration||30))/60),em=(mm+(a.duration||30))%60;
+  return`${a.time} – ${String(eh%24).padStart(2,'0')}:${String(em).padStart(2,'0')}`;
 }
 
-/* ════════════════════════════════════════
-   TOAST
-════════════════════════════════════════ */
-let toastTm;
+/* ════ TOAST ════ */
+let _tt;
 function toast(msg){
   const el=$('toast');el.textContent=msg;el.classList.add('show');
-  clearTimeout(toastTm);toastTm=setTimeout(()=>el.classList.remove('show'),2200);
+  clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),2000);
 }
 
-/* ════════════════════════════════════════
-   CHART
-════════════════════════════════════════ */
+/* ════ CHART (Canvas) ════ */
+let _chartRaf=null;
 function drawChart(data){
-  const svg=$('wchart');if(!svg)return;
-  const W=svg.parentElement?.offsetWidth||270,H=100;
-  svg.setAttribute('width',W);svg.setAttribute('height',H);svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
-  if(data.length<2){svg.innerHTML=`<text x="${W/2}" y="50" text-anchor="middle" fill="var(--hint)" font-size="12" font-family="Nunito" font-weight="700">нет данных</text>`;return;}
-  const ws=data.map(d=>d.weight);
-  const mn=Math.min(...ws)-.6,mx=Math.max(...ws)+.6,rng=mx-mn||1;
-  const pl={l:8,r:8,t:18,b:22};
-  const xs=(W-pl.l-pl.r)/(data.length-1);
-  const yf=w=>pl.t+(1-(w-mn)/rng)*(H-pl.t-pl.b);
-  const pts=data.map((d,i)=>[pl.l+i*xs,yf(d.weight)]);
-  let lp=`M${pts[0][0]},${pts[0][1]}`;
-  for(let i=0;i<pts.length-1;i++){const cx=(pts[i][0]+pts[i+1][0])/2;lp+=` C${cx},${pts[i][1]} ${cx},${pts[i+1][1]} ${pts[i+1][0]},${pts[i+1][1]}`;}
-  const ap=lp+` L${pts[pts.length-1][0]},${H} L${pts[0][0]},${H} Z`;
-  svg.innerHTML=`<defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--sun)" stop-opacity=".2"/><stop offset="100%" stop-color="var(--sun)" stop-opacity="0"/></linearGradient></defs>
-  <path d="${ap}" fill="url(#cg)"/>
-  <path d="${lp}" fill="none" stroke="var(--sun)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-  ${pts.map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="var(--sun)" stroke="var(--bg2)" stroke-width="2"/>
-  <text x="${p[0]}" y="${H-3}" text-anchor="middle" font-size="9" fill="var(--hint)" font-family="Nunito" font-weight="700">${fmtDateMD(data[i].logged_at)}</text>
-  <text x="${p[0]}" y="${p[1]-9}" text-anchor="middle" font-size="10" fill="var(--sun)" font-weight="900" font-family="Nunito">${data[i].weight}</text>`).join('')}`;
+  const canvas=$('wchart');if(!canvas)return;
+  cancelAnimationFrame(_chartRaf);
+  _chartRaf=requestAnimationFrame(()=>{
+    const dpr=window.devicePixelRatio||1;
+    const W=canvas.parentElement.offsetWidth||280,H=90;
+    canvas.width=W*dpr;canvas.height=H*dpr;
+    canvas.style.width=W+'px';canvas.style.height=H+'px';
+    const ctx=canvas.getContext('2d');
+    ctx.scale(dpr,dpr);
+    const cs=getComputedStyle(document.documentElement);
+    const sun=cs.getPropertyValue('--sun').trim()||'#FF6B35';
+    const hint=cs.getPropertyValue('--hint').trim()||'#A89F90';
+    const bg2=cs.getPropertyValue('--bg2').trim()||'#fff';
+    ctx.clearRect(0,0,W,H);
+    if(!data||data.length<2){
+      ctx.fillStyle=hint;ctx.font='600 11px Nunito,sans-serif';
+      ctx.textAlign='center';ctx.fillText('нет данных',W/2,H/2);return;
+    }
+    const ws=data.map(d=>d.weight);
+    const mn=Math.min(...ws)-.5,mx=Math.max(...ws)+.5,rng=mx-mn||1;
+    const pl={l:10,r:10,t:18,b:20};
+    const xs=(W-pl.l-pl.r)/(data.length-1);
+    const yf=w=>pl.t+(1-(w-mn)/rng)*(H-pl.t-pl.b);
+    const pts=data.map((d,i)=>[pl.l+i*xs,yf(d.weight)]);
+    // area
+    const grad=ctx.createLinearGradient(0,0,0,H);
+    grad.addColorStop(0,'rgba(255,107,53,.18)');grad.addColorStop(1,'rgba(255,107,53,0)');
+    ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);
+    for(let i=0;i<pts.length-1;i++){const cx=(pts[i][0]+pts[i+1][0])/2;ctx.bezierCurveTo(cx,pts[i][1],cx,pts[i+1][1],pts[i+1][0],pts[i+1][1]);}
+    ctx.lineTo(pts[pts.length-1][0],H);ctx.lineTo(pts[0][0],H);ctx.closePath();
+    ctx.fillStyle=grad;ctx.fill();
+    // line
+    ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);
+    for(let i=0;i<pts.length-1;i++){const cx=(pts[i][0]+pts[i+1][0])/2;ctx.bezierCurveTo(cx,pts[i][1],cx,pts[i+1][1],pts[i+1][0],pts[i+1][1]);}
+    ctx.strokeStyle=sun;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.lineCap='round';ctx.stroke();
+    // dots + labels
+    pts.forEach((p,i)=>{
+      ctx.beginPath();ctx.arc(p[0],p[1],4,0,Math.PI*2);
+      ctx.fillStyle=sun;ctx.fill();
+      ctx.beginPath();ctx.arc(p[0],p[1],2.5,0,Math.PI*2);
+      ctx.fillStyle=bg2;ctx.fill();
+      ctx.fillStyle=sun;ctx.font='700 9px Nunito,sans-serif';ctx.textAlign='center';
+      ctx.fillText(data[i].weight,p[0],p[1]-8);
+      ctx.fillStyle=hint;ctx.font='700 8px Nunito,sans-serif';
+      ctx.fillText(fmtMD(data[i].logged_at),p[0],H-2);
+    });
+  });
 }
 
-/* ════════════════════════════════════════
-   RENDER: HOME
-════════════════════════════════════════ */
+/* ════ RENDER HOME ════ */
 function renderHome(){
-  const u=getUser(),ss=getSetts(),wl=getWLog(),sl=getSLog();
-  const wd=getWD(),cal=getCD(),acts=getActs();
-
-  t('h-name',u.name||'—');
+  const u=gU(),wl=gWL(),sl=gSL(),wd=gWD();
+  T('h-name',u.name||'—');
   const now=new Date();
   const days=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
   const mons=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
-  t('h-date',days[now.getDay()]+', '+now.getDate()+' '+mons[now.getMonth()]);
-  const dsl=daysToSummer();
-  t('h-days',dsl);t('h-dunit',plurD(dsl));t('h-ddays',dsl);
-
+  T('h-date',days[now.getDay()]+', '+now.getDate()+' '+mons[now.getMonth()]);
+  const dsl=dts();T('h-days',dsl);T('h-dunit',pD(dsl));T('h-ddays',dsl);
+  // water arc
   const wt=wd.total||0,wg=u.water_goal||2000,wp=Math.min(1,wt/wg);
-  t('arc-wpct',Math.round(wp*100)+'%');t('arc-wml',wt);t('arc-wgoal',wg);
-  setTimeout(()=>{const arc=$('arc-w');if(arc)arc.setAttribute('stroke-dashoffset',188.5*(1-wp));},80);
-
+  T('arc-wpct',Math.round(wp*100)+'%');T('arc-wml',wt);
+  requestAnimationFrame(()=>{const a=$('arc-w');if(a)a.setAttribute('stroke-dashoffset',175.9*(1-wp));});
+  // cal arc
   const ct=totalCal(),cg=u.cal_goal||2000,cp=Math.min(1,ct/cg);
-  t('arc-cpct',Math.round(cp*100)+'%');t('arc-cval',ct);t('arc-cgoal',cg);
-  setTimeout(()=>{const arc=$('arc-c');if(arc)arc.setAttribute('stroke-dashoffset',238.8*(1-cp));},80);
-
-  const streak=getStreak();
-  const sws=$('h-streak-wrap');
-  if(sws)sws.style.display=streak>=2?'':'none';
-  t('h-sval',streak+' дней подряд');
-
-  if(sl.length>0){
+  T('arc-cpct',Math.round(cp*100)+'%');T('arc-cval',ct);
+  requestAnimationFrame(()=>{const a=$('arc-c');if(a)a.setAttribute('stroke-dashoffset',219.9*(1-cp));});
+  // sleep arc
+  if(sl.length){
     const last=sl[sl.length-1];
-    const sq=$('arc-sq');
-    if(sq){sq.className='sq';sq.style.justifyContent='center';
-      sq.innerHTML=Array.from({length:5},(_,i)=>`<div class="sq-d${i<last.quality?' on':''}"></div>`).join('');}
+    const sqEl=$('arc-sq');
+    if(sqEl)sqEl.innerHTML=Array.from({length:5},(_,i)=>`<div class="sqd${i<last.quality?' on':''}"></div>`).join('');
     const sp=Math.min(1,last.hours/9);
-    setTimeout(()=>{const arc=$('arc-s');if(arc)arc.setAttribute('stroke-dashoffset',188.5*(1-sp));},80);
-    t('arc-sh',last.hours.toFixed(1));
+    requestAnimationFrame(()=>{const a=$('arc-s');if(a)a.setAttribute('stroke-dashoffset',175.9*(1-sp));});
+    T('arc-sh',last.hours.toFixed(1));
   }
-
-  if(wl.length>0){
+  // weight
+  if(wl.length){
     const cw=wl[wl.length-1].weight,sw=u.start_weight||wl[0].weight||cw,gw=u.goal_weight;
-    t('h-wcur',cw.toFixed(1));t('h-wgoal',gw?gw.toFixed(1):'—');
-    const tot=Math.abs(sw-gw||1),lost=sw-cw;
+    T('h-wcur',cw.toFixed(1));T('h-wgoal',gw?gw.toFixed(1):'—');
+    const tot=Math.abs(sw-gw)||1,lost=sw-cw;
     const pct=gw?Math.min(100,Math.max(0,Math.round(lost/tot*100))):0;
-    t('h-wpct',pct+'%');
-    setTimeout(()=>{const b=$('h-wbar');if(b)b.style.width=pct+'%';},80);
+    T('h-wpct',pct+'%');
+    requestAnimationFrame(()=>{const b=$('h-wbar');if(b)b.style.width=pct+'%';});
   }
-
-  const plSec=$('h-plan-sec'),plList=$('h-plan-list');
-  if(plSec&&plList){
-    if(!acts.length){plSec.style.display='none';}
+  // streak
+  const streak=gStreak();
+  const sw=$('h-streak-w');if(sw)sw.style.display=streak>=2?'':'none';
+  T('h-sval',streak+' дней подряд');
+  // plan preview
+  const acts=gActs();
+  const ps=$('h-plan-sec'),pl=$('h-plan-list');
+  if(ps&&pl){
+    if(!acts.length){ps.style.display='none';}
     else{
-      plSec.style.display='';
-      const nowT=new Date();
-      plList.innerHTML=acts.map(a=>{
-        const ico=ACT_ICO[a.type]||'☀️',col=ACT_COL[a.type]||'#FF9800';
-        const done=a.completed;
-        const [hh,mm]=(a.time||'00:00').split(':').map(Number);
+      ps.style.display='';
+      const nt=new Date();
+      pl.innerHTML=acts.map(a=>{
+        const ico=ACT_ICO[a.type]||'✨',col=ACT_COL[a.type]||'#FF9800',done=a.completed;
+        const[hh,mm]=(a.time||'00:00').split(':').map(Number);
         const at=new Date();at.setHours(hh,mm,0,0);
         const et=new Date(at.getTime()+(a.duration||30)*60000);
         const ts=`${a.time}–${String(et.getHours()).padStart(2,'0')}:${String(et.getMinutes()).padStart(2,'0')}`;
-        const late=!done&&nowT>et;
-        const badge=done?`<span class="pill pill-ok">✓</span>`:late?`<span class="pill pill-late">⚠️</span>`:`<span class="pill pill-up">${a.time}</span>`;
-        return`<div class="act-card${done?' done':''}">
-          <div class="act-ico" style="background:${col}18">${done?'✅':ico}</div>
-          <div class="act-info"><div class="act-name">${a.name}</div><div class="act-time">${ts} · ${a.duration} мин</div></div>
-          <div>${badge}</div>
-        </div>`;
+        const late=!done&&nt>et;
+        const badge=done?`<span class="pill p-ok">✓</span>`:late?`<span class="pill p-late">Просрочено</span>`:`<span class="pill p-soon">${a.time}</span>`;
+        return`<div class="ac${done?' done':''}"><div class="ac-ico" style="background:${col}16">${done?'✅':ico}</div><div class="ac-body"><div class="ac-name">${a.name}</div><div class="ac-sub">${ts} · ${a.duration} мин</div></div>${badge}</div>`;
       }).join('');
     }
   }
 }
 
-/* ════════════════════════════════════════
-   RENDER: TRACK
-════════════════════════════════════════ */
+/* ════ RENDER TRACK ════ */
 function renderTrack(tab){
   if(tab==='water')renderWater();
   else if(tab==='cal')renderCal();
   else renderProds();
 }
-
 function renderWater(){
-  const u=getUser(),wd=getWD();
+  const u=gU(),wd=gWD();
   const wt=wd.total||0,wg=u.water_goal||2000,wp=Math.min(100,Math.round(wt/wg*100));
-  t('w-total',wt);t('w-goal',wg);
-  setTimeout(()=>{const b=$('w-bar');if(b)b.style.width=wp+'%';},80);
-  const st=getStreak();
-  h('w-streak',st>=2?`<div style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,107,53,.12);color:var(--sun);padding:5px 14px;border-radius:99px;font-size:12px;font-weight:800;">🔥 ${st} дней подряд</div>`:'');
+  T('w-total',wt);T('w-goal',wg);
+  requestAnimationFrame(()=>{const b=$('w-bar');if(b)b.style.width=wp+'%';});
+  const st=gStreak();
+  H('w-streak',st>=2?`<div style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,107,53,.1);color:var(--sun);padding:4px 12px;border-radius:99px;font-size:11px;font-weight:800">🔥 ${st} дней подряд</div>`:'');
   const entries=wd.entries||[];
-  h('w-entries',entries.length
-    ?[...entries].reverse().slice(0,8).map((e,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(0,0,0,.04)${i===0?';border-bottom:none':''}"><span style="font-size:13px;font-weight:700;color:var(--water)">+${e} мл</span><span style="font-size:12px;color:var(--hint);font-weight:600">стакан ${entries.length-i}</span></div>`).join('')
-    :'<div style="text-align:center;padding:14px;color:var(--hint);font-size:13px;font-weight:600">ещё ничего не записано</div>');
+  H('w-entries',entries.length?[...entries].reverse().slice(0,8).map((e,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(0,0,0,.04)${i===0?';border-bottom:none':''}"><span style="font-size:12px;font-weight:700;color:var(--water)">+${e} мл</span><span class="t5" style="font-size:11px">стакан ${entries.length-i}</span></div>`).join(''):'<div style="text-align:center;padding:12px;color:var(--hint);font-size:12px;font-weight:600">Пока ничего не записано</div>');
 }
-
 function renderCal(){
-  const u=getUser(),cd=getCD();
+  const u=gU(),cd=gCD();
   const ct=totalCal(),cg=u.cal_goal||2000,cp=Math.min(100,Math.round(ct/cg*100));
-  t('c-total',ct);t('c-goal',cg);
-  setTimeout(()=>{const b=$('c-bar');if(b)b.style.width=cp+'%';},80);
-  const MEALS=[
-    {k:'breakfast',i:'🌅',n:'Завтрак',col:'#FF9800'},
-    {k:'lunch',i:'☀️',n:'Обед',col:'#FF6B35'},
-    {k:'dinner',i:'🌙',n:'Ужин',col:'#8B7FD4'},
-    {k:'snack',i:'🍑',n:'Перекус',col:'#52C177'},
-    {k:'other',i:'🌿',n:'Другое',col:'#607D8B'},
-  ];
-  h('c-meals',MEALS.map(m=>`<div class="meal-row">
-    <div class="meal-ico" style="background:${m.col}18;color:${m.col}">${m.i}</div>
-    <div style="flex:1"><div class="meal-name">${m.n}</div>${!cd[m.k]?`<div style="font-size:11px;color:var(--hint);font-weight:600">не записано</div>`:''}</div>
-    <div class="meal-kcal" style="${cd[m.k]?'color:var(--cal)':'color:var(--hint)'}">${cd[m.k]||'—'} ${cd[m.k]?'ккал':''}</div>
-  </div>`).join(''));
+  T('c-total',ct);T('c-goal',cg);
+  requestAnimationFrame(()=>{const b=$('c-bar');if(b)b.style.width=cp+'%';});
+  const MEALS=[{k:'breakfast',i:'🌅',n:'Завтрак',col:'#FF9800'},{k:'lunch',i:'☀️',n:'Обед',col:'#FF6B35'},{k:'dinner',i:'🌙',n:'Ужин',col:'#8B7FD4'},{k:'snack',i:'🍑',n:'Перекус',col:'#52C177'},{k:'other',i:'🌿',n:'Другое',col:'#607D8B'}];
+  H('c-meals',MEALS.map(m=>`<div class="mr"><div class="mr-ico" style="background:${m.col}15;color:${m.col}">${m.i}</div><div style="flex:1"><div class="mr-name">${m.n}</div>${!cd[m.k]?`<div class="t5" style="font-size:10px">не записано</div>`:''}</div><div class="mr-kcal" style="${cd[m.k]?'color:var(--cal)':'color:var(--hint)'}">${cd[m.k]||'—'} ${cd[m.k]?'ккал':''}</div></div>`).join(''));
 }
-
 function renderProds(){
-  h('prod-list',getProds().slice(0,10).map(p=>`<div class="prod-row"><div><div class="prod-name">${p.name}</div><div class="prod-meta">Б${p.protein} · Ж${p.fat} · У${p.carbs}</div></div><div class="prod-kcal">${p.calories}</div></div>`).join(''));
+  H('prod-list',gProds().slice(0,10).map(p=>`<div class="pr"><div><div class="pr-name">${p.name}</div><div class="pr-meta">Б${p.protein} · Ж${p.fat} · У${p.carbs}</div></div><div class="pr-kcal">${p.calories}</div></div>`).join(''));
 }
 
-/* ════════════════════════════════════════
-   RENDER: PLAN
-════════════════════════════════════════ */
+/* ════ RENDER PLAN ════ */
 function renderPlan(){
-  const acts=getActs();
+  const acts=gActs();
   const now=new Date();
   const mons=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
-  t('pl-date','сегодня · '+now.getDate()+' '+mons[now.getMonth()]);
-  const doneCnt=acts.filter(a=>a.completed).length,total=acts.length;
-  t('pl-cnt',total?`${doneCnt}/${total}`:'0/0');
-  setTimeout(()=>{const ring=$('pl-ring');if(ring)ring.setAttribute('stroke-dashoffset',138.2*(1-(total?doneCnt/total:0)));},80);
+  T('pl-date','сегодня · '+now.getDate()+' '+mons[now.getMonth()]);
+  const done=acts.filter(a=>a.completed).length,total=acts.length;
+  T('pl-cnt',total?`${done}/${total}`:'0/0');
+  requestAnimationFrame(()=>{const r=$('pl-ring');if(r)r.setAttribute('stroke-dashoffset',125.7*(1-(total?done/total:0)));});
   const empty=$('pl-empty'),list=$('pl-list');
   if(!acts.length){if(empty)empty.style.display='';if(list){list.innerHTML='';list.style.display='none';}return;}
   if(empty)empty.style.display='none';if(list)list.style.display='';
   list.innerHTML=acts.map(a=>{
-    const ico=ACT_ICO[a.type]||'☀️',col=ACT_COL[a.type]||'#FF9800';
-    const st=getActivityStatus(a);
-    const timeRange=formatTimeRange(a);
-    const isTiming=timerSt.id===a.id;
-    const pillClass={done:'pill-done-g',active:'pill-now-active',soon:'pill-soon',late:'pill-late2',later:'pill-later'}[st.state]||'pill-later';
-    const progressPct=st.state==='active'?Math.round((st.progress||0)*100):st.state==='done'?100:0;
-    const barColor=st.state==='done'?'var(--green)':st.state==='active'?'var(--water)':'rgba(255,107,53,.3)';
-    const showBar=['done','active','soon'].includes(st.state);
-    const barWidth=st.state==='soon'?80:progressPct;
+    const ico=ACT_ICO[a.type]||'✨',col=ACT_COL[a.type]||'#FF9800';
+    const st=actStatus(a);
+    const pc={done:'p-ok',now:'p-now',soon:'p-soon',late:'p-late',later:'p-later'}[st.s]||'p-later';
+    const pct=st.s==='now'?Math.round((st.p||0)*100):st.s==='done'?100:0;
+    const bar=['done','now','soon'].includes(st.s);
     const en=a.name.replace(/'/g,"\\'");
-    return`<div class="plan-card ${a.completed?'done-card':''}">
-      <div class="plan-card-top">
-        <div class="plan-card-ico" style="background:${col}18">${a.completed?'✅':ico}</div>
-        <div class="plan-card-body">
-          <div class="plan-card-name ${a.completed?'done-text':''}">${a.name}</div>
-          <div class="plan-card-time">${timeRange} · ${a.duration} мин${isTiming?' · <span style="color:var(--sun)">⏱</span>':''}</div>
-          <span class="countdown-pill ${pillClass}">${st.label}</span>
-        </div>
-        <div class="plan-card-actions">
-          <button class="btn btn-ghost" style="padding:7px 10px;font-size:12px;border-radius:9px" onclick="completeAct(${a.id})">${a.completed?'↩':'✓'}</button>
-          ${!a.completed?`<button class="btn btn-primary" style="padding:7px 10px;font-size:12px;border-radius:9px;width:auto" onclick="startTimer(${a.id},'${en}',${a.duration})">▶</button>`:''}
-        </div>
+    return`<div class="ac${a.completed?' done':''}">
+      <div class="ac-ico" style="background:${col}16">${a.completed?'✅':ico}</div>
+      <div class="ac-body">
+        <div class="ac-name${a.completed?' done-text':''}">${a.name}</div>
+        <div class="ac-sub">${fmtRange(a)} · ${a.duration} мин</div>
+        <span class="pill ${pc}">${st.l}</span>
+        ${bar?`<div class="ac-bar"><div class="ac-barf" style="width:${st.s==='soon'?80:pct}%;background:${st.s==='done'?'var(--green)':st.s==='now'?'var(--water)':'rgba(255,107,53,.35)'}"></div></div>`:''}
       </div>
-      ${showBar?`<div class="plan-status-bar"><div class="plan-status-fill" style="width:${barWidth}%;background:${barColor}"></div></div>`:''}
+      <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
+        <button class="btn btn-g" style="padding:6px 10px;font-size:12px;border-radius:9px" onclick="completeAct(${a.id})">${a.completed?'↩':'✓'}</button>
+      </div>
     </div>`;
   }).join('');
 }
 setInterval(()=>{if(curTab==='plan')renderPlan();},30000);
 
-/* ════════════════════════════════════════
-   RENDER: SLEEP
-════════════════════════════════════════ */
+/* ════ RENDER SLEEP ════ */
 function renderSleep(){
-  const sl=getSLog();
-  if(sl.length){
-    const last=sl[sl.length-1];
-    t('sl-h',last.hours.toFixed(1));
-    t('sl-qico',qIco(last.quality));
-    h('sl-dots',Array.from({length:5},(_,i)=>`<div class="sq-d${i<last.quality?' on':''}"></div>`).join(''));
-  }else{t('sl-h','—');t('sl-qico','—');h('sl-dots','');}
-  const last7=sl.slice(-7).reverse();
-  h('sl-hist',last7.length?last7.map(e=>`<div class="hrow">
-    <div class="hrow-date">${fmtDate(e.logged_at)}</div>
-    <div style="display:flex;align-items:center;gap:8px;flex:1">
-      <div class="hrow-val">${e.hours.toFixed(1)} ч</div>
-      <div class="sq">${Array.from({length:5},(_,i)=>`<div class="sq-d${i<e.quality?' on':''}"></div>`).join('')}</div>
-    </div>
-    <div style="font-size:18px">${qIco(e.quality)}</div>
-  </div>`).join('')
-  :'<div style="text-align:center;padding:18px;color:var(--hint);font-size:13px;font-weight:600">нет записей</div>');
-  if(last7.length){
-    const ah=+(last7.reduce((a,b)=>a+b.hours,0)/last7.length).toFixed(1);
-    const aq=+(last7.reduce((a,b)=>a+(b.quality||3),0)/last7.length).toFixed(1);
-    t('sl-avg-h',ah);t('sl-avg-q',qIco(Math.round(aq))+' '+aq);
+  const sl=gSL();
+  if(sl.length){const last=sl[sl.length-1];T('sl-h',last.hours.toFixed(1));T('sl-qico',qIco(last.quality));H('sl-dots',Array.from({length:5},(_,i)=>`<div class="sqd${i<last.quality?' on':''}"></div>`).join(''));}
+  else{T('sl-h','—');T('sl-qico','—');H('sl-dots','');}
+  const l7=sl.slice(-7).reverse();
+  H('sl-hist',l7.length?l7.map(e=>`<div class="hr"><div class="hr-d">${fmtD(e.logged_at)}</div><div style="display:flex;align-items:center;gap:7px;flex:1"><div class="hr-v">${e.hours.toFixed(1)} ч</div><div class="sq">${Array.from({length:5},(_,i)=>`<div class="sqd${i<e.quality?' on':''}"></div>`).join('')}</div></div><div style="font-size:16px">${qIco(e.quality)}</div></div>`).join(''):'<div style="text-align:center;padding:14px;color:var(--hint);font-size:12px;font-weight:600">Нет записей</div>');
+  if(l7.length){
+    const ah=+(l7.reduce((a,b)=>a+b.hours,0)/l7.length).toFixed(1);
+    const aq=+(l7.reduce((a,b)=>a+(b.quality||3),0)/l7.length).toFixed(1);
+    T('sl-avg-h',ah);T('sl-avg-q',qIco(Math.round(aq))+' '+aq);
   }
 }
 
-/* ════════════════════════════════════════
-   RENDER: PROGRESS
-════════════════════════════════════════ */
+/* ════ RENDER PROGRESS ════ */
 function renderProgress(){
-  const u=getUser(),wl=getWLog(),sl=getSLog(),wd=getWD();
-  const acts=getActs();
+  const u=gU(),wl=gWL(),sl=gSL(),wd=gWD(),acts=gActs();
   if(wl.length){
     const cw=wl[wl.length-1].weight,sw=u.start_weight||wl[0].weight||cw,gw=u.goal_weight;
-    t('pr-wcur',cw.toFixed(1));t('pr-wgoal',gw?gw.toFixed(1)+' кг':'—');
-    t('pr-wgoal2',gw?gw.toFixed(1):'—');t('pr-wstart',sw.toFixed(1));
+    T('pr-wcur',cw.toFixed(1));T('pr-wgoal',gw?gw.toFixed(1)+' кг':'—');
+    T('pr-wgoal2',gw?gw.toFixed(1):'—');T('pr-wstart',sw.toFixed(1));
     const tot=Math.abs(sw-(gw||sw))||1,lost=sw-cw;
     const pct=gw?Math.min(100,Math.max(0,Math.round(lost/tot*100))):0;
-    t('pr-wpct',pct+'%');t('pr-winfo',`потеряно ${Math.abs(lost).toFixed(1)} кг · осталось ${Math.max(0,cw-(gw||cw)).toFixed(1)} кг`);
-    setTimeout(()=>{const b=$('pr-wbar');if(b)b.style.width=pct+'%';},80);
-    if(wl.length>=2&&gw&&cw>gw){
-      try{
-        const d1=new Date(wl[0].logged_at+'T00:00:00'),d2=new Date(wl[wl.length-1].logged_at+'T00:00:00');
-        const ddays=Math.max(1,(d2-d1)/86400000);
-        const rate=(wl[0].weight-wl[wl.length-1].weight)/ddays*7;
-        if(rate>0.01){
-          const dl=Math.ceil((cw-gw)/rate*7),eta=new Date();eta.setDate(eta.getDate()+dl);
-          const mons=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
-          t('pr-forecast',`☀️ прогноз: ${eta.getDate()} ${mons[eta.getMonth()]} · темп ${rate.toFixed(2)} кг/нед`);
-        }
-      }catch{}
-    }
+    T('pr-wpct',pct+'%');T('pr-winfo',`потеряно ${Math.abs(lost).toFixed(1)} кг · осталось ${Math.max(0,cw-(gw||cw)).toFixed(1)} кг`);
+    requestAnimationFrame(()=>{const b=$('pr-wbar');if(b)b.style.width=pct+'%';});
+    if(wl.length>=2&&gw&&cw>gw){try{
+      const d1=new Date(wl[0].logged_at+'T00:00:00'),d2=new Date(wl[wl.length-1].logged_at+'T00:00:00');
+      const dd=Math.max(1,(d2-d1)/86400000),rate=(wl[0].weight-wl[wl.length-1].weight)/dd*7;
+      if(rate>.01){const dl=Math.ceil((cw-gw)/rate*7),eta=new Date();eta.setDate(eta.getDate()+dl);const mons=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];T('pr-forecast','Прогноз: '+eta.getDate()+' '+mons[eta.getMonth()]+' · темп '+rate.toFixed(2)+' кг/нед');}
+    }catch{}}
   }
   drawChart(wl.slice(-7));
-  t('pw-water',wd.total||0);
-  t('pw-cal',totalCal());
-  if(sl.length){t('pw-sleep',+(sl.slice(-7).reduce((a,b)=>a+b.hours,0)/Math.min(7,sl.length)).toFixed(1));}
-  else t('pw-sleep','—');
-  const last6=wl.slice(-6).reverse();
-  h('pr-whist',last6.length?last6.map((e,i)=>{
-    const prev=last6[i+1];const diff=prev?+(e.weight-prev.weight).toFixed(1):0;
-    return`<div class="hrow"><div class="hrow-date">${fmtDate(e.logged_at)}</div><div class="hrow-val">${e.weight.toFixed(1)} кг</div>${diff?`<div class="hrow-diff ${diff<0?'diff-neg':'diff-pos'}">${diff>0?'+':''}${diff}</div>`:'<div></div>'}</div>`;
-  }).join('')
-  :'<div style="text-align:center;padding:14px;color:var(--hint);font-size:13px;font-weight:600">нет записей</div>');
-  t('at-t',acts.filter(a=>a.completed).length);
-  t('at-w',+((wd.total||0)/1000).toFixed(1));
-  t('at-s',getStreak());
+  T('pw-water',wd.total||0);T('pw-cal',totalCal());
+  if(sl.length)T('pw-sleep',+(sl.slice(-7).reduce((a,b)=>a+b.hours,0)/Math.min(7,sl.length)).toFixed(1));
+  else T('pw-sleep','—');
+  const l6=wl.slice(-6).reverse();
+  H('pr-whist',l6.length?l6.map((e,i)=>{const prev=l6[i+1];const diff=prev?+(e.weight-prev.weight).toFixed(1):0;return`<div class="hr"><div class="hr-d">${fmtD(e.logged_at)}</div><div class="hr-v">${e.weight.toFixed(1)} кг</div>${diff?`<div class="hr-diff ${diff<0?'d-neg':'d-pos'}">${diff>0?'+':''}${diff}</div>`:'<div></div>'}</div>`;}).join(''):'<div style="text-align:center;padding:12px;color:var(--hint);font-size:12px;font-weight:600">Нет записей</div>');
+  T('at-t',acts.filter(a=>a.completed).length);
+  T('at-w',+((wd.total||0)/1000).toFixed(1));
+  T('at-s',gStreak());
 }
 
-/* ════════════════════════════════════════
-   RENDER: PROFILE
-════════════════════════════════════════ */
+/* ════ RENDER PROFILE ════ */
 function renderProfile(){
-  const u=getUser(),ss=getSetts(),wl=getWLog();
+  const u=gU(),ss=gSS(),wl=gWL();
   const av=$('pf-av');if(av)av.textContent=(u.name||'?').charAt(0).toUpperCase();
-  t('pf-name',u.name||'—');
-  const meta=[];if(u.age)meta.push(u.age+' лет');if(u.height)meta.push(u.height+' см');
-  if(u.gender)meta.push(u.gender==='male'?'♂':'♀');
-  t('pf-meta',meta.join(' · ')||'—');
-  t('pf-gw',u.goal_weight?u.goal_weight+' кг':'—');
-  t('pf-pname-preview',u.name||'—');
-  t('pf-height',u.height?u.height+' см':'—');
-  t('pf-age',u.age?u.age+' лет':'—');
-  t('pf-gwater',(u.water_goal||2000)+' мл');
+  T('pf-name',u.name||'—');
+  const meta=[];if(u.age)meta.push(u.age+' лет');if(u.height)meta.push(u.height+' см');if(u.gender)meta.push(u.gender==='male'?'♂':'♀');
+  T('pf-meta',meta.join(' · ')||'—');
+  T('pf-gw',u.goal_weight?u.goal_weight+' кг':'—');
+  T('pf-pname',u.name||'—');
+  T('pf-height',u.height?u.height+' см':'—');
+  T('pf-age',u.age?u.age+' лет':'—');
+  T('pf-gwater',(u.water_goal||2000)+' мл');
   const bmiRow=$('pf-bmi-row');
   if(u.height&&wl.length){
     const cw=wl[wl.length-1].weight,h2=u.height/100;
@@ -2501,35 +1561,23 @@ function renderProfile(){
     const ideal=+((u.height-100)*.9).toFixed(1);
     const bmr=Math.round(u.gender==='female'?10*cw+6.25*u.height-5*(u.age||25)-161:10*cw+6.25*u.height-5*(u.age||25)+5);
     if(bmiRow)bmiRow.style.display='';
-    t('pf-bmi',bmi);t('pf-ideal',ideal);t('pf-bmr',bmr);
+    T('pf-bmi',bmi);T('pf-ideal',ideal);T('pf-bmr',bmr);
   }else if(bmiRow)bmiRow.style.display='none';
-  [['w'],['water'],['cal'],['sleep']].forEach(([k])=>{
+  ['w','water','cal','sleep'].forEach(k=>{
     const tog=$('tog-'+k),on=ss[k]!==false;
     if(tog){tog.classList.toggle('on',on);tog.classList.toggle('off',!on);}
   });
 }
 
-/* ════════════════════════════════════════
-   INIT
-════════════════════════════════════════ */
-document.addEventListener('DOMContentLoaded', async ()=>{
-  // Apply dark theme
-  const isDark=tg?.colorScheme==='dark'||window.matchMedia?.('(prefers-color-scheme:dark)').matches;
-  if(isDark)document.body.classList.add('tg-dark');
-  tg?.onEvent('themeChanged',()=>{
-    document.body.classList.toggle('tg-dark',tg?.colorScheme==='dark');
-  });
-
-  // Init nav indicator
-  setTimeout(()=>updateNavIndicator('home'), 100);
-
+/* ════ INIT ════ */
+document.addEventListener('DOMContentLoaded',async()=>{
+  const dark=tg?.colorScheme==='dark'||window.matchMedia?.('(prefers-color-scheme:dark)').matches;
+  if(dark)document.body.classList.add('tg-dark');
+  tg?.onEvent('themeChanged',()=>document.body.classList.toggle('tg-dark',tg?.colorScheme==='dark'));
   await loadData();
   renderHome();
-  setTimeout(()=>renderHome(),150);
-
-  setInterval(async()=>{
-    if(curTab==='home'){ await loadData(); renderHome(); }
-  },30000);
+  setTimeout(renderHome,150);
+  setInterval(async()=>{if(curTab==='home'){await loadData();renderHome();}},30000);
 });
 </script>
 </body>
