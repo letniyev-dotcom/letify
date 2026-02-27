@@ -22,7 +22,7 @@
   --sb:0px;
   --sh:0 2px 12px rgba(0,0,0,.07);
   --page-bot:calc(80px + var(--sb) + 20px);
-  --page-top:calc(var(--st) + 14px);
+  --page-top:calc(var(--st) + 18px);
 }
 html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overscroll-behavior:none;user-select:none}
 
@@ -61,26 +61,36 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
 }
 .scr::-webkit-scrollbar{display:none}
 .scr.open{transform:none;pointer-events:all}
-/* Заголовок экрана — только название, без кнопки назад (Telegram сам показывает) */
+/* Заголовок экрана */
 .scr-hdr{
   flex-shrink:0;
   background:var(--bg);
-  padding:calc(var(--st)+14px) 16px 12px;
+  padding:calc(var(--st)+16px) 20px 14px;
   border-bottom:1px solid var(--brd);
 }
-.scr-title{font-size:20px;font-weight:900;letter-spacing:-.02em}
-.scr-subtitle{font-size:13px;font-weight:600;color:var(--hint);margin-top:2px}
-/* Скроллируемое тело */
-.scr-body{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:16px 16px 0}
+.scr-title{font-size:22px;font-weight:900;letter-spacing:-.02em}
+.scr-subtitle{font-size:13px;font-weight:600;color:var(--hint);margin-top:3px}
+/* Скроллируемое тело с кнопкой внутри */
+.scr-body{
+  flex:1;
+  overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  padding:20px 16px calc(var(--sb)+28px);
+  display:flex;flex-direction:column;
+}
 .scr-body::-webkit-scrollbar{display:none}
-/* Кнопка сохранения — фиксированная снизу */
+/* Кнопка сохранения — прямо в теле, не фиксированная снизу */
 .scr-foot{
   flex-shrink:0;
-  padding:12px 16px calc(var(--sb)+12px);
+  padding:0 16px calc(var(--sb)+20px);
   background:var(--bg);
-  border-top:1px solid var(--brd);
 }
-.scr-foot .btn-p{margin:0}
+/* spacer чтобы кнопка не прилипала к контенту */
+.scr-foot-gap{height:20px;flex-shrink:0}
+/* Альтернатива: кнопка сразу под контентом */
+.scr-btn-wrap{
+  margin-top:24px;
+}
 
 /* ── ISLAND NAV ── */
 #nav{
@@ -218,7 +228,7 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
 /* ── BTNS ── */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;cursor:pointer;font-family:inherit;font-weight:800;transition:transform .14s cubic-bezier(.34,1.56,.64,1),opacity .14s}
 .btn:active{transform:scale(.87);opacity:.8}
-.btn-p{background:linear-gradient(135deg,var(--sun),var(--sun2));color:#fff;padding:14px 20px;font-size:14px;border-radius:var(--r);box-shadow:0 5px 20px rgba(255,107,53,.28);width:100%}
+.btn-p{background:linear-gradient(135deg,var(--sun),var(--sun2));color:#fff;padding:16px 24px;font-size:15px;font-weight:900;border-radius:18px;box-shadow:0 6px 24px rgba(255,107,53,.32),0 2px 8px rgba(255,107,53,.18);width:100%;letter-spacing:.01em}
 .btn-g{background:var(--bg3);color:var(--text);padding:11px 16px;font-size:13px;border-radius:11px}
 .btn-water{background:rgba(78,174,229,.11);color:var(--water);padding:13px 8px;font-size:13px;border-radius:11px;flex:1}
 
@@ -498,7 +508,7 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
 
 <!-- ══════════ TRACK ══════════ -->
 <div class="page" id="p-track">
-<div style="position:sticky;top:0;background:var(--bg);z-index:10;padding:calc(var(--st)+10px) 16px 10px">
+<div style="position:sticky;top:0;background:var(--bg);z-index:10;padding:calc(var(--st)+14px) 16px 10px">
   <div class="ttabs">
     <button class="ttab on" id="tt-water" onclick="setTTab('water')">Вода</button>
     <button class="ttab" id="tt-cal" onclick="setTTab('cal')">Калории</button>
@@ -759,16 +769,19 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
     <div class="scr-subtitle">потяни барабан чтобы выбрать</div>
   </div>
   <div class="scr-body">
-    <div class="card" style="padding:20px 16px">
-      <div style="display:flex;align-items:center;justify-content:center;gap:4px;margin-bottom:10px">
-        <span style="font-size:13px;font-weight:800;color:var(--hint)">КГ</span>
-        <span style="font-size:13px;font-weight:800;color:var(--hint);margin-left:auto">.X</span>
+    <div class="card" style="padding:20px 16px;margin-bottom:0">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 4px">
+        <span style="font-size:12px;font-weight:800;color:var(--hint);text-transform:uppercase;letter-spacing:.06em">КГ</span>
+        <span style="font-size:12px;font-weight:800;color:var(--hint);text-transform:uppercase;letter-spacing:.06em">.X</span>
       </div>
       <div class="wp-row" id="wp-weight-wrap"></div>
     </div>
-  </div>
-  <div class="scr-foot">
-    <button class="btn btn-p" onclick="submitWeight()">Сохранить вес</button>
+    <div class="scr-btn-wrap">
+      <button class="btn btn-p" onclick="submitWeight()">Сохранить вес</button>
+    </div>
+    <div style="margin-top:12px">
+      <button class="btn btn-g" style="width:100%;padding:14px;border-radius:18px;font-size:14px;font-weight:800" onclick="openScr('scr-whist')">📊 История веса</button>
+    </div>
   </div>
 </div>
 
@@ -792,9 +805,9 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
         <button class="seg-btn" onclick="setSleepQ(5)" data-q="5">🌟</button>
       </div>
     </div>
-  </div>
-  <div class="scr-foot">
-    <button class="btn btn-p" onclick="submitSleep()">Сохранить сон</button>
+    <div class="scr-btn-wrap">
+      <button class="btn btn-p" onclick="submitSleep()">Сохранить сон</button>
+    </div>
   </div>
 </div>
 
@@ -824,9 +837,9 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
         <input class="f-inp f-inp-wide" id="inp-cal-desc" type="text" placeholder="гречка, курица…">
       </div>
     </div>
-  </div>
-  <div class="scr-foot">
-    <button class="btn btn-p" onclick="submitCal()">Добавить</button>
+    <div class="scr-btn-wrap">
+      <button class="btn btn-p" onclick="submitCal()">Добавить</button>
+    </div>
   </div>
 </div>
 
@@ -888,7 +901,7 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
     </div>
 
   </div>
-  <div class="scr-foot" id="act-foot">
+  <div class="scr-foot" id="act-foot" style="padding:0 16px calc(var(--sb)+20px)">
     <button class="btn btn-p" id="act-next-btn" onclick="actStepNext()">Далее →</button>
   </div>
 </div>
@@ -911,9 +924,9 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
         <button class="seg-btn" onclick="setGender('female')" data-g="female">Женский</button>
       </div>
     </div>
-  </div>
-  <div class="scr-foot">
-    <button class="btn btn-p" onclick="submitProfile()">Сохранить</button>
+    <div class="scr-btn-wrap">
+      <button class="btn btn-p" onclick="submitProfile()">Сохранить</button>
+    </div>
   </div>
 </div>
 
@@ -928,9 +941,9 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
       <div class="f-row"><span class="f-lbl">Норма воды, мл</span><input class="f-inp" id="inp-gwat" type="number" inputmode="numeric" step="100" placeholder="2000"></div>
       <div class="f-row" style="padding-bottom:0"><span class="f-lbl">Норма калорий</span><input class="f-inp" id="inp-gcal" type="number" inputmode="numeric" step="50" placeholder="2000"></div>
     </div>
-  </div>
-  <div class="scr-foot">
-    <button class="btn btn-p" onclick="submitGoals()">Сохранить цели</button>
+    <div class="scr-btn-wrap">
+      <button class="btn btn-p" onclick="submitGoals()">Сохранить цели</button>
+    </div>
   </div>
 </div>
 
@@ -954,8 +967,20 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
         <span class="lt-lbl" style="color:var(--red)">Сбросить все данные</span>
       </div>
     </div>
-    <div style="text-align:center;padding:20px 0 8px">
+    <div style="text-align:center;padding:24px 0 8px">
       <div class="t5">letify · ver 3.0</div>
+    </div>
+  </div>
+</div>
+<!-- Scr: История веса -->
+<div class="scr" id="scr-whist">
+  <div class="scr-hdr">
+    <div class="scr-title">История веса</div>
+    <div class="scr-subtitle">все записанные измерения</div>
+  </div>
+  <div class="scr-body">
+    <div class="card" style="padding:10px 14px" id="scr-whist-list">
+      <div style="text-align:center;padding:20px;color:var(--hint);font-size:13px;font-weight:600">Нет записей</div>
     </div>
   </div>
 </div>
@@ -1018,9 +1043,13 @@ if(tg){
   setTimeout(_applySA,120);setTimeout(_applySA,600);
 }
 function _applySA(){
-  const top=tg?.safeAreaInset?.top??tg?.contentSafeAreaInset?.top??0;
-  const bot=tg?.safeAreaInset?.bottom??tg?.contentSafeAreaInset?.bottom??0;
-  const st=Math.min(Math.max(top,0),80);
+  const saTop=Math.max(tg?.safeAreaInset?.top??0,0);
+  const csaTop=Math.max(tg?.contentSafeAreaInset?.top??0,0);
+  const top=saTop+csaTop;
+  const saBot=Math.max(tg?.safeAreaInset?.bottom??0,0);
+  const csaBot=Math.max(tg?.contentSafeAreaInset?.bottom??0,0);
+  const bot=saBot+csaBot;
+  const st=Math.min(Math.max(top,0),120);
   const sb=Math.min(Math.max(bot,0),80);
   document.documentElement.style.setProperty('--st',st+'px');
   document.documentElement.style.setProperty('--sb',sb+'px');
@@ -1193,6 +1222,20 @@ function _populateScr(id){
   // Init pickers after layout
   if(id==='scr-weight')requestAnimationFrame(()=>initWeightPicker());
   if(id==='scr-sleep')requestAnimationFrame(()=>initSleepPicker());
+  if(id==='scr-whist'){
+    const wl=gWL().slice().reverse();
+    const el=document.getElementById('scr-whist-list');
+    if(el){
+      if(!wl.length){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--hint);font-size:13px;font-weight:600">Нет записей</div>';}
+      else{
+        el.innerHTML=wl.map((e,i)=>{
+          const prev=wl[i+1];
+          const diff=prev?+(e.weight-prev.weight).toFixed(1):0;
+          return`<div class="hr"><div class="hr-d">${fmtD(e.logged_at)}</div><div class="hr-v">${e.weight.toFixed(1)} кг</div>${diff?`<div class="hr-diff ${diff<0?'d-neg':'d-pos'}">${diff>0?'+':''}${diff}</div>`:'<div style="min-width:32px"></div>'}</div>`;
+        }).join('');
+      }
+    }
+  }
 }
 
 /* ════ WHEEL PICKER ════ */
