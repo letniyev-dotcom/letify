@@ -39,8 +39,8 @@
   --r-lg: 28px;
 
   --nav-h: 76px;
-  --st: env(safe-area-inset-top, 0px);
-  --sb: env(safe-area-inset-bottom, 0px);
+  --st: max(var(--tg-safe-area-inset-top, 0px), env(safe-area-inset-top, 0px));
+  --sb: max(var(--tg-safe-area-inset-bottom, 0px), env(safe-area-inset-bottom, 0px));
 
   --shadow: 0 2px 20px rgba(0,0,0,.06);
   --shadow-strong: 0 8px 32px rgba(255,107,53,.22);
@@ -102,10 +102,8 @@ html,body{
   transition:background .3s ease;
 }
 #nav-backdrop.open{
-  background:rgba(0,0,0,.35);
+  background:rgba(0,0,0,.45);
   pointer-events:all;
-  backdrop-filter:blur(6px);
-  -webkit-backdrop-filter:blur(6px);
 }
 
 /* FAB wrapper */
@@ -190,18 +188,18 @@ html,body{
   cursor:pointer;
   pointer-events:none;
   opacity:0;
-  transform:translateX(-50%) translateY(20px) scale(.7);
+  transform:translateX(-50%) translateY(16px);
   transition:
-    opacity .28s cubic-bezier(.4,0,.2,1),
-    transform .38s cubic-bezier(.34,1.5,.64,1);
-  will-change:transform,opacity;
+    opacity .2s ease,
+    transform .25s ease;
+  will-change:opacity,transform;
 }
 .fan-item.visible{
   opacity:1;
-  transform:translateX(-50%) translateY(0) scale(1);
+  transform:translateX(-50%) translateY(0);
   pointer-events:all;
 }
-.fan-item:active .fan-ico{transform:scale(.8)!important}
+.fan-item:active .fan-ico{transform:scale(.85)!important}
 
 .fan-ico{
   width:54px;height:54px;border-radius:18px;
@@ -564,7 +562,7 @@ html,body{
 <div class="reveal">
 
 <!-- greeting -->
-<div class="pad" style="padding-top:20px;padding-bottom:0;display:flex;align-items:flex-start;justify-content:space-between">
+<div class="pad" style="padding-top:max(20px, calc(var(--st) + 8px));padding-bottom:0;display:flex;align-items:flex-start;justify-content:space-between">
   <div>
     <div class="t1">Привет, <span class="grad" id="h-name">...</span></div>
     <div class="t5" style="margin-top:4px" id="h-date">сегодня загружается...</div>
@@ -1146,6 +1144,16 @@ if(tg){
   if(typeof tg.requestFullscreen === 'function') tg.requestFullscreen();
   if(typeof tg.disableVerticalSwipes === 'function') tg.disableVerticalSwipes();
   tg.onEvent('themeChanged', applyTheme);
+  // Обновляем safe area после изменений viewport
+  tg.onEvent('viewportChanged', fixSafeArea);
+  tg.onEvent('safeAreaChanged', fixSafeArea);
+  setTimeout(fixSafeArea, 300);
+}
+function fixSafeArea(){
+  const top = tg?.safeAreaInset?.top ?? 0;
+  const bottom = tg?.safeAreaInset?.bottom ?? 0;
+  if(top > 0) document.documentElement.style.setProperty('--st', top + 'px');
+  if(bottom > 0) document.documentElement.style.setProperty('--sb', bottom + 'px');
 }
 function applyTheme(){
   const p = tg?.themeParams || {};
