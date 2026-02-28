@@ -54,74 +54,16 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   overflow:hidden;
 }
 #splash::before{
-  content:'';
-  position:absolute;
-  inset:0;
+  content:'';position:absolute;inset:0;
   background:radial-gradient(ellipse 45% 30% at 50% 40%, rgba(255,107,53,.10) 0%, transparent 70%);
   pointer-events:none;
 }
-#splash::after{
-  content:'';
-  position:absolute;
-  width:180px;height:180px;
-  border-radius:50%;
-  background:radial-gradient(circle, rgba(255,171,64,.07) 0%, transparent 70%);
-  top:50%;left:50%;transform:translate(-50%,-60%);
-  pointer-events:none;
-  animation:sp-glow 3s ease-in-out infinite;
-}
 #splash.hiding{opacity:0;transform:scale(1.04);}
-.sp-logo{
-  width:96px;height:96px;border-radius:32px;
-  background:linear-gradient(145deg,#FF6B35,#FFAB40);
-  display:flex;align-items:center;justify-content:center;
-  font-size:46px;
-  box-shadow:0 20px 60px rgba(255,107,53,.35),0 6px 16px rgba(255,107,53,.2),inset 0 1px 0 rgba(255,255,255,.3);
-  margin-bottom:28px;
-  animation:sp-pop .75s cubic-bezier(.34,1.7,.64,1) forwards;
-  transform:scale(.4) translateY(40px);opacity:0;
-  position:relative;z-index:1;
-}
-.sp-title{
-  font-family:'Onest',sans-serif;
-  font-size:48px;font-weight:900;letter-spacing:-.05em;
-  background:linear-gradient(110deg,#FF5520,#FF6B35,#FFAB40);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  animation:sp-up .55s .2s cubic-bezier(.34,1.3,.64,1) forwards;
-  opacity:0;transform:translateY(16px);
-  position:relative;z-index:1;
-}
-.sp-sub{
-  font-family:'Onest',sans-serif;
-  font-size:15px;font-weight:600;color:var(--hint);margin-top:8px;
-  letter-spacing:.02em;
-  animation:sp-up .5s .35s ease forwards;
-  opacity:0;transform:translateY(8px);
-  position:relative;z-index:1;
-}
-.sp-divider{
-  width:40px;height:2px;border-radius:99px;
-  background:linear-gradient(90deg,var(--sun),var(--sun2));
-  margin-top:28px;opacity:0;
-  animation:sp-up .4s .5s ease forwards,sp-grow .7s .5s cubic-bezier(.34,1.3,.64,1) forwards;
-  transform-origin:center;
-  position:relative;z-index:1;
-}
-.sp-dots{
-  display:flex;gap:8px;
-}
-.sp-dot{
-  width:8px;height:8px;border-radius:50%;
-  background:linear-gradient(135deg,var(--sun),var(--sun2));
-  animation:sp-bounce 1.5s ease-in-out infinite;
-}
+.sp-dots{display:flex;gap:8px;}
+.sp-dot{width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,var(--sun),var(--sun2));animation:sp-bounce 1.5s ease-in-out infinite;}
 .sp-dot:nth-child(2){animation-delay:.18s;opacity:.65;}
 .sp-dot:nth-child(3){animation-delay:.36s;opacity:.35;}
-@keyframes sp-pop{to{transform:scale(1) translateY(0);opacity:1}}
-@keyframes sp-up{to{opacity:1;transform:translateY(0)}}
-@keyframes sp-glow{0%,100%{opacity:.6;transform:translate(-50%,-60%) scale(1)}50%{opacity:1;transform:translate(-50%,-60%) scale(1.1)}}
 @keyframes sp-bounce{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(-5px);opacity:1}}
-@keyframes sp-grow{from{width:20px}to{width:40px}}
 
 /* ══ MAIN PAGES ══ */
 .page{
@@ -254,17 +196,16 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 }
 .tg-dark #nav{background:rgba(24,18,10,.96);border-color:rgba(255,255,255,.1)}
 #nav.gone{bottom:calc(-120px - var(--sb));opacity:0;pointer-events:none}
+/* Nav item — no dot, just icon centered */
 .nt{
   width:50px;height:50px;border-radius:16px;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  display:flex;align-items:center;justify-content:center;
   cursor:pointer;color:var(--hint);
   transition:color .16s,background .16s,transform .14s cubic-bezier(.34,1.4,.64,1);
 }
 .nt.on{color:var(--sun);background:rgba(255,107,53,.1)}
 .nt:active{transform:scale(.94);transition:transform .1s ease}
 .nt svg{width:22px;height:22px;flex-shrink:0}
-.nt-dot{width:4px;height:4px;border-radius:50%;background:var(--sun);opacity:0;transition:opacity .16s}
-.nt.on .nt-dot{opacity:1}
 
 /* ══ TYPOGRAPHY ══ */
 .t1{font-size:26px;font-weight:900;line-height:1.1;letter-spacing:-.02em}
@@ -338,16 +279,13 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .ac-barf{height:100%;border-radius:99px;transition:width .4s ease}
 .tg-dark .ac-bar{background:rgba(255,255,255,.1)}
 
-/* ══ LP INDICATOR (long press) — REMOVED, using confirm dialog instead ══ */
-.lp-indicator{display:none}
-
-/* ══ COMPLETING TIMER BAR ══ */
+/* ══ COMPLETING TIMER BAR — 3.5s ══ */
 .ac-timer-bar{
   position:absolute;bottom:0;left:0;
   height:3px;
   background:linear-gradient(90deg,rgba(82,193,119,.5),var(--green));
   border-radius:0 99px 99px 0;
-  transition:width 5.05s linear;
+  transition:width 3.55s linear;
   pointer-events:none;
 }
 
@@ -471,7 +409,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   -webkit-overflow-scrolling:touch;
   scrollbar-width:none;
   padding-bottom:4px;
-  /* Isolate compositing layer — prevents SVG filter black artifact on pop */
   isolation:isolate;
   transform:translateZ(0);
   -webkit-transform:translateZ(0);
@@ -535,6 +472,17 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 /* ══ CLEAR BTN HINT ══ */
 .clear-hint{font-size:10px;font-weight:600;color:var(--hint);text-align:center;margin-top:6px;padding:0 4px}
+
+/* ══ PLAN ADD BTN — sticky so it doesn't jump ══ */
+#pl-add-btn-wrap{
+  position:sticky;
+  bottom:calc(var(--sb) + 16px);
+  z-index:5;
+  background:linear-gradient(to top, var(--bg) 75%, transparent);
+  padding-top:12px;
+  padding-bottom:4px;
+  margin-top:8px;
+}
 </style>
 </head>
 <body>
@@ -704,13 +652,8 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 <div class="pad" style="margin-top:4px">
   <div style="font-size:10px;font-weight:700;color:var(--hint);text-align:center;padding:6px 0 2px;letter-spacing:.04em">удержи карточку чтобы удалить</div>
 </div>
-<div id="pl-empty" class="empty" style="display:none">
-  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
-  <div class="empty-t">нет задач на сегодня</div>
-  <div class="empty-s">нажми кнопку ниже чтобы добавить</div>
-</div>
 <div class="pad" id="pl-list" style="margin-top:4px"></div>
-<div class="pad gap" id="pl-add-btn-wrap">
+<div class="pad" id="pl-add-btn-wrap">
   <button class="btn btn-p" onclick="pushPage('pp-act')">добавить активность</button>
 </div>
 <div style="height:8px"></div>
@@ -822,6 +765,12 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     <span class="lt-val" id="pf-pname">—</span>
     <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
   </div>
+  <div class="lt" onclick="pushPage('pp-start-weight')">
+    <div class="lt-ic">⚖️</div>
+    <span class="lt-lbl">начальный вес и цель</span>
+    <span class="lt-val" id="pf-sw">—</span>
+    <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+  </div>
   <div class="lt" style="padding-bottom:0;border:none" onclick="pushPage('pp-goals')">
     <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg></div>
     <span class="lt-lbl">мои цели</span>
@@ -830,13 +779,56 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
 </div>
 </div>
-<div style="text-align:center;padding:16px 0 8px"><div class="t5">letify · ver 4.2</div></div>
+<div class="pad" style="margin-top:10px">
+  <button class="btn btn-danger" style="width:100%;padding:14px" onclick="resetAllData()">🗑 сбросить все данные</button>
+  <div class="clear-hint">удалит все записи и настройки навсегда</div>
+</div>
+<div style="text-align:center;padding:16px 0 8px"><div class="t5">letify · ver 4.3</div></div>
 <div style="height:8px"></div>
 </div>
 
 </div><!-- /pages -->
 
 <!-- ══════ PUSH PAGES ══════ -->
+
+<!-- PP: Начальный вес и цель -->
+<div class="push-page" id="pp-start-weight">
+  <div class="pp-hdr">
+    <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <div><div class="pp-title">начальный вес</div><div class="pp-subtitle">точка отсчёта для прогресса</div></div>
+  </div>
+  <div class="pp-body">
+    <div class="big-val-card">
+      <div class="big-val"><span id="sw-int">80</span><span style="font-size:28px;color:var(--hint)">.</span><span id="sw-dec">0</span></div>
+      <div class="big-val-unit">кг · начальная точка</div>
+    </div>
+    <div class="m3-sec">килограммы</div>
+    <div class="m3-card" style="padding:8px">
+      <div class="stepper-wrap">
+        <button class="stepper-btn" onclick="stepSW('int',-1)">−</button>
+        <div class="stepper-val" id="sw-int-disp">80</div>
+        <button class="stepper-btn" onclick="stepSW('int',1)">+</button>
+      </div>
+    </div>
+    <div class="m3-sec">десятые</div>
+    <div class="m3-card" style="padding:8px">
+      <div class="stepper-wrap">
+        <button class="stepper-btn" onclick="stepSW('dec',-1)">−</button>
+        <div class="stepper-val" id="sw-dec-disp">.0</div>
+        <button class="stepper-btn" onclick="stepSW('dec',1)">+</button>
+      </div>
+    </div>
+    <div class="m3-sec">моя цель</div>
+    <div class="m3-card" style="padding:10px">
+      <div class="m3-seg" id="seg-goal-type" style="margin-bottom:0">
+        <button class="m3-seg-btn on" onclick="setGoalType('lose')" data-gt="lose">📉 похудение</button>
+        <button class="m3-seg-btn" onclick="setGoalType('gain')" data-gt="gain">📈 набор массы</button>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--hint);text-align:center;font-weight:600;margin-bottom:20px" id="sw-type-hint">прогресс считается как потеря веса</div>
+    <button class="btn btn-p" onclick="saveStartWeight()">сохранить</button>
+  </div>
+</div>
 
 <!-- PP: Записать вес -->
 <div class="push-page" id="pp-weight">
@@ -1191,31 +1183,25 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
 </div>
 
-<!-- NAV -->
+<!-- NAV — no dots, icon centered -->
 <nav id="nav">
   <div class="nt on" id="nt-home" onclick="navTo('home')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
-    <div class="nt-dot"></div>
   </div>
   <div class="nt" id="nt-track" onclick="navTo('track')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>
-    <div class="nt-dot"></div>
   </div>
   <div class="nt" id="nt-plan" onclick="navTo('plan')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/></svg>
-    <div class="nt-dot"></div>
   </div>
   <div class="nt" id="nt-sleep" onclick="navTo('sleep')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-    <div class="nt-dot"></div>
   </div>
   <div class="nt" id="nt-progress" onclick="navTo('progress')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-4 4 4 4-6"/></svg>
-    <div class="nt-dot"></div>
   </div>
   <div class="nt" id="nt-profile" onclick="navTo('profile')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-    <div class="nt-dot"></div>
   </div>
 </nav>
 
@@ -1270,12 +1256,18 @@ const API_BASE='https://letify-production.up.railway.app';
 const tgUser=tg?.initDataUnsafe?.user;
 const UID=tgUser?.id||null;
 const TODAY=new Date().toLocaleDateString('en-CA');
+
+/* localStorage helpers */
+const lsGet=k=>{try{const r=localStorage.getItem('lf2_'+k);return r?JSON.parse(r):null}catch{return null}};
+const lsSet=(k,v)=>{try{localStorage.setItem('lf2_'+k,JSON.stringify(v))}catch{}};
+
 let C={
-  user:{name:'…',height:0,age:0,start_weight:0,goal_weight:0,water_goal:2000,cal_goal:2000,gender:'male'},
+  user:{name:'…',height:0,age:0,start_weight:0,goal_weight:0,water_goal:2000,cal_goal:2000,gender:'male',goal_type:'lose'},
   settings:{show_weight:1,show_water:1,show_calories:1,show_sleep:1},
   water:{total:0,entries:[],streak:0},calories:{},
   weight_log:[],sleep_log:[],acts_today:[],products:[]
 };
+
 async function loadData(){
   if(!UID){_demo();return;}
   try{
@@ -1288,29 +1280,34 @@ async function loadData(){
     C.acts_today=d.acts_today||[];C.products=d.products||[];
   }catch{_demo();}
 }
+
 function _demo(){
-  const g=k=>{try{const r=localStorage.getItem('lf2_'+k);return r?JSON.parse(r):null}catch{return null}};
-  const s=(k,v)=>{try{localStorage.setItem('lf2_'+k,JSON.stringify(v))}catch{}};
-  if(!g('ds')){
-    s('user',{name:tgUser?.first_name||'Алекс',height:175,age:27,start_weight:85,goal_weight:75,water_goal:2500,cal_goal:2000,gender:'male'});
+  if(!lsGet('ds')){
+    lsSet('user',{name:tgUser?.first_name||'Алекс',height:175,age:27,start_weight:85,goal_weight:75,water_goal:2500,cal_goal:2000,gender:'male',goal_type:'lose'});
     const now=new Date(),wl=[],sl=[];
     for(let i=13;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);wl.push({weight:+(85-((13-i)*.25)+(Math.random()-.5)*.3).toFixed(1),logged_at:d.toLocaleDateString('en-CA')});}
     for(let i=6;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);sl.push({hours:+(6.5+Math.random()*2).toFixed(1),quality:3+Math.floor(Math.random()*3),logged_at:d.toLocaleDateString('en-CA')});}
-    s('wlog',wl);s('slog',sl);
-    s('wd_'+TODAY,{total:1350,entries:[250,200,150,250,200,150,150]});
-    s('cd_'+TODAY,{breakfast:420,lunch:680,dinner:0,snack:185,other:0});s('streak',7);
-    s('acts_'+TODAY,[
+    lsSet('wlog',wl);lsSet('slog',sl);
+    lsSet('wd_'+TODAY,{total:1350,entries:[250,200,150,250,200,150,150]});
+    lsSet('cd_'+TODAY,{breakfast:420,lunch:680,dinner:0,snack:185,other:0});lsSet('streak',7);
+    lsSet('acts_'+TODAY,[
       {id:1,name:'пробежка',type:'run',scheduled_at:'2024-01-01T07:00',duration:30,completed:0},
       {id:2,name:'зал',type:'gym',scheduled_at:'2024-01-01T18:30',duration:60,completed:0},
       {id:3,name:'йога',type:'yoga',scheduled_at:'2024-01-01T21:00',duration:25,completed:0}
-    ]);s('ds',1);
+    ]);lsSet('ds',1);
   }
-  const u=g('user')||{},wd=g('wd_'+TODAY)||{total:0,entries:[]},cd=g('cd_'+TODAY)||{};
-  C.user=u;C.settings={show_weight:1,show_water:1,show_calories:1,show_sleep:1};
-  C.water={total:wd.total||0,entries:wd.entries||[],streak:g('streak')||0};
-  C.calories=cd;C.weight_log=g('wlog')||[];C.sleep_log=g('slog')||[];
-  C.acts_today=g('acts_'+TODAY)||[];
+  const u=lsGet('user')||{};
+  const wd=lsGet('wd_'+TODAY)||{total:0,entries:[]};
+  const cd=lsGet('cd_'+TODAY)||{};
+  C.user={...{name:'Алекс',height:0,age:0,start_weight:0,goal_weight:0,water_goal:2000,cal_goal:2000,gender:'male',goal_type:'lose'},...u};
+  C.settings={show_weight:1,show_water:1,show_calories:1,show_sleep:1};
+  C.water={total:wd.total||0,entries:wd.entries||[],streak:lsGet('streak')||0};
+  C.calories=cd;
+  C.weight_log=lsGet('wlog')||[];
+  C.sleep_log=lsGet('slog')||[];
+  C.acts_today=lsGet('acts_'+TODAY)||[];
 }
+
 async function apiPost(path,body){
   if(!UID)return;
   try{await fetch(`${API_BASE}${path}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uid:UID,...body})});}catch{}
@@ -1323,11 +1320,10 @@ async function reload(){
 }
 
 const gU=()=>C.user;
-const gSS=()=>({w:!!C.settings?.show_weight,water:!!C.settings?.show_water,cal:!!C.settings?.show_calories,sleep:!!C.settings?.show_sleep});
-// Sort ascending: oldest first (left), newest last (right)
 const gWL=()=>C.weight_log.map(r=>({weight:r.weight,logged_at:(r.logged_at||'').slice(0,10)})).sort((a,b)=>(a.logged_at||'').localeCompare(b.logged_at||''));
 const gSL=()=>C.sleep_log.map(r=>({hours:r.hours,quality:r.quality,logged_at:(r.logged_at||'').slice(0,10)}));
-const gWD=()=>C.water;const gCD=()=>C.calories;
+const gWD=()=>C.water;
+const gCD=()=>C.calories;
 const gActs=()=>C.acts_today.map(a=>({...a,time:(a.scheduled_at||'').slice(11,16)||'00:00',completed:!!a.completed}));
 const gStreak=()=>C.water.streak||0;
 const totalCal=()=>Object.values(gCD()).reduce((a,b)=>a+b,0);
@@ -1372,7 +1368,6 @@ function popPage(doRender=true){
   if(!curPushPage)return;
   if(curPushPage==='pp-pdata')_saveProfileSilent();
   if(curPushPage==='pp-goals')_saveGoalsSilent();
-  // Clear weight chart SVG BEFORE animating out — prevents black filter artifact on iOS/WebKit
   if(curPushPage==='pp-weight-chart'){
     const wrap=document.getElementById('wchart-svg-wrap');
     if(wrap)wrap.innerHTML='';
@@ -1389,11 +1384,20 @@ function popPage(doRender=true){
   if(tg?.BackButton){tg.BackButton.hide();tg.BackButton.offClick(popPage);}
   if(doRender&&_completingMap.size===0){const renders={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};renders[curTab]?.();}
 }
+
 function _populatePP(id){
-  const u=gU(),ss=gSS();
+  const u=gU();
   if(id==='pp-weight-chart'){_populateWeightChart();}
+  if(id==='pp-start-weight'){
+    const sw=u.start_weight&&u.start_weight>0?u.start_weight:80;
+    _swInt=Math.floor(sw);_swDec=Math.round((sw-Math.floor(sw))*10);
+    _goalType=u.goal_type||'lose';
+    _updateSWDisplay();
+    document.querySelectorAll('#seg-goal-type .m3-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.gt===_goalType));
+    _updateGoalTypeHint();
+  }
   if(id==='pp-weight'){
-    const wl=gWL();const iw=wl.length?wl[wl.length-1].weight:70;
+    const wl=gWL();const iw=wl.length?wl[wl.length-1].weight:u.start_weight||70;
     _wtInt=Math.round(Math.floor(iw));_wtDec=Math.round((iw-Math.floor(iw))*10);
     _updateWeightDisplay();
   }
@@ -1432,7 +1436,6 @@ function _populatePP(id){
     const wl=gWL(),wd=gWD(),acts=gActs();
     const l20=[...wl].reverse().slice(0,20);
     const HH=(eid,v)=>{const el=document.getElementById(eid);if(el)el.innerHTML=v;};
-    const TT=(eid,v)=>{const el=document.getElementById(eid);if(el)el.textContent=v;};
     const emptyMsg='<div style="text-align:center;padding:16px;color:var(--hint);font-size:13px;font-weight:600">нет записей</div>';
     HH('pp-whist',l20.length?l20.map((e,i)=>{
       const prev=l20[i+1];
@@ -1440,9 +1443,9 @@ function _populatePP(id){
       const diffHtml=diff?('<div class="hr-diff '+(diff<0?'d-neg':'d-pos')+'">'+(diff>0?'+':'')+diff+'</div>'):'<div></div>';
       return '<div class="hr"><div class="hr-d">'+fmtD(e.logged_at)+'</div><div class="hr-v">'+e.weight.toFixed(1)+' кг</div>'+diffHtml+'</div>';
     }).join(''):emptyMsg);
-    TT('pp-at-t',acts.filter(a=>a.completed).length);
-    TT('pp-at-w',+((wd.total||0)/1000).toFixed(1));
-    TT('pp-at-s',gStreak());
+    T('pp-at-t',acts.filter(a=>a.completed).length);
+    T('pp-at-w',+((wd.total||0)/1000).toFixed(1));
+    T('pp-at-s',gStreak());
   }
   if(id==='pp-act'){
     actStep=1;_actType='run';_actDur=45;_timeH=8;_timeM=0;_timeEH=9;_timeEM=0;_actDays=[];
@@ -1485,6 +1488,40 @@ function _populatePP(id){
       }).join('');}
     }
   }
+}
+
+/* ══ START WEIGHT STEPPER ══ */
+let _swInt=80,_swDec=0,_goalType='lose';
+function _updateSWDisplay(){
+  const A=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  A('sw-int',_swInt);A('sw-dec',_swDec);
+  A('sw-int-disp',_swInt);A('sw-dec-disp','.'+_swDec);
+}
+function _updateGoalTypeHint(){
+  const el=document.getElementById('sw-type-hint');
+  if(el)el.textContent=_goalType==='lose'?'прогресс считается как потеря веса':'прогресс считается как набор веса';
+}
+function stepSW(part,dir){
+  if(part==='int')_swInt=Math.max(30,Math.min(250,_swInt+dir));
+  else _swDec=(_swDec+dir+10)%10;
+  _updateSWDisplay();tg?.HapticFeedback?.selectionChanged();
+}
+function setGoalType(gt){
+  _goalType=gt;
+  document.querySelectorAll('#seg-goal-type .m3-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.gt===gt));
+  _updateGoalTypeHint();
+  tg?.HapticFeedback?.selectionChanged();
+}
+function saveStartWeight(){
+  const sw=_swInt+_swDec/10;
+  if(sw<30||sw>300){toast('некорректный вес');return;}
+  C.user={...C.user,start_weight:sw,goal_type:_goalType};
+  if(!UID)lsSet('user',C.user);
+  popPage();
+  renderProfile();renderProgress();renderHome();
+  toast('начальный вес сохранён');
+  tg?.HapticFeedback?.notificationOccurred('success');
+  apiPost('/api/profile',{start_weight:sw,goal_type:_goalType});
 }
 
 /* ══ WEIGHT STEPPER ══ */
@@ -1627,16 +1664,14 @@ function toggleDay(day,el){
   if(_actDays.length===0)toggleDayDaily();
 }
 
-/* ══ LONG PRESS (hold → native confirm → delete) ══ */
+/* ══ LONG PRESS ══ */
 let _lpTimer=null,_lpEl=null;
-
 function startLongPress(id,el){
   if(_lpEl)cancelLongPress();
   _lpEl=el;
   _lpTimer=setTimeout(()=>{
     _lpTimer=null;
-    const savedEl=_lpEl;
-    _lpEl=null;
+    const savedEl=_lpEl;_lpEl=null;
     tg?.HapticFeedback?.notificationOccurred('warning');
     navigator.vibrate?.([30,10,40]);
     const actName=savedEl?.querySelector('.ac-name')?.textContent||'активность';
@@ -1648,69 +1683,52 @@ function cancelLongPress(){
   _lpEl=null;
 }
 
-/* ══ DELETE DIRECTLY ══ */
+/* ══ DELETE ══ */
 async function deleteActDirectly(id,cardEl){
   tg?.HapticFeedback?.notificationOccurred('warning');
-  // Remove from data immediately so nothing can bring it back
   C.acts_today=C.acts_today.filter(x=>x.id!==id);
+  if(!UID)lsSet('acts_'+TODAY,C.acts_today);
   if(_completingMap.has(id)){clearTimeout(_completingMap.get(id).hideTimer);_completingMap.delete(id);}
 
   function _afterDelete(){
-    // Update counters without full re-render
     const acts=gActs();
     const done=acts.filter(a=>a.completed).length,total=acts.length;
     T('pl-cnt',total?`${done}/${total}`:'0/0');
     requestAnimationFrame(()=>{const r=$('pl-ring');if(r)r.setAttribute('stroke-dashoffset',125.7*(1-(total?done/total:0)));});
-    // Show empty state only if no active tasks AND no cards still animating
-    const activeTasks=acts.filter(a=>!a.completed);
-    const hasAnimating=_completingMap.size>0||document.querySelectorAll('#pl-list .ac').length>0;
-    const empty=$('pl-empty'),list=$('pl-list');
-    if(!activeTasks.length&&!hasAnimating){
-      if(list){list.innerHTML='';list.style.display='none';}
-      if(empty)empty.style.display='';
-    }
     renderHome();
   }
 
   toast('удалено');
   if(cardEl&&cardEl.parentNode){
     const h=cardEl.offsetHeight;
-    cardEl.style.height=h+'px';
-    cardEl.style.overflow='hidden';
-    cardEl.style.flexShrink='0';
+    cardEl.style.height=h+'px';cardEl.style.overflow='hidden';cardEl.style.flexShrink='0';
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
-      cardEl.style.transition='opacity .3s ease,transform .3s ease,height .33s cubic-bezier(.4,0,.2,1),margin-bottom .33s ease';
-      cardEl.style.opacity='0';
-      cardEl.style.transform='translateX(32px) scale(0.95)';
-      cardEl.style.height='0';
-      cardEl.style.marginBottom='0';
-      cardEl.style.paddingTop='0';
+      cardEl.style.transition='opacity .25s ease,transform .25s ease,height .27s cubic-bezier(.4,0,.2,1),margin-bottom .27s ease';
+      cardEl.style.opacity='0';cardEl.style.transform='translateX(32px) scale(0.95)';
+      cardEl.style.height='0';cardEl.style.marginBottom='0';cardEl.style.paddingTop='0';
       setTimeout(()=>{
         if(cardEl.parentNode)cardEl.remove();
         _afterDelete();
-      },340);
+      },280);
     }));
-  }else{
-    _afterDelete();
-  }
+  }else{_afterDelete();}
   await apiPost('/api/activity/delete',{act_id:id});
 }
 
 /* ══ COMPLETING MAP ══ */
 const _completingMap=new Map();
 
-/* ══ COMPLETE ACT (5s countdown then animate out — no renderPlan ever) ══ */
+/* ══ COMPLETE ACT ══ */
 async function completeAct(id){
   const act=C.acts_today.find(x=>x.id===id);
   if(!act)return;
 
-  // Undo path
+  // Undo
   if(_completingMap.has(id)){
     const{hideTimer}=_completingMap.get(id);
-    clearTimeout(hideTimer);
-    _completingMap.delete(id);
+    clearTimeout(hideTimer);_completingMap.delete(id);
     C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:0}:x);
-    // Restore card visually
+    if(!UID)lsSet('acts_'+TODAY,C.acts_today);
     const cardEl=document.querySelector(`#pl-list .ac[data-id="${id}"]`);
     if(cardEl){
       cardEl.classList.remove('done');
@@ -1719,10 +1737,7 @@ async function completeAct(id){
       const btn=cardEl.querySelector('.complete-btn-js');
       if(btn){btn.innerHTML='✓';btn.style.background='';btn.style.color='';btn.onclick=()=>completeAct(id);}
       const tb=cardEl.querySelector('.ac-timer-bar');if(tb)tb.remove();
-      // Restore height
-      cardEl.style.transition='height .3s ease';
-      cardEl.style.height='';
-      cardEl.style.overflow='';
+      cardEl.style.transition='height .25s ease';cardEl.style.height='';cardEl.style.overflow='';
     }
     _updatePlanCounters();
     toast('отменено');tg?.HapticFeedback?.notificationOccurred('warning');
@@ -1732,8 +1747,8 @@ async function completeAct(id){
 
   if(act.completed)return;
 
-  // Mark completed
   C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:1}:x);
+  if(!UID)lsSet('acts_'+TODAY,C.acts_today);
   _updatePlanCounters();
   renderHome();
   tg?.HapticFeedback?.notificationOccurred('success');
@@ -1748,42 +1763,27 @@ async function completeAct(id){
     if(btn){btn.innerHTML='↩';btn.style.background='rgba(82,193,119,.12)';btn.style.color='var(--green)';btn.onclick=(e)=>{e.stopPropagation();completeAct(id);};}
 
     const timerBar=document.createElement('div');
-    timerBar.className='ac-timer-bar';
-    timerBar.style.width='100%';
+    timerBar.className='ac-timer-bar';timerBar.style.width='100%';
     cardEl.appendChild(timerBar);
     requestAnimationFrame(()=>requestAnimationFrame(()=>{timerBar.style.width='0%';}));
 
-    // Lock height so nothing jumps
-    cardEl.style.height=cardEl.offsetHeight+'px';
-    cardEl.style.overflow='hidden';
+    // Lock height to prevent layout jump
+    cardEl.style.height=cardEl.offsetHeight+'px';cardEl.style.overflow='hidden';
 
     const hideTimer=setTimeout(()=>{
       _completingMap.delete(id);
       requestAnimationFrame(()=>{
-        cardEl.style.transition=
-          'opacity .4s ease,'+
-          'transform .4s cubic-bezier(.4,0,.2,1),'+
-          'height .42s cubic-bezier(.4,0,.2,1),'+
-          'margin-bottom .42s ease';
-        cardEl.style.opacity='0';
-        cardEl.style.transform='translateX(60px)';
-        cardEl.style.height='0';
-        cardEl.style.marginBottom='0';
+        cardEl.style.transition='opacity .3s ease,transform .3s cubic-bezier(.4,0,.2,1),height .32s cubic-bezier(.4,0,.2,1),margin-bottom .32s ease';
+        cardEl.style.opacity='0';cardEl.style.transform='translateX(60px)';
+        cardEl.style.height='0';cardEl.style.marginBottom='0';
         setTimeout(()=>{
           if(cardEl.parentNode)cardEl.remove();
-          // Once ALL animations are done — just clear the list silently and reload
           if(_completingMap.size===0){
-            const list=$('pl-list');
-            // Only blank out if truly no active cards remain in DOM
-            if(list&&list.querySelectorAll('.ac').length===0){
-              list.innerHTML='';list.style.display='none';
-            }
-            // Reload will properly set empty-state (avoids flash)
-            reload().then(()=>{/* silent */});
+            reload().then(()=>{});
           }
-        },430);
+        },330);
       });
-    },5100);
+    },3600); // 3.6s timer (matches 3.55s CSS transition + small buffer)
 
     _completingMap.set(id,{hideTimer});
     await apiPost('/api/activity/complete',{act_id:id});
@@ -1803,11 +1803,11 @@ function _updatePlanCounters(){
 
 function openDoneActs(){pushPage('pp-done-acts');}
 
-/* ══ CLEAR HISTORY ══ */
+/* ══ CLEAR / RESET ══ */
 function clearWaterHistory(){
   if(!confirm('очистить всю воду за сегодня?'))return;
   C.water={total:0,entries:[],streak:C.water.streak||0};
-  if(!UID){try{localStorage.removeItem('lf2_wd_'+TODAY);}catch{}}
+  if(!UID)lsSet('wd_'+TODAY,{total:0,entries:[]});
   renderTrack('water');renderHome();toast('история воды очищена');
   if(curPushPage==='pp-water-hist')_populatePP('pp-water-hist');
   apiPost('/api/water/clear',{});
@@ -1815,6 +1815,7 @@ function clearWaterHistory(){
 function clearSleepHistory(){
   if(!confirm('удалить всю историю сна?'))return;
   C.sleep_log=[];
+  if(!UID)lsSet('slog',[]);
   renderSleep();renderHome();toast('история сна удалена');
   if(curPushPage==='pp-sleep-hist')_populatePP('pp-sleep-hist');
   apiPost('/api/sleep/clear',{});
@@ -1822,9 +1823,29 @@ function clearSleepHistory(){
 function clearWeightHistory(){
   if(!confirm('удалить всю историю веса?'))return;
   C.weight_log=[];
+  if(!UID)lsSet('wlog',[]);
   renderProgress();renderHome();toast('история веса удалена');
   if(curPushPage==='pp-history')_populatePP('pp-history');
   apiPost('/api/weight/clear',{});
+}
+function resetAllData(){
+  if(!confirm('удалить ВСЕ данные?\nПрофиль, вес, сон, вода, план — всё будет удалено.'))return;
+  // Clear localStorage
+  const keys=Object.keys(localStorage).filter(k=>k.startsWith('lf2_'));
+  keys.forEach(k=>{try{localStorage.removeItem(k);}catch{}});
+  // Reset in-memory
+  const name=tgUser?.first_name||'Гость';
+  C={
+    user:{name,height:0,age:0,start_weight:0,goal_weight:0,water_goal:2000,cal_goal:2000,gender:'male',goal_type:'lose'},
+    settings:{show_weight:1,show_water:1,show_calories:1,show_sleep:1},
+    water:{total:0,entries:[],streak:0},calories:{},
+    weight_log:[],sleep_log:[],acts_today:[],products:[]
+  };
+  _completingMap.clear();
+  renderHome();renderProfile();renderProgress();renderPlan();renderSleep();renderTrack(trackTab);
+  toast('все данные сброшены');
+  tg?.HapticFeedback?.notificationOccurred('warning');
+  apiPost('/api/reset',{});
 }
 
 /* ══ SUBMIT ACTIONS ══ */
@@ -1832,12 +1853,14 @@ let _addWBusy=false;
 async function addW(ml){
   if(_addWBusy)return;_addWBusy=true;
   C.water.total=(C.water.total||0)+ml;C.water.entries=[...(C.water.entries||[]),ml];
+  if(!UID)lsSet('wd_'+TODAY,{total:C.water.total,entries:C.water.entries});
   renderTrack('water');renderHome();toast('+'+ml+' мл');tg?.HapticFeedback?.impactOccurred('light');
   apiPost('/api/water',{amount:ml});setTimeout(()=>{_addWBusy=false;},250);
 }
 async function undoW(){
   if(!C.water.entries?.length){toast('нечего отменять');return;}
   const last=C.water.entries.pop();C.water.total=Math.max(0,(C.water.total||0)-last);
+  if(!UID)lsSet('wd_'+TODAY,{total:C.water.total,entries:C.water.entries});
   renderTrack('water');renderHome();toast('отменено −'+last+' мл');apiPost('/api/water/undo',{});
 }
 async function submitWeight(){
@@ -1845,7 +1868,15 @@ async function submitWeight(){
   if(v<30||v>300){toast('некорректный вес');return;}
   popPage();
   C.weight_log=[...(C.weight_log||[]),{weight:v,logged_at:TODAY}];
-  if(!C.user.start_weight)C.user.start_weight=v;
+  // Set start weight if not set
+  if(!C.user.start_weight||C.user.start_weight===0){
+    C.user.start_weight=v;
+  }
+  // Persist to localStorage for demo mode
+  if(!UID){
+    lsSet('wlog',C.weight_log);
+    lsSet('user',C.user);
+  }
   renderHome();renderProgress();toast('вес '+v.toFixed(1)+' кг сохранён');tg?.HapticFeedback?.notificationOccurred('success');
   await apiPost('/api/weight',{weight:v});
   await reload();
@@ -1854,6 +1885,7 @@ async function submitSleep(){
   const hrs=_slH+(_slMin/60);
   popPage();
   C.sleep_log=[...(C.sleep_log||[]),{hours:hrs,quality:_sleepQ,logged_at:TODAY}];
+  if(!UID)lsSet('slog',C.sleep_log);
   renderSleep();renderHome();toast('сон '+(_slH+(_slMin?'.5':''))+' ч сохранён');tg?.HapticFeedback?.notificationOccurred('success');
   await apiPost('/api/sleep',{hours:hrs,quality:_sleepQ});await reload();
 }
@@ -1862,6 +1894,7 @@ async function submitCal(){
   if(!_calVal||_calVal<10){toast('выбери калории');return;}
   popPage();
   if(!C.calories)C.calories={};C.calories[_mealType]=(C.calories[_mealType]||0)+_calVal;
+  if(!UID)lsSet('cd_'+TODAY,C.calories);
   renderTrack('cal');renderHome();toast('+'+_calVal+' ккал');tg?.HapticFeedback?.notificationOccurred('success');
   await apiPost('/api/calories',{amount:_calVal,meal_type:_mealType,description:desc});await reload();
 }
@@ -1871,6 +1904,7 @@ function _saveProfileSilent(){
   const age=parseInt(document.getElementById('inp-age')?.value);
   if(!name)return;
   C.user={...C.user,name,height:height||0,age:age||0,gender:_gender};
+  if(!UID)lsSet('user',C.user);
   renderProfile();renderHome();toast('профиль сохранён');
   apiPost('/api/profile',{name,height:height||0,age:age||0,gender:_gender});
 }
@@ -1879,7 +1913,8 @@ function _saveGoalsSilent(){
   const gwat=parseInt(document.getElementById('inp-gwat')?.value)||2000;
   const gcal=parseInt(document.getElementById('inp-gcal')?.value)||2000;
   C.user={...C.user,goal_weight:gw,water_goal:gwat,cal_goal:gcal};
-  renderProfile();renderHome();toast('цели сохранены');
+  if(!UID)lsSet('user',C.user);
+  renderProfile();renderHome();renderProgress();toast('цели сохранены');
   apiPost('/api/goals',{goal_weight:gw,water_goal:gwat,cal_goal:gcal});
 }
 async function submitAct(){
@@ -1890,6 +1925,7 @@ async function submitAct(){
   const fid=Date.now();
   const days=_actDays.length&&_actDays.length<7?_actDays:[];
   C.acts_today=[...(C.acts_today||[]),{id:fid,name,type:_actType,scheduled_at:`${TODAY}T${time}:00`,duration:_actDur,completed:0,repeat_days:days}];
+  if(!UID)lsSet('acts_'+TODAY,C.acts_today);
   renderPlan();renderHome();toast(name+' добавлено 🎉');tg?.HapticFeedback?.notificationOccurred('success');
   await apiPost('/api/activity/create',{name,type:_actType,time,duration:_actDur,repeat_days:days});await reload();
 }
@@ -1922,106 +1958,63 @@ function fmtRange(a){
 let _tt;
 function toast(msg){const el=$('toast');if(!el)return;el.textContent=msg;el.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),1800);}
 
-/* ══════════════════════════════════════════
-   WEIGHT CHART — SVG, fixed ordering & push page
-   Oldest LEFT → Newest RIGHT, auto-scroll to right
-══════════════════════════════════════════ */
+/* ══ WEIGHT CHART ══ */
 function drawWeightChart(data){
   const wrap=document.getElementById('wchart-svg-wrap');
   const container=document.getElementById('wchart-container');
   if(!wrap||!container)return;
-
-  // Sort ascending: oldest left → newest right
   data=[...data].sort((a,b)=>(a.logged_at||'').localeCompare(b.logged_at||''));
-
   if(!data||data.length<2){
     wrap.innerHTML=`<div style="text-align:center;padding:48px 16px;color:var(--hint);font-size:13px;font-weight:700">нет данных для графика<br><span style="font-size:11px;opacity:.6">запиши хотя бы 2 записи веса</span></div>`;
     return;
   }
-
-  // Deduplicate by date — keep last entry per date
   const byDate=new Map();
   data.forEach(d=>byDate.set(d.logged_at,d));
   data=[...byDate.values()].sort((a,b)=>a.logged_at.localeCompare(b.logged_at));
-
   const n=data.length;
-  // Measure container width after DOM is ready
   const containerW=container.clientWidth||320;
   const minColW=56;
-  const W=Math.max(containerW-4, n*minColW+40);
-  const H=160;
-  const PAD={l:36,r:16,t:32,b:28};
-  const chartW=W-PAD.l-PAD.r;
-  const chartH=H-PAD.t-PAD.b;
-
+  const W=Math.max(containerW-4,n*minColW+40);
+  const H=160,PAD={l:36,r:16,t:32,b:28};
+  const chartW=W-PAD.l-PAD.r,chartH=H-PAD.t-PAD.b;
   const ws=data.map(d=>d.weight);
-  const rawMin=Math.min(...ws);
-  const rawMax=Math.max(...ws);
+  const rawMin=Math.min(...ws),rawMax=Math.max(...ws);
   const span=rawMax-rawMin||0.5;
-  const mn=rawMin-span*0.2;
-  const mx=rawMax+span*0.2;
-  const rng=mx-mn;
-
+  const mn=rawMin-span*0.2,mx=rawMax+span*0.2,rng=mx-mn;
   const xStep=n>1?chartW/(n-1):0;
-  const pts=data.map((d,i)=>{
-    const x=PAD.l+i*xStep;
-    const y=PAD.t+chartH*(1-(d.weight-mn)/rng);
-    return{x,y,w:d.weight,d:d.logged_at};
-  });
-
+  const pts=data.map((d,i)=>({x:PAD.l+i*xStep,y:PAD.t+chartH*(1-(d.weight-mn)/rng),w:d.weight,d:d.logged_at}));
   const dark=document.body.classList.contains('tg-dark');
   const accent='#FF6B35';
   const hintC=dark?'rgba(255,255,255,0.3)':'rgba(0,0,0,0.28)';
   const labelC=dark?'rgba(255,255,255,0.5)':'rgba(0,0,0,0.45)';
   const bg2C=dark?'#181818':'#ffffff';
   const gridC=dark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.06)';
-
-  // Smooth bezier
   function makePath(pts){
     if(pts.length===1)return`M${pts[0].x},${pts[0].y}`;
     let d=`M${pts[0].x},${pts[0].y}`;
-    for(let i=0;i<pts.length-1;i++){
-      const cx=(pts[i].x+pts[i+1].x)/2;
-      d+=` C${cx},${pts[i].y} ${cx},${pts[i+1].y} ${pts[i+1].x},${pts[i+1].y}`;
-    }
+    for(let i=0;i<pts.length-1;i++){const cx=(pts[i].x+pts[i+1].x)/2;d+=` C${cx},${pts[i].y} ${cx},${pts[i+1].y} ${pts[i+1].x},${pts[i+1].y}`;}
     return d;
   }
-
   const linePath=makePath(pts);
-  const fillPath=linePath
-    +` L${pts[pts.length-1].x},${H-PAD.b+4}`
-    +` L${pts[0].x},${H-PAD.b+4} Z`;
-
+  const fillPath=linePath+` L${pts[pts.length-1].x},${H-PAD.b+4} L${pts[0].x},${H-PAD.b+4} Z`;
   const uid=Math.random().toString(36).slice(2,7);
-  const gradId='g'+uid;
-  const glowId='gw'+uid;
-  const clipId='cl'+uid;
-
-  // Y-axis labels (3 levels)
+  const gradId='g'+uid,glowId='gw'+uid,clipId='cl'+uid;
   const yLabels=[0.15,0.5,0.85].map(f=>{
-    const gy=PAD.t+chartH*f;
-    const val=mx-rng*f;
+    const gy=PAD.t+chartH*f,val=mx-rng*f;
     return`<text x="${PAD.l-4}" y="${gy+4}" text-anchor="end" font-family="Onest,sans-serif" font-size="8.5" font-weight="700" fill="${hintC}">${val.toFixed(1)}</text>
     <line x1="${PAD.l}" y1="${gy}" x2="${W-PAD.r}" y2="${gy}" stroke="${gridC}" stroke-width="1" stroke-dasharray="3,3"/>`;
   }).join('');
-
   const lastIdx=pts.length-1;
   const dotsHTML=pts.map((p,i)=>{
-    const isLast=i===lastIdx;
-    const r=isLast?5.5:3.5;
+    const isLast=i===lastIdx,r=isLast?5.5:3.5;
     const lbX=Math.max(PAD.l+10,Math.min(W-PAD.r-10,p.x));
-    return`
-    <circle cx="${p.x}" cy="${p.y}" r="${r}" fill="${accent}" opacity="${isLast?1:0.75}"/>
+    return`<circle cx="${p.x}" cy="${p.y}" r="${r}" fill="${accent}" opacity="${isLast?1:0.75}"/>
     <circle cx="${p.x}" cy="${p.y}" r="${r-1.8}" fill="${bg2C}"/>
     <text x="${lbX}" y="${p.y-9}" text-anchor="middle" font-family="Onest,sans-serif" font-size="${isLast?10:8.5}" font-weight="${isLast?900:700}" fill="${isLast?accent:labelC}">${p.w.toFixed(1)}</text>
     <text x="${lbX}" y="${H-PAD.b+14}" text-anchor="middle" font-family="Onest,sans-serif" font-size="8" font-weight="600" fill="${hintC}">${fmtMD(p.d)}</text>`;
   }).join('');
-
   const lastPt=pts[lastIdx];
-
-  wrap.style.width=W+'px';
-  wrap.style.minWidth=W+'px';
-  wrap.style.display='block';
+  wrap.style.width=W+'px';wrap.style.minWidth=W+'px';wrap.style.display='block';
   wrap.innerHTML=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="display:block;overflow:visible">
   <defs>
     <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
@@ -2032,9 +2025,7 @@ function drawWeightChart(data){
       <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
-    <clipPath id="${clipId}">
-      <rect x="${PAD.l}" y="0" width="${chartW}" height="${H}"/>
-    </clipPath>
+    <clipPath id="${clipId}"><rect x="${PAD.l}" y="0" width="${chartW}" height="${H}"/></clipPath>
   </defs>
   ${yLabels}
   <g clip-path="url(#${clipId})">
@@ -2048,17 +2039,14 @@ function drawWeightChart(data){
   </g>
   ${dotsHTML}
 </svg>`;
-
-  // Scroll to the RIGHT (newest entry) — use setTimeout to ensure layout done
   setTimeout(()=>{container.scrollLeft=container.scrollWidth;},60);
 }
 
 function _populateWeightChart(){
-  const wl=gWL(); // already sorted ascending (oldest first)
+  const wl=gWL();
   const data=wl.length>30?wl.slice(-30):wl;
   const sub=document.getElementById('wc-sub');
   if(sub)sub.textContent=data.length+' записей · последние '+Math.min(30,data.length)+' дней';
-  // Render stat list
   const statEl=document.getElementById('wc-stat-list');
   if(statEl&&wl.length){
     const cw=wl[wl.length-1].weight;
@@ -2072,7 +2060,6 @@ function _populateWeightChart(){
       ${gw?`<div class="sbox"><div class="sv" style="color:var(--water)">${gw.toFixed(1)}</div><div class="sl">цель кг</div></div>`:''}
     </div>`;
   }
-  // Draw chart after the push page is visible and has layout
   requestAnimationFrame(()=>requestAnimationFrame(()=>drawWeightChart(data)));
 }
 
@@ -2097,14 +2084,22 @@ function renderHome(){
     requestAnimationFrame(()=>{const a=$('arc-s');if(a)a.setAttribute('stroke-dashoffset',163.4*(1-Math.min(1,last.hours/9)));});
     T('arc-sh',last.hours.toFixed(1));
   }
+  // Weight progress — simple & correct
   if(wl.length){
-    const cw=wl[wl.length-1].weight,gw=u.goal_weight;
-    const allW=wl.map(d=>d.weight);
-    const sw=gw&&gw<cw?Math.max(...allW):(gw&&gw>cw?Math.min(...allW):(u.start_weight||allW[0]||cw));
+    const cw=wl[wl.length-1].weight;
+    const gw=u.goal_weight||0;
+    const sw=u.start_weight&&u.start_weight>0?u.start_weight:wl[0].weight;
     T('h-wcur',cw.toFixed(1));T('h-wgoal',gw?gw.toFixed(1):'—');
-    const tot=Math.abs(sw-gw)||1,done=Math.abs(sw-cw);
-    const pct=gw?Math.min(100,Math.max(0,Math.round(done/tot*100))):0;
-    T('h-wpct',pct+'%');requestAnimationFrame(()=>{const b=$('h-wbar');if(b)b.style.width=pct+'%';});
+    if(gw&&Math.abs(sw-gw)>0.01){
+      const total=Math.abs(sw-gw),done=Math.abs(sw-cw);
+      const pct=Math.min(100,Math.max(0,Math.round(done/total*100)));
+      T('h-wpct',pct+'%');
+      requestAnimationFrame(()=>{const b=$('h-wbar');if(b)b.style.width=pct+'%';});
+    }else{
+      T('h-wpct',gw?'0%':'—');
+    }
+  }else{
+    T('h-wcur','—');T('h-wgoal',gU().goal_weight?gU().goal_weight.toFixed(1):'—');T('h-wpct','—');
   }
   const streak=gStreak();
   const sw=$('h-streak-w');if(sw)sw.style.display=streak>=2?'':'none';
@@ -2143,6 +2138,7 @@ function renderHome(){
     }
   }
 }
+
 function renderTrack(tab){if(tab==='water')renderWater();else renderCal();}
 function renderWater(){
   const u=gU(),wd=gWD();
@@ -2160,8 +2156,8 @@ function renderCal(){
   const MEALS=[{k:'breakfast',i:'🌅',n:'завтрак',col:'#FF9800'},{k:'lunch',i:'☀️',n:'обед',col:'#FF6B35'},{k:'dinner',i:'🌙',n:'ужин',col:'#8B7FD4'},{k:'snack',i:'🍑',n:'перекус',col:'#52C177'},{k:'other',i:'🌿',n:'другое',col:'#607D8B'}];
   H('c-meals',MEALS.map(m=>`<div class="mr"><div class="mr-ico" style="background:${m.col}18;color:${m.col}">${m.i}</div><div style="flex:1"><div class="mr-name">${m.n}</div>${!cd[m.k]?`<div class="t5" style="font-size:10px">не записано</div>`:''}</div><div class="mr-kcal" style="${cd[m.k]?'color:var(--cal)':'color:var(--hint)'}">${cd[m.k]||'—'} ${cd[m.k]?'ккал':''}</div></div>`).join(''));
 }
+
 function renderPlan(){
-  // Never re-render while cards are animating — it causes flicker and jumping
   if(_completingMap.size>0)return;
   const acts=gActs();const now=new Date();
   const mons=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
@@ -2169,18 +2165,14 @@ function renderPlan(){
   const done=acts.filter(a=>a.completed).length,total=acts.length;
   T('pl-cnt',total?`${done}/${total}`:'0/0');
   requestAnimationFrame(()=>{const r=$('pl-ring');if(r)r.setAttribute('stroke-dashoffset',125.7*(1-(total?done/total:0)));});
-  const empty=$('pl-empty'),list=$('pl-list');
+  const list=$('pl-list');
   const activeTasks=acts.filter(a=>!a.completed);
-  const domCards=document.querySelectorAll('#pl-list .ac');
+  if(!list)return;
   if(!activeTasks.length){
-    // Only show "нет задач" if no tasks exist at all (not just "all completed")
-    if(domCards.length===0){
-      if(empty)empty.style.display=acts.length===0?'':'none';
-      if(list){list.innerHTML='';list.style.display='none';}
-    }
-    return;
+    list.innerHTML='';
+    return; // No empty-state shown — button is always visible via sticky
   }
-  if(empty)empty.style.display='none';if(list)list.style.display='';
+  list.style.display='';
   list.innerHTML=activeTasks.map(a=>{
     const ico=ACT_ICO[a.type]||'✨',col=ACT_COL[a.type]||'#FF9800';
     const st=actStatus(a);
@@ -2201,7 +2193,9 @@ function renderPlan(){
     </div>`;
   }).join('');
 }
+
 setInterval(()=>{if(curTab==='plan'&&_completingMap.size===0)renderPlan();},30000);
+
 function renderSleep(){
   const sl=gSL();
   if(sl.length){const last=sl[sl.length-1];T('sl-h',last.hours.toFixed(1));T('sl-qico',qIco(last.quality));H('sl-dots',Array.from({length:5},(_,i)=>`<div class="sqd${i<last.quality?' on':''}"></div>`).join(''));}
@@ -2209,47 +2203,63 @@ function renderSleep(){
   const l7=gSL().slice(-7).reverse();
   if(l7.length){T('sl-avg-h',+(l7.reduce((a,b)=>a+b.hours,0)/l7.length).toFixed(1));T('sl-avg-q',qIco(Math.round(l7.reduce((a,b)=>a+(b.quality||3),0)/l7.length))+' '+(l7.reduce((a,b)=>a+(b.quality||3),0)/l7.length).toFixed(1));}
 }
+
 function renderProgress(){
   const u=gU(),wl=gWL(),sl=gSL(),wd=gWD();
   if(wl.length){
     const cw=wl[wl.length-1].weight;
     const gw=u.goal_weight||0;
-    const allWeights=wl.map(d=>d.weight);
-    // Start weight: use the most logical reference depending on direction
-    let sw=u.start_weight&&u.start_weight>0?u.start_weight:allWeights[0];
-    if(gw>0&&gw<cw){
-      // Losing weight: start = highest weight on record (or start_weight if higher)
-      sw=Math.max(sw,...allWeights);
-    }else if(gw>0&&gw>cw){
-      // Gaining weight: start = lowest weight on record (or start_weight if lower)
-      sw=Math.min(sw,...allWeights);
-    }
+    // Use explicitly set start_weight; fallback to first log entry
+    const sw=u.start_weight&&u.start_weight>0?u.start_weight:wl[0].weight;
+
     T('pr-wcur',cw.toFixed(1));
     T('pr-wgoal',gw?gw.toFixed(1)+' кг':'—');
     T('pr-wgoal2',gw?gw.toFixed(1):'—');
     T('pr-wstart',sw.toFixed(1));
-    const tot=Math.abs(sw-gw)||1;
-    const done=Math.abs(sw-cw);
-    const pct=gw?Math.min(100,Math.max(0,Math.round(done/tot*100))):0;
-    T('pr-wpct',pct+'%');
-    // Use sw as the reference for "lost/gained" — consistent with what's displayed as "start"
-    const diff=sw-cw;
-    const diffLabel=gw&&gw<sw?`потеряно ${Math.abs(diff).toFixed(1)} кг · осталось ${gw?Math.max(0,Math.abs(cw-gw)).toFixed(1)+' кг':'—'}`
-                              :`набрано ${Math.abs(diff).toFixed(1)} кг · осталось ${gw?Math.max(0,Math.abs(cw-gw)).toFixed(1)+' кг':'—'}`;
-    T('pr-winfo',gw?diffLabel:`текущий вес · нет цели`);
-    requestAnimationFrame(()=>{const b=$('pr-wbar');if(b)b.style.width=pct+'%';});
-    if(wl.length>=2&&gw&&cw>gw){try{
-      const d1=new Date(wl[0].logged_at+'T00:00:00'),d2=new Date(wl[wl.length-1].logged_at+'T00:00:00');
-      const dd=Math.max(1,(d2-d1)/86400000),rate=(wl[0].weight-cw)/dd*7;
-      if(rate>.01){const dl=Math.ceil((cw-gw)/rate*7),eta=new Date();eta.setDate(eta.getDate()+dl);const mons=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];T('pr-forecast','прогноз: '+eta.getDate()+' '+mons[eta.getMonth()]+' · темп '+rate.toFixed(2)+' кг/нед');}
-      else{T('pr-forecast','');}
-    }catch{T('pr-forecast','');}}
-    else{T('pr-forecast','');}
+
+    if(gw&&Math.abs(sw-gw)>0.01){
+      const total=Math.abs(sw-gw);
+      const done=Math.abs(sw-cw);
+      const pct=Math.min(100,Math.max(0,Math.round(done/total*100)));
+      T('pr-wpct',pct+'%');
+      requestAnimationFrame(()=>{const b=$('pr-wbar');if(b)b.style.width=pct+'%';});
+      const isLosing=gw<sw;
+      const diffVal=Math.max(0,isLosing?sw-cw:cw-sw);
+      const rem=Math.max(0,Math.abs(cw-gw));
+      T('pr-winfo',(isLosing?'потеряно ':'набрано ')+diffVal.toFixed(1)+' кг · осталось '+rem.toFixed(1)+' кг');
+    }else if(!gw){
+      T('pr-wpct','—');T('pr-winfo','укажи целевой вес в «мои цели»');
+      requestAnimationFrame(()=>{const b=$('pr-wbar');if(b)b.style.width='0%';});
+    }else{
+      T('pr-wpct','0%');T('pr-winfo','укажи начальный вес в настройках');
+      requestAnimationFrame(()=>{const b=$('pr-wbar');if(b)b.style.width='0%';});
+    }
+
+    // Forecast
+    if(wl.length>=2&&gw&&sw){
+      try{
+        const d1=new Date(wl[0].logged_at+'T00:00:00'),d2=new Date(wl[wl.length-1].logged_at+'T00:00:00');
+        const dd=Math.max(1,(d2-d1)/86400000);
+        const rate=Math.abs(wl[0].weight-cw)/dd*7;
+        if(rate>0.01){
+          const dl=Math.ceil(Math.abs(cw-gw)/rate*7);
+          const eta=new Date();eta.setDate(eta.getDate()+dl);
+          const mons=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+          T('pr-forecast','прогноз: '+eta.getDate()+' '+mons[eta.getMonth()]+' · темп '+rate.toFixed(2)+' кг/нед');
+        }else T('pr-forecast','');
+      }catch{T('pr-forecast','');}
+    }else T('pr-forecast','');
+  }else{
+    T('pr-wcur','—');T('pr-wgoal','—');T('pr-wstart','—');
+    T('pr-winfo','запиши первый вес и укажи начальный вес');
+    T('pr-wpct','—');
+    requestAnimationFrame(()=>{const b=$('pr-wbar');if(b)b.style.width='0%';});
+    T('pr-forecast','');
   }
-  // No inline chart — chart is in pp-weight-chart push page
   T('pw-water',wd.total||0);T('pw-cal',totalCal());
   T('pw-sleep',sl.length?+(sl.slice(-7).reduce((a,b)=>a+b.hours,0)/Math.min(7,sl.length)).toFixed(1):'—');
 }
+
 function renderProfile(){
   const u=gU(),wl=gWL();
   const av=$('pf-av');if(av)av.textContent=(u.name||'?').charAt(0).toUpperCase();
@@ -2257,6 +2267,11 @@ function renderProfile(){
   const meta=[];if(u.age)meta.push(u.age+' лет');if(u.height)meta.push(u.height+' см');if(u.gender)meta.push(u.gender==='male'?'♂':'♀');
   T('pf-meta',meta.join(' · ')||'—');
   T('pf-gw',u.goal_weight?u.goal_weight+' кг':'—');T('pf-pname',u.name||'—');
+  // Show start weight + goal type
+  const swLabel=u.start_weight&&u.start_weight>0
+    ?(u.start_weight.toFixed(1)+' кг · '+(u.goal_type==='gain'?'набор':'похудение'))
+    :'не задан';
+  T('pf-sw',swLabel);
   const bmiRow=$('pf-bmi-row');
   if(u.height&&wl.length){
     const cw=wl[wl.length-1].weight,h2=u.height/100;
@@ -2274,14 +2289,10 @@ document.addEventListener('DOMContentLoaded',async()=>{
   tg?.onEvent('themeChanged',()=>{document.body.classList.toggle('tg-dark',tg?.colorScheme==='dark');applyTheme();});
   await loadData();
   renderHome();
-  // Hide splash
   setTimeout(()=>{
     const sp=document.getElementById('splash');
-    if(sp){
-      sp.classList.add('hiding');
-      setTimeout(()=>sp.remove(),520);
-    }
-  },1400);
+    if(sp){sp.classList.add('hiding');setTimeout(()=>sp.remove(),520);}
+  },1200);
   setInterval(async()=>{if(curTab==='home'&&_completingMap.size===0){await loadData();renderHome();}},30000);
 });
 </script>
