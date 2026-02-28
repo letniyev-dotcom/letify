@@ -1641,51 +1641,80 @@ function cancelLongPress(){
 /* ══ DELETE DIRECTLY ══ */
 async function deleteActDirectly(id,cardEl){
   tg?.HapticFeedback?.notificationOccurred('warning');
+  // Remove from data immediately so nothing can bring it back
+  C.acts_today=C.acts_today.filter(x=>x.id!==id);
+  if(_completingMap.has(id)){clearTimeout(_completingMap.get(id).hideTimer);_completingMap.delete(id);}
+
+  function _afterDelete(){
+    // Update counters without full re-render
+    const acts=gActs();
+    const done=acts.filter(a=>a.completed).length,total=acts.length;
+    T('pl-cnt',total?`${done}/${total}`:'0/0');
+    requestAnimationFrame(()=>{const r=$('pl-ring');if(r)r.setAttribute('stroke-dashoffset',125.7*(1-(total?done/total:0)));});
+    // Show empty state only if no active tasks AND no cards still animating
+    const activeTasks=acts.filter(a=>!a.completed);
+    const hasAnimating=_completingMap.size>0||document.querySelectorAll('#pl-list .ac').length>0;
+    const empty=$('pl-empty'),list=$('pl-list');
+    if(!activeTasks.length&&!hasAnimating){
+      if(list){list.innerHTML='';list.style.display='none';}
+      if(empty)empty.style.display='';
+    }
+    renderHome();
+  }
+
+  toast('удалено');
   if(cardEl&&cardEl.parentNode){
-    // Freeze height before animation to prevent layout jumps
-    const h=cardEl.offsetHeight+8; // +8 for margin-bottom
-    cardEl.style.height=cardEl.offsetHeight+'px';
+    const h=cardEl.offsetHeight;
+    cardEl.style.height=h+'px';
     cardEl.style.overflow='hidden';
     cardEl.style.flexShrink='0';
-    requestAnimationFrame(()=>{
-      requestAnimationFrame(()=>{
-        cardEl.style.transition='opacity .35s ease, transform .35s ease, height .38s cubic-bezier(.4,0,.2,1), margin-bottom .38s ease';
-        cardEl.style.opacity='0';
-        cardEl.style.transform='translateX(28px) scale(0.95)';
-        cardEl.style.height='0';
-        cardEl.style.marginBottom='0';
-        setTimeout(()=>{
-          C.acts_today=C.acts_today.filter(x=>x.id!==id);
-          if(_completingMap.has(id)){clearTimeout(_completingMap.get(id).hideTimer);_completingMap.delete(id);}
-          if(cardEl.parentNode)cardEl.remove();
-          renderPlan();renderHome();
-        },390);
-      });
-    });
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      cardEl.style.transition='opacity .3s ease,transform .3s ease,height .33s cubic-bezier(.4,0,.2,1),margin-bottom .33s ease';
+      cardEl.style.opacity='0';
+      cardEl.style.transform='translateX(32px) scale(0.95)';
+      cardEl.style.height='0';
+      cardEl.style.marginBottom='0';
+      cardEl.style.paddingTop='0';
+      setTimeout(()=>{
+        if(cardEl.parentNode)cardEl.remove();
+        _afterDelete();
+      },340);
+    }));
   }else{
-    C.acts_today=C.acts_today.filter(x=>x.id!==id);
-    renderPlan();renderHome();
+    _afterDelete();
   }
-  toast('удалено');
   await apiPost('/api/activity/delete',{act_id:id});
-  setTimeout(async()=>{await reload();},600);
 }
 
 /* ══ COMPLETING MAP ══ */
 const _completingMap=new Map();
 
-/* ══ COMPLETE ACT (5s countdown then animate out cleanly) ══ */
+/* ══ COMPLETE ACT (5s countdown then animate out — no renderPlan ever) ══ */
 async function completeAct(id){
   const act=C.acts_today.find(x=>x.id===id);
   if(!act)return;
 
-  // If already completing → undo
+  // Undo path
   if(_completingMap.has(id)){
     const{hideTimer}=_completingMap.get(id);
     clearTimeout(hideTimer);
     _completingMap.delete(id);
     C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:0}:x);
-    renderPlan();renderHome();
+    // Restore card visually
+    const cardEl=document.querySelector(`#pl-list .ac[data-id="${id}"]`);
+    if(cardEl){
+      cardEl.classList.remove('done');
+      const nameEl=cardEl.querySelector('.ac-name');if(nameEl)nameEl.classList.remove('done-text');
+      const pill=cardEl.querySelector('.pill');if(pill){pill.className='pill p-later';pill.innerHTML='запланировано';}
+      const btn=cardEl.querySelector('.complete-btn-js');
+      if(btn){btn.innerHTML='✓';btn.style.background='';btn.style.color='';btn.onclick=()=>completeAct(id);}
+      const tb=cardEl.querySelector('.ac-timer-bar');if(tb)tb.remove();
+      // Restore height
+      cardEl.style.transition='height .3s ease';
+      cardEl.style.height='';
+      cardEl.style.overflow='';
+    }
+    _updatePlanCounters();
     toast('отменено');tg?.HapticFeedback?.notificationOccurred('warning');
     apiPost('/api/activity/uncomplete',{act_id:id});
     return;
@@ -1693,86 +1722,76 @@ async function completeAct(id){
 
   if(act.completed)return;
 
-  // Mark completed in data
+  // Mark completed
   C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:1}:x);
-
-  // Update counters
-  const done=gActs().filter(a=>a.completed).length;
-  const total=gActs().length;
-  T('pl-cnt',`${done}/${total}`);
-  requestAnimationFrame(()=>{const r=$('pl-ring');if(r)r.setAttribute('stroke-dashoffset',125.7*(1-(total?done/total:0)));});
+  _updatePlanCounters();
   renderHome();
-
   tg?.HapticFeedback?.notificationOccurred('success');
   toast('выполнено 🎉');
 
   const cardEl=document.querySelector(`#pl-list .ac[data-id="${id}"]`);
   if(cardEl){
-    // Transform card to done state visually
     cardEl.classList.add('done');
-    const nameEl=cardEl.querySelector('.ac-name');
-    if(nameEl)nameEl.classList.add('done-text');
-    const pill=cardEl.querySelector('.pill');
-    if(pill){pill.className='pill p-ok';pill.innerHTML='✓ выполнено';}
-
-    // Change button to undo
+    const nameEl=cardEl.querySelector('.ac-name');if(nameEl)nameEl.classList.add('done-text');
+    const pill=cardEl.querySelector('.pill');if(pill){pill.className='pill p-ok';pill.innerHTML='✓ выполнено';}
     const btn=cardEl.querySelector('.complete-btn-js');
-    if(btn){
-      btn.innerHTML='↩';
-      btn.style.background='rgba(82,193,119,.12)';
-      btn.style.color='var(--green)';
-      btn.onclick=(e)=>{e.stopPropagation();completeAct(id);};
-    }
+    if(btn){btn.innerHTML='↩';btn.style.background='rgba(82,193,119,.12)';btn.style.color='var(--green)';btn.onclick=(e)=>{e.stopPropagation();completeAct(id);};}
 
-    // Rounded countdown timer bar (depletes over 5s, right side rounded)
     const timerBar=document.createElement('div');
     timerBar.className='ac-timer-bar';
     timerBar.style.width='100%';
     cardEl.appendChild(timerBar);
     requestAnimationFrame(()=>requestAnimationFrame(()=>{timerBar.style.width='0%';}));
 
-    // Lock height now so the card holds its space during animation
-    const lockedH=cardEl.offsetHeight;
-    cardEl.style.height=lockedH+'px';
+    // Lock height so nothing jumps
+    cardEl.style.height=cardEl.offsetHeight+'px';
     cardEl.style.overflow='hidden';
 
     const hideTimer=setTimeout(()=>{
       _completingMap.delete(id);
-      // Clean slide-out: opacity + x-translate + height collapse simultaneously
       requestAnimationFrame(()=>{
         cardEl.style.transition=
-          'opacity .45s ease, '+
-          'transform .45s cubic-bezier(.4,0,.2,1), '+
-          'height .45s cubic-bezier(.4,0,.2,1), '+
-          'margin-bottom .45s ease';
+          'opacity .4s ease,'+
+          'transform .4s cubic-bezier(.4,0,.2,1),'+
+          'height .42s cubic-bezier(.4,0,.2,1),'+
+          'margin-bottom .42s ease';
         cardEl.style.opacity='0';
         cardEl.style.transform='translateX(60px)';
         cardEl.style.height='0';
         cardEl.style.marginBottom='0';
         setTimeout(()=>{
-          // Remove the card element directly — no full re-render needed
           if(cardEl.parentNode)cardEl.remove();
-          // Check if list is now empty and show empty state if needed
-          const activeTasks=C.acts_today.filter(a=>!a.completed);
-          if(!activeTasks.length){
-            const list=$('pl-list');
-            const empty=$('pl-empty');
-            if(list){list.innerHTML='';list.style.display='none';}
-            if(empty)empty.style.display='';
+          // Only show empty state once ALL animations are done
+          if(_completingMap.size===0){
+            const activeTasks=C.acts_today.filter(a=>!a.completed);
+            if(!activeTasks.length){
+              const list=$('pl-list');const empty=$('pl-empty');
+              if(list){list.innerHTML='';list.style.display='none';}
+              if(empty)empty.style.display='';
+            }
+            // Reload data from server quietly
+            reload().then(()=>{/* silent */});
           }
-        },460);
+        },430);
       });
     },5100);
 
     _completingMap.set(id,{hideTimer});
     await apiPost('/api/activity/complete',{act_id:id});
-    setTimeout(async()=>{if(_completingMap.size===0)await reload();},5800);
   }else{
-    renderPlan();
+    _updatePlanCounters();
     await apiPost('/api/activity/complete',{act_id:id});
     await reload();
   }
 }
+
+function _updatePlanCounters(){
+  const acts=gActs();
+  const done=acts.filter(a=>a.completed).length,total=acts.length;
+  T('pl-cnt',total?`${done}/${total}`:'0/0');
+  requestAnimationFrame(()=>{const r=$('pl-ring');if(r)r.setAttribute('stroke-dashoffset',125.7*(1-(total?done/total:0)));});
+}
+
 function openDoneActs(){pushPage('pp-done-acts');}
 
 /* ══ CLEAR HISTORY ══ */
@@ -2133,6 +2152,7 @@ function renderCal(){
   H('c-meals',MEALS.map(m=>`<div class="mr"><div class="mr-ico" style="background:${m.col}18;color:${m.col}">${m.i}</div><div style="flex:1"><div class="mr-name">${m.n}</div>${!cd[m.k]?`<div class="t5" style="font-size:10px">не записано</div>`:''}</div><div class="mr-kcal" style="${cd[m.k]?'color:var(--cal)':'color:var(--hint)'}">${cd[m.k]||'—'} ${cd[m.k]?'ккал':''}</div></div>`).join(''));
 }
 function renderPlan(){
+  // Never re-render while cards are animating — it causes flicker and jumping
   if(_completingMap.size>0)return;
   const acts=gActs();const now=new Date();
   const mons=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
@@ -2142,9 +2162,13 @@ function renderPlan(){
   requestAnimationFrame(()=>{const r=$('pl-ring');if(r)r.setAttribute('stroke-dashoffset',125.7*(1-(total?done/total:0)));});
   const empty=$('pl-empty'),list=$('pl-list');
   const activeTasks=acts.filter(a=>!a.completed);
+  const domCards=document.querySelectorAll('#pl-list .ac');
   if(!activeTasks.length){
-    if(empty)empty.style.display=acts.length?'none':'';
-    if(list){list.innerHTML='';list.style.display='none';}
+    // Only show empty if no DOM cards still animating
+    if(domCards.length===0){
+      if(empty)empty.style.display=acts.length?'none':'';
+      if(list){list.innerHTML='';list.style.display='none';}
+    }
     return;
   }
   if(empty)empty.style.display='none';if(list)list.style.display='';
