@@ -18,6 +18,8 @@
 <meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
 <title>letify</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
@@ -47,47 +49,79 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   background:var(--bg);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:0;
-  transition:opacity .45s ease,transform .45s ease;
-  will-change:opacity;
+  transition:opacity .5s ease,transform .5s ease;
+  will-change:opacity,transform;
+  overflow:hidden;
 }
-#splash.hiding{opacity:0;transform:scale(1.03);}
+#splash::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:radial-gradient(ellipse 70% 50% at 50% 40%, rgba(255,107,53,.13) 0%, transparent 70%);
+  pointer-events:none;
+}
+#splash::after{
+  content:'';
+  position:absolute;
+  width:340px;height:340px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(255,171,64,.09) 0%, transparent 70%);
+  top:50%;left:50%;transform:translate(-50%,-60%);
+  pointer-events:none;
+  animation:sp-glow 3s ease-in-out infinite;
+}
+#splash.hiding{opacity:0;transform:scale(1.04);}
 .sp-logo{
-  width:84px;height:84px;border-radius:28px;
-  background:linear-gradient(135deg,var(--sun),var(--sun2));
+  width:96px;height:96px;border-radius:32px;
+  background:linear-gradient(145deg,#FF6B35,#FFAB40);
   display:flex;align-items:center;justify-content:center;
-  font-size:42px;
-  box-shadow:0 16px 48px rgba(255,107,53,.32),0 4px 12px rgba(255,107,53,.18);
-  margin-bottom:22px;
-  animation:sp-pop .7s cubic-bezier(.34,1.7,.64,1) forwards;
-  transform:scale(.5) translateY(30px);opacity:0;
+  font-size:46px;
+  box-shadow:0 20px 60px rgba(255,107,53,.35),0 6px 16px rgba(255,107,53,.2),inset 0 1px 0 rgba(255,255,255,.3);
+  margin-bottom:28px;
+  animation:sp-pop .75s cubic-bezier(.34,1.7,.64,1) forwards;
+  transform:scale(.4) translateY(40px);opacity:0;
+  position:relative;z-index:1;
 }
 .sp-title{
-  font-size:40px;font-weight:900;letter-spacing:-.04em;
-  background:linear-gradient(105deg,var(--sun),var(--sun2));
+  font-family:'Onest',sans-serif;
+  font-size:48px;font-weight:900;letter-spacing:-.05em;
+  background:linear-gradient(110deg,#FF5520,#FF6B35,#FFAB40);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  animation:sp-up .5s .18s ease forwards;
-  opacity:0;transform:translateY(12px);
+  animation:sp-up .55s .2s cubic-bezier(.34,1.3,.64,1) forwards;
+  opacity:0;transform:translateY(16px);
+  position:relative;z-index:1;
 }
 .sp-sub{
-  font-size:14px;font-weight:600;color:var(--hint);margin-top:7px;
-  animation:sp-up .5s .32s ease forwards;
+  font-family:'Onest',sans-serif;
+  font-size:15px;font-weight:600;color:var(--hint);margin-top:8px;
+  letter-spacing:.02em;
+  animation:sp-up .5s .35s ease forwards;
   opacity:0;transform:translateY(8px);
+  position:relative;z-index:1;
+}
+.sp-divider{
+  width:40px;height:2px;border-radius:99px;
+  background:linear-gradient(90deg,var(--sun),var(--sun2));
+  margin-top:28px;opacity:0;
+  animation:sp-up .4s .5s ease forwards,sp-grow .7s .5s cubic-bezier(.34,1.3,.64,1) forwards;
+  transform-origin:center;
+  position:relative;z-index:1;
 }
 .sp-dots{
-  display:flex;gap:7px;margin-top:44px;
-  animation:sp-up .5s .5s ease forwards;
-  opacity:0;transform:translateY(6px);
+  display:flex;gap:8px;
 }
 .sp-dot{
-  width:7px;height:7px;border-radius:50%;
+  width:8px;height:8px;border-radius:50%;
   background:linear-gradient(135deg,var(--sun),var(--sun2));
-  animation:sp-pulse 1.4s .6s ease-in-out infinite;
+  animation:sp-bounce 1.5s ease-in-out infinite;
 }
-.sp-dot:nth-child(2){animation-delay:.75s;opacity:.65;}
-.sp-dot:nth-child(3){animation-delay:.9s;opacity:.35;}
+.sp-dot:nth-child(2){animation-delay:.18s;opacity:.65;}
+.sp-dot:nth-child(3){animation-delay:.36s;opacity:.35;}
 @keyframes sp-pop{to{transform:scale(1) translateY(0);opacity:1}}
 @keyframes sp-up{to{opacity:1;transform:translateY(0)}}
-@keyframes sp-pulse{0%,100%{transform:scale(1) translateY(0);opacity:.5}50%{transform:scale(1.45) translateY(-3px);opacity:1}}
+@keyframes sp-glow{0%,100%{opacity:.6;transform:translate(-50%,-60%) scale(1)}50%{opacity:1;transform:translate(-50%,-60%) scale(1.1)}}
+@keyframes sp-bounce{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(-5px);opacity:1}}
+@keyframes sp-grow{from{width:20px}to{width:40px}}
 
 /* ══ MAIN PAGES ══ */
 .page{
@@ -304,28 +338,17 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .ac-barf{height:100%;border-radius:99px;transition:width .4s ease}
 .tg-dark .ac-bar{background:rgba(255,255,255,.1)}
 
-/* ══ LP INDICATOR (long press) ══ */
-.lp-indicator{
-  position:absolute;bottom:0;left:0;
-  height:3px;width:0;
-  background:var(--red);
-  border-radius:0 3px 0 0;
-  opacity:0;
-  transition:none;
-}
-.ac.lp-active .lp-indicator{
-  opacity:1;width:100%;
-  transition:width 3s linear;
-  border-radius:0;
-}
+/* ══ LP INDICATOR (long press) — REMOVED, using confirm dialog instead ══ */
+.lp-indicator{display:none}
 
 /* ══ COMPLETING TIMER BAR ══ */
 .ac-timer-bar{
   position:absolute;bottom:0;left:0;
   height:3px;
-  background:var(--green);
-  border-radius:0;
+  background:linear-gradient(90deg,rgba(82,193,119,.5),var(--green));
+  border-radius:0 99px 99px 0;
   transition:width 5.05s linear;
+  pointer-events:none;
 }
 
 /* ══ SLEEP DOTS ══ */
@@ -441,9 +464,21 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .m3-tog-lbl{flex:1;font-size:14px;font-weight:700}
 .tg-dark .m3-tog-row{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08)}
 
-/* ══ CHART ══ */
-.chart-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin:0 -2px;padding:0 2px;}
-.chart-scroll::-webkit-scrollbar{display:none}
+/* ══ WEIGHT CHART (SVG-based) ══ */
+.wchart-wrap{
+  width:100%;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  margin:4px -2px 0;
+  padding:0 2px 4px;
+}
+.wchart-wrap::-webkit-scrollbar{display:none}
+.wchart-svg{
+  display:block;
+  min-width:100%;
+  overflow:visible;
+}
 
 /* ══ EMPTY ══ */
 .empty{text-align:center;padding:40px 20px}
@@ -488,6 +523,36 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .time-arr-btn:active{transform:scale(.96);opacity:.7;transition:transform .06s ease,opacity .06s ease}
 .tg-dark .time-arr-btn{background:rgba(255,255,255,.08)}
 
+/* ══ CUSTOM CONFIRM SHEET ══ */
+#confirm-overlay{
+  position:fixed;inset:0;z-index:99998;
+  background:rgba(0,0,0,.5);
+  backdrop-filter:blur(4px);
+  display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity .22s ease;
+}
+#confirm-overlay.show{opacity:1;pointer-events:all}
+#confirm-sheet{
+  background:var(--bg2);
+  border-radius:24px 24px 0 0;
+  padding:12px 20px calc(var(--sb) + 20px);
+  width:100%;max-width:480px;
+  transform:translateY(100%);
+  transition:transform .28s cubic-bezier(.34,1.1,.64,1);
+  box-shadow:0 -8px 40px rgba(0,0,0,.15);
+}
+.tg-dark #confirm-sheet{background:#1a1a1a;border:1px solid rgba(255,255,255,.1);border-bottom:none}
+#confirm-overlay.show #confirm-sheet{transform:translateY(0)}
+.confirm-handle{width:36px;height:4px;border-radius:99px;background:var(--brd);margin:0 auto 18px}
+.confirm-title{font-size:18px;font-weight:900;letter-spacing:-.02em;margin-bottom:6px;text-align:center}
+.confirm-sub{font-size:13px;color:var(--hint);font-weight:600;text-align:center;margin-bottom:22px}
+.confirm-btns{display:flex;gap:10px}
+.confirm-btn-cancel{flex:1;padding:14px;border-radius:14px;border:none;cursor:pointer;font-family:inherit;font-size:15px;font-weight:800;background:var(--bg3);color:var(--text);transition:opacity .1s}
+.confirm-btn-ok{flex:1;padding:14px;border-radius:14px;border:none;cursor:pointer;font-family:inherit;font-size:15px;font-weight:800;background:rgba(244,92,92,.1);color:var(--red);transition:opacity .1s}
+.confirm-btn-cancel:active,.confirm-btn-ok:active{opacity:.7}
+.tg-dark .confirm-btn-cancel{background:rgba(255,255,255,.1);color:#fff}
+
 /* ══ DARK OVERRIDES ══ */
 .tg-dark{--bg3:rgba(255,255,255,.07);--brd:rgba(255,255,255,.09);--sh:0 2px 12px rgba(0,0,0,.4)}
 .tg-dark .push-page,.tg-dark .pp-hdr{background:var(--bg)}
@@ -508,9 +573,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 <!-- ══ SPLASH ══ -->
 <div id="splash">
-  <div class="sp-logo">☀️</div>
-  <div class="sp-title">letify</div>
-  <div class="sp-sub">твой путь к лету</div>
   <div class="sp-dots">
     <div class="sp-dot"></div>
     <div class="sp-dot"></div>
@@ -671,7 +733,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 </div>
 </div>
 <div class="pad" style="margin-top:4px">
-  <div style="font-size:10px;font-weight:700;color:var(--hint);text-align:center;padding:6px 0 2px;letter-spacing:.04em">удержи карточку 3 сек чтобы удалить</div>
+  <div style="font-size:10px;font-weight:700;color:var(--hint);text-align:center;padding:6px 0 2px;letter-spacing:.04em">удержи карточку чтобы удалить</div>
 </div>
 <div id="pl-empty" class="empty" style="display:none">
   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
@@ -679,7 +741,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   <div class="empty-s">нажми кнопку ниже чтобы добавить</div>
 </div>
 <div class="pad" id="pl-list" style="margin-top:4px"></div>
-<div class="pad gap">
+<div class="pad gap" id="pl-add-btn-wrap">
   <button class="btn btn-p" onclick="pushPage('pp-act')">добавить активность</button>
 </div>
 <div style="height:8px"></div>
@@ -746,9 +808,9 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 </div>
 <div class="pad gap">
 <div class="card" style="padding:14px">
-  <div class="t5" style="margin-bottom:8px">динамика веса</div>
-  <div class="chart-scroll" id="chart-scroll-wrap">
-    <canvas id="wchart" height="90" style="display:block"></canvas>
+  <div class="t5" style="margin-bottom:12px">динамика веса</div>
+  <div class="wchart-wrap" id="wchart-container">
+    <div id="wchart-svg-wrap" style="min-width:100%"></div>
   </div>
 </div>
 </div>
@@ -798,7 +860,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
 </div>
 </div>
-<div style="text-align:center;padding:16px 0 8px"><div class="t5">letify · ver 4.1</div></div>
+<div style="text-align:center;padding:16px 0 8px"><div class="t5">letify · ver 4.2</div></div>
 <div style="height:8px"></div>
 </div>
 
@@ -1145,6 +1207,19 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
 </div>
 
+<!-- ══ CUSTOM CONFIRM SHEET ══ -->
+<div id="confirm-overlay" onclick="confirmCancel()">
+  <div id="confirm-sheet" onclick="event.stopPropagation()">
+    <div class="confirm-handle"></div>
+    <div class="confirm-title" id="confirm-title">удалить?</div>
+    <div class="confirm-sub" id="confirm-sub">это действие нельзя отменить</div>
+    <div class="confirm-btns">
+      <button class="confirm-btn-cancel" onclick="confirmCancel()">отмена</button>
+      <button class="confirm-btn-ok" id="confirm-ok-btn" onclick="confirmOk()">удалить</button>
+    </div>
+  </div>
+</div>
+
 <!-- NAV -->
 <nav id="nav">
   <div class="nt on" id="nt-home" onclick="navTo('home')">
@@ -1271,13 +1346,14 @@ async function apiPost(path,body){
 }
 async function reload(){
   await loadData();
-  if(_completingMap.size>0)return; // don't re-render during animations
+  if(_completingMap.size>0)return;
   const rMap={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};
   rMap[curTab]?.();
 }
 
 const gU=()=>C.user;
 const gSS=()=>({w:!!C.settings?.show_weight,water:!!C.settings?.show_water,cal:!!C.settings?.show_calories,sleep:!!C.settings?.show_sleep});
+// Sort ascending: oldest first (left), newest last (right)
 const gWL=()=>C.weight_log.map(r=>({weight:r.weight,logged_at:(r.logged_at||'').slice(0,10)})).sort((a,b)=>(a.logged_at||'').localeCompare(b.logged_at||''));
 const gSL=()=>C.sleep_log.map(r=>({hours:r.hours,quality:r.quality,logged_at:(r.logged_at||'').slice(0,10)}));
 const gWD=()=>C.water;const gCD=()=>C.calories;
@@ -1574,53 +1650,83 @@ function toggleDay(day,el){
   if(_actDays.length===0)toggleDayDaily();
 }
 
-/* ══ LONG PRESS (3s, no confirmation) ══ */
+/* ══ CUSTOM CONFIRM SHEET ══ */
+let _confirmCallback=null;
+function showConfirm(title,sub,okLabel,cb){
+  _confirmCallback=cb;
+  const ov=document.getElementById('confirm-overlay');
+  const t=document.getElementById('confirm-title');
+  const s=document.getElementById('confirm-sub');
+  const ob=document.getElementById('confirm-ok-btn');
+  if(t)t.textContent=title;
+  if(s)s.textContent=sub||'это действие нельзя отменить';
+  if(ob)ob.textContent=okLabel||'удалить';
+  if(ov)ov.classList.add('show');
+  tg?.HapticFeedback?.impactOccurred('medium');
+}
+function confirmOk(){
+  const ov=document.getElementById('confirm-overlay');
+  if(ov)ov.classList.remove('show');
+  if(_confirmCallback){const cb=_confirmCallback;_confirmCallback=null;cb();}
+}
+function confirmCancel(){
+  const ov=document.getElementById('confirm-overlay');
+  if(ov)ov.classList.remove('show');
+  _confirmCallback=null;
+}
+
+/* ══ LONG PRESS (hold → confirm sheet → delete) ══ */
 let _lpTimer=null,_lpEl=null;
 
 function startLongPress(id,el){
   if(_lpEl)cancelLongPress();
   _lpEl=el;
-  // Trigger CSS animation for progress bar
-  el.classList.add('lp-active');
+  // Subtle haptic start
   _lpTimer=setTimeout(()=>{
     _lpTimer=null;
     const savedEl=_lpEl;
     _lpEl=null;
-    if(savedEl)savedEl.classList.remove('lp-active');
-    deleteActDirectly(id,savedEl);
-  },3000);
+    tg?.HapticFeedback?.notificationOccurred('warning');
+    navigator.vibrate?.([30,10,40]);
+    // Show confirm sheet instead of deleting silently
+    const actName=savedEl?.querySelector('.ac-name')?.textContent||'активность';
+    showConfirm(
+      'удалить «'+actName+'»?',
+      'задача будет удалена из плана навсегда',
+      'удалить',
+      ()=>deleteActDirectly(id,savedEl)
+    );
+  },700);
 }
 function cancelLongPress(){
   if(_lpTimer){clearTimeout(_lpTimer);_lpTimer=null;}
-  if(_lpEl){
-    const ind=_lpEl.querySelector('.lp-indicator');
-    if(ind){ind.style.transition='none';ind.style.width='0';ind.style.opacity='0';}
-    _lpEl.classList.remove('lp-active');
-    _lpEl=null;
-  }
+  _lpEl=null;
 }
 
 /* ══ DELETE DIRECTLY ══ */
 async function deleteActDirectly(id,cardEl){
   tg?.HapticFeedback?.notificationOccurred('warning');
-  navigator.vibrate?.([40,20,60]);
   if(cardEl&&cardEl.parentNode){
-    const h=cardEl.offsetHeight;
-    cardEl.style.maxHeight=h+'px';
+    // Freeze height before animation to prevent layout jumps
+    const h=cardEl.offsetHeight+8; // +8 for margin-bottom
+    cardEl.style.height=cardEl.offsetHeight+'px';
     cardEl.style.overflow='hidden';
+    cardEl.style.flexShrink='0';
     requestAnimationFrame(()=>{
-      cardEl.style.transition='all .45s cubic-bezier(.4,0,.2,1)';
-      cardEl.style.opacity='0';
-      cardEl.style.transform='scale(0.92) translateX(24px)';
-      cardEl.style.maxHeight='0';
-      cardEl.style.marginBottom='0';
-      cardEl.style.padding='0';
+      requestAnimationFrame(()=>{
+        cardEl.style.transition='opacity .35s ease, transform .35s ease, height .38s cubic-bezier(.4,0,.2,1), margin-bottom .38s ease';
+        cardEl.style.opacity='0';
+        cardEl.style.transform='translateX(28px) scale(0.95)';
+        cardEl.style.height='0';
+        cardEl.style.marginBottom='0';
+        setTimeout(()=>{
+          C.acts_today=C.acts_today.filter(x=>x.id!==id);
+          if(_completingMap.has(id)){clearTimeout(_completingMap.get(id).hideTimer);_completingMap.delete(id);}
+          if(cardEl.parentNode)cardEl.remove();
+          renderPlan();renderHome();
+        },390);
+      });
     });
-    setTimeout(()=>{
-      C.acts_today=C.acts_today.filter(x=>x.id!==id);
-      if(_completingMap.has(id)){clearTimeout(_completingMap.get(id).hideTimer);_completingMap.delete(id);}
-      renderPlan();renderHome();
-    },460);
   }else{
     C.acts_today=C.acts_today.filter(x=>x.id!==id);
     renderPlan();renderHome();
@@ -1633,12 +1739,12 @@ async function deleteActDirectly(id,cardEl){
 /* ══ COMPLETING MAP ══ */
 const _completingMap=new Map();
 
-/* ══ COMPLETE ACT (5s then animate out) ══ */
+/* ══ COMPLETE ACT (5s countdown then animate out cleanly) ══ */
 async function completeAct(id){
   const act=C.acts_today.find(x=>x.id===id);
   if(!act)return;
 
-  // If already in completing state, this is undo
+  // If already completing → undo
   if(_completingMap.has(id)){
     const{hideTimer}=_completingMap.get(id);
     clearTimeout(hideTimer);
@@ -1652,10 +1758,10 @@ async function completeAct(id){
 
   if(act.completed)return;
 
-  // Mark as completed in data
+  // Mark completed in data
   C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:1}:x);
 
-  // Update counters immediately
+  // Update counters
   const done=gActs().filter(a=>a.completed).length;
   const total=gActs().length;
   T('pl-cnt',`${done}/${total}`);
@@ -1667,7 +1773,7 @@ async function completeAct(id){
 
   const cardEl=document.querySelector(`#pl-list .ac[data-id="${id}"]`);
   if(cardEl){
-    // Transform to done state
+    // Transform card to done state visually
     cardEl.classList.add('done');
     const nameEl=cardEl.querySelector('.ac-name');
     if(nameEl)nameEl.classList.add('done-text');
@@ -1683,34 +1789,48 @@ async function completeAct(id){
       btn.onclick=(e)=>{e.stopPropagation();completeAct(id);};
     }
 
-    // Add countdown timer bar (depletes over 5s)
+    // Rounded countdown timer bar (depletes over 5s, right side rounded)
     const timerBar=document.createElement('div');
     timerBar.className='ac-timer-bar';
     timerBar.style.width='100%';
     cardEl.appendChild(timerBar);
-    // Trigger the CSS transition (depletion)
     requestAnimationFrame(()=>requestAnimationFrame(()=>{timerBar.style.width='0%';}));
 
-    // Measure height for animation
-    const h=cardEl.offsetHeight;
-    cardEl.style.maxHeight=h+'px';
+    // Lock height now so the card holds its space during animation
+    const lockedH=cardEl.offsetHeight;
+    cardEl.style.height=lockedH+'px';
     cardEl.style.overflow='hidden';
 
     const hideTimer=setTimeout(()=>{
       _completingMap.delete(id);
+      // Clean slide-out: opacity + x-translate + height collapse simultaneously
       requestAnimationFrame(()=>{
-        cardEl.style.transition='opacity .55s ease, transform .55s cubic-bezier(.4,0,.2,1), max-height .55s ease, margin-bottom .55s ease';
+        cardEl.style.transition=
+          'opacity .45s ease, '+
+          'transform .45s cubic-bezier(.4,0,.2,1), '+
+          'height .45s cubic-bezier(.4,0,.2,1), '+
+          'margin-bottom .45s ease';
         cardEl.style.opacity='0';
-        cardEl.style.transform='translateX(64px) scale(0.94)';
-        cardEl.style.maxHeight='0';
+        cardEl.style.transform='translateX(60px)';
+        cardEl.style.height='0';
         cardEl.style.marginBottom='0';
-        setTimeout(()=>{renderPlan();},560);
+        setTimeout(()=>{
+          // Remove the card element directly — no full re-render needed
+          if(cardEl.parentNode)cardEl.remove();
+          // Check if list is now empty and show empty state if needed
+          const activeTasks=C.acts_today.filter(a=>!a.completed);
+          if(!activeTasks.length){
+            const list=$('pl-list');
+            const empty=$('pl-empty');
+            if(list){list.innerHTML='';list.style.display='none';}
+            if(empty)empty.style.display='';
+          }
+        },460);
       });
     },5100);
 
     _completingMap.set(id,{hideTimer});
     await apiPost('/api/activity/complete',{act_id:id});
-    // Delay reload until after full animation
     setTimeout(async()=>{if(_completingMap.size===0)await reload();},5800);
   }else{
     renderPlan();
@@ -1722,26 +1842,29 @@ function openDoneActs(){pushPage('pp-done-acts');}
 
 /* ══ CLEAR HISTORY ══ */
 function clearWaterHistory(){
-  if(!confirm('очистить всю воду за сегодня?'))return;
-  C.water={total:0,entries:[],streak:C.water.streak||0};
-  if(!UID){try{localStorage.removeItem('lf2_wd_'+TODAY);}catch{}}
-  renderTrack('water');renderHome();toast('история воды очищена');
-  if(curPushPage==='pp-water-hist')_populatePP('pp-water-hist');
-  apiPost('/api/water/clear',{});
+  showConfirm('очистить воду?','сбросит всю воду за сегодня','очистить',()=>{
+    C.water={total:0,entries:[],streak:C.water.streak||0};
+    if(!UID){try{localStorage.removeItem('lf2_wd_'+TODAY);}catch{}}
+    renderTrack('water');renderHome();toast('история воды очищена');
+    if(curPushPage==='pp-water-hist')_populatePP('pp-water-hist');
+    apiPost('/api/water/clear',{});
+  });
 }
 function clearSleepHistory(){
-  if(!confirm('удалить всю историю сна?'))return;
-  C.sleep_log=[];
-  renderSleep();renderHome();toast('история сна удалена');
-  if(curPushPage==='pp-sleep-hist')_populatePP('pp-sleep-hist');
-  apiPost('/api/sleep/clear',{});
+  showConfirm('удалить историю сна?','данные будут удалены навсегда','удалить',()=>{
+    C.sleep_log=[];
+    renderSleep();renderHome();toast('история сна удалена');
+    if(curPushPage==='pp-sleep-hist')_populatePP('pp-sleep-hist');
+    apiPost('/api/sleep/clear',{});
+  });
 }
 function clearWeightHistory(){
-  if(!confirm('удалить всю историю веса?'))return;
-  C.weight_log=[];
-  renderProgress();renderHome();toast('история веса удалена');
-  if(curPushPage==='pp-history')_populatePP('pp-history');
-  apiPost('/api/weight/clear',{});
+  showConfirm('удалить историю веса?','данные будут удалены навсегда','удалить',()=>{
+    C.weight_log=[];
+    renderProgress();renderHome();toast('история веса удалена');
+    if(curPushPage==='pp-history')_populatePP('pp-history');
+    apiPost('/api/weight/clear',{});
+  });
 }
 
 /* ══ SUBMIT ACTIONS ══ */
@@ -1767,7 +1890,7 @@ async function submitWeight(){
   await apiPost('/api/weight',{weight:v});
   await reload();
   const wl=gWL();
-  scheduleChart(wl.length>14?wl.slice(-14):wl,true);
+  drawWeightChart(wl.length>14?wl.slice(-14):wl);
 }
 async function submitSleep(){
   const hrs=_slH+(_slMin/60);
@@ -1841,115 +1964,130 @@ function fmtRange(a){
 let _tt;
 function toast(msg){const el=$('toast');if(!el)return;el.textContent=msg;el.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),1800);}
 
-/* ══ CHART (fixed: old→new left→right, auto-scroll to latest) ══ */
-let _chartRAF=null,_chartAnimRAF=null,_chartScheduled=null;
+/* ══════════════════════════════════════════
+   WEIGHT CHART — full SVG redesign
+   Oldest entries LEFT → Newest entries RIGHT
+══════════════════════════════════════════ */
+function drawWeightChart(data){
+  const wrap=document.getElementById('wchart-svg-wrap');
+  if(!wrap)return;
 
-function scheduleChart(data,animate){
-  clearTimeout(_chartScheduled);
-  _chartScheduled=setTimeout(()=>drawChart(data,animate),60);
-}
+  // Always sort ascending: oldest on left, newest on right
+  data=[...data].sort((a,b)=>(a.logged_at||'').localeCompare(b.logged_at||''));
 
-function drawChart(data,animate){
-  const canvas=$('wchart');if(!canvas)return;
-  cancelAnimationFrame(_chartRAF);
-  _chartRAF=requestAnimationFrame(()=>{
-    // Sort ascending: oldest left → newest right
-    if(data&&data.length>1){
-      data=[...data].sort((a,b)=>(a.logged_at||'').localeCompare(b.logged_at||''));
-    }
-    const dpr=Math.min(window.devicePixelRatio||1,2);
-    const scrollEl=canvas.parentElement;
-    const containerW=scrollEl?.clientWidth||300;
-    const minCols=Math.max(data?data.length:5,5);
-    const W=Math.max(containerW,minCols*54+40);
-    const H=100;
-    canvas.width=W*dpr;canvas.height=H*dpr;
-    canvas.style.width=W+'px';canvas.style.height=H+'px';
-    const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
-    const cs=getComputedStyle(document.documentElement);
-    const sun=cs.getPropertyValue('--sun').trim()||'#FF6B35';
-    const hint=cs.getPropertyValue('--hint').trim()||'#A89F90';
-    const bg2=cs.getPropertyValue('--bg2').trim()||'#fff';
-    ctx.clearRect(0,0,W,H);
-    if(!data||data.length<2){
-      ctx.fillStyle=hint;ctx.font='600 12px Onest,sans-serif';ctx.textAlign='center';ctx.fillText('нет данных',W/2,H/2);
-      return;
-    }
-    const ws=data.map(d=>d.weight);
-    const mn=Math.min(...ws)-.8,mx=Math.max(...ws)+.8,rng=mx-mn||1;
-    const pl={l:30,r:30,t:24,b:26};
-    const xs=(W-pl.l-pl.r)/(data.length-1);
-    const yf=w=>pl.t+(1-(w-mn)/rng)*(H-pl.t-pl.b);
-    const pts=data.map((d,i)=>[pl.l+i*xs,yf(d.weight)]);
+  if(!data||data.length<2){
+    wrap.innerHTML=`<div style="text-align:center;padding:32px 16px;color:var(--hint);font-size:13px;font-weight:700">нет данных для графика</div>`;
+    return;
+  }
 
-    const _drawFrame=(progress)=>{
-      ctx.clearRect(0,0,W,H);
-      const p=Math.min(1,progress??1);
+  // Compute layout
+  const n=data.length;
+  const colW=Math.max(52, Math.floor((wrap.clientWidth||280)/(n+0.5)));
+  const W=Math.max(wrap.clientWidth||280, n*colW+32);
+  const H=130;
+  const PAD={l:10,r:10,t:28,b:24};
+  const chartW=W-PAD.l-PAD.r;
+  const chartH=H-PAD.t-PAD.b;
 
-      // Grid lines (subtle)
-      ctx.strokeStyle=hint+'22';ctx.lineWidth=1;
-      for(let i=1;i<3;i++){
-        const y=pl.t+(H-pl.t-pl.b)*i/3;
-        ctx.beginPath();ctx.moveTo(pl.l,y);ctx.lineTo(W-pl.r,y);ctx.stroke();
-      }
+  const ws=data.map(d=>d.weight);
+  const rawMin=Math.min(...ws);
+  const rawMax=Math.max(...ws);
+  const span=rawMax-rawMin||1;
+  const mn=rawMin-span*0.18;
+  const mx=rawMax+span*0.18;
+  const rng=mx-mn;
 
-      // Gradient fill
-      const clipCount=Math.floor(p*(pts.length-1));
-      const grad=ctx.createLinearGradient(0,0,0,H);
-      grad.addColorStop(0,'rgba(255,107,53,.2)');grad.addColorStop(1,'rgba(255,107,53,0)');
-      ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);
-      const nPts=animate?Math.min(pts.length,clipCount+2):pts.length;
-      for(let i=0;i<nPts-1;i++){
-        const cx=(pts[i][0]+pts[i+1][0])/2;
-        ctx.bezierCurveTo(cx,pts[i][1],cx,pts[i+1][1],pts[i+1][0],pts[i+1][1]);
-      }
-      ctx.lineTo(pts[Math.min(nPts-1,pts.length-1)][0],H);
-      ctx.lineTo(pts[0][0],H);ctx.closePath();
-      ctx.fillStyle=grad;ctx.globalAlpha=p;ctx.fill();ctx.globalAlpha=1;
-
-      // Line
-      ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);
-      for(let i=0;i<nPts-1;i++){
-        const cx=(pts[i][0]+pts[i+1][0])/2;
-        ctx.bezierCurveTo(cx,pts[i][1],cx,pts[i+1][1],pts[i+1][0],pts[i+1][1]);
-      }
-      ctx.strokeStyle=sun;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.lineCap='round';ctx.stroke();
-
-      // Dots + labels
-      for(let i=0;i<nPts;i++){
-        const alpha=animate?Math.max(0,Math.min(1,(p*data.length)-i+1)):1;
-        if(alpha<0.01)continue;
-        ctx.globalAlpha=alpha;
-        ctx.beginPath();ctx.arc(pts[i][0],pts[i][1],4,0,Math.PI*2);ctx.fillStyle=sun;ctx.fill();
-        ctx.beginPath();ctx.arc(pts[i][0],pts[i][1],2.2,0,Math.PI*2);ctx.fillStyle=bg2;ctx.fill();
-        // Weight label
-        ctx.fillStyle=sun;ctx.font='700 9px Onest,sans-serif';ctx.textAlign='center';
-        const lx=Math.max(20,Math.min(W-20,pts[i][0]));
-        ctx.fillText(data[i].weight.toFixed(1),lx,pts[i][1]-9);
-        // Date label
-        ctx.fillStyle=hint;ctx.font='600 8px Onest,sans-serif';
-        ctx.fillText(fmtMD(data[i].logged_at),lx,H-5);
-        ctx.globalAlpha=1;
-      }
-    };
-
-    if(animate){
-      cancelAnimationFrame(_chartAnimRAF);
-      const start=performance.now(),dur=700;
-      const step=(now)=>{
-        const p=(now-start)/dur;
-        _drawFrame(p);
-        if(p<1)_chartAnimRAF=requestAnimationFrame(step);
-        else _drawFrame(1);
-      };
-      _chartAnimRAF=requestAnimationFrame(step);
-    }else{
-      _drawFrame(1);
-    }
-
-    // Auto-scroll to the right to show latest data
-    setTimeout(()=>{if(scrollEl)scrollEl.scrollLeft=scrollEl.scrollWidth;},animate?100:50);
+  // X positions: evenly spaced, first at colW/2, last at W-PAD.r-colW/2
+  const xStep=(n>1)?(chartW-colW)/(n-1):0;
+  const pts=data.map((d,i)=>{
+    const x=PAD.l+colW/2+i*xStep;
+    const y=PAD.t+chartH*(1-(d.weight-mn)/rng);
+    return{x,y,w:d.weight,d:d.logged_at};
   });
+
+  // Build SVG
+  const cs=getComputedStyle(document.documentElement);
+  const dark=document.body.classList.contains('tg-dark');
+  const sunColor='#FF6B35';
+  const hintColor=dark?'rgba(255,255,255,0.28)':'rgba(0,0,0,0.22)';
+  const labelColor=dark?'rgba(255,255,255,0.45)':'rgba(0,0,0,0.35)';
+  const bg2=dark?'#1a1a1a':'#ffffff';
+  const gridColor=dark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.05)';
+
+  // Smooth bezier path
+  function smoothPath(pts){
+    if(pts.length<2)return`M${pts[0].x},${pts[0].y}`;
+    let d=`M${pts[0].x},${pts[0].y}`;
+    for(let i=0;i<pts.length-1;i++){
+      const cx=(pts[i].x+pts[i+1].x)/2;
+      d+=` C${cx},${pts[i].y} ${cx},${pts[i+1].y} ${pts[i+1].x},${pts[i+1].y}`;
+    }
+    return d;
+  }
+
+  const linePath=smoothPath(pts);
+  const fillPath=linePath+` L${pts[pts.length-1].x},${H} L${pts[0].x},${H} Z`;
+
+  const gradId='wg'+Date.now();
+  const glowId='wglow'+Date.now();
+
+  // Determine if trend is down (good) or up
+  const trendDown=pts[pts.length-1].y>pts[0].y;
+  const accentColor=sunColor;
+
+  const dotsHTML=pts.map((p,i)=>{
+    const isLast=i===n-1;
+    const lx=Math.max(PAD.l+16,Math.min(W-PAD.l-16,p.x));
+    return`
+      <text x="${lx}" y="${p.y-10}" text-anchor="middle" font-family="Onest,sans-serif" font-size="9" font-weight="800" fill="${isLast?accentColor:labelColor}">${p.w.toFixed(1)}</text>
+      <circle cx="${p.x}" cy="${p.y}" r="${isLast?5.5:3.5}" fill="${accentColor}" opacity="${isLast?1:0.7}"/>
+      <circle cx="${p.x}" cy="${p.y}" r="${isLast?3:2}" fill="${bg2}"/>
+      <text x="${lx}" y="${H-4}" text-anchor="middle" font-family="Onest,sans-serif" font-size="8" font-weight="600" fill="${hintColor}">${fmtMD(p.d)}</text>
+    `;
+  }).join('');
+
+  // Pulsing glow on last point
+  const lastPt=pts[pts.length-1];
+  const pulseHTML=`
+    <circle cx="${lastPt.x}" cy="${lastPt.y}" r="12" fill="${accentColor}" opacity="0.12">
+      <animate attributeName="r" values="8;14;8" dur="2.4s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.12;0.04;0.12" dur="2.4s" repeatCount="indefinite"/>
+    </circle>
+  `;
+
+  // Horizontal grid lines (3 lines)
+  const gridLines=[0.25,0.5,0.75].map(f=>{
+    const gy=PAD.t+chartH*f;
+    const gw=mn+rng*(1-f);
+    const lx=PAD.l+4;
+    return`<line x1="${PAD.l}" y1="${gy}" x2="${W-PAD.r}" y2="${gy}" stroke="${gridColor}" stroke-width="1"/>
+    <text x="${lx}" y="${gy-3}" font-family="Onest,sans-serif" font-size="7.5" font-weight="600" fill="${hintColor}" opacity="0.7">${gw.toFixed(1)}</text>`;
+  }).join('');
+
+  wrap.style.minWidth=W+'px';
+  wrap.innerHTML=`
+<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block;overflow:visible">
+  <defs>
+    <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${accentColor}" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="${accentColor}" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="${glowId}">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  ${gridLines}
+  <path d="${fillPath}" fill="url(#${gradId})"/>
+  <path d="${linePath}" fill="none" stroke="${accentColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#${glowId})"/>
+  <path d="${linePath}" fill="none" stroke="${accentColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  ${pulseHTML}
+  ${dotsHTML}
+</svg>`;
+
+  // Auto-scroll to the right (newest) after render
+  const container=document.getElementById('wchart-container');
+  if(container)requestAnimationFrame(()=>{container.scrollLeft=container.scrollWidth;});
 }
 
 /* ══ RENDERS ══ */
@@ -2034,7 +2172,7 @@ function renderCal(){
   H('c-meals',MEALS.map(m=>`<div class="mr"><div class="mr-ico" style="background:${m.col}18;color:${m.col}">${m.i}</div><div style="flex:1"><div class="mr-name">${m.n}</div>${!cd[m.k]?`<div class="t5" style="font-size:10px">не записано</div>`:''}</div><div class="mr-kcal" style="${cd[m.k]?'color:var(--cal)':'color:var(--hint)'}">${cd[m.k]||'—'} ${cd[m.k]?'ккал':''}</div></div>`).join(''));
 }
 function renderPlan(){
-  if(_completingMap.size>0)return; // don't interrupt completing animations
+  if(_completingMap.size>0)return;
   const acts=gActs();const now=new Date();
   const mons=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
   T('pl-date','сегодня · '+now.getDate()+' '+mons[now.getMonth()]);
@@ -2066,7 +2204,6 @@ function renderPlan(){
       <div style="flex-shrink:0">
         <button class="btn btn-g complete-btn-js" style="padding:7px 11px;font-size:12px;border-radius:9px" onclick="completeAct(${a.id})">✓</button>
       </div>
-      <div class="lp-indicator"></div>
     </div>`;
   }).join('');
 }
@@ -2094,7 +2231,8 @@ function renderProgress(){
     }catch{}}
   }
   const chartData=wl.length>14?wl.slice(-14):wl;
-  scheduleChart(chartData,false);
+  // Draw chart after layout is ready
+  requestAnimationFrame(()=>drawWeightChart(chartData));
   T('pw-water',wd.total||0);T('pw-cal',totalCal());
   T('pw-sleep',sl.length?+(sl.slice(-7).reduce((a,b)=>a+b.hours,0)/Math.min(7,sl.length)).toFixed(1):'—');
 }
@@ -2122,14 +2260,14 @@ document.addEventListener('DOMContentLoaded',async()=>{
   tg?.onEvent('themeChanged',()=>{document.body.classList.toggle('tg-dark',tg?.colorScheme==='dark');applyTheme();});
   await loadData();
   renderHome();
-  // Hide splash with beautiful transition
+  // Hide splash
   setTimeout(()=>{
     const sp=document.getElementById('splash');
     if(sp){
       sp.classList.add('hiding');
-      setTimeout(()=>sp.remove(),500);
+      setTimeout(()=>sp.remove(),520);
     }
-  },1200);
+  },1400);
   setInterval(async()=>{if(curTab==='home'&&_completingMap.size===0){await loadData();renderHome();}},30000);
 });
 </script>
