@@ -464,21 +464,15 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .m3-tog-lbl{flex:1;font-size:14px;font-weight:700}
 .tg-dark .m3-tog-row{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08)}
 
-/* ══ WEIGHT CHART (SVG-based) ══ */
-.wchart-wrap{
+/* ══ WEIGHT CHART push page ══ */
+.wchart-push-wrap{
   width:100%;
   overflow-x:auto;
   -webkit-overflow-scrolling:touch;
   scrollbar-width:none;
-  margin:4px -2px 0;
-  padding:0 2px 4px;
+  padding-bottom:4px;
 }
-.wchart-wrap::-webkit-scrollbar{display:none}
-.wchart-svg{
-  display:block;
-  min-width:100%;
-  overflow:visible;
-}
+.wchart-push-wrap::-webkit-scrollbar{display:none}
 
 /* ══ EMPTY ══ */
 .empty{text-align:center;padding:40px 20px}
@@ -522,36 +516,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 }
 .time-arr-btn:active{transform:scale(.96);opacity:.7;transition:transform .06s ease,opacity .06s ease}
 .tg-dark .time-arr-btn{background:rgba(255,255,255,.08)}
-
-/* ══ CUSTOM CONFIRM SHEET ══ */
-#confirm-overlay{
-  position:fixed;inset:0;z-index:99998;
-  background:rgba(0,0,0,.5);
-  backdrop-filter:blur(4px);
-  display:flex;align-items:flex-end;justify-content:center;
-  opacity:0;pointer-events:none;
-  transition:opacity .22s ease;
-}
-#confirm-overlay.show{opacity:1;pointer-events:all}
-#confirm-sheet{
-  background:var(--bg2);
-  border-radius:24px 24px 0 0;
-  padding:12px 20px calc(var(--sb) + 20px);
-  width:100%;max-width:480px;
-  transform:translateY(100%);
-  transition:transform .28s cubic-bezier(.34,1.1,.64,1);
-  box-shadow:0 -8px 40px rgba(0,0,0,.15);
-}
-.tg-dark #confirm-sheet{background:#1a1a1a;border:1px solid rgba(255,255,255,.1);border-bottom:none}
-#confirm-overlay.show #confirm-sheet{transform:translateY(0)}
-.confirm-handle{width:36px;height:4px;border-radius:99px;background:var(--brd);margin:0 auto 18px}
-.confirm-title{font-size:18px;font-weight:900;letter-spacing:-.02em;margin-bottom:6px;text-align:center}
-.confirm-sub{font-size:13px;color:var(--hint);font-weight:600;text-align:center;margin-bottom:22px}
-.confirm-btns{display:flex;gap:10px}
-.confirm-btn-cancel{flex:1;padding:14px;border-radius:14px;border:none;cursor:pointer;font-family:inherit;font-size:15px;font-weight:800;background:var(--bg3);color:var(--text);transition:opacity .1s}
-.confirm-btn-ok{flex:1;padding:14px;border-radius:14px;border:none;cursor:pointer;font-family:inherit;font-size:15px;font-weight:800;background:rgba(244,92,92,.1);color:var(--red);transition:opacity .1s}
-.confirm-btn-cancel:active,.confirm-btn-ok:active{opacity:.7}
-.tg-dark .confirm-btn-cancel{background:rgba(255,255,255,.1);color:#fff}
 
 /* ══ DARK OVERRIDES ══ */
 .tg-dark{--bg3:rgba(255,255,255,.07);--brd:rgba(255,255,255,.09);--sh:0 2px 12px rgba(0,0,0,.4)}
@@ -807,12 +771,13 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 </div>
 </div>
 <div class="pad gap">
-<div class="card" style="padding:14px">
-  <div class="t5" style="margin-bottom:12px">динамика веса</div>
-  <div class="wchart-wrap" id="wchart-container">
-    <div id="wchart-svg-wrap" style="min-width:100%"></div>
-  </div>
-</div>
+  <button class="btn btn-g" style="width:100%;padding:14px 16px;font-size:14px;border-radius:14px;display:flex;align-items:center;justify-content:space-between" onclick="pushPage('pp-weight-chart')">
+    <span style="display:flex;align-items:center;gap:8px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-4 4 4 4-6"/></svg>
+      <span style="font-weight:800">динамика веса</span>
+    </span>
+    <span style="color:var(--hint)">открыть →</span>
+  </button>
 </div>
 <div class="sec">эта неделя</div>
 <div class="pad sb-row">
@@ -1207,16 +1172,17 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
 </div>
 
-<!-- ══ CUSTOM CONFIRM SHEET ══ -->
-<div id="confirm-overlay" onclick="confirmCancel()">
-  <div id="confirm-sheet" onclick="event.stopPropagation()">
-    <div class="confirm-handle"></div>
-    <div class="confirm-title" id="confirm-title">удалить?</div>
-    <div class="confirm-sub" id="confirm-sub">это действие нельзя отменить</div>
-    <div class="confirm-btns">
-      <button class="confirm-btn-cancel" onclick="confirmCancel()">отмена</button>
-      <button class="confirm-btn-ok" id="confirm-ok-btn" onclick="confirmOk()">удалить</button>
+<!-- PP: График веса -->
+<div class="push-page" id="pp-weight-chart">
+  <div class="pp-hdr">
+    <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <div><div class="pp-title">динамика веса</div><div class="pp-subtitle" id="wc-sub">история</div></div>
+  </div>
+  <div class="pp-body" style="padding:12px 12px calc(var(--sb)+24px)">
+    <div class="wchart-push-wrap" id="wchart-container">
+      <div id="wchart-svg-wrap"></div>
     </div>
+    <div style="margin-top:16px" id="wc-stat-list"></div>
   </div>
 </div>
 
@@ -1415,6 +1381,7 @@ function popPage(doRender=true){
 }
 function _populatePP(id){
   const u=gU(),ss=gSS();
+  if(id==='pp-weight-chart'){_populateWeightChart();}
   if(id==='pp-weight'){
     const wl=gWL();const iw=wl.length?wl[wl.length-1].weight:70;
     _wtInt=Math.round(Math.floor(iw));_wtDec=Math.round((iw-Math.floor(iw))*10);
@@ -1650,52 +1617,20 @@ function toggleDay(day,el){
   if(_actDays.length===0)toggleDayDaily();
 }
 
-/* ══ CUSTOM CONFIRM SHEET ══ */
-let _confirmCallback=null;
-function showConfirm(title,sub,okLabel,cb){
-  _confirmCallback=cb;
-  const ov=document.getElementById('confirm-overlay');
-  const t=document.getElementById('confirm-title');
-  const s=document.getElementById('confirm-sub');
-  const ob=document.getElementById('confirm-ok-btn');
-  if(t)t.textContent=title;
-  if(s)s.textContent=sub||'это действие нельзя отменить';
-  if(ob)ob.textContent=okLabel||'удалить';
-  if(ov)ov.classList.add('show');
-  tg?.HapticFeedback?.impactOccurred('medium');
-}
-function confirmOk(){
-  const ov=document.getElementById('confirm-overlay');
-  if(ov)ov.classList.remove('show');
-  if(_confirmCallback){const cb=_confirmCallback;_confirmCallback=null;cb();}
-}
-function confirmCancel(){
-  const ov=document.getElementById('confirm-overlay');
-  if(ov)ov.classList.remove('show');
-  _confirmCallback=null;
-}
-
-/* ══ LONG PRESS (hold → confirm sheet → delete) ══ */
+/* ══ LONG PRESS (hold → native confirm → delete) ══ */
 let _lpTimer=null,_lpEl=null;
 
 function startLongPress(id,el){
   if(_lpEl)cancelLongPress();
   _lpEl=el;
-  // Subtle haptic start
   _lpTimer=setTimeout(()=>{
     _lpTimer=null;
     const savedEl=_lpEl;
     _lpEl=null;
     tg?.HapticFeedback?.notificationOccurred('warning');
     navigator.vibrate?.([30,10,40]);
-    // Show confirm sheet instead of deleting silently
     const actName=savedEl?.querySelector('.ac-name')?.textContent||'активность';
-    showConfirm(
-      'удалить «'+actName+'»?',
-      'задача будет удалена из плана навсегда',
-      'удалить',
-      ()=>deleteActDirectly(id,savedEl)
-    );
+    if(confirm('удалить «'+actName+'»?'))deleteActDirectly(id,savedEl);
   },700);
 }
 function cancelLongPress(){
@@ -1842,29 +1777,26 @@ function openDoneActs(){pushPage('pp-done-acts');}
 
 /* ══ CLEAR HISTORY ══ */
 function clearWaterHistory(){
-  showConfirm('очистить воду?','сбросит всю воду за сегодня','очистить',()=>{
-    C.water={total:0,entries:[],streak:C.water.streak||0};
-    if(!UID){try{localStorage.removeItem('lf2_wd_'+TODAY);}catch{}}
-    renderTrack('water');renderHome();toast('история воды очищена');
-    if(curPushPage==='pp-water-hist')_populatePP('pp-water-hist');
-    apiPost('/api/water/clear',{});
-  });
+  if(!confirm('очистить всю воду за сегодня?'))return;
+  C.water={total:0,entries:[],streak:C.water.streak||0};
+  if(!UID){try{localStorage.removeItem('lf2_wd_'+TODAY);}catch{}}
+  renderTrack('water');renderHome();toast('история воды очищена');
+  if(curPushPage==='pp-water-hist')_populatePP('pp-water-hist');
+  apiPost('/api/water/clear',{});
 }
 function clearSleepHistory(){
-  showConfirm('удалить историю сна?','данные будут удалены навсегда','удалить',()=>{
-    C.sleep_log=[];
-    renderSleep();renderHome();toast('история сна удалена');
-    if(curPushPage==='pp-sleep-hist')_populatePP('pp-sleep-hist');
-    apiPost('/api/sleep/clear',{});
-  });
+  if(!confirm('удалить всю историю сна?'))return;
+  C.sleep_log=[];
+  renderSleep();renderHome();toast('история сна удалена');
+  if(curPushPage==='pp-sleep-hist')_populatePP('pp-sleep-hist');
+  apiPost('/api/sleep/clear',{});
 }
 function clearWeightHistory(){
-  showConfirm('удалить историю веса?','данные будут удалены навсегда','удалить',()=>{
-    C.weight_log=[];
-    renderProgress();renderHome();toast('история веса удалена');
-    if(curPushPage==='pp-history')_populatePP('pp-history');
-    apiPost('/api/weight/clear',{});
-  });
+  if(!confirm('удалить всю историю веса?'))return;
+  C.weight_log=[];
+  renderProgress();renderHome();toast('история веса удалена');
+  if(curPushPage==='pp-history')_populatePP('pp-history');
+  apiPost('/api/weight/clear',{});
 }
 
 /* ══ SUBMIT ACTIONS ══ */
@@ -1889,8 +1821,6 @@ async function submitWeight(){
   renderHome();renderProgress();toast('вес '+v.toFixed(1)+' кг сохранён');tg?.HapticFeedback?.notificationOccurred('success');
   await apiPost('/api/weight',{weight:v});
   await reload();
-  const wl=gWL();
-  drawWeightChart(wl.length>14?wl.slice(-14):wl);
 }
 async function submitSleep(){
   const hrs=_slH+(_slMin/60);
@@ -1965,58 +1895,62 @@ let _tt;
 function toast(msg){const el=$('toast');if(!el)return;el.textContent=msg;el.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),1800);}
 
 /* ══════════════════════════════════════════
-   WEIGHT CHART — full SVG redesign
-   Oldest entries LEFT → Newest entries RIGHT
+   WEIGHT CHART — SVG, fixed ordering & push page
+   Oldest LEFT → Newest RIGHT, auto-scroll to right
 ══════════════════════════════════════════ */
 function drawWeightChart(data){
   const wrap=document.getElementById('wchart-svg-wrap');
-  if(!wrap)return;
+  const container=document.getElementById('wchart-container');
+  if(!wrap||!container)return;
 
-  // Always sort ascending: oldest on left, newest on right
+  // Sort ascending: oldest left → newest right
   data=[...data].sort((a,b)=>(a.logged_at||'').localeCompare(b.logged_at||''));
 
   if(!data||data.length<2){
-    wrap.innerHTML=`<div style="text-align:center;padding:32px 16px;color:var(--hint);font-size:13px;font-weight:700">нет данных для графика</div>`;
+    wrap.innerHTML=`<div style="text-align:center;padding:48px 16px;color:var(--hint);font-size:13px;font-weight:700">нет данных для графика<br><span style="font-size:11px;opacity:.6">запиши хотя бы 2 записи веса</span></div>`;
     return;
   }
 
-  // Compute layout
+  // Deduplicate by date — keep last entry per date
+  const byDate=new Map();
+  data.forEach(d=>byDate.set(d.logged_at,d));
+  data=[...byDate.values()].sort((a,b)=>a.logged_at.localeCompare(b.logged_at));
+
   const n=data.length;
-  const colW=Math.max(52, Math.floor((wrap.clientWidth||280)/(n+0.5)));
-  const W=Math.max(wrap.clientWidth||280, n*colW+32);
-  const H=130;
-  const PAD={l:10,r:10,t:28,b:24};
+  // Measure container width after DOM is ready
+  const containerW=container.clientWidth||320;
+  const minColW=56;
+  const W=Math.max(containerW-4, n*minColW+40);
+  const H=160;
+  const PAD={l:36,r:16,t:32,b:28};
   const chartW=W-PAD.l-PAD.r;
   const chartH=H-PAD.t-PAD.b;
 
   const ws=data.map(d=>d.weight);
   const rawMin=Math.min(...ws);
   const rawMax=Math.max(...ws);
-  const span=rawMax-rawMin||1;
-  const mn=rawMin-span*0.18;
-  const mx=rawMax+span*0.18;
+  const span=rawMax-rawMin||0.5;
+  const mn=rawMin-span*0.2;
+  const mx=rawMax+span*0.2;
   const rng=mx-mn;
 
-  // X positions: evenly spaced, first at colW/2, last at W-PAD.r-colW/2
-  const xStep=(n>1)?(chartW-colW)/(n-1):0;
+  const xStep=n>1?chartW/(n-1):0;
   const pts=data.map((d,i)=>{
-    const x=PAD.l+colW/2+i*xStep;
+    const x=PAD.l+i*xStep;
     const y=PAD.t+chartH*(1-(d.weight-mn)/rng);
     return{x,y,w:d.weight,d:d.logged_at};
   });
 
-  // Build SVG
-  const cs=getComputedStyle(document.documentElement);
   const dark=document.body.classList.contains('tg-dark');
-  const sunColor='#FF6B35';
-  const hintColor=dark?'rgba(255,255,255,0.28)':'rgba(0,0,0,0.22)';
-  const labelColor=dark?'rgba(255,255,255,0.45)':'rgba(0,0,0,0.35)';
-  const bg2=dark?'#1a1a1a':'#ffffff';
-  const gridColor=dark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.05)';
+  const accent='#FF6B35';
+  const hintC=dark?'rgba(255,255,255,0.3)':'rgba(0,0,0,0.28)';
+  const labelC=dark?'rgba(255,255,255,0.5)':'rgba(0,0,0,0.45)';
+  const bg2C=dark?'#181818':'#ffffff';
+  const gridC=dark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.06)';
 
-  // Smooth bezier path
-  function smoothPath(pts){
-    if(pts.length<2)return`M${pts[0].x},${pts[0].y}`;
+  // Smooth bezier
+  function makePath(pts){
+    if(pts.length===1)return`M${pts[0].x},${pts[0].y}`;
     let d=`M${pts[0].x},${pts[0].y}`;
     for(let i=0;i<pts.length-1;i++){
       const cx=(pts[i].x+pts[i+1].x)/2;
@@ -2025,69 +1959,93 @@ function drawWeightChart(data){
     return d;
   }
 
-  const linePath=smoothPath(pts);
-  const fillPath=linePath+` L${pts[pts.length-1].x},${H} L${pts[0].x},${H} Z`;
+  const linePath=makePath(pts);
+  const fillPath=linePath
+    +` L${pts[pts.length-1].x},${H-PAD.b+4}`
+    +` L${pts[0].x},${H-PAD.b+4} Z`;
 
-  const gradId='wg'+Date.now();
-  const glowId='wglow'+Date.now();
+  const uid=Math.random().toString(36).slice(2,7);
+  const gradId='g'+uid;
+  const glowId='gw'+uid;
+  const clipId='cl'+uid;
 
-  // Determine if trend is down (good) or up
-  const trendDown=pts[pts.length-1].y>pts[0].y;
-  const accentColor=sunColor;
-
-  const dotsHTML=pts.map((p,i)=>{
-    const isLast=i===n-1;
-    const lx=Math.max(PAD.l+16,Math.min(W-PAD.l-16,p.x));
-    return`
-      <text x="${lx}" y="${p.y-10}" text-anchor="middle" font-family="Onest,sans-serif" font-size="9" font-weight="800" fill="${isLast?accentColor:labelColor}">${p.w.toFixed(1)}</text>
-      <circle cx="${p.x}" cy="${p.y}" r="${isLast?5.5:3.5}" fill="${accentColor}" opacity="${isLast?1:0.7}"/>
-      <circle cx="${p.x}" cy="${p.y}" r="${isLast?3:2}" fill="${bg2}"/>
-      <text x="${lx}" y="${H-4}" text-anchor="middle" font-family="Onest,sans-serif" font-size="8" font-weight="600" fill="${hintColor}">${fmtMD(p.d)}</text>
-    `;
-  }).join('');
-
-  // Pulsing glow on last point
-  const lastPt=pts[pts.length-1];
-  const pulseHTML=`
-    <circle cx="${lastPt.x}" cy="${lastPt.y}" r="12" fill="${accentColor}" opacity="0.12">
-      <animate attributeName="r" values="8;14;8" dur="2.4s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="0.12;0.04;0.12" dur="2.4s" repeatCount="indefinite"/>
-    </circle>
-  `;
-
-  // Horizontal grid lines (3 lines)
-  const gridLines=[0.25,0.5,0.75].map(f=>{
+  // Y-axis labels (3 levels)
+  const yLabels=[0.15,0.5,0.85].map(f=>{
     const gy=PAD.t+chartH*f;
-    const gw=mn+rng*(1-f);
-    const lx=PAD.l+4;
-    return`<line x1="${PAD.l}" y1="${gy}" x2="${W-PAD.r}" y2="${gy}" stroke="${gridColor}" stroke-width="1"/>
-    <text x="${lx}" y="${gy-3}" font-family="Onest,sans-serif" font-size="7.5" font-weight="600" fill="${hintColor}" opacity="0.7">${gw.toFixed(1)}</text>`;
+    const val=mx-rng*f;
+    return`<text x="${PAD.l-4}" y="${gy+4}" text-anchor="end" font-family="Onest,sans-serif" font-size="8.5" font-weight="700" fill="${hintC}">${val.toFixed(1)}</text>
+    <line x1="${PAD.l}" y1="${gy}" x2="${W-PAD.r}" y2="${gy}" stroke="${gridC}" stroke-width="1" stroke-dasharray="3,3"/>`;
   }).join('');
 
+  const lastIdx=pts.length-1;
+  const dotsHTML=pts.map((p,i)=>{
+    const isLast=i===lastIdx;
+    const r=isLast?5.5:3.5;
+    const lbX=Math.max(PAD.l+10,Math.min(W-PAD.r-10,p.x));
+    return`
+    <circle cx="${p.x}" cy="${p.y}" r="${r}" fill="${accent}" opacity="${isLast?1:0.75}"/>
+    <circle cx="${p.x}" cy="${p.y}" r="${r-1.8}" fill="${bg2C}"/>
+    <text x="${lbX}" y="${p.y-9}" text-anchor="middle" font-family="Onest,sans-serif" font-size="${isLast?10:8.5}" font-weight="${isLast?900:700}" fill="${isLast?accent:labelC}">${p.w.toFixed(1)}</text>
+    <text x="${lbX}" y="${H-PAD.b+14}" text-anchor="middle" font-family="Onest,sans-serif" font-size="8" font-weight="600" fill="${hintC}">${fmtMD(p.d)}</text>`;
+  }).join('');
+
+  const lastPt=pts[lastIdx];
+
+  wrap.style.width=W+'px';
   wrap.style.minWidth=W+'px';
-  wrap.innerHTML=`
-<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block;overflow:visible">
+  wrap.style.display='block';
+  wrap.innerHTML=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="display:block;overflow:visible">
   <defs>
     <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="${accentColor}" stop-opacity="0.22"/>
-      <stop offset="100%" stop-color="${accentColor}" stop-opacity="0"/>
+      <stop offset="0%" stop-color="${accent}" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="${accent}" stop-opacity="0.02"/>
     </linearGradient>
-    <filter id="${glowId}">
-      <feGaussianBlur stdDeviation="2.5" result="blur"/>
-      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    <filter id="${glowId}" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
+    <clipPath id="${clipId}">
+      <rect x="${PAD.l}" y="0" width="${chartW}" height="${H}"/>
+    </clipPath>
   </defs>
-  ${gridLines}
-  <path d="${fillPath}" fill="url(#${gradId})"/>
-  <path d="${linePath}" fill="none" stroke="${accentColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#${glowId})"/>
-  <path d="${linePath}" fill="none" stroke="${accentColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-  ${pulseHTML}
+  ${yLabels}
+  <g clip-path="url(#${clipId})">
+    <path d="${fillPath}" fill="url(#${gradId})"/>
+    <path d="${linePath}" fill="none" stroke="${accent}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#${glowId})" opacity="0.5"/>
+    <path d="${linePath}" fill="none" stroke="${accent}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${lastPt.x}" cy="${lastPt.y}" r="14" fill="${accent}" opacity="0.1">
+      <animate attributeName="r" values="10;16;10" dur="2.8s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.1;0.04;0.1" dur="2.8s" repeatCount="indefinite"/>
+    </circle>
+  </g>
   ${dotsHTML}
 </svg>`;
 
-  // Auto-scroll to the right (newest) after render
-  const container=document.getElementById('wchart-container');
-  if(container)requestAnimationFrame(()=>{container.scrollLeft=container.scrollWidth;});
+  // Scroll to the RIGHT (newest entry) — use setTimeout to ensure layout done
+  setTimeout(()=>{container.scrollLeft=container.scrollWidth;},60);
+}
+
+function _populateWeightChart(){
+  const wl=gWL(); // already sorted ascending (oldest first)
+  const data=wl.length>30?wl.slice(-30):wl;
+  const sub=document.getElementById('wc-sub');
+  if(sub)sub.textContent=data.length+' записей · последние '+Math.min(30,data.length)+' дней';
+  // Render stat list
+  const statEl=document.getElementById('wc-stat-list');
+  if(statEl&&wl.length){
+    const cw=wl[wl.length-1].weight;
+    const sw=Math.max(...wl.map(d=>d.weight));
+    const best=Math.min(...wl.map(d=>d.weight));
+    const gw=gU().goal_weight;
+    statEl.innerHTML=`<div class="sb-row">
+      <div class="sbox"><div class="sv" style="color:var(--sun)">${cw.toFixed(1)}</div><div class="sl">сейчас кг</div></div>
+      <div class="sbox"><div class="sv" style="color:var(--red)">${sw.toFixed(1)}</div><div class="sl">макс кг</div></div>
+      <div class="sbox"><div class="sv" style="color:var(--green)">${best.toFixed(1)}</div><div class="sl">мин кг</div></div>
+      ${gw?`<div class="sbox"><div class="sv" style="color:var(--water)">${gw.toFixed(1)}</div><div class="sl">цель кг</div></div>`:''}
+    </div>`;
+  }
+  // Draw chart after the push page is visible and has layout
+  requestAnimationFrame(()=>requestAnimationFrame(()=>drawWeightChart(data)));
 }
 
 /* ══ RENDERS ══ */
@@ -2112,9 +2070,12 @@ function renderHome(){
     T('arc-sh',last.hours.toFixed(1));
   }
   if(wl.length){
-    const cw=wl[wl.length-1].weight,sw=u.start_weight||wl[0].weight||cw,gw=u.goal_weight;
+    const cw=wl[wl.length-1].weight,gw=u.goal_weight;
+    const allW=wl.map(d=>d.weight);
+    const sw=gw&&gw<cw?Math.max(...allW):(gw&&gw>cw?Math.min(...allW):(u.start_weight||allW[0]||cw));
     T('h-wcur',cw.toFixed(1));T('h-wgoal',gw?gw.toFixed(1):'—');
-    const tot=Math.abs(sw-gw)||1,pct=gw?Math.min(100,Math.max(0,Math.round((sw-cw)/tot*100))):0;
+    const tot=Math.abs(sw-gw)||1,done=Math.abs(sw-cw);
+    const pct=gw?Math.min(100,Math.max(0,Math.round(done/tot*100))):0;
     T('h-wpct',pct+'%');requestAnimationFrame(()=>{const b=$('h-wbar');if(b)b.style.width=pct+'%';});
   }
   const streak=gStreak();
@@ -2218,21 +2179,40 @@ function renderSleep(){
 function renderProgress(){
   const u=gU(),wl=gWL(),sl=gSL(),wd=gWD();
   if(wl.length){
-    const cw=wl[wl.length-1].weight,sw=u.start_weight||wl[0].weight||cw,gw=u.goal_weight;
-    T('pr-wcur',cw.toFixed(1));T('pr-wgoal',gw?gw.toFixed(1)+' кг':'—');T('pr-wgoal2',gw?gw.toFixed(1):'—');T('pr-wstart',sw.toFixed(1));
-    const tot=Math.abs(sw-(gw||sw))||1,lost=sw-cw;
-    const pct=gw?Math.min(100,Math.max(0,Math.round(lost/tot*100))):0;
-    T('pr-wpct',pct+'%');T('pr-winfo',`потеряно ${Math.abs(lost).toFixed(1)} кг · осталось ${Math.max(0,cw-(gw||cw)).toFixed(1)} кг`);
+    const cw=wl[wl.length-1].weight;
+    const gw=u.goal_weight||0;
+    // Use the maximum recorded weight as the "start" so progress is always positive when losing
+    // (works whether user is losing or gaining toward goal)
+    const allWeights=wl.map(d=>d.weight);
+    let sw=u.start_weight&&u.start_weight>0?u.start_weight:allWeights[0];
+    // If goal is set, use max weight between sw and historical max as starting reference
+    if(gw>0&&gw<cw){
+      // Losing weight path: start = highest weight ever
+      sw=Math.max(sw,...allWeights);
+    }else if(gw>0&&gw>cw){
+      // Gaining weight path: start = lowest weight ever
+      sw=Math.min(sw,...allWeights);
+    }
+    T('pr-wcur',cw.toFixed(1));
+    T('pr-wgoal',gw?gw.toFixed(1)+' кг':'—');
+    T('pr-wgoal2',gw?gw.toFixed(1):'—');
+    T('pr-wstart',sw.toFixed(1));
+    const tot=Math.abs(sw-gw)||1;
+    const done=Math.abs(sw-cw);
+    const pct=gw?Math.min(100,Math.max(0,Math.round(done/tot*100))):0;
+    T('pr-wpct',pct+'%');
+    const lost=allWeights[0]-cw; // diff from first entry
+    T('pr-winfo',`потеряно ${Math.abs(lost).toFixed(1)} кг · осталось ${gw?Math.max(0,Math.abs(cw-gw)).toFixed(1)+'кг':'—'}`);
     requestAnimationFrame(()=>{const b=$('pr-wbar');if(b)b.style.width=pct+'%';});
     if(wl.length>=2&&gw&&cw>gw){try{
       const d1=new Date(wl[0].logged_at+'T00:00:00'),d2=new Date(wl[wl.length-1].logged_at+'T00:00:00');
-      const dd=Math.max(1,(d2-d1)/86400000),rate=(wl[0].weight-wl[wl.length-1].weight)/dd*7;
+      const dd=Math.max(1,(d2-d1)/86400000),rate=(wl[0].weight-cw)/dd*7;
       if(rate>.01){const dl=Math.ceil((cw-gw)/rate*7),eta=new Date();eta.setDate(eta.getDate()+dl);const mons=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];T('pr-forecast','прогноз: '+eta.getDate()+' '+mons[eta.getMonth()]+' · темп '+rate.toFixed(2)+' кг/нед');}
-    }catch{}}
+      else{T('pr-forecast','');}
+    }catch{T('pr-forecast','');}}
+    else{T('pr-forecast','');}
   }
-  const chartData=wl.length>14?wl.slice(-14):wl;
-  // Draw chart after layout is ready
-  requestAnimationFrame(()=>drawWeightChart(chartData));
+  // No inline chart — chart is in pp-weight-chart push page
   T('pw-water',wd.total||0);T('pw-cal',totalCal());
   T('pw-sleep',sl.length?+(sl.slice(-7).reduce((a,b)=>a+b.hours,0)/Math.min(7,sl.length)).toFixed(1):'—');
 }
