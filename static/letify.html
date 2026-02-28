@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <style id="pre-theme">
   /* Мгновенная тёмная тема до загрузки JS */
-  html,body,#root{background:#17212b !important;color:#fff !important;}
+  html,body,#root{background:#111111 !important;color:#fff !important;}
 </style>
 <script>
 // Применяем тему немедленно, до рендера страницы
@@ -36,7 +36,7 @@
 }
 /* Pre-dark (применяется до TG init) */
 .pre-dark{
-  --bg:#17212b;--bg2:#17212b;--bg3:rgba(255,255,255,.07);
+  --bg:#111111;--bg2:#111111;--bg3:rgba(255,255,255,.07);
   --text:#ffffff;--hint:#708499;
 }
 html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overscroll-behavior:none;user-select:none}
@@ -393,7 +393,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tg-dark .m3-tog-row{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08)}
 
 /* ── CHART SCROLL ── */
-.chart-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin:0 -4px;padding:0 4px;}
+.chart-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin:0 -2px;padding:0 2px;scroll-behavior:smooth;}
 .chart-scroll::-webkit-scrollbar{display:none}
 .chart-scroll{-ms-overflow-style:none}
 
@@ -402,6 +402,56 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .empty svg{opacity:.22;margin-bottom:12px}
 .empty-t{font-size:15px;font-weight:800;margin-bottom:5px}
 .empty-s{font-size:12px;color:var(--hint);font-weight:600}
+
+/* ── TASK COMPLETION ANIMATION ── */
+.ac-completing{
+  transition:opacity .5s ease,transform .5s ease,max-height .5s ease,margin-bottom .5s ease,padding .5s ease;
+  overflow:hidden;
+}
+.ac-completing.hide{opacity:0;transform:translateY(10px) scale(.98);max-height:0!important;margin-bottom:0!important;padding:0!important;}
+
+/* ── DELETE DIALOG ── */
+.del-overlay{
+  position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,.5);
+  display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;transition:opacity .2s ease;
+  pointer-events:none;
+}
+.del-overlay.show{opacity:1;pointer-events:all;}
+.del-sheet{
+  background:var(--bg2);
+  border-radius:20px 20px 0 0;
+  padding:20px 16px calc(20px + var(--sb));
+  width:100%;
+  transform:translateY(100%);
+  transition:transform .3s cubic-bezier(.34,1.1,.64,1);
+}
+.del-overlay.show .del-sheet{transform:translateY(0);}
+.tg-dark .del-sheet{background:rgba(30,24,16,.98);border:1px solid rgba(255,255,255,.1);}
+
+/* ── DAY SELECTOR (activity creation) ── */
+.days-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}
+.day-btn{
+  padding:12px 4px;border-radius:12px;border:2px solid transparent;
+  background:var(--bg3);cursor:pointer;text-align:center;
+  font-size:12px;font-weight:800;color:var(--hint);font-family:inherit;
+  transition:all .14s ease;
+}
+.day-btn:active{transform:scale(.96)}
+.day-btn.on{background:rgba(255,107,53,.1);border-color:var(--sun);color:var(--sun)}
+.tg-dark .day-btn{background:rgba(255,255,255,.07)}
+.tg-dark .day-btn.on{background:rgba(255,107,53,.18)}
+.day-btn-daily{
+  grid-column:1/-1;padding:13px;border-radius:12px;border:2px solid transparent;
+  background:var(--bg3);cursor:pointer;text-align:center;
+  font-size:13px;font-weight:800;color:var(--hint);font-family:inherit;
+  transition:all .14s ease;margin-bottom:4px;
+}
+.day-btn-daily:active{transform:scale(.98)}
+.day-btn-daily.on{background:rgba(255,107,53,.1);border-color:var(--sun);color:var(--sun)}
+.tg-dark .day-btn-daily{background:rgba(255,255,255,.07)}
+.tg-dark .day-btn-daily.on{background:rgba(255,107,53,.18)}
 
 /* ── DARK OVERRIDES ── */
 .tg-dark{
@@ -449,9 +499,9 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   font-weight:800;
   line-height:1;
 }
-.time-arr-btn:active{transform:scale(.9);transition:transform .08s ease}
+.time-arr-btn:active{transform:scale(.96);opacity:.7;transition:transform .06s ease,opacity .06s ease}
 .tg-dark .time-arr-btn{background:rgba(255,255,255,.08)}
-.tg-dark .time-arr-btn:active{transform:scale(.9)}
+.tg-dark .time-arr-btn:active{transform:scale(.96);opacity:.7}
 </style>
 </head>
 <body>
@@ -571,9 +621,11 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   <button class="btn btn-water" onclick="addW(500)">+500 мл</button>
 </div>
 <button class="btn btn-g" style="margin-top:7px;width:100%;padding:12px" onclick="undoW()">отменить последнее</button>
-<div style="margin-top:12px">
-  <div class="t5" style="margin-bottom:6px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em">история сегодня</div>
-  <div class="card" id="w-entries" style="padding:10px 12px"></div>
+<div style="margin-top:10px">
+  <button class="btn btn-g" style="width:100%;padding:12px;display:flex;align-items:center;justify-content:space-between" onclick="pushPage('pp-water-hist')">
+    <span style="font-size:13px;font-weight:800">история сегодня</span>
+    <span style="color:var(--hint);font-size:13px">→</span>
+  </button>
 </div>
 </div>
 </div>
@@ -598,11 +650,11 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   <div class="t5" id="pl-date">сегодня</div>
 </div>
 <div class="pad gap">
-<div class="card">
+<div class="card" style="cursor:pointer" onclick="openDoneActs()">
   <div style="display:flex;align-items:center;justify-content:space-between">
     <div>
       <div style="font-size:34px;font-weight:900;line-height:1" id="pl-cnt">0/0</div>
-      <div class="t5" style="margin-top:2px">задач выполнено</div>
+      <div class="t5" style="margin-top:2px">задач выполнено <span style="color:var(--hint);font-size:10px">→</span></div>
     </div>
     <svg width="52" height="52" viewBox="0 0 52 52">
       <circle cx="26" cy="26" r="20" fill="none" stroke="rgba(0,0,0,.06)" stroke-width="4.5"/>
@@ -645,8 +697,12 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 </div>
 </div>
 <button class="btn btn-p" style="margin:10px 16px 0;width:calc(100% - 32px)" onclick="pushPage('pp-sleep')">записать сон</button>
-<div class="sec">последние 7 ночей</div>
-<div class="pad"><div class="card" id="sl-hist" style="padding:10px 12px"></div></div>
+<div class="pad" style="margin-top:10px">
+  <button class="btn btn-g" style="width:100%;padding:12px;display:flex;align-items:center;justify-content:space-between" onclick="pushPage('pp-sleep-hist')">
+    <span style="font-size:13px;font-weight:800">последние 7 ночей</span>
+    <span style="color:var(--hint);font-size:13px">→</span>
+  </button>
+</div>
 <div class="sec">среднее за неделю</div>
 <div class="pad sb-row">
   <div class="sbox"><div class="sv" id="sl-avg-h" style="color:var(--sleep)">—</div><div class="sl">часов</div></div>
@@ -999,6 +1055,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
         <div class="step-pip on" id="sp1"></div>
         <div class="step-pip" id="sp2"></div>
         <div class="step-pip" id="sp3"></div>
+        <div class="step-pip" id="sp4"></div>
       </div>
       <div class="pp-title" id="act-step-title">название</div>
     </div>
@@ -1061,13 +1118,28 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       </div>
       <div id="act-dur-display" style="text-align:center;margin-top:10px;font-size:13px;font-weight:700;color:var(--hint)">длительность: 60 мин</div>
     </div>
-    <!-- Step 3 -->
+    <!-- Step 3: Day selection -->
     <div class="act-step" id="act-s3">
+      <div class="act-hint">в какие дни повторять?</div>
+      <button class="day-btn-daily on" id="day-btn-daily" onclick="toggleDayDaily()">ежедневно</button>
+      <div class="days-grid" id="days-grid">
+        <button class="day-btn" onclick="toggleDay(1,this)" data-day="1">пн</button>
+        <button class="day-btn" onclick="toggleDay(2,this)" data-day="2">вт</button>
+        <button class="day-btn" onclick="toggleDay(3,this)" data-day="3">ср</button>
+        <button class="day-btn" onclick="toggleDay(4,this)" data-day="4">чт</button>
+        <button class="day-btn" onclick="toggleDay(5,this)" data-day="5">пт</button>
+        <button class="day-btn" onclick="toggleDay(6,this)" data-day="6">сб</button>
+        <button class="day-btn" onclick="toggleDay(0,this)" data-day="0">вс</button>
+      </div>
+    </div>
+    <!-- Step 4 -->
+    <div class="act-step" id="act-s4">
       <div class="act-hint">проверь и добавь в план</div>
       <div style="text-align:center;padding:16px 0 12px">
         <div id="act-confirm-ico" style="font-size:60px;margin-bottom:12px">🏃</div>
         <div id="act-confirm-name" style="font-size:24px;font-weight:900;letter-spacing:-.02em;margin-bottom:6px">—</div>
         <div id="act-confirm-time" style="font-size:15px;color:var(--hint);font-weight:700">—</div>
+        <div id="act-confirm-days" style="font-size:12px;color:var(--sun);font-weight:700;margin-top:4px">—</div>
       </div>
       <div class="m3-card" style="padding:14px">
         <div style="display:flex;align-items:center;justify-content:space-between">
@@ -1099,6 +1171,69 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 </div>
 
 <div id="toast"></div>
+
+<!-- PP: История воды -->
+<div class="push-page" id="pp-water-hist">
+  <div class="pp-hdr">
+    <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <div><div class="pp-title">история воды</div><div class="pp-subtitle">сегодня</div></div>
+  </div>
+  <div class="pp-body">
+    <div class="m3-card" style="padding:10px 12px;overflow-y:auto;max-height:calc(100vh - 160px)">
+      <div id="wh-entries">
+        <div style="text-align:center;padding:20px;color:var(--hint);font-size:13px;font-weight:600">пока ничего не записано</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PP: История сна -->
+<div class="push-page" id="pp-sleep-hist">
+  <div class="pp-hdr">
+    <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <div><div class="pp-title">история сна</div><div class="pp-subtitle">последние 7 ночей</div></div>
+  </div>
+  <div class="pp-body">
+    <div class="m3-card" style="padding:10px 12px;overflow-y:auto;max-height:calc(100vh - 180px)">
+      <div id="slh-entries">
+        <div style="text-align:center;padding:20px;color:var(--hint);font-size:13px;font-weight:600">нет записей</div>
+      </div>
+    </div>
+    <div class="sec" style="padding-top:16px">среднее за неделю</div>
+    <div class="sb-row">
+      <div class="sbox"><div class="sv" id="slh-avg-h" style="color:var(--sleep)">—</div><div class="sl">часов</div></div>
+      <div class="sbox"><div class="sv" id="slh-avg-q">—</div><div class="sl">качество</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- PP: Выполненные задачи -->
+<div class="push-page" id="pp-done-acts">
+  <div class="pp-hdr">
+    <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <div><div class="pp-title">выполненные</div><div class="pp-subtitle">задачи сегодня</div></div>
+  </div>
+  <div class="pp-body">
+    <div class="m3-card" style="padding:0;overflow:hidden">
+      <div id="done-acts-list" style="overflow-y:auto;max-height:calc(100vh - 160px);padding:10px 12px">
+        <div style="text-align:center;padding:20px;color:var(--hint);font-size:13px;font-weight:600">нет выполненных задач</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete dialog -->
+<div class="del-overlay" id="del-overlay" onclick="closeDelDialog()">
+  <div class="del-sheet" onclick="event.stopPropagation()">
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="font-size:32px;margin-bottom:8px">🗑️</div>
+      <div style="font-size:17px;font-weight:900;margin-bottom:4px">удалить активность?</div>
+      <div class="t5" id="del-act-name" style="font-size:13px">—</div>
+    </div>
+    <button class="btn" style="background:rgba(244,92,92,.1);color:var(--red);width:100%;padding:14px;font-size:15px;border-radius:14px;margin-bottom:8px" onclick="confirmDeleteAct()">удалить</button>
+    <button class="btn btn-g" style="width:100%;padding:14px;font-size:15px;border-radius:14px" onclick="closeDelDialog()">отмена</button>
+  </div>
+</div>
 
 <!-- NAV -->
 <nav id="nav">
@@ -1163,7 +1298,7 @@ function applyTheme(){
   const dark=tg?.colorScheme==='dark'||window.matchMedia?.('(prefers-color-scheme:dark)').matches;
   document.body.classList.toggle('tg-dark',dark);
   if(dark){
-    const bg=p.bg_color||'#17212b';
+    const bg=p.bg_color||'#111111';
     document.documentElement.style.setProperty('--bg',bg);
     document.documentElement.style.setProperty('--bg2',bg);
     document.documentElement.style.setProperty('--text',p.text_color||'#ffffff');
@@ -1354,13 +1489,47 @@ function _populatePP(id){
     TT('pp-at-w',+((wd.total||0)/1000).toFixed(1));
     TT('pp-at-s',gStreak());
   }
-    if(id==='pp-act'){
-    actStep=1;_actType='run';_actDur=45;_timeH=8;_timeM=0;_timeEH=9;_timeEM=0;
+  if(id==='pp-act'){
+    actStep=1;_actType='run';_actDur=45;_timeH=8;_timeM=0;_timeEH=9;_timeEM=0;_actDays=[];
     const ni=document.getElementById('inp-aname');if(ni)ni.value='пробежка';
     document.querySelectorAll('#act-quick .type-card').forEach((c,i)=>c.classList.toggle('on',i===0));
-    // dur-grid replaced by end-time picker
+    document.getElementById('day-btn-daily')?.classList.add('on');
+    document.querySelectorAll('#days-grid .day-btn').forEach(b=>b.classList.remove('on'));
     _updateTimeDisplay();
     _renderActStep();
+  }
+  if(id==='pp-water-hist'){
+    const wd=gWD();const entries=wd.entries||[];
+    const el=document.getElementById('wh-entries');
+    if(el){
+      if(!entries.length){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--hint);font-size:13px;font-weight:600">пока ничего не записано</div>';}
+      else{el.innerHTML=[...entries].reverse().map((e,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--brd)${i===0?';border-bottom:none':''}">
+        <div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:32px;border-radius:10px;background:rgba(78,174,229,.1);display:flex;align-items:center;justify-content:center;font-size:14px">💧</div><span style="font-size:14px;font-weight:800;color:var(--water)">+${e} мл</span></div>
+        <span class="t5">стакан ${entries.length-i}</span></div>`).join('');}
+    }
+  }
+  if(id==='pp-sleep-hist'){
+    const sl=gSL();const l7=sl.slice(-7).reverse();
+    const el=document.getElementById('slh-entries');
+    if(el){
+      if(!l7.length){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--hint);font-size:13px;font-weight:600">нет записей</div>';}
+      else{el.innerHTML=l7.map(e=>`<div class="hr"><div class="hr-d">${fmtD(e.logged_at)}</div><div style="display:flex;align-items:center;gap:7px;flex:1"><div class="hr-v">${e.hours.toFixed(1)} ч</div><div class="sq">${Array.from({length:5},(_,i)=>`<div class="sqd${i<e.quality?' on':''}"></div>`).join('')}</div></div><div style="font-size:16px">${qIco(e.quality)}</div></div>`).join('');}
+    }
+    if(l7.length){
+      T('slh-avg-h',+(l7.reduce((a,b)=>a+b.hours,0)/l7.length).toFixed(1));
+      T('slh-avg-q',qIco(Math.round(l7.reduce((a,b)=>a+(b.quality||3),0)/l7.length))+' '+(l7.reduce((a,b)=>a+(b.quality||3),0)/l7.length).toFixed(1));
+    }
+  }
+  if(id==='pp-done-acts'){
+    const acts=gActs().filter(a=>a.completed);
+    const el=document.getElementById('done-acts-list');
+    if(el){
+      if(!acts.length){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--hint);font-size:13px;font-weight:600">нет выполненных задач</div>';}
+      else{el.innerHTML=acts.map(a=>{
+        const ico=ACT_ICO[a.type]||'✨',col=ACT_COL[a.type]||'#FF9800';
+        return`<div class="ac done" style="margin-bottom:8px"><div class="ac-ico" style="background:${col}18">✅</div><div class="ac-body"><div class="ac-name done-text">${a.name}</div><div class="ac-sub">${fmtRange(a)} · ${a.duration} мин</div></div><span class="pill p-ok">✓</span></div>`;
+      }).join('');}
+    }
   }
 }
 
@@ -1475,24 +1644,29 @@ function toggleSett(key){
 }
 
 /* ══ ACTIVITY FORM ══ */
-let actStep=1,_actType='run',_actDur=45;
-const ACT_TITLES=['название','когда?','готово!'];
+let actStep=1,_actType='run',_actDur=45,_actDays=[];
+const ACT_TITLES=['название','когда?','повторение','готово!'];
 function _renderActStep(){
-  [1,2,3].forEach(i=>{
+  [1,2,3,4].forEach(i=>{
     document.getElementById('act-s'+i)?.classList.toggle('active',i===actStep);
     const pip=document.getElementById('sp'+i);
     if(pip){pip.classList.toggle('on',i===actStep);pip.classList.toggle('done',i<actStep);if(i<actStep)pip.classList.remove('on');}
   });
   document.getElementById('act-step-title').textContent=ACT_TITLES[actStep-1];
   const btn=document.getElementById('act-next-btn');
-  if(btn)btn.textContent=actStep===3?'✓ добавить в план':'далее →';
-  if(actStep===3){
+  if(btn)btn.textContent=actStep===4?'✓ добавить в план':'далее →';
+  if(actStep===4){
     const name=document.getElementById('inp-aname')?.value||'—';
     const time=document.getElementById('inp-atime')?.value||'08:00';
     const ico={run:'🏃',walk:'🚶',bike:'🚴',gym:'💪',yoga:'🧘',swim:'🏊',other:'✨'}[_actType]||'✨';
     const ci=document.getElementById('act-confirm-ico');if(ci)ci.textContent=ico;
     const cn=document.getElementById('act-confirm-name');if(cn)cn.textContent=name;
     const ct=document.getElementById('act-confirm-time');if(ct)ct.textContent=time+' · '+_actDur+' мин';
+    const cd=document.getElementById('act-confirm-days');
+    if(cd){
+      if(_actDays.length===0||_actDays.length===7)cd.textContent='ежедневно';
+      else{const dnames=['вс','пн','вт','ср','чт','пт','сб'];cd.textContent=_actDays.sort().map(d=>dnames[d]).join(', ');}
+    }
   }
   tg?.HapticFeedback?.selectionChanged();
 }
@@ -1500,6 +1674,7 @@ function actBackOrPop(){if(actStep>1){actStep--;_renderActStep();}else popPage()
 function actStepNext(){
   if(actStep===1){if(!(document.getElementById('inp-aname')?.value?.trim())){toast('введи название');return;}actStep=2;_renderActStep();}
   else if(actStep===2){actStep=3;_renderActStep();}
+  else if(actStep===3){actStep=4;_renderActStep();}
   else submitAct();
 }
 function actQuick(name,type,el){
@@ -1508,10 +1683,32 @@ function actQuick(name,type,el){
   el?.classList.add('on');
   const inp=document.getElementById('inp-aname');if(inp)inp.value=name;
 }
+function toggleDayDaily(){
+  _actDays=[];
+  document.getElementById('day-btn-daily')?.classList.add('on');
+  document.querySelectorAll('#days-grid .day-btn').forEach(b=>b.classList.remove('on'));
+}
+function toggleDay(day,el){
+  document.getElementById('day-btn-daily')?.classList.remove('on');
+  const idx=_actDays.indexOf(day);
+  if(idx>=0){_actDays.splice(idx,1);el?.classList.remove('on');}
+  else{_actDays.push(day);el?.classList.add('on');}
+  if(_actDays.length===0)toggleDayDaily();
+}
 function setDur(val,el){
   _actDur=val;
   // Legacy: kept for compatibility
 }
+
+/* ══ LONG PRESS ══ */
+let _lpTimer=null;
+function startLongPress(id,el){
+  _lpTimer=setTimeout(()=>{
+    showDelDialog(id);
+    navigator.vibrate&&navigator.vibrate(30);
+  },600);
+}
+function cancelLongPress(){clearTimeout(_lpTimer);_lpTimer=null;}
 
 /* ══ SUBMIT ACTIONS ══ */
 let _addWBusy=false;
@@ -1529,8 +1726,64 @@ async function undoW(){
 async function completeAct(id){
   const a=gActs().find(x=>x.id===id);if(!a)return;
   const ns=!a.completed;C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:ns?1:0}:x);
-  renderPlan();renderHome();toast(ns?'выполнено':'отменено');tg?.HapticFeedback?.notificationOccurred(ns?'success':'warning');
+  if(ns){
+    // Find card element and animate it away
+    const cardEl=document.querySelector(`#pl-list .ac[data-id="${id}"]`);
+    if(cardEl){
+      const h=cardEl.offsetHeight;
+      cardEl.style.maxHeight=h+'px';
+      cardEl.classList.add('ac-completing');
+      renderPlan();
+      // Re-find after re-render (won't exist if completed), so just animate in place
+      setTimeout(()=>{
+        if(cardEl&&cardEl.parentNode){
+          cardEl.classList.add('hide');
+        }
+      },1800);
+    } else {
+      renderPlan();
+    }
+  } else {
+    renderPlan();
+  }
+  renderHome();toast(ns?'выполнено 🎉':'отменено');tg?.HapticFeedback?.notificationOccurred(ns?'success':'warning');
   await apiPost(ns?'/api/activity/complete':'/api/activity/uncomplete',{act_id:id});await reload();
+}
+function openDoneActs(){pushPage('pp-done-acts');}
+
+/* ══ DELETE ACTIVITY ══ */
+let _delActId=null;
+function showDelDialog(id){
+  _delActId=id;
+  const a=gActs().find(x=>x.id===id);
+  const nm=document.getElementById('del-act-name');if(nm)nm.textContent=a?a.name:'—';
+  const ov=document.getElementById('del-overlay');
+  if(ov){ov.classList.add('show');}
+  tg?.HapticFeedback?.impactOccurred('medium');
+}
+function closeDelDialog(){
+  const ov=document.getElementById('del-overlay');if(ov)ov.classList.remove('show');
+  _delActId=null;
+}
+async function confirmDeleteAct(){
+  if(!_delActId)return;
+  const id=_delActId;closeDelDialog();
+  // Animate card out
+  const cardEl=document.querySelector(`#pl-list .ac[data-id="${id}"]`);
+  if(cardEl){
+    const h=cardEl.offsetHeight;cardEl.style.maxHeight=h+'px';
+    cardEl.classList.add('ac-completing');
+    setTimeout(()=>{cardEl.classList.add('hide');},50);
+    setTimeout(()=>{
+      C.acts_today=C.acts_today.filter(x=>x.id!==id);
+      renderPlan();renderHome();
+    },550);
+  } else {
+    C.acts_today=C.acts_today.filter(x=>x.id!==id);
+    renderPlan();renderHome();
+  }
+  toast('удалено');tg?.HapticFeedback?.notificationOccurred('warning');
+  await apiPost('/api/activity/delete',{act_id:id});await reload();
 }
 async function submitWeight(){
   const v=_wtInt+_wtDec/10;
@@ -1538,10 +1791,15 @@ async function submitWeight(){
   popPage();
   C.weight_log=[...(C.weight_log||[]),{weight:v,logged_at:TODAY}];
   if(!C.user.start_weight)C.user.start_weight=v;
-  renderHome();toast('вес '+v.toFixed(1)+' кг сохранён');tg?.HapticFeedback?.notificationOccurred('success');
+  renderHome();renderProgress();toast('вес '+v.toFixed(1)+' кг сохранён');tg?.HapticFeedback?.notificationOccurred('success');
+  // Animate chart after render
+  const wl=gWL();
+  setTimeout(()=>drawChart(wl.length>14?wl.slice(-14):wl,true),80);
   await apiPost('/api/weight',{weight:v});
   cancelAnimationFrame(_chartRaf);
   await reload();
+  const wl2=gWL();
+  setTimeout(()=>drawChart(wl2.length>14?wl2.slice(-14):wl2,true),80);
 }
 async function submitSleep(){
   const hrs=_slH+(_slMin/60);
@@ -1598,9 +1856,10 @@ async function submitAct(){
   if(!name){toast('введи название');return;}
   popPage();
   const fid=Date.now();
-  C.acts_today=[...(C.acts_today||[]),{id:fid,name,type:_actType,scheduled_at:`${TODAY}T${time}:00`,duration:_actDur,completed:0}];
+  const days=_actDays.length&&_actDays.length<7?_actDays:[];
+  C.acts_today=[...(C.acts_today||[]),{id:fid,name,type:_actType,scheduled_at:`${TODAY}T${time}:00`,duration:_actDur,completed:0,repeat_days:days}];
   renderPlan();renderHome();toast(name+' добавлено 🎉');tg?.HapticFeedback?.notificationOccurred('success');
-  await apiPost('/api/activity/create',{name,type:_actType,time,duration:_actDur});await reload();
+  await apiPost('/api/activity/create',{name,type:_actType,time,duration:_actDur,repeat_days:days});await reload();
 }
 function confirmReset(){
   if(!confirm('сбросить все данные?'))return;
@@ -1641,17 +1900,17 @@ let _tt;
 function toast(msg){const el=$('toast');if(!el)return;el.textContent=msg;el.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),1800);}
 
 /* ══ CHART ══ */
-let _chartRaf=null;
-function drawChart(data){
+let _chartRaf=null,_chartAnimId=null;
+function drawChart(data,animate){
   const canvas=$('wchart');if(!canvas)return;
   cancelAnimationFrame(_chartRaf);
   _chartRaf=requestAnimationFrame(()=>{
     const dpr=Math.min(window.devicePixelRatio||1,2);
     const containerW=canvas.parentElement.clientWidth||280;
-    // Sort by date (oldest first = left side)
     if(data&&data.length>1){data=[...data].sort((a,b)=>(a.logged_at||'').localeCompare(b.logged_at||''));}
-    const W=Math.max(containerW, data&&data.length>5 ? data.length*52 : containerW);
-    const H=90;
+    const minCols=data&&data.length>5?data.length:5;
+    const W=Math.max(containerW, minCols*52+40);
+    const H=100;
     canvas.width=W*dpr;canvas.height=H*dpr;canvas.style.width=W+'px';canvas.style.height=H+'px';
     const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
     const cs=getComputedStyle(document.documentElement);
@@ -1661,25 +1920,65 @@ function drawChart(data){
     ctx.clearRect(0,0,W,H);
     if(!data||data.length<2){ctx.fillStyle=hint;ctx.font='600 11px Onest,sans-serif';ctx.textAlign='center';ctx.fillText('нет данных',W/2,H/2);return;}
     const ws=data.map(d=>d.weight);
-    const mn=Math.min(...ws)-.3,mx=Math.max(...ws)+.3,rng=mx-mn||1;
-    const pl={l:8,r:8,t:18,b:20};
+    const mn=Math.min(...ws)-.5,mx=Math.max(...ws)+.5,rng=mx-mn||1;
+    const pl={l:26,r:26,t:22,b:24};
     const xs=(W-pl.l-pl.r)/(data.length-1);
     const yf=w=>pl.t+(1-(w-mn)/rng)*(H-pl.t-pl.b);
     const pts=data.map((d,i)=>[pl.l+i*xs,yf(d.weight)]);
-    const grad=ctx.createLinearGradient(0,0,0,H);
-    grad.addColorStop(0,'rgba(255,107,53,.16)');grad.addColorStop(1,'rgba(255,107,53,0)');
-    ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);
-    for(let i=0;i<pts.length-1;i++){const cx=(pts[i][0]+pts[i+1][0])/2;ctx.bezierCurveTo(cx,pts[i][1],cx,pts[i+1][1],pts[i+1][0],pts[i+1][1]);}
-    ctx.lineTo(pts[pts.length-1][0],H);ctx.lineTo(pts[0][0],H);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
-    ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);
-    for(let i=0;i<pts.length-1;i++){const cx=(pts[i][0]+pts[i+1][0])/2;ctx.bezierCurveTo(cx,pts[i][1],cx,pts[i+1][1],pts[i+1][0],pts[i+1][1]);}
-    ctx.strokeStyle=sun;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.lineCap='round';ctx.stroke();
-    pts.forEach((p,i)=>{
-      ctx.beginPath();ctx.arc(p[0],p[1],4,0,Math.PI*2);ctx.fillStyle=sun;ctx.fill();
-      ctx.beginPath();ctx.arc(p[0],p[1],2.5,0,Math.PI*2);ctx.fillStyle=bg2;ctx.fill();
-      ctx.fillStyle=sun;ctx.font='700 9px Onest,sans-serif';ctx.textAlign='center';ctx.fillText(data[i].weight,p[0],p[1]-8);
-      ctx.fillStyle=hint;ctx.font='700 8px Onest,sans-serif';ctx.fillText(fmtMD(data[i].logged_at),p[0],H-2);
-    });
+    
+    const _drawFrame=(progress)=>{
+      ctx.clearRect(0,0,W,H);
+      const p=progress===undefined?1:Math.min(1,progress);
+      
+      // gradient fill
+      const grad=ctx.createLinearGradient(0,0,0,H);
+      grad.addColorStop(0,'rgba(255,107,53,.18)');grad.addColorStop(1,'rgba(255,107,53,0)');
+      ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);
+      for(let i=0;i<pts.length-1;i++){
+        const cx=(pts[i][0]+pts[i+1][0])/2;
+        ctx.bezierCurveTo(cx,pts[i][1],cx,pts[i+1][1],pts[i+1][0],pts[i+1][1]);
+      }
+      ctx.lineTo(pts[pts.length-1][0],H);ctx.lineTo(pts[0][0],H);ctx.closePath();
+      ctx.fillStyle=grad;ctx.globalAlpha=p;ctx.fill();ctx.globalAlpha=1;
+      
+      // line
+      ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);
+      for(let i=0;i<pts.length-1;i++){
+        const cx=(pts[i][0]+pts[i+1][0])/2;
+        ctx.bezierCurveTo(cx,pts[i][1],cx,pts[i+1][1],pts[i+1][0],pts[i+1][1]);
+      }
+      ctx.strokeStyle=sun;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.lineCap='round';ctx.stroke();
+      
+      // dots and labels
+      pts.forEach((pt,i)=>{
+        const alpha=animate?Math.max(0,Math.min(1,(p*data.length)-i)):1;
+        ctx.globalAlpha=alpha;
+        ctx.beginPath();ctx.arc(pt[0],pt[1],4,0,Math.PI*2);ctx.fillStyle=sun;ctx.fill();
+        ctx.beginPath();ctx.arc(pt[0],pt[1],2.5,0,Math.PI*2);ctx.fillStyle=bg2;ctx.fill();
+        ctx.fillStyle=sun;ctx.font='700 9px Onest,sans-serif';
+        ctx.textAlign='center';
+        // Clamp label x to avoid clipping
+        const lx=Math.max(18,Math.min(W-18,pt[0]));
+        ctx.fillText(data[i].weight,lx,pt[1]-8);
+        ctx.fillStyle=hint;ctx.font='700 8px Onest,sans-serif';
+        ctx.fillText(fmtMD(data[i].logged_at),lx,H-4);
+        ctx.globalAlpha=1;
+      });
+    };
+    
+    if(animate){
+      cancelAnimationFrame(_chartAnimId);
+      const start=performance.now();
+      const dur=600;
+      const step=(now)=>{
+        const p=(now-start)/dur;
+        _drawFrame(p);
+        if(p<1)_chartAnimId=requestAnimationFrame(step);
+      };
+      _chartAnimId=requestAnimationFrame(step);
+    } else {
+      _drawFrame();
+    }
   });
 }
 
@@ -1719,15 +2018,34 @@ function renderHome(){
     if(!acts.length){ps.style.display='none';}
     else{
       ps.style.display='';const nt=new Date();
-      pl.innerHTML=acts.map(a=>{
-        const ico=ACT_ICO[a.type]||'✨',col=ACT_COL[a.type]||'#FF9800',done=a.completed;
+      // Find current task (running now)
+      const current=acts.find(a=>{
+        if(a.completed)return false;
         const[hh,mm]=(a.time||'00:00').split(':').map(Number);
         const at=new Date();at.setHours(hh,mm,0,0);const et=new Date(at.getTime()+(a.duration||30)*60000);
-        const ts=`${a.time}–${String(et.getHours()).padStart(2,'0')}:${String(et.getMinutes()).padStart(2,'0')}`;
-        const late=!done&&nt>et;
-        const badge=done?`<span class="pill p-ok">✓</span>`:late?`<span class="pill p-late">просрочено</span>`:`<span class="pill p-soon">${a.time}</span>`;
-        return`<div class="ac${done?' done':''}"><div class="ac-ico" style="background:${col}18">${done?'✅':ico}</div><div class="ac-body"><div class="ac-name">${a.name}</div><div class="ac-sub">${ts} · ${a.duration} мин</div></div>${badge}</div>`;
-      }).join('');
+        return nt>=at&&nt<=et;
+      });
+      // Find next upcoming task (not done, not late)
+      const upcoming=acts.filter(a=>{
+        if(a.completed)return false;
+        const[hh,mm]=(a.time||'00:00').split(':').map(Number);
+        const at=new Date();at.setHours(hh,mm,0,0);
+        return at>nt;
+      }).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
+      const next=upcoming[0];
+      const toShow=[current,next].filter(Boolean);
+      if(!toShow.length){ps.style.display='none';}
+      else{
+        pl.innerHTML=toShow.map(a=>{
+          const ico=ACT_ICO[a.type]||'✨',col=ACT_COL[a.type]||'#FF9800',done=a.completed;
+          const[hh,mm]=(a.time||'00:00').split(':').map(Number);
+          const at=new Date();at.setHours(hh,mm,0,0);const et=new Date(at.getTime()+(a.duration||30)*60000);
+          const ts=`${a.time}–${String(et.getHours()).padStart(2,'0')}:${String(et.getMinutes()).padStart(2,'0')}`;
+          const isNow=nt>=at&&nt<=et;
+          const badge=done?`<span class="pill p-ok">✓</span>`:isNow?`<span class="pill p-now">идёт сейчас</span>`:`<span class="pill p-soon">${a.time}</span>`;
+          return`<div class="ac${done?' done':''}"><div class="ac-ico" style="background:${col}18">${done?'✅':ico}</div><div class="ac-body"><div class="ac-name">${a.name}</div><div class="ac-sub">${ts} · ${a.duration} мин</div></div>${badge}</div>`;
+        }).join('');
+      }
     }
   }
 }
@@ -1739,8 +2057,7 @@ function renderWater(){
   requestAnimationFrame(()=>{const b=$('w-bar');if(b)b.style.width=wp+'%';});
   const st=gStreak();
   H('w-streak',st>=2?`<div style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,107,53,.1);color:var(--sun);padding:4px 12px;border-radius:99px;font-size:11px;font-weight:800">🔥 ${st} дней подряд</div>`:'');
-  const entries=wd.entries||[];
-  H('w-entries',entries.length?[...entries].reverse().slice(0,8).map((e,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--brd)${i===0?';border-bottom:none':''}"><span style="font-size:12px;font-weight:700;color:var(--water)">+${e} мл</span><span class="t5" style="font-size:11px">стакан ${entries.length-i}</span></div>`).join(''):'<div style="text-align:center;padding:12px;color:var(--hint);font-size:12px;font-weight:600">пока ничего не записано</div>');
+  // History is in pp-water-hist push page
 }
 function renderCal(){
   const u=gU(),cd=gCD();
@@ -1760,22 +2077,22 @@ function renderPlan(){
   const empty=$('pl-empty'),list=$('pl-list');
   if(!acts.length){if(empty)empty.style.display='';if(list){list.innerHTML='';list.style.display='none';}return;}
   if(empty)empty.style.display='none';if(list)list.style.display='';
-  list.innerHTML=acts.map(a=>{
+  list.innerHTML=acts.filter(a=>!a.completed).map(a=>{
     const ico=ACT_ICO[a.type]||'✨',col=ACT_COL[a.type]||'#FF9800';
     const st=actStatus(a);
     const pc={done:'p-ok',now:'p-now',soon:'p-soon',late:'p-late',later:'p-later'}[st.s]||'p-later';
     const pct=st.s==='now'?Math.round((st.p||0)*100):st.s==='done'?100:0;
     const bar=['done','now','soon'].includes(st.s);
-    return`<div class="ac${a.completed?' done':''}">
-      <div class="ac-ico" style="background:${col}18">${a.completed?'✅':ico}</div>
+    return`<div class="ac" data-id="${a.id}" oncontextmenu="event.preventDefault();showDelDialog(${a.id})" ontouchstart="startLongPress(${a.id},this)" ontouchend="cancelLongPress()" ontouchmove="cancelLongPress()">
+      <div class="ac-ico" style="background:${col}18">${ico}</div>
       <div class="ac-body">
-        <div class="ac-name${a.completed?' done-text':''}">${a.name}</div>
+        <div class="ac-name">${a.name}</div>
         <div class="ac-sub">${fmtRange(a)} · ${a.duration} мин</div>
         <span class="pill ${pc}">${st.l}</span>
         ${bar?`<div class="ac-bar"><div class="ac-barf" style="width:${st.s==='soon'?80:pct}%;background:${st.s==='done'?'var(--green)':st.s==='now'?'var(--water)':'rgba(255,107,53,.35)'}"></div></div>`:''}
       </div>
       <div style="flex-shrink:0">
-        <button class="btn btn-g" style="padding:7px 11px;font-size:12px;border-radius:9px" onclick="completeAct(${a.id})">${a.completed?'↩':'✓'}</button>
+        <button class="btn btn-g" style="padding:7px 11px;font-size:12px;border-radius:9px" onclick="completeAct(${a.id})">✓</button>
       </div>
     </div>`;
   }).join('');
@@ -1786,7 +2103,7 @@ function renderSleep(){
   if(sl.length){const last=sl[sl.length-1];T('sl-h',last.hours.toFixed(1));T('sl-qico',qIco(last.quality));H('sl-dots',Array.from({length:5},(_,i)=>`<div class="sqd${i<last.quality?' on':''}"></div>`).join(''));}
   else{T('sl-h','—');T('sl-qico','—');H('sl-dots','');}
   const l7=sl.slice(-7).reverse();
-  H('sl-hist',l7.length?l7.map(e=>`<div class="hr"><div class="hr-d">${fmtD(e.logged_at)}</div><div style="display:flex;align-items:center;gap:7px;flex:1"><div class="hr-v">${e.hours.toFixed(1)} ч</div><div class="sq">${Array.from({length:5},(_,i)=>`<div class="sqd${i<e.quality?' on':''}"></div>`).join('')}</div></div><div style="font-size:16px">${qIco(e.quality)}</div></div>`).join(''):'<div style="text-align:center;padding:14px;color:var(--hint);font-size:12px;font-weight:600">нет записей</div>');
+  // History is now in pp-sleep-hist push page
   if(l7.length){T('sl-avg-h',+(l7.reduce((a,b)=>a+b.hours,0)/l7.length).toFixed(1));T('sl-avg-q',qIco(Math.round(l7.reduce((a,b)=>a+(b.quality||3),0)/l7.length))+' '+(l7.reduce((a,b)=>a+(b.quality||3),0)/l7.length).toFixed(1));}
 }
 function renderProgress(){
@@ -1804,7 +2121,7 @@ function renderProgress(){
       if(rate>.01){const dl=Math.ceil((cw-gw)/rate*7),eta=new Date();eta.setDate(eta.getDate()+dl);const mons=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];T('pr-forecast','прогноз: '+eta.getDate()+' '+mons[eta.getMonth()]+' · темп '+rate.toFixed(2)+' кг/нед');}
     }catch{}}
   }
-  setTimeout(()=>drawChart(wl.length>14?wl.slice(-14):wl),50);
+  setTimeout(()=>drawChart(wl.length>14?wl.slice(-14):wl,false),50);
   T('pw-water',wd.total||0);T('pw-cal',totalCal());
   T('pw-sleep',sl.length?+(sl.slice(-7).reduce((a,b)=>a+b.hours,0)/Math.min(7,sl.length)).toFixed(1):'—');
   // История перенесена в pp-history
