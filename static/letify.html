@@ -57,15 +57,15 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   content:'';
   position:absolute;
   inset:0;
-  background:radial-gradient(ellipse 70% 50% at 50% 40%, rgba(255,107,53,.13) 0%, transparent 70%);
+  background:radial-gradient(ellipse 45% 30% at 50% 40%, rgba(255,107,53,.10) 0%, transparent 70%);
   pointer-events:none;
 }
 #splash::after{
   content:'';
   position:absolute;
-  width:340px;height:340px;
+  width:180px;height:180px;
   border-radius:50%;
-  background:radial-gradient(circle, rgba(255,171,64,.09) 0%, transparent 70%);
+  background:radial-gradient(circle, rgba(255,171,64,.07) 0%, transparent 70%);
   top:50%;left:50%;transform:translate(-50%,-60%);
   pointer-events:none;
   animation:sp-glow 3s ease-in-out infinite;
@@ -471,11 +471,16 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   -webkit-overflow-scrolling:touch;
   scrollbar-width:none;
   padding-bottom:4px;
+  /* Isolate compositing layer — prevents SVG filter black artifact on pop */
+  isolation:isolate;
+  transform:translateZ(0);
+  -webkit-transform:translateZ(0);
 }
 .wchart-push-wrap::-webkit-scrollbar{display:none}
 
 /* ══ EMPTY ══ */
-.empty{text-align:center;padding:40px 20px}
+.empty{text-align:center;padding:40px 20px;animation:empty-fadein .35s ease forwards}
+@keyframes empty-fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .empty svg{opacity:.22;margin-bottom:12px}
 .empty-t{font-size:15px;font-weight:800;margin-bottom:5px}
 .empty-s{font-size:12px;color:var(--hint);font-weight:600}
@@ -1367,6 +1372,11 @@ function popPage(doRender=true){
   if(!curPushPage)return;
   if(curPushPage==='pp-pdata')_saveProfileSilent();
   if(curPushPage==='pp-goals')_saveGoalsSilent();
+  // Clear weight chart SVG BEFORE animating out — prevents black filter artifact on iOS/WebKit
+  if(curPushPage==='pp-weight-chart'){
+    const wrap=document.getElementById('wchart-svg-wrap');
+    if(wrap)wrap.innerHTML='';
+  }
   const pp=document.getElementById(curPushPage);
   if(pp){
     pp.style.opacity='0';pp.style.transform='translateY(10px) translateZ(0)';
@@ -1761,15 +1771,14 @@ async function completeAct(id){
         cardEl.style.marginBottom='0';
         setTimeout(()=>{
           if(cardEl.parentNode)cardEl.remove();
-          // Only show empty state once ALL animations are done
+          // Once ALL animations are done — just clear the list silently and reload
           if(_completingMap.size===0){
-            const activeTasks=C.acts_today.filter(a=>!a.completed);
-            if(!activeTasks.length){
-              const list=$('pl-list');const empty=$('pl-empty');
-              if(list){list.innerHTML='';list.style.display='none';}
-              if(empty)empty.style.display='';
+            const list=$('pl-list');
+            // Only blank out if truly no active cards remain in DOM
+            if(list&&list.querySelectorAll('.ac').length===0){
+              list.innerHTML='';list.style.display='none';
             }
-            // Reload data from server quietly
+            // Reload will properly set empty-state (avoids flash)
             reload().then(()=>{/* silent */});
           }
         },430);
@@ -2164,9 +2173,9 @@ function renderPlan(){
   const activeTasks=acts.filter(a=>!a.completed);
   const domCards=document.querySelectorAll('#pl-list .ac');
   if(!activeTasks.length){
-    // Only show empty if no DOM cards still animating
+    // Only show "нет задач" if no tasks exist at all (not just "all completed")
     if(domCards.length===0){
-      if(empty)empty.style.display=acts.length?'none':'';
+      if(empty)empty.style.display=acts.length===0?'':'none';
       if(list){list.innerHTML='';list.style.display='none';}
     }
     return;
@@ -2205,16 +2214,14 @@ function renderProgress(){
   if(wl.length){
     const cw=wl[wl.length-1].weight;
     const gw=u.goal_weight||0;
-    // Use the maximum recorded weight as the "start" so progress is always positive when losing
-    // (works whether user is losing or gaining toward goal)
     const allWeights=wl.map(d=>d.weight);
+    // Start weight: use the most logical reference depending on direction
     let sw=u.start_weight&&u.start_weight>0?u.start_weight:allWeights[0];
-    // If goal is set, use max weight between sw and historical max as starting reference
     if(gw>0&&gw<cw){
-      // Losing weight path: start = highest weight ever
+      // Losing weight: start = highest weight on record (or start_weight if higher)
       sw=Math.max(sw,...allWeights);
     }else if(gw>0&&gw>cw){
-      // Gaining weight path: start = lowest weight ever
+      // Gaining weight: start = lowest weight on record (or start_weight if lower)
       sw=Math.min(sw,...allWeights);
     }
     T('pr-wcur',cw.toFixed(1));
@@ -2225,8 +2232,11 @@ function renderProgress(){
     const done=Math.abs(sw-cw);
     const pct=gw?Math.min(100,Math.max(0,Math.round(done/tot*100))):0;
     T('pr-wpct',pct+'%');
-    const lost=allWeights[0]-cw; // diff from first entry
-    T('pr-winfo',`потеряно ${Math.abs(lost).toFixed(1)} кг · осталось ${gw?Math.max(0,Math.abs(cw-gw)).toFixed(1)+'кг':'—'}`);
+    // Use sw as the reference for "lost/gained" — consistent with what's displayed as "start"
+    const diff=sw-cw;
+    const diffLabel=gw&&gw<sw?`потеряно ${Math.abs(diff).toFixed(1)} кг · осталось ${gw?Math.max(0,Math.abs(cw-gw)).toFixed(1)+' кг':'—'}`
+                              :`набрано ${Math.abs(diff).toFixed(1)} кг · осталось ${gw?Math.max(0,Math.abs(cw-gw)).toFixed(1)+' кг':'—'}`;
+    T('pr-winfo',gw?diffLabel:`текущий вес · нет цели`);
     requestAnimationFrame(()=>{const b=$('pr-wbar');if(b)b.style.width=pct+'%';});
     if(wl.length>=2&&gw&&cw>gw){try{
       const d1=new Date(wl[0].logged_at+'T00:00:00'),d2=new Date(wl[wl.length-1].logged_at+'T00:00:00');
