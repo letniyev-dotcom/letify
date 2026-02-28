@@ -3,16 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <style id="pre-theme">
-  /* Мгновенная тёмная тема до загрузки JS */
-  html,body,#root{background:#111111 !important;color:#fff !important;}
+  html,body,#root,#splash{background:#FAF7F2 !important}
+  html.pre-dark,html.pre-dark body,html.pre-dark #root,html.pre-dark #splash{background:#111111 !important;color:#fff !important}
 </style>
 <script>
-// Применяем тему немедленно, до рендера страницы
 (function(){
-  var tgScheme = null;
-  try { tgScheme = window.Telegram?.WebApp?.colorScheme; } catch(e){}
-  var dark = tgScheme === 'dark' || window.matchMedia('(prefers-color-scheme:dark)').matches;
-  if(dark) document.documentElement.classList.add('pre-dark');
+  var tgScheme=null;
+  try{tgScheme=window.Telegram?.WebApp?.colorScheme;}catch(e){}
+  var dark=tgScheme==='dark'||window.matchMedia('(prefers-color-scheme:dark)').matches;
+  if(dark)document.documentElement.classList.add('pre-dark');
 })();
 </script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
@@ -34,7 +33,6 @@
   --page-bot:calc(var(--nav-h) + 16px);
   --page-top:calc(var(--st) + 16px);
 }
-/* Pre-dark (применяется до TG init) */
 .pre-dark{
   --bg:#111111;--bg2:#111111;--bg3:rgba(255,255,255,.07);
   --text:#ffffff;--hint:#708499;
@@ -43,7 +41,55 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 #root{position:fixed;inset:0}
 #pages{position:absolute;inset:0}
 
-/* ── MAIN PAGES ── */
+/* ══ SPLASH ══ */
+#splash{
+  position:fixed;inset:0;z-index:99999;
+  background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:0;
+  transition:opacity .45s ease,transform .45s ease;
+  will-change:opacity;
+}
+#splash.hiding{opacity:0;transform:scale(1.03);}
+.sp-logo{
+  width:84px;height:84px;border-radius:28px;
+  background:linear-gradient(135deg,var(--sun),var(--sun2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:42px;
+  box-shadow:0 16px 48px rgba(255,107,53,.32),0 4px 12px rgba(255,107,53,.18);
+  margin-bottom:22px;
+  animation:sp-pop .7s cubic-bezier(.34,1.7,.64,1) forwards;
+  transform:scale(.5) translateY(30px);opacity:0;
+}
+.sp-title{
+  font-size:40px;font-weight:900;letter-spacing:-.04em;
+  background:linear-gradient(105deg,var(--sun),var(--sun2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:sp-up .5s .18s ease forwards;
+  opacity:0;transform:translateY(12px);
+}
+.sp-sub{
+  font-size:14px;font-weight:600;color:var(--hint);margin-top:7px;
+  animation:sp-up .5s .32s ease forwards;
+  opacity:0;transform:translateY(8px);
+}
+.sp-dots{
+  display:flex;gap:7px;margin-top:44px;
+  animation:sp-up .5s .5s ease forwards;
+  opacity:0;transform:translateY(6px);
+}
+.sp-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:linear-gradient(135deg,var(--sun),var(--sun2));
+  animation:sp-pulse 1.4s .6s ease-in-out infinite;
+}
+.sp-dot:nth-child(2){animation-delay:.75s;opacity:.65;}
+.sp-dot:nth-child(3){animation-delay:.9s;opacity:.35;}
+@keyframes sp-pop{to{transform:scale(1) translateY(0);opacity:1}}
+@keyframes sp-up{to{opacity:1;transform:translateY(0)}}
+@keyframes sp-pulse{0%,100%{transform:scale(1) translateY(0);opacity:.5}50%{transform:scale(1.45) translateY(-3px);opacity:1}}
+
+/* ══ MAIN PAGES ══ */
 .page{
   position:absolute;inset:0;
   overflow-y:auto;overflow-x:hidden;
@@ -58,7 +104,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .page::-webkit-scrollbar{display:none}
 .page.active{opacity:1;pointer-events:all;transform:none}
 
-/* ── PUSH PAGES ── */
+/* ══ PUSH PAGES ══ */
 .push-page{
   position:fixed;inset:0;z-index:60;
   background:var(--bg);
@@ -70,21 +116,16 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   transition:opacity .22s ease, transform .22s ease;
   pointer-events:none;
   display:flex;flex-direction:column;
-  backface-visibility:hidden;
-  -webkit-backface-visibility:hidden;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;
 }
 .push-page::-webkit-scrollbar{display:none}
 .push-page.open{opacity:1;transform:translateX(0);pointer-events:all}
-
-/* ── PUSH HEADER ── */
 .pp-hdr{
   flex-shrink:0;
-  padding-top:calc(var(--st) + 10px);
-  padding-bottom:12px;
+  padding-top:calc(var(--st) + 10px);padding-bottom:12px;
   padding-left:16px;padding-right:16px;
   display:flex;align-items:center;gap:12px;
-  border-bottom:1px solid var(--brd);
-  background:var(--bg);
+  border-bottom:1px solid var(--brd);background:var(--bg);
 }
 .tg-env .pp-back{display:none !important}
 .pp-back{
@@ -97,18 +138,14 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tg-dark .pp-back:active{background:rgba(255,255,255,.18)}
 .pp-title{font-size:18px;font-weight:900;letter-spacing:-.02em}
 .pp-subtitle{font-size:11px;font-weight:500;color:var(--hint);margin-top:1px}
-
-/* ── PUSH BODY ── */
 .pp-body{
   flex:1;overflow-y:auto;overflow-x:hidden;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:none;
-  padding:16px;
-  padding-bottom:calc(var(--sb) + 24px);
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;
+  padding:16px;padding-bottom:calc(var(--sb) + 24px);
 }
 .pp-body::-webkit-scrollbar{display:none}
 
-/* ── MD3 FIELDS ── */
+/* ══ MD3 FIELDS ══ */
 .m3-field{position:relative;margin-bottom:8px}
 .m3-field:last-child{margin-bottom:0}
 .m3-input{
@@ -129,7 +166,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 }
 .m3-input.num{text-align:right}
 .m3-input::placeholder{color:var(--hint);font-size:14px;font-weight:500}
-
 .m3-card{
   background:var(--bg2);border-radius:16px;
   padding:14px;box-shadow:var(--sh);margin-bottom:10px;
@@ -137,7 +173,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tg-dark .m3-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);box-shadow:none}
 .m3-sec{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--hint);padding:12px 2px 6px}
 .m3-sec:first-child{padding-top:0}
-
 .m3-seg{display:flex;gap:4px;background:var(--bg3);border-radius:12px;padding:3px;margin-bottom:10px}
 .m3-seg-btn{
   flex:1;padding:10px 6px;font-size:13px;font-weight:700;
@@ -150,45 +185,29 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tg-dark .m3-seg-btn.on{background:rgba(255,255,255,.16)}
 .m3-seg-emoji .m3-seg-btn{font-size:22px;padding:7px 4px}
 
-/* ── +/- STEPPER ── */
-.stepper-wrap{
-  display:flex;align-items:center;gap:0;
-  background:var(--bg3);border-radius:16px;
-  overflow:hidden;
-}
+/* ══ STEPPER ══ */
+.stepper-wrap{display:flex;align-items:center;gap:0;background:var(--bg3);border-radius:16px;overflow:hidden}
 .stepper-btn{
-  width:56px;height:64px;
-  background:transparent;border:none;cursor:pointer;
-  font-size:26px;font-weight:700;color:var(--sun);
-  font-family:inherit;flex-shrink:0;
+  width:56px;height:64px;background:transparent;border:none;cursor:pointer;
+  font-size:26px;font-weight:700;color:var(--sun);font-family:inherit;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
-  transition:background .1s;
-  -webkit-tap-highlight-color:transparent;
+  transition:background .1s;-webkit-tap-highlight-color:transparent;
 }
-
 .stepper-val{
-  flex:1;text-align:center;
-  font-size:38px;font-weight:700;letter-spacing:-.02em;
-  color:var(--text);padding:0 4px;
-  user-select:none;
+  flex:1;text-align:center;font-size:38px;font-weight:700;letter-spacing:-.02em;
+  color:var(--text);padding:0 4px;user-select:none;
 }
 .stepper-val .unit{font-size:14px;font-weight:700;color:var(--hint);margin-left:4px}
-
-/* Двойной степпер (кг + .X) */
 .dual-stepper{display:flex;gap:8px;align-items:stretch}
 .dual-stepper .stepper-wrap{flex:1}
-
-/* ── BIG VALUE DISPLAY ── */
 .big-val-card{
   background:linear-gradient(135deg,rgba(255,107,53,.07),rgba(255,171,64,.04));
-  border-radius:20px;padding:24px 20px;
-  text-align:center;margin-bottom:16px;
+  border-radius:20px;padding:24px 20px;text-align:center;margin-bottom:16px;
 }
 .big-val{font-size:64px;font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--text)}
 .big-val-unit{font-size:16px;font-weight:700;color:var(--hint);margin-top:4px}
-.big-val-range{font-size:12px;font-weight:600;color:var(--hint);margin-top:6px}
 
-/* ── ISLAND NAV ── */
+/* ══ NAV ══ */
 #nav{
   position:fixed;bottom:12px;left:0;right:0;margin:0 auto;
   width:fit-content;z-index:9999;
@@ -213,21 +232,19 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .nt-dot{width:4px;height:4px;border-radius:50%;background:var(--sun);opacity:0;transition:opacity .16s}
 .nt.on .nt-dot{opacity:1}
 
-/* ── TYPOGRAPHY ── */
+/* ══ TYPOGRAPHY ══ */
 .t1{font-size:26px;font-weight:900;line-height:1.1;letter-spacing:-.02em}
 .t2{font-size:20px;font-weight:900;letter-spacing:-.02em}
 .t5{font-size:12px;font-weight:600;color:var(--hint)}
 .grad{background:linear-gradient(105deg,var(--sun),var(--sun2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 
-/* ── CARDS / LAYOUT ── */
+/* ══ CARDS ══ */
 .card{background:var(--bg2);border-radius:var(--r-lg);padding:16px;box-shadow:var(--sh);position:relative;overflow:hidden}
 .tg-dark .card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);box-shadow:none}
 .pad{padding:0 16px}
 .gap{margin-top:10px}
 .sec{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--hint);padding:14px 20px 6px}
 .tg-dark .sec{color:rgba(255,255,255,.35)}
-
-/* ── LIST TILE ── */
 .lt{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--brd);cursor:pointer;transition:opacity .12s}
 .lt:last-child{border-bottom:none;padding-bottom:0}
 .lt:first-child{padding-top:0}
@@ -239,7 +256,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .lt-chev{color:var(--hint);opacity:.4;flex-shrink:0}
 .tg-dark .lt{border-bottom-color:rgba(255,255,255,.08)}
 
-/* ── PROGRESS BAR ── */
+/* ══ PROGRESS BAR ══ */
 .pb{height:6px;background:rgba(0,0,0,.06);border-radius:99px;overflow:hidden;margin-top:10px}
 .pbf{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.34,1.1,.64,1)}
 .pb-sun{background:linear-gradient(90deg,var(--sun),var(--sun2))}
@@ -247,25 +264,31 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .pb-sleep{background:var(--sleep)}
 .tg-dark .pb{background:rgba(255,255,255,.1)}
 
-/* ── ARC ── */
+/* ══ ARC ══ */
 .aw{position:relative;display:inline-flex;align-items:center;justify-content:center}
 .ai{position:absolute;text-align:center;pointer-events:none}
 
-/* ── STAT BOX ── */
+/* ══ STAT BOX ══ */
 .sb-row{display:flex;gap:8px}
 .sbox{flex:1;background:var(--bg2);border-radius:var(--r);padding:12px;box-shadow:var(--sh);text-align:center}
 .tg-dark .sbox{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);box-shadow:none}
 .sv{font-size:19px;font-weight:900;margin-bottom:2px}
 .sl{font-size:10px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.06em}
 
-/* ── BANNER ── */
+/* ══ BANNER ══ */
 .banner{background:linear-gradient(130deg,#FF6B35,#FFAB40);border-radius:var(--r-lg);padding:16px;color:#fff;position:relative;overflow:hidden}
 .banner::after{content:'';position:absolute;right:-10px;top:-10px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.1);pointer-events:none}
 
-/* ── ACT CARD ── */
-.ac{background:var(--bg2);border-radius:var(--r);padding:12px;display:flex;align-items:flex-start;gap:10px;box-shadow:var(--sh);margin-bottom:8px;transition:opacity .16s}
+/* ══ ACT CARD ══ */
+.ac{
+  background:var(--bg2);border-radius:var(--r);padding:12px;
+  display:flex;align-items:flex-start;gap:10px;
+  box-shadow:var(--sh);margin-bottom:8px;
+  transition:opacity .16s;
+  position:relative;overflow:hidden;
+}
 .tg-dark .ac{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);box-shadow:none}
-.ac.done{opacity:.42}
+.ac.done{opacity:.46}
 .ac-ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 .ac-body{flex:1;min-width:0}
 .ac-name{font-size:14px;font-weight:800;margin-bottom:2px}
@@ -281,13 +304,37 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .ac-barf{height:100%;border-radius:99px;transition:width .4s ease}
 .tg-dark .ac-bar{background:rgba(255,255,255,.1)}
 
-/* ── SLEEP DOTS ── */
+/* ══ LP INDICATOR (long press) ══ */
+.lp-indicator{
+  position:absolute;bottom:0;left:0;
+  height:3px;width:0;
+  background:var(--red);
+  border-radius:0 3px 0 0;
+  opacity:0;
+  transition:none;
+}
+.ac.lp-active .lp-indicator{
+  opacity:1;width:100%;
+  transition:width 3s linear;
+  border-radius:0;
+}
+
+/* ══ COMPLETING TIMER BAR ══ */
+.ac-timer-bar{
+  position:absolute;bottom:0;left:0;
+  height:3px;
+  background:var(--green);
+  border-radius:0;
+  transition:width 5.05s linear;
+}
+
+/* ══ SLEEP DOTS ══ */
 .sq{display:flex;gap:3px}
 .sqd{width:14px;height:4px;border-radius:99px;background:rgba(0,0,0,.07)}
 .sqd.on{background:var(--sleep)}
 .tg-dark .sqd{background:rgba(255,255,255,.14)}
 
-/* ── HISTORY ROW ── */
+/* ══ HISTORY ROW ══ */
 .hr{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid var(--brd);gap:10px}
 .hr:last-child{border-bottom:none;padding-bottom:0}
 .hr:first-child{padding-top:0}
@@ -297,7 +344,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .d-neg{color:var(--green)}.d-pos{color:var(--red)}
 .tg-dark .hr{border-bottom-color:rgba(255,255,255,.08)}
 
-/* ── MEAL ROW ── */
+/* ══ MEAL ROW ══ */
 .mr{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--brd)}
 .mr:last-child{border-bottom:none;padding-bottom:0}
 .mr:first-child{padding-top:0}
@@ -306,23 +353,25 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .mr-kcal{font-size:13px;font-weight:900;flex-shrink:0}
 .tg-dark .mr{border-bottom-color:rgba(255,255,255,.08)}
 
-/* ── BTNS ── */
+/* ══ BTNS ══ */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;cursor:pointer;font-family:inherit;font-weight:800;transition:transform .1s ease,opacity .12s}
 .btn:active{transform:scale(.98);opacity:.92}
 .btn-p{background:linear-gradient(135deg,var(--sun),var(--sun2));color:#fff;padding:15px 20px;font-size:15px;border-radius:14px;box-shadow:0 4px 16px rgba(255,107,53,.28);width:100%;letter-spacing:.01em}
 .btn-g{background:var(--bg3);color:var(--text);padding:11px 16px;font-size:13px;border-radius:11px}
 .btn-water{background:rgba(78,174,229,.1);color:var(--water);padding:13px 8px;font-size:13px;border-radius:12px;flex:1;font-weight:800}
+.btn-danger{background:rgba(244,92,92,.09);color:var(--red);padding:11px 16px;font-size:13px;border-radius:11px;width:100%}
 .tg-dark .btn-g{background:rgba(255,255,255,.1);color:#fff}
 .tg-dark .btn-water{background:rgba(78,174,229,.18);color:#7ecef5}
+.tg-dark .btn-danger{background:rgba(244,92,92,.15)}
 
-/* ── TOGGLE ── */
+/* ══ TOGGLE ══ */
 .tog{width:46px;height:26px;border-radius:99px;position:relative;cursor:pointer;flex-shrink:0;transition:background .2s}
 .tog::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:3px;transition:left .22s cubic-bezier(.34,1.5,.64,1);box-shadow:0 1px 5px rgba(0,0,0,.16)}
 .tog.on{background:var(--sun)}.tog.off{background:rgba(0,0,0,.16)}
 .tog.on::after{left:23px}.tog.off::after{left:3px}
 .tg-dark .tog.off{background:rgba(255,255,255,.22)}
 
-/* ── TRACK TABS ── */
+/* ══ TRACK TABS ══ */
 .ttabs{display:flex;gap:3px;background:rgba(0,0,0,.05);border-radius:12px;padding:3px}
 .ttab{flex:1;padding:8px 4px;font-size:12px;font-weight:800;border:none;border-radius:9px;cursor:pointer;font-family:inherit;background:transparent;color:var(--hint);transition:background .14s,color .14s,box-shadow .14s}
 .ttab.on{background:var(--bg2);color:var(--text);box-shadow:0 1px 5px rgba(0,0,0,.08)}
@@ -330,10 +379,10 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tg-dark .ttab.on{background:rgba(255,255,255,.16);color:#fff}
 .tg-dark .ttab{color:rgba(255,255,255,.4)}
 
-/* ── AVATAR ── */
+/* ══ AVATAR ══ */
 .pav{width:64px;height:64px;border-radius:20px;background:linear-gradient(135deg,var(--sun),var(--sun2));display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;color:#fff;box-shadow:0 5px 18px rgba(255,107,53,.25);flex-shrink:0}
 
-/* ── TOAST ── */
+/* ══ TOAST ══ */
 #toast{
   position:fixed;bottom:calc(var(--nav-h) + 12px);left:50%;
   transform:translateX(-50%) translateY(8px);
@@ -344,7 +393,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 }
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* ── ACTIVITY: TYPE GRID ── */
+/* ══ TYPE GRID ══ */
 .type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
 .type-card{
   padding:14px 10px;border-radius:14px;border:2px solid transparent;
@@ -358,20 +407,20 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tg-dark .type-card{background:rgba(255,255,255,.07)}
 .tg-dark .type-card.on{background:rgba(255,107,53,.16)}
 
-/* ── DURATION GRID ── */
+/* ══ DURATION GRID ══ */
 .dur-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:4px}
 .dur-btn{
   padding:10px 6px;border-radius:10px;border:2px solid transparent;
   background:var(--bg3);cursor:pointer;text-align:center;
-  font-size:12px;font-weight:800;color:var(--hint);
-  font-family:inherit;transition:all .12s ease;
+  font-size:12px;font-weight:800;color:var(--hint);font-family:inherit;
+  transition:all .12s ease;
 }
-.dur-btn:active{transform:scale(.97);transition:transform .08s ease}
+.dur-btn:active{transform:scale(.97)}
 .dur-btn.on{background:rgba(255,107,53,.08);border-color:var(--sun);color:var(--sun)}
 .tg-dark .dur-btn{background:rgba(255,255,255,.07)}
 .tg-dark .dur-btn.on{background:rgba(255,107,53,.18)}
 
-/* ── STEP INDICATOR ── */
+/* ══ STEP INDICATOR ══ */
 .step-ind{display:flex;align-items:center;gap:6px;margin-bottom:20px}
 .step-pip{width:8px;height:8px;border-radius:50%;background:var(--bg3);transition:all .25s ease}
 .step-pip.on{width:22px;border-radius:4px;background:var(--sun)}
@@ -380,7 +429,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .act-step.active{display:block}
 .act-hint{font-size:12px;color:var(--hint);font-weight:500;margin-bottom:16px}
 
-/* ── TOGGLE ROW ── */
+/* ══ TOGGLE ROW ══ */
 .m3-tog-row{
   display:flex;align-items:center;gap:12px;
   padding:13px 14px;background:var(--bg2);
@@ -392,45 +441,17 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .m3-tog-lbl{flex:1;font-size:14px;font-weight:700}
 .tg-dark .m3-tog-row{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08)}
 
-/* ── CHART SCROLL ── */
-.chart-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin:0 -2px;padding:0 2px;scroll-behavior:smooth;}
+/* ══ CHART ══ */
+.chart-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin:0 -2px;padding:0 2px;}
 .chart-scroll::-webkit-scrollbar{display:none}
-.chart-scroll{-ms-overflow-style:none}
 
-/* ── EMPTY ── */
+/* ══ EMPTY ══ */
 .empty{text-align:center;padding:40px 20px}
 .empty svg{opacity:.22;margin-bottom:12px}
 .empty-t{font-size:15px;font-weight:800;margin-bottom:5px}
 .empty-s{font-size:12px;color:var(--hint);font-weight:600}
 
-/* ── TASK COMPLETION ANIMATION ── */
-.ac-completing{
-  transition:opacity .5s ease,transform .5s ease,max-height .5s ease,margin-bottom .5s ease,padding .5s ease;
-  overflow:hidden;
-}
-.ac-completing.hide{opacity:0;transform:translateY(10px) scale(.98);max-height:0!important;margin-bottom:0!important;padding:0!important;}
-
-/* ── DELETE DIALOG ── */
-.del-overlay{
-  position:fixed;inset:0;z-index:200;
-  background:rgba(0,0,0,.5);
-  display:flex;align-items:flex-end;justify-content:center;
-  opacity:0;transition:opacity .2s ease;
-  pointer-events:none;
-}
-.del-overlay.show{opacity:1;pointer-events:all;}
-.del-sheet{
-  background:var(--bg2);
-  border-radius:20px 20px 0 0;
-  padding:20px 16px calc(20px + var(--sb));
-  width:100%;
-  transform:translateY(100%);
-  transition:transform .3s cubic-bezier(.34,1.1,.64,1);
-}
-.del-overlay.show .del-sheet{transform:translateY(0);}
-.tg-dark .del-sheet{background:rgba(30,24,16,.98);border:1px solid rgba(255,255,255,.1);}
-
-/* ── DAY SELECTOR (activity creation) ── */
+/* ══ DAY SELECTOR ══ */
 .days-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}
 .day-btn{
   padding:12px 4px;border-radius:12px;border:2px solid transparent;
@@ -453,59 +474,50 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tg-dark .day-btn-daily{background:rgba(255,255,255,.07)}
 .tg-dark .day-btn-daily.on{background:rgba(255,107,53,.18)}
 
-/* ── DARK OVERRIDES ── */
-.tg-dark{
-  --bg3:rgba(255,255,255,.07);
-  --brd:rgba(255,255,255,.09);
-  --sh:0 2px 12px rgba(0,0,0,.4);
+/* ══ TIME PICKER ══ */
+.time-picker-row{display:flex;align-items:center;justify-content:center;gap:0}
+.time-col{display:flex;flex-direction:column;align-items:center;gap:2px;flex:1}
+.time-digit{font-size:42px;font-weight:800;letter-spacing:-.02em;color:var(--text);line-height:1.1;min-width:70px;text-align:center;padding:4px 0}
+.time-sep{font-size:38px;font-weight:800;color:var(--text);padding:0 2px;line-height:1;opacity:.4;align-self:center}
+.time-arr-btn{
+  width:100%;padding:9px 0;background:transparent;border:none;border-radius:9px;
+  font-size:20px;color:var(--sun);cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;justify-content:center;
+  -webkit-tap-highlight-color:transparent;font-weight:800;line-height:1;
 }
+.time-arr-btn:active{transform:scale(.96);opacity:.7;transition:transform .06s ease,opacity .06s ease}
+.tg-dark .time-arr-btn{background:rgba(255,255,255,.08)}
+
+/* ══ DARK OVERRIDES ══ */
+.tg-dark{--bg3:rgba(255,255,255,.07);--brd:rgba(255,255,255,.09);--sh:0 2px 12px rgba(0,0,0,.4)}
 .tg-dark .push-page,.tg-dark .pp-hdr{background:var(--bg)}
 .tg-dark .t5{color:rgba(255,255,255,.4)}
 .tg-dark #nav{background:rgba(20,14,8,.96);border-color:rgba(255,255,255,.1)}
 .tg-dark .empty svg{opacity:.15}
 .tg-dark .banner::after{opacity:.5}
-
-/* stepper-btn no highlight */
 .stepper-btn{transition:transform .1s ease}
 .stepper-btn:active{background:transparent !important;transform:scale(.88)}
-/* water btn */
 .btn-water:active{background:rgba(78,174,229,.15) !important}
 
-/* ── TIME PICKER ── */
-.time-picker-row{
-  display:flex;align-items:center;justify-content:center;gap:0;
-}
-.time-col{
-  display:flex;flex-direction:column;align-items:center;gap:2px;
-  flex:1;
-}
-.time-digit{
-  font-size:42px;font-weight:800;letter-spacing:-.02em;
-  color:var(--text);line-height:1.1;min-width:70px;text-align:center;
-  padding:4px 0;
-}
-.time-sep{
-  font-size:38px;font-weight:800;color:var(--text);
-  padding:0 2px;line-height:1;opacity:.4;
-  align-self:center;margin-bottom:0;
-}
-.time-arr-btn{
-  width:100%;padding:9px 0;
-  background:transparent;border:none;border-radius:9px;
-  font-size:20px;color:var(--sun);cursor:pointer;
-  font-family:inherit;transition:transform .1s;
-  display:flex;align-items:center;justify-content:center;
-  -webkit-tap-highlight-color:transparent;
-  font-weight:800;
-  line-height:1;
-}
-.time-arr-btn:active{transform:scale(.96);opacity:.7;transition:transform .06s ease,opacity .06s ease}
-.tg-dark .time-arr-btn{background:rgba(255,255,255,.08)}
-.tg-dark .time-arr-btn:active{transform:scale(.96);opacity:.7}
+/* ══ CLEAR BTN HINT ══ */
+.clear-hint{font-size:10px;font-weight:600;color:var(--hint);text-align:center;margin-top:6px;padding:0 4px}
 </style>
 </head>
 <body>
 <div id="root">
+
+<!-- ══ SPLASH ══ -->
+<div id="splash">
+  <div class="sp-logo">☀️</div>
+  <div class="sp-title">letify</div>
+  <div class="sp-sub">твой путь к лету</div>
+  <div class="sp-dots">
+    <div class="sp-dot"></div>
+    <div class="sp-dot"></div>
+    <div class="sp-dot"></div>
+  </div>
+</div>
+
 <div id="pages">
 
 <!-- ══ HOME ══ -->
@@ -521,7 +533,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     <div class="t5" id="h-dunit">дней</div>
   </div>
 </div>
-
 <div class="pad gap">
 <div class="banner">
   <div style="font-size:13px;font-weight:800;opacity:.88;margin-bottom:2px">путь к лету</div>
@@ -529,7 +540,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   <div style="font-size:11px;opacity:.72;font-weight:600;margin-top:3px">ты делаешь это каждый день</div>
 </div>
 </div>
-
 <div class="pad gap">
 <div class="card" style="padding:16px 6px 12px">
   <div style="display:flex;justify-content:space-around;align-items:center">
@@ -560,7 +570,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
 </div>
 </div>
-
 <div class="pad gap">
 <div class="card" style="cursor:pointer" onclick="navTo('progress')">
   <div style="display:flex;align-items:center;justify-content:space-between">
@@ -579,12 +588,10 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   <div class="pb gap"><div class="pbf pb-sun" id="h-wbar" style="width:0%"></div></div>
 </div>
 </div>
-
 <div id="h-plan-sec" style="display:none">
   <div class="sec">сегодня</div>
   <div class="pad" id="h-plan-list"></div>
 </div>
-
 <div class="pad" id="h-streak-w" style="margin-top:10px;display:none">
   <div style="background:linear-gradient(90deg,rgba(255,107,53,.07),rgba(255,171,64,.04));border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;gap:10px">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--sun)"><path d="M12 2c0 5.5-5 7-5 11a5 5 0 0 0 10 0c0-4-5-5.5-5-11z"/></svg>
@@ -663,6 +670,9 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
 </div>
 </div>
+<div class="pad" style="margin-top:4px">
+  <div style="font-size:10px;font-weight:700;color:var(--hint);text-align:center;padding:6px 0 2px;letter-spacing:.04em">удержи карточку 3 сек чтобы удалить</div>
+</div>
 <div id="pl-empty" class="empty" style="display:none">
   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
   <div class="empty-t">нет задач на сегодня</div>
@@ -737,7 +747,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 <div class="pad gap">
 <div class="card" style="padding:14px">
   <div class="t5" style="margin-bottom:8px">динамика веса</div>
-  <div class="chart-scroll">
+  <div class="chart-scroll" id="chart-scroll-wrap">
     <canvas id="wchart" height="90" style="display:block"></canvas>
   </div>
 </div>
@@ -788,19 +798,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
 </div>
 </div>
-<!-- физические данные скрыты -->
-<!-- приложение секция скрыта -->
-<div style="display:none">
-<div class="card">
-  <!-- настройки скрыты -->
-  <div class="lt" style="padding-bottom:0;border:none" onclick="pushPage('pp-weight')">
-    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zm-8 5h.01"/></svg></div>
-    <span class="lt-lbl">записать вес</span>
-    <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-  </div>
-</div>
-</div>
-<div style="text-align:center;padding:16px 0 8px"><div class="t5">letify · ver 4.0</div></div>
+<div style="text-align:center;padding:16px 0 8px"><div class="t5">letify · ver 4.1</div></div>
 <div style="height:8px"></div>
 </div>
 
@@ -808,25 +806,17 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 <!-- ══════ PUSH PAGES ══════ -->
 
-<!-- PP: История веса -->
-</div>
-
 <!-- PP: Записать вес -->
 <div class="push-page" id="pp-weight">
   <div class="pp-hdr">
     <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
-    <div>
-      <div class="pp-title">записать вес</div>
-      <div class="pp-subtitle" style="margin-top:1px">текущий вес в килограммах</div>
-    </div>
+    <div><div class="pp-title">записать вес</div><div class="pp-subtitle" style="margin-top:1px">текущий вес в килограммах</div></div>
   </div>
   <div class="pp-body">
-    <!-- Big display -->
     <div class="big-val-card">
       <div class="big-val"><span id="wt-int">70</span><span style="font-size:28px;color:var(--hint)">.</span><span id="wt-dec">0</span></div>
       <div class="big-val-unit">кг</div>
     </div>
-    <!-- Kg stepper -->
     <div class="m3-sec">килограммы</div>
     <div class="m3-card" style="padding:8px">
       <div class="stepper-wrap">
@@ -835,7 +825,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
         <button class="stepper-btn" onclick="stepW('int',1)">+</button>
       </div>
     </div>
-    <!-- Decimal stepper -->
     <div class="m3-sec">десятые</div>
     <div class="m3-card" style="padding:8px">
       <div class="stepper-wrap">
@@ -852,17 +841,13 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 <div class="push-page" id="pp-sleep">
   <div class="pp-hdr">
     <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
-    <div>
-      <div class="pp-title">записать сон</div>
-      <div class="pp-subtitle" style="margin-top:1px">сколько спал прошлой ночью?</div>
-    </div>
+    <div><div class="pp-title">записать сон</div><div class="pp-subtitle" style="margin-top:1px">сколько спал прошлой ночью?</div></div>
   </div>
   <div class="pp-body">
     <div class="big-val-card" style="background:linear-gradient(135deg,rgba(139,127,212,.08),rgba(139,127,212,.03))">
       <div class="big-val" style="color:var(--sleep)"><span id="sl-val-disp">8</span><span style="font-size:28px;color:var(--hint)">.0</span></div>
       <div class="big-val-unit">часов</div>
     </div>
-    <!-- Hours stepper -->
     <div class="m3-sec">часов сна</div>
     <div class="m3-card" style="padding:8px">
       <div class="stepper-wrap">
@@ -871,7 +856,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
         <button class="stepper-btn" style="color:var(--sleep)" onclick="stepSl('h',1)">+</button>
       </div>
     </div>
-    <!-- Half-hours -->
     <div class="m3-sec">минуты</div>
     <div class="m3-card" style="padding:10px">
       <div class="m3-seg" style="margin-bottom:0">
@@ -879,7 +863,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
         <button class="m3-seg-btn" id="sl-m30" onclick="setSleepMin(30)">:30</button>
       </div>
     </div>
-    <!-- Quality -->
     <div class="m3-sec">качество сна</div>
     <div class="m3-card" style="padding:10px">
       <div class="m3-seg m3-seg-emoji" id="seg-sleepq" style="margin-bottom:0">
@@ -894,20 +877,16 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
 </div>
 
-<!-- PP: Добавить еду (2 шага) -->
+<!-- PP: Добавить еду -->
 <div class="push-page" id="pp-cal">
   <div class="pp-hdr">
     <button class="pp-back" onclick="calBackOrPop()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
     <div style="flex:1">
-      <div class="step-ind">
-        <div class="step-pip on" id="cp1"></div>
-        <div class="step-pip" id="cp2"></div>
-      </div>
+      <div class="step-ind"><div class="step-pip on" id="cp1"></div><div class="step-pip" id="cp2"></div></div>
       <div class="pp-title" id="cal-step-title">название блюда</div>
     </div>
   </div>
   <div class="pp-body">
-    <!-- Шаг 1: название -->
     <div class="act-step active" id="cal-s1">
       <div class="act-hint">как называется блюдо?</div>
       <div class="m3-card" style="padding:16px 14px;margin-bottom:0">
@@ -918,7 +897,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       </div>
       <button class="btn btn-p" style="margin-top:20px" onclick="calStepNext()">далее →</button>
     </div>
-    <!-- Шаг 2: калории + приём пищи -->
     <div class="act-step" id="cal-s2">
       <div class="big-val-card" style="background:linear-gradient(135deg,rgba(244,129,74,.08),rgba(244,129,74,.03))">
         <div class="big-val" style="color:var(--cal)" id="cal-preview">500</div>
@@ -962,25 +940,15 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
   <div class="pp-body">
     <div class="m3-card">
-      <div class="m3-field">
-        <div class="m3-label">имя</div>
-        <input class="m3-input" id="inp-pname" type="text" placeholder="Алексей">
-      </div>
-      <div class="m3-field">
-        <div class="m3-label">рост, см</div>
-        <input class="m3-input num" id="inp-height" type="number" inputmode="numeric" min="100" max="250" placeholder="175">
-      </div>
-      <div class="m3-field">
-        <div class="m3-label">возраст</div>
-        <input class="m3-input num" id="inp-age" type="number" inputmode="numeric" min="10" max="100" placeholder="25">
-      </div>
+      <div class="m3-field"><div class="m3-label">имя</div><input class="m3-input" id="inp-pname" type="text" placeholder="Алексей"></div>
+      <div class="m3-field"><div class="m3-label">рост, см</div><input class="m3-input num" id="inp-height" type="number" inputmode="numeric" min="100" max="250" placeholder="175"></div>
+      <div class="m3-field"><div class="m3-label">возраст</div><input class="m3-input num" id="inp-age" type="number" inputmode="numeric" min="10" max="100" placeholder="25"></div>
     </div>
     <div class="m3-sec">пол</div>
     <div class="m3-seg" id="seg-gender">
       <button class="m3-seg-btn on" onclick="setGender('male')" data-g="male">♂ мужской</button>
       <button class="m3-seg-btn" onclick="setGender('female')" data-g="female">♀ женский</button>
     </div>
-    <!-- автосохранение при закрытии -->
   </div>
 </div>
 
@@ -992,57 +960,10 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
   <div class="pp-body">
     <div class="m3-card">
-      <div class="m3-field">
-        <div class="m3-label">целевой вес, кг</div>
-        <input class="m3-input num" id="inp-gw" type="number" inputmode="decimal" step="0.5" placeholder="70">
-      </div>
-      <div class="m3-field">
-        <div class="m3-label">норма воды, мл</div>
-        <input class="m3-input num" id="inp-gwat" type="number" inputmode="numeric" step="100" placeholder="2000">
-      </div>
-      <div class="m3-field">
-        <div class="m3-label">норма калорий</div>
-        <input class="m3-input num" id="inp-gcal" type="number" inputmode="numeric" step="50" placeholder="2000">
-      </div>
+      <div class="m3-field"><div class="m3-label">целевой вес, кг</div><input class="m3-input num" id="inp-gw" type="number" inputmode="decimal" step="0.5" placeholder="70"></div>
+      <div class="m3-field"><div class="m3-label">норма воды, мл</div><input class="m3-input num" id="inp-gwat" type="number" inputmode="numeric" step="100" placeholder="2000"></div>
+      <div class="m3-field"><div class="m3-label">норма калорий</div><input class="m3-input num" id="inp-gcal" type="number" inputmode="numeric" step="50" placeholder="2000"></div>
     </div>
-    <!-- автосохранение целей при закрытии -->
-  </div>
-</div>
-
-<!-- PP: Настройки -->
-<div class="push-page" id="pp-sett">
-  <div class="pp-hdr">
-    <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
-    <div><div class="pp-title">настройки</div></div>
-  </div>
-  <div class="pp-body">
-    <div style="margin-bottom:4px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--hint)">отображение</div>
-    <div class="m3-tog-row" onclick="toggleSett('w')">
-      <div class="m3-tog-ic">⚖️</div>
-      <div class="m3-tog-lbl">показывать вес</div>
-      <div class="tog on" id="tog-w"></div>
-    </div>
-    <div class="m3-tog-row" onclick="toggleSett('water')">
-      <div class="m3-tog-ic">💧</div>
-      <div class="m3-tog-lbl">показывать воду</div>
-      <div class="tog on" id="tog-water"></div>
-    </div>
-    <div class="m3-tog-row" onclick="toggleSett('cal')">
-      <div class="m3-tog-ic">🔥</div>
-      <div class="m3-tog-lbl">показывать калории</div>
-      <div class="tog on" id="tog-cal"></div>
-    </div>
-    <div class="m3-tog-row" onclick="toggleSett('sleep')">
-      <div class="m3-tog-ic">🌙</div>
-      <div class="m3-tog-lbl">показывать сон</div>
-      <div class="tog on" id="tog-sleep"></div>
-    </div>
-    <div style="margin-top:16px;margin-bottom:4px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--hint)">данные</div>
-    <div class="m3-tog-row" onclick="confirmReset()">
-      <div class="m3-tog-ic">🗑️</div>
-      <div class="m3-tog-lbl" style="color:var(--red)">сбросить все данные</div>
-    </div>
-    <div style="text-align:center;padding:24px 0 0"><div class="t5">letify · ver 4.0</div></div>
   </div>
 </div>
 
@@ -1061,7 +982,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     </div>
   </div>
   <div class="pp-body">
-    <!-- Step 1 -->
     <div class="act-step active" id="act-s1">
       <div class="act-hint">как называется активность?</div>
       <div class="m3-card" style="padding:10px 12px;margin-bottom:0">
@@ -1080,7 +1000,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
         <div class="type-card" onclick="actQuick('другое','other',this)"><div class="type-card-ico">✨</div><div class="type-card-lbl">другое</div></div>
       </div>
     </div>
-    <!-- Step 2 -->
     <div class="act-step" id="act-s2">
       <div class="act-hint">выбери время начала и конца</div>
       <div style="margin-bottom:8px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--hint)">время начала</div>
@@ -1118,7 +1037,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       </div>
       <div id="act-dur-display" style="text-align:center;margin-top:10px;font-size:13px;font-weight:700;color:var(--hint)">длительность: 60 мин</div>
     </div>
-    <!-- Step 3: Day selection -->
     <div class="act-step" id="act-s3">
       <div class="act-hint">в какие дни повторять?</div>
       <button class="day-btn-daily on" id="day-btn-daily" onclick="toggleDayDaily()">ежедневно</button>
@@ -1132,7 +1050,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
         <button class="day-btn" onclick="toggleDay(0,this)" data-day="0">вс</button>
       </div>
     </div>
-    <!-- Step 4 -->
     <div class="act-step" id="act-s4">
       <div class="act-hint">проверь и добавь в план</div>
       <div style="text-align:center;padding:16px 0 12px">
@@ -1161,7 +1078,9 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   <div class="pp-body">
     <div class="m3-sec">история веса</div>
     <div class="m3-card"><div id="pp-whist" style="padding:2px 0"></div></div>
-    <div class="m3-sec">за всё время</div>
+    <button class="btn btn-danger" style="margin-top:4px" onclick="clearWeightHistory()">🗑 очистить историю веса</button>
+    <div class="clear-hint">данные будут удалены навсегда</div>
+    <div class="m3-sec" style="margin-top:8px">за всё время</div>
     <div class="sb-row">
       <div class="sbox"><div class="sv grad" id="pp-at-t">0</div><div class="sl">тренировок</div></div>
       <div class="sbox"><div class="sv grad" id="pp-at-w">0</div><div class="sl">воды л</div></div>
@@ -1179,11 +1098,13 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     <div><div class="pp-title">история воды</div><div class="pp-subtitle">сегодня</div></div>
   </div>
   <div class="pp-body">
-    <div class="m3-card" style="padding:10px 12px;overflow-y:auto;max-height:calc(100vh - 160px)">
+    <div class="m3-card" style="padding:10px 12px">
       <div id="wh-entries">
         <div style="text-align:center;padding:20px;color:var(--hint);font-size:13px;font-weight:600">пока ничего не записано</div>
       </div>
     </div>
+    <button class="btn btn-danger" style="margin-top:10px" onclick="clearWaterHistory()">🗑 очистить историю воды</button>
+    <div class="clear-hint">сбросит всю воду за сегодня</div>
   </div>
 </div>
 
@@ -1194,11 +1115,13 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     <div><div class="pp-title">история сна</div><div class="pp-subtitle">последние 7 ночей</div></div>
   </div>
   <div class="pp-body">
-    <div class="m3-card" style="padding:10px 12px;overflow-y:auto;max-height:calc(100vh - 180px)">
+    <div class="m3-card" style="padding:10px 12px">
       <div id="slh-entries">
         <div style="text-align:center;padding:20px;color:var(--hint);font-size:13px;font-weight:600">нет записей</div>
       </div>
     </div>
+    <button class="btn btn-danger" style="margin-top:10px" onclick="clearSleepHistory()">🗑 очистить историю сна</button>
+    <div class="clear-hint">данные будут удалены навсегда</div>
     <div class="sec" style="padding-top:16px">среднее за неделю</div>
     <div class="sb-row">
       <div class="sbox"><div class="sv" id="slh-avg-h" style="color:var(--sleep)">—</div><div class="sl">часов</div></div>
@@ -1215,23 +1138,10 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
   <div class="pp-body">
     <div class="m3-card" style="padding:0;overflow:hidden">
-      <div id="done-acts-list" style="overflow-y:auto;max-height:calc(100vh - 160px);padding:10px 12px">
+      <div id="done-acts-list" style="padding:10px 12px">
         <div style="text-align:center;padding:20px;color:var(--hint);font-size:13px;font-weight:600">нет выполненных задач</div>
       </div>
     </div>
-  </div>
-</div>
-
-<!-- Delete dialog -->
-<div class="del-overlay" id="del-overlay" onclick="closeDelDialog()">
-  <div class="del-sheet" onclick="event.stopPropagation()">
-    <div style="text-align:center;margin-bottom:16px">
-      <div style="font-size:32px;margin-bottom:8px">🗑️</div>
-      <div style="font-size:17px;font-weight:900;margin-bottom:4px">удалить активность?</div>
-      <div class="t5" id="del-act-name" style="font-size:13px">—</div>
-    </div>
-    <button class="btn" style="background:rgba(244,92,92,.1);color:var(--red);width:100%;padding:14px;font-size:15px;border-radius:14px;margin-bottom:8px" onclick="confirmDeleteAct()">удалить</button>
-    <button class="btn btn-g" style="width:100%;padding:14px;font-size:15px;border-radius:14px" onclick="closeDelDialog()">отмена</button>
   </div>
 </div>
 
@@ -1263,7 +1173,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
 </nav>
 
-</div><!-- /pages-wrapper -->
 </div><!-- /root -->
 
 <script>
@@ -1345,7 +1254,7 @@ function _demo(){
     s('wd_'+TODAY,{total:1350,entries:[250,200,150,250,200,150,150]});
     s('cd_'+TODAY,{breakfast:420,lunch:680,dinner:0,snack:185,other:0});s('streak',7);
     s('acts_'+TODAY,[
-      {id:1,name:'пробежка',type:'run',scheduled_at:'2024-01-01T07:00',duration:30,completed:1},
+      {id:1,name:'пробежка',type:'run',scheduled_at:'2024-01-01T07:00',duration:30,completed:0},
       {id:2,name:'зал',type:'gym',scheduled_at:'2024-01-01T18:30',duration:60,completed:0},
       {id:3,name:'йога',type:'yoga',scheduled_at:'2024-01-01T21:00',duration:25,completed:0}
     ]);s('ds',1);
@@ -1362,12 +1271,14 @@ async function apiPost(path,body){
 }
 async function reload(){
   await loadData();
+  if(_completingMap.size>0)return; // don't re-render during animations
   const rMap={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};
   rMap[curTab]?.();
 }
+
 const gU=()=>C.user;
 const gSS=()=>({w:!!C.settings?.show_weight,water:!!C.settings?.show_water,cal:!!C.settings?.show_calories,sleep:!!C.settings?.show_sleep});
-const gWL=()=>C.weight_log.map(r=>({weight:r.weight,logged_at:(r.logged_at||'').slice(0,10)}));
+const gWL=()=>C.weight_log.map(r=>({weight:r.weight,logged_at:(r.logged_at||'').slice(0,10)})).sort((a,b)=>(a.logged_at||'').localeCompare(b.logged_at||''));
 const gSL=()=>C.sleep_log.map(r=>({hours:r.hours,quality:r.quality,logged_at:(r.logged_at||'').slice(0,10)}));
 const gWD=()=>C.water;const gCD=()=>C.calories;
 const gActs=()=>C.acts_today.map(a=>({...a,time:(a.scheduled_at||'').slice(11,16)||'00:00',completed:!!a.completed}));
@@ -1402,8 +1313,7 @@ function setTTab(t){
 /* ══ PUSH PAGES ══ */
 let curPushPage=null;
 function pushPage(id){
-  curPushPage=id;
-  navHidden=true;
+  curPushPage=id;navHidden=true;
   document.getElementById('nav')?.classList.add('gone');
   const pp=document.getElementById(id);
   if(pp){pp.classList.add('open');pp.scrollTop=0;const body=pp.querySelector('.pp-body');if(body)body.scrollTop=0;}
@@ -1413,13 +1323,11 @@ function pushPage(id){
 }
 function popPage(doRender=true){
   if(!curPushPage)return;
-  // Автосохранение при закрытии
-  if(curPushPage==='pp-pdata'){_saveProfileSilent();}
-  if(curPushPage==='pp-goals'){_saveGoalsSilent();}
+  if(curPushPage==='pp-pdata')_saveProfileSilent();
+  if(curPushPage==='pp-goals')_saveGoalsSilent();
   const pp=document.getElementById(curPushPage);
   if(pp){
-    pp.style.opacity='0';
-    pp.style.transform='translateY(10px) translateZ(0)';
+    pp.style.opacity='0';pp.style.transform='translateY(10px) translateZ(0)';
     setTimeout(()=>{pp.style.transition='none';pp.classList.remove('open');pp.style.opacity='';pp.style.transform='';setTimeout(()=>{pp.style.transition='';},10);},200);
   }
   curPushPage=null;navHidden=false;
@@ -1427,7 +1335,7 @@ function popPage(doRender=true){
   const sb=Math.min(Math.max(tg?.safeAreaInset?.bottom??0,0),80);
   const nav=document.getElementById('nav');if(nav)nav.style.bottom=(12+sb)+'px';
   if(tg?.BackButton){tg.BackButton.hide();tg.BackButton.offClick(popPage);}
-  if(doRender){const renders={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};renders[curTab]?.();}
+  if(doRender&&_completingMap.size===0){const renders={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};renders[curTab]?.();}
 }
 function _populatePP(id){
   const u=gU(),ss=gSS();
@@ -1450,7 +1358,7 @@ function _populatePP(id){
     const t=document.getElementById('cal-step-title');if(t)t.textContent='название блюда';
     const p1=document.getElementById('cp1'),p2=document.getElementById('cp2');
     if(p1){p1.classList.add('on');p1.classList.remove('done');}
-    if(p2){p2.classList.remove('on');}
+    if(p2)p2.classList.remove('on');
     _updateCalDisplay();
     document.querySelectorAll('#seg-meal .m3-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.m==='breakfast'));
     document.querySelectorAll('#cal-s2 .dur-grid .dur-btn').forEach(b=>b.classList.remove('on'));
@@ -1467,20 +1375,14 @@ function _populatePP(id){
     const wi=document.getElementById('inp-gwat');if(wi)wi.value=u.water_goal||2000;
     const ci=document.getElementById('inp-gcal');if(ci)ci.value=u.cal_goal||2000;
   }
-  if(id==='pp-sett'){
-    ['w','water','cal','sleep'].forEach(k=>{
-      const tog=document.getElementById('tog-'+k),on=ss[k]!==false;
-      if(tog){tog.classList.toggle('on',on);tog.classList.toggle('off',!on);}
-    });
-  }
   if(id==='pp-history'){
     const wl=gWL(),wd=gWD(),acts=gActs();
-    const l6=wl.slice(-20).reverse();
+    const l20=[...wl].reverse().slice(0,20);
     const HH=(eid,v)=>{const el=document.getElementById(eid);if(el)el.innerHTML=v;};
     const TT=(eid,v)=>{const el=document.getElementById(eid);if(el)el.textContent=v;};
     const emptyMsg='<div style="text-align:center;padding:16px;color:var(--hint);font-size:13px;font-weight:600">нет записей</div>';
-    HH('pp-whist',l6.length?l6.map((e,i)=>{
-      const prev=l6[i+1];
+    HH('pp-whist',l20.length?l20.map((e,i)=>{
+      const prev=l20[i+1];
       const diff=prev?+(e.weight-prev.weight).toFixed(1):0;
       const diffHtml=diff?('<div class="hr-diff '+(diff<0?'d-neg':'d-pos')+'">'+(diff>0?'+':'')+diff+'</div>'):'<div></div>';
       return '<div class="hr"><div class="hr-d">'+fmtD(e.logged_at)+'</div><div class="hr-v">'+e.weight.toFixed(1)+' кг</div>'+diffHtml+'</div>';
@@ -1495,15 +1397,14 @@ function _populatePP(id){
     document.querySelectorAll('#act-quick .type-card').forEach((c,i)=>c.classList.toggle('on',i===0));
     document.getElementById('day-btn-daily')?.classList.add('on');
     document.querySelectorAll('#days-grid .day-btn').forEach(b=>b.classList.remove('on'));
-    _updateTimeDisplay();
-    _renderActStep();
+    _updateTimeDisplay();_renderActStep();
   }
   if(id==='pp-water-hist'){
     const wd=gWD();const entries=wd.entries||[];
     const el=document.getElementById('wh-entries');
     if(el){
       if(!entries.length){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--hint);font-size:13px;font-weight:600">пока ничего не записано</div>';}
-      else{el.innerHTML=[...entries].reverse().map((e,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--brd)${i===0?';border-bottom:none':''}">
+      else{el.innerHTML=[...entries].reverse().map((e,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--brd)${i===entries.length-1?';border-bottom:none':''}">
         <div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:32px;border-radius:10px;background:rgba(78,174,229,.1);display:flex;align-items:center;justify-content:center;font-size:14px">💧</div><span style="font-size:14px;font-weight:800;color:var(--water)">+${e} мл</span></div>
         <span class="t5">стакан ${entries.length-i}</span></div>`).join('');}
     }
@@ -1526,7 +1427,7 @@ function _populatePP(id){
     if(el){
       if(!acts.length){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--hint);font-size:13px;font-weight:600">нет выполненных задач</div>';}
       else{el.innerHTML=acts.map(a=>{
-        const ico=ACT_ICO[a.type]||'✨',col=ACT_COL[a.type]||'#FF9800';
+        const col=ACT_COL[a.type]||'#FF9800';
         return`<div class="ac done" style="margin-bottom:8px"><div class="ac-ico" style="background:${col}18">✅</div><div class="ac-body"><div class="ac-name done-text">${a.name}</div><div class="ac-sub">${fmtRange(a)} · ${a.duration} мин</div></div><span class="pill p-ok">✓</span></div>`;
       }).join('');}
     }
@@ -1536,50 +1437,42 @@ function _populatePP(id){
 /* ══ WEIGHT STEPPER ══ */
 let _wtInt=70,_wtDec=0;
 function _updateWeightDisplay(){
-  const A=(id,v)=>{const e=document.getElementById(id);if(e)_animNum(e,v);};
-  A('wt-int',_wtInt);A('wt-dec',_wtDec);
-  A('wt-int-disp',_wtInt);A('wt-dec-disp','.'+_wtDec);
+  const A=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  A('wt-int',_wtInt);A('wt-dec',_wtDec);A('wt-int-disp',_wtInt);A('wt-dec-disp','.'+_wtDec);
 }
 function stepW(part,dir){
-  if(part==='int'){_wtInt=Math.max(30,Math.min(250,_wtInt+dir));}
-  else{_wtDec=(_wtDec+dir+10)%10;}
-  _updateWeightDisplay();
-  tg?.HapticFeedback?.selectionChanged();
+  if(part==='int')_wtInt=Math.max(30,Math.min(250,_wtInt+dir));
+  else _wtDec=(_wtDec+dir+10)%10;
+  _updateWeightDisplay();tg?.HapticFeedback?.selectionChanged();
 }
 
 /* ══ SLEEP STEPPER ══ */
 let _slH=8,_slMin=0,_sleepQ=3;
 function _updateSleepDisplay(){
-  const e=document.getElementById('sl-val-disp');if(e)_animNum(e,_slH);
-  const hd=document.getElementById('sl-h-disp');if(hd)_animNum(hd,_slH);
+  const e=document.getElementById('sl-val-disp');if(e)e.textContent=_slH;
+  const hd=document.getElementById('sl-h-disp');if(hd)hd.textContent=_slH;
   const m0=document.getElementById('sl-m0'),m30=document.getElementById('sl-m30');
   if(m0){m0.classList.toggle('on',_slMin===0);m0.classList.toggle('off',_slMin!==0);}
   if(m30){m30.classList.toggle('on',_slMin===30);m30.classList.toggle('off',_slMin!==30);}
 }
 function stepSl(part,dir){
-  if(part==='h'){_slH=Math.max(1,Math.min(20,_slH+dir));}
-  _updateSleepDisplay();
-  tg?.HapticFeedback?.selectionChanged();
+  if(part==='h')_slH=Math.max(1,Math.min(20,_slH+dir));
+  _updateSleepDisplay();tg?.HapticFeedback?.selectionChanged();
 }
 function setSleepMin(m){_slMin=m;_updateSleepDisplay();}
 function setSleepQ(q){_sleepQ=q;document.querySelectorAll('#seg-sleepq .m3-seg-btn').forEach(b=>b.classList.toggle('on',+b.dataset.q===q));}
 
 /* ══ CAL STEPPER ══ */
 let _calVal=500,_calStep=1;
-const CAL_STEP_TITLES=['название блюда','сколько калорий?'];
 function _updateCalDisplay(){
-  const e=document.getElementById('cal-preview');if(e)_animNum(e,_calVal);
-  const d=document.getElementById('cal-step-disp');if(d)_animNum(d,_calVal);
+  const e=document.getElementById('cal-preview');if(e)e.textContent=_calVal;
+  const d=document.getElementById('cal-step-disp');if(d)d.textContent=_calVal;
 }
 function stepCal(delta){_calVal=Math.max(50,Math.min(3000,_calVal+delta));_updateCalDisplay();tg?.HapticFeedback?.selectionChanged();}
 function setCalVal(v){
   _calVal=v;_updateCalDisplay();
   document.querySelectorAll('#cal-s2 .dur-grid .dur-btn').forEach(b=>b.classList.toggle('on',parseInt(b.textContent)===v));
   tg?.HapticFeedback?.selectionChanged();
-}
-function calQuickDish(name,meal){
-  const inp=document.getElementById('inp-cal-desc');if(inp)inp.value=name;
-  setMeal(meal);calStepNext();
 }
 function calStepNext(){
   _calStep=2;
@@ -1588,7 +1481,7 @@ function calStepNext(){
   const t=document.getElementById('cal-step-title');if(t)t.textContent='сколько калорий?';
   const p1=document.getElementById('cp1'),p2=document.getElementById('cp2');
   if(p1){p1.classList.remove('on');p1.classList.add('done');}
-  if(p2){p2.classList.add('on');}
+  if(p2)p2.classList.add('on');
   tg?.HapticFeedback?.selectionChanged();
 }
 function calBackOrPop(){
@@ -1599,7 +1492,7 @@ function calBackOrPop(){
     const t=document.getElementById('cal-step-title');if(t)t.textContent='название блюда';
     const p1=document.getElementById('cp1'),p2=document.getElementById('cp2');
     if(p1){p1.classList.add('on');p1.classList.remove('done');}
-    if(p2){p2.classList.remove('on');}
+    if(p2)p2.classList.remove('on');
   }else popPage();
 }
 
@@ -1609,13 +1502,9 @@ function _updateTimeDisplay(){
   const pad=v=>String(v).padStart(2,'0');
   const hd=document.getElementById('time-h-disp'),md=document.getElementById('time-m-disp');
   const ehd=document.getElementById('time-eh-disp'),emd=document.getElementById('time-em-disp');
-  if(hd)hd.textContent=pad(_timeH);
-  if(md)md.textContent=pad(_timeM);
-  if(ehd)ehd.textContent=pad(_timeEH);
-  if(emd)emd.textContent=pad(_timeEM);
-  const inp=document.getElementById('inp-atime');
-  if(inp)inp.value=pad(_timeH)+':'+pad(_timeM);
-  // Вычисляем длительность
+  if(hd)hd.textContent=pad(_timeH);if(md)md.textContent=pad(_timeM);
+  if(ehd)ehd.textContent=pad(_timeEH);if(emd)emd.textContent=pad(_timeEM);
+  const inp=document.getElementById('inp-atime');if(inp)inp.value=pad(_timeH)+':'+pad(_timeM);
   const startMin=_timeH*60+_timeM,endMin=_timeEH*60+_timeEM;
   let dur=endMin-startMin;if(dur<=0)dur+=24*60;
   const dd=document.getElementById('act-dur-display');
@@ -1623,10 +1512,10 @@ function _updateTimeDisplay(){
   _actDur=dur;
 }
 function stepTime(part,dir){
-  if(part==='sh'){_timeH=(_timeH+dir+24)%24;}
-  else if(part==='sm'){_timeM=(_timeM+dir*5+60)%60;}
-  else if(part==='eh'){_timeEH=(_timeEH+dir+24)%24;}
-  else if(part==='em'){_timeEM=(_timeEM+dir*5+60)%60;}
+  if(part==='sh')_timeH=(_timeH+dir+24)%24;
+  else if(part==='sm')_timeM=(_timeM+dir*5+60)%60;
+  else if(part==='eh')_timeEH=(_timeEH+dir+24)%24;
+  else if(part==='em')_timeEM=(_timeEM+dir*5+60)%60;
   _updateTimeDisplay();tg?.HapticFeedback?.selectionChanged();
 }
 
@@ -1634,14 +1523,6 @@ function stepTime(part,dir){
 let _mealType='breakfast',_gender='male';
 function setMeal(m){_mealType=m;document.querySelectorAll('#seg-meal .m3-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.m===m));}
 function setGender(g){_gender=g;document.querySelectorAll('#seg-gender .m3-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.g===g));}
-function toggleSett(key){
-  const ss=gSS();const nv=!ss[key];
-  const fm={w:'show_weight',water:'show_water',cal:'show_calories',sleep:'show_sleep'};
-  if(fm[key])C.settings[fm[key]]=nv?1:0;
-  const tog=document.getElementById('tog-'+key);if(tog){tog.classList.toggle('on',nv);tog.classList.toggle('off',!nv);}
-  toast(nv?'показывается':'скрыто');
-  apiPost('/api/settings',{[fm[key]]:nv?1:0});
-}
 
 /* ══ ACTIVITY FORM ══ */
 let actStep=1,_actType='run',_actDur=45,_actDays=[];
@@ -1663,10 +1544,7 @@ function _renderActStep(){
     const cn=document.getElementById('act-confirm-name');if(cn)cn.textContent=name;
     const ct=document.getElementById('act-confirm-time');if(ct)ct.textContent=time+' · '+_actDur+' мин';
     const cd=document.getElementById('act-confirm-days');
-    if(cd){
-      if(_actDays.length===0||_actDays.length===7)cd.textContent='ежедневно';
-      else{const dnames=['вс','пн','вт','ср','чт','пт','сб'];cd.textContent=_actDays.sort().map(d=>dnames[d]).join(', ');}
-    }
+    if(cd){if(_actDays.length===0||_actDays.length===7)cd.textContent='ежедневно';else{const dnames=['вс','пн','вт','ср','чт','пт','сб'];cd.textContent=_actDays.sort().map(d=>dnames[d]).join(', ');}}
   }
   tg?.HapticFeedback?.selectionChanged();
 }
@@ -1695,20 +1573,176 @@ function toggleDay(day,el){
   else{_actDays.push(day);el?.classList.add('on');}
   if(_actDays.length===0)toggleDayDaily();
 }
-function setDur(val,el){
-  _actDur=val;
-  // Legacy: kept for compatibility
+
+/* ══ LONG PRESS (3s, no confirmation) ══ */
+let _lpTimer=null,_lpEl=null;
+
+function startLongPress(id,el){
+  if(_lpEl)cancelLongPress();
+  _lpEl=el;
+  // Trigger CSS animation for progress bar
+  el.classList.add('lp-active');
+  _lpTimer=setTimeout(()=>{
+    _lpTimer=null;
+    const savedEl=_lpEl;
+    _lpEl=null;
+    if(savedEl)savedEl.classList.remove('lp-active');
+    deleteActDirectly(id,savedEl);
+  },3000);
+}
+function cancelLongPress(){
+  if(_lpTimer){clearTimeout(_lpTimer);_lpTimer=null;}
+  if(_lpEl){
+    const ind=_lpEl.querySelector('.lp-indicator');
+    if(ind){ind.style.transition='none';ind.style.width='0';ind.style.opacity='0';}
+    _lpEl.classList.remove('lp-active');
+    _lpEl=null;
+  }
 }
 
-/* ══ LONG PRESS ══ */
-let _lpTimer=null;
-function startLongPress(id,el){
-  _lpTimer=setTimeout(()=>{
-    showDelDialog(id);
-    navigator.vibrate&&navigator.vibrate(30);
-  },600);
+/* ══ DELETE DIRECTLY ══ */
+async function deleteActDirectly(id,cardEl){
+  tg?.HapticFeedback?.notificationOccurred('warning');
+  navigator.vibrate?.([40,20,60]);
+  if(cardEl&&cardEl.parentNode){
+    const h=cardEl.offsetHeight;
+    cardEl.style.maxHeight=h+'px';
+    cardEl.style.overflow='hidden';
+    requestAnimationFrame(()=>{
+      cardEl.style.transition='all .45s cubic-bezier(.4,0,.2,1)';
+      cardEl.style.opacity='0';
+      cardEl.style.transform='scale(0.92) translateX(24px)';
+      cardEl.style.maxHeight='0';
+      cardEl.style.marginBottom='0';
+      cardEl.style.padding='0';
+    });
+    setTimeout(()=>{
+      C.acts_today=C.acts_today.filter(x=>x.id!==id);
+      if(_completingMap.has(id)){clearTimeout(_completingMap.get(id).hideTimer);_completingMap.delete(id);}
+      renderPlan();renderHome();
+    },460);
+  }else{
+    C.acts_today=C.acts_today.filter(x=>x.id!==id);
+    renderPlan();renderHome();
+  }
+  toast('удалено');
+  await apiPost('/api/activity/delete',{act_id:id});
+  setTimeout(async()=>{await reload();},600);
 }
-function cancelLongPress(){clearTimeout(_lpTimer);_lpTimer=null;}
+
+/* ══ COMPLETING MAP ══ */
+const _completingMap=new Map();
+
+/* ══ COMPLETE ACT (5s then animate out) ══ */
+async function completeAct(id){
+  const act=C.acts_today.find(x=>x.id===id);
+  if(!act)return;
+
+  // If already in completing state, this is undo
+  if(_completingMap.has(id)){
+    const{hideTimer}=_completingMap.get(id);
+    clearTimeout(hideTimer);
+    _completingMap.delete(id);
+    C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:0}:x);
+    renderPlan();renderHome();
+    toast('отменено');tg?.HapticFeedback?.notificationOccurred('warning');
+    apiPost('/api/activity/uncomplete',{act_id:id});
+    return;
+  }
+
+  if(act.completed)return;
+
+  // Mark as completed in data
+  C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:1}:x);
+
+  // Update counters immediately
+  const done=gActs().filter(a=>a.completed).length;
+  const total=gActs().length;
+  T('pl-cnt',`${done}/${total}`);
+  requestAnimationFrame(()=>{const r=$('pl-ring');if(r)r.setAttribute('stroke-dashoffset',125.7*(1-(total?done/total:0)));});
+  renderHome();
+
+  tg?.HapticFeedback?.notificationOccurred('success');
+  toast('выполнено 🎉');
+
+  const cardEl=document.querySelector(`#pl-list .ac[data-id="${id}"]`);
+  if(cardEl){
+    // Transform to done state
+    cardEl.classList.add('done');
+    const nameEl=cardEl.querySelector('.ac-name');
+    if(nameEl)nameEl.classList.add('done-text');
+    const pill=cardEl.querySelector('.pill');
+    if(pill){pill.className='pill p-ok';pill.innerHTML='✓ выполнено';}
+
+    // Change button to undo
+    const btn=cardEl.querySelector('.complete-btn-js');
+    if(btn){
+      btn.innerHTML='↩';
+      btn.style.background='rgba(82,193,119,.12)';
+      btn.style.color='var(--green)';
+      btn.onclick=(e)=>{e.stopPropagation();completeAct(id);};
+    }
+
+    // Add countdown timer bar (depletes over 5s)
+    const timerBar=document.createElement('div');
+    timerBar.className='ac-timer-bar';
+    timerBar.style.width='100%';
+    cardEl.appendChild(timerBar);
+    // Trigger the CSS transition (depletion)
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{timerBar.style.width='0%';}));
+
+    // Measure height for animation
+    const h=cardEl.offsetHeight;
+    cardEl.style.maxHeight=h+'px';
+    cardEl.style.overflow='hidden';
+
+    const hideTimer=setTimeout(()=>{
+      _completingMap.delete(id);
+      requestAnimationFrame(()=>{
+        cardEl.style.transition='opacity .55s ease, transform .55s cubic-bezier(.4,0,.2,1), max-height .55s ease, margin-bottom .55s ease';
+        cardEl.style.opacity='0';
+        cardEl.style.transform='translateX(64px) scale(0.94)';
+        cardEl.style.maxHeight='0';
+        cardEl.style.marginBottom='0';
+        setTimeout(()=>{renderPlan();},560);
+      });
+    },5100);
+
+    _completingMap.set(id,{hideTimer});
+    await apiPost('/api/activity/complete',{act_id:id});
+    // Delay reload until after full animation
+    setTimeout(async()=>{if(_completingMap.size===0)await reload();},5800);
+  }else{
+    renderPlan();
+    await apiPost('/api/activity/complete',{act_id:id});
+    await reload();
+  }
+}
+function openDoneActs(){pushPage('pp-done-acts');}
+
+/* ══ CLEAR HISTORY ══ */
+function clearWaterHistory(){
+  if(!confirm('очистить всю воду за сегодня?'))return;
+  C.water={total:0,entries:[],streak:C.water.streak||0};
+  if(!UID){try{localStorage.removeItem('lf2_wd_'+TODAY);}catch{}}
+  renderTrack('water');renderHome();toast('история воды очищена');
+  if(curPushPage==='pp-water-hist')_populatePP('pp-water-hist');
+  apiPost('/api/water/clear',{});
+}
+function clearSleepHistory(){
+  if(!confirm('удалить всю историю сна?'))return;
+  C.sleep_log=[];
+  renderSleep();renderHome();toast('история сна удалена');
+  if(curPushPage==='pp-sleep-hist')_populatePP('pp-sleep-hist');
+  apiPost('/api/sleep/clear',{});
+}
+function clearWeightHistory(){
+  if(!confirm('удалить всю историю веса?'))return;
+  C.weight_log=[];
+  renderProgress();renderHome();toast('история веса удалена');
+  if(curPushPage==='pp-history')_populatePP('pp-history');
+  apiPost('/api/weight/clear',{});
+}
 
 /* ══ SUBMIT ACTIONS ══ */
 let _addWBusy=false;
@@ -1723,68 +1757,6 @@ async function undoW(){
   const last=C.water.entries.pop();C.water.total=Math.max(0,(C.water.total||0)-last);
   renderTrack('water');renderHome();toast('отменено −'+last+' мл');apiPost('/api/water/undo',{});
 }
-async function completeAct(id){
-  const a=gActs().find(x=>x.id===id);if(!a)return;
-  const ns=!a.completed;C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:ns?1:0}:x);
-  if(ns){
-    // Find card element and animate it away
-    const cardEl=document.querySelector(`#pl-list .ac[data-id="${id}"]`);
-    if(cardEl){
-      const h=cardEl.offsetHeight;
-      cardEl.style.maxHeight=h+'px';
-      cardEl.classList.add('ac-completing');
-      renderPlan();
-      // Re-find after re-render (won't exist if completed), so just animate in place
-      setTimeout(()=>{
-        if(cardEl&&cardEl.parentNode){
-          cardEl.classList.add('hide');
-        }
-      },1800);
-    } else {
-      renderPlan();
-    }
-  } else {
-    renderPlan();
-  }
-  renderHome();toast(ns?'выполнено 🎉':'отменено');tg?.HapticFeedback?.notificationOccurred(ns?'success':'warning');
-  await apiPost(ns?'/api/activity/complete':'/api/activity/uncomplete',{act_id:id});await reload();
-}
-function openDoneActs(){pushPage('pp-done-acts');}
-
-/* ══ DELETE ACTIVITY ══ */
-let _delActId=null;
-function showDelDialog(id){
-  _delActId=id;
-  const a=gActs().find(x=>x.id===id);
-  const nm=document.getElementById('del-act-name');if(nm)nm.textContent=a?a.name:'—';
-  const ov=document.getElementById('del-overlay');
-  if(ov){ov.classList.add('show');}
-  tg?.HapticFeedback?.impactOccurred('medium');
-}
-function closeDelDialog(){
-  const ov=document.getElementById('del-overlay');if(ov)ov.classList.remove('show');
-  _delActId=null;
-}
-async function confirmDeleteAct(){
-  if(!_delActId)return;
-  const id=_delActId;closeDelDialog();
-  // Animate card out
-  const cardEl=document.querySelector(`#pl-list .ac[data-id="${id}"]`);
-  if(cardEl){
-    const h=cardEl.offsetHeight;cardEl.style.maxHeight=h+'px';
-    cardEl.classList.add('ac-completing');
-    setTimeout(()=>{cardEl.classList.add('hide');},50);
-    setTimeout(()=>{
-      C.acts_today=C.acts_today.filter(x=>x.id!==id);
-      renderPlan();renderHome();
-    },550);
-  } else {
-    C.acts_today=C.acts_today.filter(x=>x.id!==id);
-    renderPlan();renderHome();
-  }
-  toast('удалено');tg?.HapticFeedback?.notificationOccurred('warning');
-  await apiPost('/api/activity/delete',{act_id:id});await reload();
-}
 async function submitWeight(){
   const v=_wtInt+_wtDec/10;
   if(v<30||v>300){toast('некорректный вес');return;}
@@ -1792,20 +1764,16 @@ async function submitWeight(){
   C.weight_log=[...(C.weight_log||[]),{weight:v,logged_at:TODAY}];
   if(!C.user.start_weight)C.user.start_weight=v;
   renderHome();renderProgress();toast('вес '+v.toFixed(1)+' кг сохранён');tg?.HapticFeedback?.notificationOccurred('success');
-  // Animate chart after render
-  const wl=gWL();
-  setTimeout(()=>drawChart(wl.length>14?wl.slice(-14):wl,true),80);
   await apiPost('/api/weight',{weight:v});
-  cancelAnimationFrame(_chartRaf);
   await reload();
-  const wl2=gWL();
-  setTimeout(()=>drawChart(wl2.length>14?wl2.slice(-14):wl2,true),80);
+  const wl=gWL();
+  scheduleChart(wl.length>14?wl.slice(-14):wl,true);
 }
 async function submitSleep(){
   const hrs=_slH+(_slMin/60);
   popPage();
   C.sleep_log=[...(C.sleep_log||[]),{hours:hrs,quality:_sleepQ,logged_at:TODAY}];
-  renderSleep();renderHome();toast('сон '+(_slH+(  _slMin?'.5':''))+' ч сохранён');tg?.HapticFeedback?.notificationOccurred('success');
+  renderSleep();renderHome();toast('сон '+(_slH+(_slMin?'.5':''))+' ч сохранён');tg?.HapticFeedback?.notificationOccurred('success');
   await apiPost('/api/sleep',{hours:hrs,quality:_sleepQ});await reload();
 }
 async function submitCal(){
@@ -1825,15 +1793,6 @@ function _saveProfileSilent(){
   renderProfile();renderHome();toast('профиль сохранён');
   apiPost('/api/profile',{name,height:height||0,age:age||0,gender:_gender});
 }
-async function submitProfile(){
-  const name=document.getElementById('inp-pname')?.value?.trim();
-  const height=parseInt(document.getElementById('inp-height')?.value);
-  const age=parseInt(document.getElementById('inp-age')?.value);
-  if(!name){toast('введи имя');return;}
-  popPage();C.user={...C.user,name,height:height||0,age:age||0,gender:_gender};
-  renderProfile();renderHome();toast('профиль обновлён');tg?.HapticFeedback?.notificationOccurred('success');
-  await apiPost('/api/profile',{name,height:height||0,age:age||0,gender:_gender});await reload();
-}
 function _saveGoalsSilent(){
   const gw=parseFloat(document.getElementById('inp-gw')?.value)||0;
   const gwat=parseInt(document.getElementById('inp-gwat')?.value)||2000;
@@ -1841,14 +1800,6 @@ function _saveGoalsSilent(){
   C.user={...C.user,goal_weight:gw,water_goal:gwat,cal_goal:gcal};
   renderProfile();renderHome();toast('цели сохранены');
   apiPost('/api/goals',{goal_weight:gw,water_goal:gwat,cal_goal:gcal});
-}
-async function submitGoals(){
-  const gw=parseFloat(document.getElementById('inp-gw')?.value)||0;
-  const gwat=parseInt(document.getElementById('inp-gwat')?.value)||2000;
-  const gcal=parseInt(document.getElementById('inp-gcal')?.value)||2000;
-  popPage();C.user={...C.user,goal_weight:gw,water_goal:gwat,cal_goal:gcal};
-  renderProfile();renderHome();toast('цели обновлены');tg?.HapticFeedback?.notificationOccurred('success');
-  await apiPost('/api/goals',{goal_weight:gw,water_goal:gwat,cal_goal:gcal});await reload();
 }
 async function submitAct(){
   const name=document.getElementById('inp-aname')?.value?.trim();
@@ -1860,12 +1811,6 @@ async function submitAct(){
   C.acts_today=[...(C.acts_today||[]),{id:fid,name,type:_actType,scheduled_at:`${TODAY}T${time}:00`,duration:_actDur,completed:0,repeat_days:days}];
   renderPlan();renderHome();toast(name+' добавлено 🎉');tg?.HapticFeedback?.notificationOccurred('success');
   await apiPost('/api/activity/create',{name,type:_actType,time,duration:_actDur,repeat_days:days});await reload();
-}
-function confirmReset(){
-  if(!confirm('сбросить все данные?'))return;
-  localStorage.clear();
-  C={user:{name:'…',water_goal:2000,cal_goal:2000},settings:{show_weight:1,show_water:1,show_calories:1,show_sleep:1},water:{total:0,entries:[],streak:0},calories:{},weight_log:[],sleep_log:[],acts_today:[],products:[]};
-  popPage();renderHome();renderProfile();toast('данные сброшены');
 }
 
 /* ══ HELPERS ══ */
@@ -1882,7 +1827,8 @@ function qIco(q){return['','😫','😴','😑','🙂','🌟'][q]||'😑';}
 function actStatus(a){
   const now=new Date(),[hh,mm]=(a.time||'00:00').split(':').map(Number);
   const st=new Date();st.setHours(hh,mm,0,0);const en=new Date(st.getTime()+(a.duration||30)*60000);
-  if(a.completed)return{s:'done',l:'выполнено'};if(now>en)return{s:'late',l:'просрочено'};
+  if(a.completed)return{s:'done',l:'выполнено'};
+  if(now>en)return{s:'late',l:'просрочено'};
   if(now>=st&&now<=en){const r=Math.round((en-now)/60000);return{s:'now',l:'идёт · ещё '+r+' мин',p:(now-st)/(en-st)};}
   const df=Math.round((st-now)/60000);if(df<=30)return{s:'soon',l:'через '+df+' мин'};return{s:'later',l:'в '+a.time};
 }
@@ -1891,94 +1837,118 @@ function fmtRange(a){
   const eh=hh+Math.floor((mm+(a.duration||30))/60),em=(mm+(a.duration||30))%60;
   return`${a.time}–${String(eh%24).padStart(2,'0')}:${String(em).padStart(2,'0')}`;
 }
-/* ══ NUMBER UPDATE ══ */
-function _animNum(el,val){
-  el.textContent=val;
-}
 
 let _tt;
 function toast(msg){const el=$('toast');if(!el)return;el.textContent=msg;el.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),1800);}
 
-/* ══ CHART ══ */
-let _chartRaf=null,_chartAnimId=null;
+/* ══ CHART (fixed: old→new left→right, auto-scroll to latest) ══ */
+let _chartRAF=null,_chartAnimRAF=null,_chartScheduled=null;
+
+function scheduleChart(data,animate){
+  clearTimeout(_chartScheduled);
+  _chartScheduled=setTimeout(()=>drawChart(data,animate),60);
+}
+
 function drawChart(data,animate){
   const canvas=$('wchart');if(!canvas)return;
-  cancelAnimationFrame(_chartRaf);
-  _chartRaf=requestAnimationFrame(()=>{
+  cancelAnimationFrame(_chartRAF);
+  _chartRAF=requestAnimationFrame(()=>{
+    // Sort ascending: oldest left → newest right
+    if(data&&data.length>1){
+      data=[...data].sort((a,b)=>(a.logged_at||'').localeCompare(b.logged_at||''));
+    }
     const dpr=Math.min(window.devicePixelRatio||1,2);
-    const containerW=canvas.parentElement.clientWidth||280;
-    if(data&&data.length>1){data=[...data].sort((a,b)=>(a.logged_at||'').localeCompare(b.logged_at||''));}
-    const minCols=data&&data.length>5?data.length:5;
-    const W=Math.max(containerW, minCols*52+40);
+    const scrollEl=canvas.parentElement;
+    const containerW=scrollEl?.clientWidth||300;
+    const minCols=Math.max(data?data.length:5,5);
+    const W=Math.max(containerW,minCols*54+40);
     const H=100;
-    canvas.width=W*dpr;canvas.height=H*dpr;canvas.style.width=W+'px';canvas.style.height=H+'px';
+    canvas.width=W*dpr;canvas.height=H*dpr;
+    canvas.style.width=W+'px';canvas.style.height=H+'px';
     const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
     const cs=getComputedStyle(document.documentElement);
     const sun=cs.getPropertyValue('--sun').trim()||'#FF6B35';
     const hint=cs.getPropertyValue('--hint').trim()||'#A89F90';
     const bg2=cs.getPropertyValue('--bg2').trim()||'#fff';
     ctx.clearRect(0,0,W,H);
-    if(!data||data.length<2){ctx.fillStyle=hint;ctx.font='600 11px Onest,sans-serif';ctx.textAlign='center';ctx.fillText('нет данных',W/2,H/2);return;}
+    if(!data||data.length<2){
+      ctx.fillStyle=hint;ctx.font='600 12px Onest,sans-serif';ctx.textAlign='center';ctx.fillText('нет данных',W/2,H/2);
+      return;
+    }
     const ws=data.map(d=>d.weight);
-    const mn=Math.min(...ws)-.5,mx=Math.max(...ws)+.5,rng=mx-mn||1;
-    const pl={l:26,r:26,t:22,b:24};
+    const mn=Math.min(...ws)-.8,mx=Math.max(...ws)+.8,rng=mx-mn||1;
+    const pl={l:30,r:30,t:24,b:26};
     const xs=(W-pl.l-pl.r)/(data.length-1);
     const yf=w=>pl.t+(1-(w-mn)/rng)*(H-pl.t-pl.b);
     const pts=data.map((d,i)=>[pl.l+i*xs,yf(d.weight)]);
-    
+
     const _drawFrame=(progress)=>{
       ctx.clearRect(0,0,W,H);
-      const p=progress===undefined?1:Math.min(1,progress);
-      
-      // gradient fill
+      const p=Math.min(1,progress??1);
+
+      // Grid lines (subtle)
+      ctx.strokeStyle=hint+'22';ctx.lineWidth=1;
+      for(let i=1;i<3;i++){
+        const y=pl.t+(H-pl.t-pl.b)*i/3;
+        ctx.beginPath();ctx.moveTo(pl.l,y);ctx.lineTo(W-pl.r,y);ctx.stroke();
+      }
+
+      // Gradient fill
+      const clipCount=Math.floor(p*(pts.length-1));
       const grad=ctx.createLinearGradient(0,0,0,H);
-      grad.addColorStop(0,'rgba(255,107,53,.18)');grad.addColorStop(1,'rgba(255,107,53,0)');
+      grad.addColorStop(0,'rgba(255,107,53,.2)');grad.addColorStop(1,'rgba(255,107,53,0)');
       ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);
-      for(let i=0;i<pts.length-1;i++){
+      const nPts=animate?Math.min(pts.length,clipCount+2):pts.length;
+      for(let i=0;i<nPts-1;i++){
         const cx=(pts[i][0]+pts[i+1][0])/2;
         ctx.bezierCurveTo(cx,pts[i][1],cx,pts[i+1][1],pts[i+1][0],pts[i+1][1]);
       }
-      ctx.lineTo(pts[pts.length-1][0],H);ctx.lineTo(pts[0][0],H);ctx.closePath();
+      ctx.lineTo(pts[Math.min(nPts-1,pts.length-1)][0],H);
+      ctx.lineTo(pts[0][0],H);ctx.closePath();
       ctx.fillStyle=grad;ctx.globalAlpha=p;ctx.fill();ctx.globalAlpha=1;
-      
-      // line
+
+      // Line
       ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);
-      for(let i=0;i<pts.length-1;i++){
+      for(let i=0;i<nPts-1;i++){
         const cx=(pts[i][0]+pts[i+1][0])/2;
         ctx.bezierCurveTo(cx,pts[i][1],cx,pts[i+1][1],pts[i+1][0],pts[i+1][1]);
       }
       ctx.strokeStyle=sun;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.lineCap='round';ctx.stroke();
-      
-      // dots and labels
-      pts.forEach((pt,i)=>{
-        const alpha=animate?Math.max(0,Math.min(1,(p*data.length)-i)):1;
+
+      // Dots + labels
+      for(let i=0;i<nPts;i++){
+        const alpha=animate?Math.max(0,Math.min(1,(p*data.length)-i+1)):1;
+        if(alpha<0.01)continue;
         ctx.globalAlpha=alpha;
-        ctx.beginPath();ctx.arc(pt[0],pt[1],4,0,Math.PI*2);ctx.fillStyle=sun;ctx.fill();
-        ctx.beginPath();ctx.arc(pt[0],pt[1],2.5,0,Math.PI*2);ctx.fillStyle=bg2;ctx.fill();
-        ctx.fillStyle=sun;ctx.font='700 9px Onest,sans-serif';
-        ctx.textAlign='center';
-        // Clamp label x to avoid clipping
-        const lx=Math.max(18,Math.min(W-18,pt[0]));
-        ctx.fillText(data[i].weight,lx,pt[1]-8);
-        ctx.fillStyle=hint;ctx.font='700 8px Onest,sans-serif';
-        ctx.fillText(fmtMD(data[i].logged_at),lx,H-4);
+        ctx.beginPath();ctx.arc(pts[i][0],pts[i][1],4,0,Math.PI*2);ctx.fillStyle=sun;ctx.fill();
+        ctx.beginPath();ctx.arc(pts[i][0],pts[i][1],2.2,0,Math.PI*2);ctx.fillStyle=bg2;ctx.fill();
+        // Weight label
+        ctx.fillStyle=sun;ctx.font='700 9px Onest,sans-serif';ctx.textAlign='center';
+        const lx=Math.max(20,Math.min(W-20,pts[i][0]));
+        ctx.fillText(data[i].weight.toFixed(1),lx,pts[i][1]-9);
+        // Date label
+        ctx.fillStyle=hint;ctx.font='600 8px Onest,sans-serif';
+        ctx.fillText(fmtMD(data[i].logged_at),lx,H-5);
         ctx.globalAlpha=1;
-      });
+      }
     };
-    
+
     if(animate){
-      cancelAnimationFrame(_chartAnimId);
-      const start=performance.now();
-      const dur=600;
+      cancelAnimationFrame(_chartAnimRAF);
+      const start=performance.now(),dur=700;
       const step=(now)=>{
         const p=(now-start)/dur;
         _drawFrame(p);
-        if(p<1)_chartAnimId=requestAnimationFrame(step);
+        if(p<1)_chartAnimRAF=requestAnimationFrame(step);
+        else _drawFrame(1);
       };
-      _chartAnimId=requestAnimationFrame(step);
-    } else {
-      _drawFrame();
+      _chartAnimRAF=requestAnimationFrame(step);
+    }else{
+      _drawFrame(1);
     }
+
+    // Auto-scroll to the right to show latest data
+    setTimeout(()=>{if(scrollEl)scrollEl.scrollLeft=scrollEl.scrollWidth;},animate?100:50);
   });
 }
 
@@ -2018,19 +1988,16 @@ function renderHome(){
     if(!acts.length){ps.style.display='none';}
     else{
       ps.style.display='';const nt=new Date();
-      // Find current task (running now)
       const current=acts.find(a=>{
         if(a.completed)return false;
         const[hh,mm]=(a.time||'00:00').split(':').map(Number);
         const at=new Date();at.setHours(hh,mm,0,0);const et=new Date(at.getTime()+(a.duration||30)*60000);
         return nt>=at&&nt<=et;
       });
-      // Find next upcoming task (not done, not late)
       const upcoming=acts.filter(a=>{
         if(a.completed)return false;
         const[hh,mm]=(a.time||'00:00').split(':').map(Number);
-        const at=new Date();at.setHours(hh,mm,0,0);
-        return at>nt;
+        const at=new Date();at.setHours(hh,mm,0,0);return at>nt;
       }).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
       const next=upcoming[0];
       const toShow=[current,next].filter(Boolean);
@@ -2057,7 +2024,6 @@ function renderWater(){
   requestAnimationFrame(()=>{const b=$('w-bar');if(b)b.style.width=wp+'%';});
   const st=gStreak();
   H('w-streak',st>=2?`<div style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,107,53,.1);color:var(--sun);padding:4px 12px;border-radius:99px;font-size:11px;font-weight:800">🔥 ${st} дней подряд</div>`:'');
-  // History is in pp-water-hist push page
 }
 function renderCal(){
   const u=gU(),cd=gCD();
@@ -2068,6 +2034,7 @@ function renderCal(){
   H('c-meals',MEALS.map(m=>`<div class="mr"><div class="mr-ico" style="background:${m.col}18;color:${m.col}">${m.i}</div><div style="flex:1"><div class="mr-name">${m.n}</div>${!cd[m.k]?`<div class="t5" style="font-size:10px">не записано</div>`:''}</div><div class="mr-kcal" style="${cd[m.k]?'color:var(--cal)':'color:var(--hint)'}">${cd[m.k]||'—'} ${cd[m.k]?'ккал':''}</div></div>`).join(''));
 }
 function renderPlan(){
+  if(_completingMap.size>0)return; // don't interrupt completing animations
   const acts=gActs();const now=new Date();
   const mons=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
   T('pl-date','сегодня · '+now.getDate()+' '+mons[now.getMonth()]);
@@ -2075,39 +2042,44 @@ function renderPlan(){
   T('pl-cnt',total?`${done}/${total}`:'0/0');
   requestAnimationFrame(()=>{const r=$('pl-ring');if(r)r.setAttribute('stroke-dashoffset',125.7*(1-(total?done/total:0)));});
   const empty=$('pl-empty'),list=$('pl-list');
-  if(!acts.length){if(empty)empty.style.display='';if(list){list.innerHTML='';list.style.display='none';}return;}
+  const activeTasks=acts.filter(a=>!a.completed);
+  if(!activeTasks.length){
+    if(empty)empty.style.display=acts.length?'none':'';
+    if(list){list.innerHTML='';list.style.display='none';}
+    return;
+  }
   if(empty)empty.style.display='none';if(list)list.style.display='';
-  list.innerHTML=acts.filter(a=>!a.completed).map(a=>{
+  list.innerHTML=activeTasks.map(a=>{
     const ico=ACT_ICO[a.type]||'✨',col=ACT_COL[a.type]||'#FF9800';
     const st=actStatus(a);
     const pc={done:'p-ok',now:'p-now',soon:'p-soon',late:'p-late',later:'p-later'}[st.s]||'p-later';
-    const pct=st.s==='now'?Math.round((st.p||0)*100):st.s==='done'?100:0;
-    const bar=['done','now','soon'].includes(st.s);
-    return`<div class="ac" data-id="${a.id}" oncontextmenu="event.preventDefault();showDelDialog(${a.id})" ontouchstart="startLongPress(${a.id},this)" ontouchend="cancelLongPress()" ontouchmove="cancelLongPress()">
+    const pct=st.s==='now'?Math.round((st.p||0)*100):0;
+    const bar=['now','soon'].includes(st.s);
+    return`<div class="ac" data-id="${a.id}" oncontextmenu="event.preventDefault()" ontouchstart="startLongPress(${a.id},this)" ontouchend="cancelLongPress()" ontouchmove="cancelLongPress()">
       <div class="ac-ico" style="background:${col}18">${ico}</div>
       <div class="ac-body">
         <div class="ac-name">${a.name}</div>
         <div class="ac-sub">${fmtRange(a)} · ${a.duration} мин</div>
         <span class="pill ${pc}">${st.l}</span>
-        ${bar?`<div class="ac-bar"><div class="ac-barf" style="width:${st.s==='soon'?80:pct}%;background:${st.s==='done'?'var(--green)':st.s==='now'?'var(--water)':'rgba(255,107,53,.35)'}"></div></div>`:''}
+        ${bar?`<div class="ac-bar"><div class="ac-barf" style="width:${st.s==='soon'?70:pct}%;background:${st.s==='now'?'var(--water)':'rgba(255,107,53,.35)'}"></div></div>`:''}
       </div>
       <div style="flex-shrink:0">
-        <button class="btn btn-g" style="padding:7px 11px;font-size:12px;border-radius:9px" onclick="completeAct(${a.id})">✓</button>
+        <button class="btn btn-g complete-btn-js" style="padding:7px 11px;font-size:12px;border-radius:9px" onclick="completeAct(${a.id})">✓</button>
       </div>
+      <div class="lp-indicator"></div>
     </div>`;
   }).join('');
 }
-setInterval(()=>{if(curTab==='plan')renderPlan();},30000);
+setInterval(()=>{if(curTab==='plan'&&_completingMap.size===0)renderPlan();},30000);
 function renderSleep(){
   const sl=gSL();
   if(sl.length){const last=sl[sl.length-1];T('sl-h',last.hours.toFixed(1));T('sl-qico',qIco(last.quality));H('sl-dots',Array.from({length:5},(_,i)=>`<div class="sqd${i<last.quality?' on':''}"></div>`).join(''));}
   else{T('sl-h','—');T('sl-qico','—');H('sl-dots','');}
-  const l7=sl.slice(-7).reverse();
-  // History is now in pp-sleep-hist push page
+  const l7=gSL().slice(-7).reverse();
   if(l7.length){T('sl-avg-h',+(l7.reduce((a,b)=>a+b.hours,0)/l7.length).toFixed(1));T('sl-avg-q',qIco(Math.round(l7.reduce((a,b)=>a+(b.quality||3),0)/l7.length))+' '+(l7.reduce((a,b)=>a+(b.quality||3),0)/l7.length).toFixed(1));}
 }
 function renderProgress(){
-  const u=gU(),wl=gWL(),sl=gSL(),wd=gWD(),acts=gActs();
+  const u=gU(),wl=gWL(),sl=gSL(),wd=gWD();
   if(wl.length){
     const cw=wl[wl.length-1].weight,sw=u.start_weight||wl[0].weight||cw,gw=u.goal_weight;
     T('pr-wcur',cw.toFixed(1));T('pr-wgoal',gw?gw.toFixed(1)+' кг':'—');T('pr-wgoal2',gw?gw.toFixed(1):'—');T('pr-wstart',sw.toFixed(1));
@@ -2121,10 +2093,10 @@ function renderProgress(){
       if(rate>.01){const dl=Math.ceil((cw-gw)/rate*7),eta=new Date();eta.setDate(eta.getDate()+dl);const mons=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];T('pr-forecast','прогноз: '+eta.getDate()+' '+mons[eta.getMonth()]+' · темп '+rate.toFixed(2)+' кг/нед');}
     }catch{}}
   }
-  setTimeout(()=>drawChart(wl.length>14?wl.slice(-14):wl,false),50);
+  const chartData=wl.length>14?wl.slice(-14):wl;
+  scheduleChart(chartData,false);
   T('pw-water',wd.total||0);T('pw-cal',totalCal());
   T('pw-sleep',sl.length?+(sl.slice(-7).reduce((a,b)=>a+b.hours,0)/Math.min(7,sl.length)).toFixed(1):'—');
-  // История перенесена в pp-history
 }
 function renderProfile(){
   const u=gU(),wl=gWL();
@@ -2133,7 +2105,6 @@ function renderProfile(){
   const meta=[];if(u.age)meta.push(u.age+' лет');if(u.height)meta.push(u.height+' см');if(u.gender)meta.push(u.gender==='male'?'♂':'♀');
   T('pf-meta',meta.join(' · ')||'—');
   T('pf-gw',u.goal_weight?u.goal_weight+' кг':'—');T('pf-pname',u.name||'—');
-  T('pf-height',u.height?u.height+' см':'—');T('pf-age',u.age?u.age+' лет':'—');T('pf-gwater',(u.water_goal||2000)+' мл');
   const bmiRow=$('pf-bmi-row');
   if(u.height&&wl.length){
     const cw=wl[wl.length-1].weight,h2=u.height/100;
@@ -2145,23 +2116,21 @@ function renderProfile(){
 
 /* ══ INIT ══ */
 document.addEventListener('DOMContentLoaded',async()=>{
-  // Скрываем сплэш после загрузки данных
-  // Убираем pre-theme сразу
   document.getElementById('pre-theme')?.remove();
   const dark=tg?.colorScheme==='dark'||window.matchMedia?.('(prefers-color-scheme:dark)').matches;
   if(dark)document.body.classList.add('tg-dark');
   tg?.onEvent('themeChanged',()=>{document.body.classList.toggle('tg-dark',tg?.colorScheme==='dark');applyTheme();});
   await loadData();
   renderHome();
-  // Скрываем splash с задержкой
+  // Hide splash with beautiful transition
   setTimeout(()=>{
     const sp=document.getElementById('splash');
-    if(sp){sp.style.opacity='0';setTimeout(()=>sp.remove(),280);}
-  },350);
-  setInterval(async()=>{if(curTab==='home'){await loadData();renderHome();}},30000);
-  // Скрываем сплэш плавно
-  const sp=document.getElementById('splash');
-  if(sp){sp.style.opacity='0';setTimeout(()=>{sp.style.display='none';},300);}
+    if(sp){
+      sp.classList.add('hiding');
+      setTimeout(()=>sp.remove(),500);
+    }
+  },1200);
+  setInterval(async()=>{if(curTab==='home'&&_completingMap.size===0){await loadData();renderHome();}},30000);
 });
 </script>
 </body>
