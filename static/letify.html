@@ -10,185 +10,175 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
 :root{
-  --bg:#FAF7F2;--bg2:#fff;--bg3:rgba(0,0,0,.05);--bg4:rgba(0,0,0,.04);
+  --bg:#FAF7F2;--bg2:#fff;--bg3:rgba(0,0,0,.05);
   --text:#1C1608;--hint:#A89F90;--brd:rgba(0,0,0,.07);
   --sun:#FF6B35;--sun2:#FFAB40;--water:#4EAEE5;--cal:#F4814A;
   --sleep:#8B7FD4;--green:#52C177;--red:#F45C5C;
   --r:14px;--r-lg:18px;
   --st:0px;--sb:0px;
   --sh:0 1px 8px rgba(0,0,0,.06),0 2px 4px rgba(0,0,0,.04);
-  --page-bot:calc(76px + var(--sb) + 16px);
+  --nav-h:calc(62px + var(--sb));
+  --page-bot:calc(var(--nav-h) + 16px);
   --page-top:calc(var(--st) + 16px);
 }
 html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overscroll-behavior:none;user-select:none}
-
 #root{position:fixed;inset:0}
 #pages{position:absolute;inset:0}
 
-/* ── PAGES ── */
+/* ── MAIN PAGES ── */
 .page{
   position:absolute;inset:0;
   overflow-y:auto;overflow-x:hidden;
-  -webkit-overflow-scrolling:touch;
-  touch-action:pan-y;
+  -webkit-overflow-scrolling:touch;touch-action:pan-y;
   scrollbar-width:none;
   padding-top:var(--page-top);
   padding-bottom:var(--page-bot);
   opacity:0;pointer-events:none;
-  transform:translateY(8px);
-  transition:opacity .2s ease,transform .22s ease;
+  transform:translateY(6px);
+  transition:opacity .2s ease,transform .2s ease;
 }
 .page::-webkit-scrollbar{display:none}
 .page.active{opacity:1;pointer-events:all;transform:none}
 
-/* ── PUSH SCREENS (slide from right) ── */
+/* ── PUSH PAGES ── */
 .push-page{
   position:fixed;inset:0;z-index:60;
   background:var(--bg);
   overflow-y:auto;overflow-x:hidden;
-  -webkit-overflow-scrolling:touch;
+  -webkit-overflow-scrolling:touch;touch-action:pan-y;
   scrollbar-width:none;
-  padding-top:var(--page-top);
-  padding-bottom:calc(var(--sb) + 100px);
   transform:translateX(100%);
   transition:transform .28s cubic-bezier(.4,0,.2,1);
   pointer-events:none;
+  display:flex;flex-direction:column;
 }
 .push-page::-webkit-scrollbar{display:none}
 .push-page.open{transform:translateX(0);pointer-events:all}
 
-/* ── BOTTOM SHEETS ── */
-#scr-overlay{
-  position:fixed;inset:0;z-index:69;
-  background:rgba(0,0,0,.45);
-  opacity:0;pointer-events:none;
-  transition:opacity .2s ease;
-}
-#scr-overlay.show{opacity:1;pointer-events:all}
-
-#slayer{position:fixed;inset:0;z-index:70;pointer-events:none}
-.scr{
-  position:absolute;bottom:0;left:0;right:0;
-  max-height:88dvh;
-  background:var(--bg);
-  pointer-events:none;
-  transform:translateY(100%);
-  transition:transform .24s cubic-bezier(.32,.72,0,1);
-  display:flex;flex-direction:column;
-  border-radius:24px 24px 0 0;
-  overflow:hidden;
-}
-.scr.open{transform:translateY(0);pointer-events:all}
-
-.scr-handle{width:36px;height:4px;border-radius:99px;background:rgba(0,0,0,.1);margin:8px auto 0;flex-shrink:0}
-.tg-dark .scr-handle{background:rgba(255,255,255,.18)}
-
-.scr-hdr{
-  flex-shrink:0;background:var(--bg);
-  padding:8px 16px 10px;
-  display:flex;align-items:center;gap:10px;
-}
-.scr-back{
-  width:34px;height:34px;border-radius:10px;
-  background:var(--bg3);display:flex;align-items:center;justify-content:center;
-  cursor:pointer;border:none;color:var(--text);
-  transition:transform .12s,background .12s;
-}
-.scr-back:active{transform:scale(.9)}
-.scr-hdr-text{flex:1;min-width:0}
-.scr-title{font-size:17px;font-weight:800;letter-spacing:-.02em;line-height:1.2}
-.scr-subtitle{font-size:11px;font-weight:500;color:var(--hint);margin-top:1px}
-.scr-body{overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:4px 16px 8px;flex:1}
-.scr-body::-webkit-scrollbar{display:none}
-.scr-foot{flex-shrink:0;padding:8px 16px calc(max(var(--sb),env(safe-area-inset-bottom,0px))+12px);background:var(--bg)}
-
-/* ── PUSH PAGE HEADER ── */
+/* ── PUSH HEADER ── */
 .pp-hdr{
-  position:sticky;top:0;z-index:5;
-  background:var(--bg);
-  padding:calc(var(--page-top) - 8px) 16px 10px;
-  display:flex;align-items:center;gap:10px;
-  margin-top:calc(0px - var(--page-top) + 8px);
+  flex-shrink:0;
+  padding-top:calc(var(--st) + 10px);
+  padding-bottom:12px;
+  padding-left:16px;padding-right:16px;
+  display:flex;align-items:center;gap:12px;
   border-bottom:1px solid var(--brd);
-  margin-bottom:0;
+  background:var(--bg);
 }
-.pp-title{font-size:17px;font-weight:800;letter-spacing:-.02em}
+.pp-back{
+  width:36px;height:36px;border-radius:12px;
+  background:var(--bg3);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;border:none;color:var(--text);flex-shrink:0;
+  transition:transform .1s,background .1s;
+}
+.pp-back:active{transform:scale(.9);background:rgba(0,0,0,.1)}
+.tg-dark .pp-back:active{background:rgba(255,255,255,.18)}
+.pp-title{font-size:18px;font-weight:900;letter-spacing:-.02em}
+.pp-subtitle{font-size:11px;font-weight:500;color:var(--hint);margin-top:1px}
 
-/* ── MD3 ПОЛЯ ── */
-.m3-field{
-  position:relative;margin-bottom:8px;
+/* ── PUSH BODY ── */
+.pp-body{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  padding:16px;
+  padding-bottom:calc(var(--sb) + 24px);
 }
+.pp-body::-webkit-scrollbar{display:none}
+
+/* ── MD3 FIELDS ── */
+.m3-field{position:relative;margin-bottom:8px}
 .m3-field:last-child{margin-bottom:0}
 .m3-input{
-  width:100%;min-height:52px;
-  padding:18px 14px 6px;
-  font-family:inherit;font-size:15px;font-weight:700;
+  width:100%;min-height:54px;
+  padding:20px 14px 6px;
+  font-family:inherit;font-size:16px;font-weight:700;
   color:var(--text);background:var(--bg3);
   border:none;outline:none;border-radius:12px;
   -webkit-appearance:none;
   transition:background .15s,box-shadow .15s;
 }
-.m3-input:focus{background:rgba(255,107,53,.07);box-shadow:0 0 0 2px rgba(255,107,53,.3)}
-.tg-dark .m3-input:focus{background:rgba(255,107,53,.14)}
+.m3-input:focus{background:rgba(255,107,53,.08);box-shadow:0 0 0 2px rgba(255,107,53,.3)}
+.tg-dark .m3-input:focus{background:rgba(255,107,53,.15)}
 .m3-label{
-  position:absolute;top:7px;left:14px;
+  position:absolute;top:8px;left:14px;
   font-size:10px;font-weight:700;color:var(--hint);
-  letter-spacing:.05em;text-transform:uppercase;
-  pointer-events:none;
+  letter-spacing:.05em;text-transform:uppercase;pointer-events:none;
 }
 .m3-input.num{text-align:right}
 .m3-input::placeholder{color:var(--hint);font-size:14px;font-weight:500}
 
-/* ── MD3 CARD ── */
 .m3-card{
-  background:var(--bg2);
-  border-radius:16px;
-  padding:12px;
-  box-shadow:var(--sh);
-  margin-bottom:10px;
+  background:var(--bg2);border-radius:16px;
+  padding:14px;box-shadow:var(--sh);margin-bottom:10px;
 }
 .tg-dark .m3-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);box-shadow:none}
+.m3-sec{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--hint);padding:12px 2px 6px}
+.m3-sec:first-child{padding-top:0}
 
-/* ── MD3 SECTION LABEL ── */
-.m3-sec{
-  font-size:11px;font-weight:700;
-  letter-spacing:.06em;text-transform:uppercase;
-  color:var(--hint);
-  padding:12px 2px 6px;
-}
-
-/* ── MD3 SEGMENT ── */
-.m3-seg{
-  display:flex;gap:4px;background:var(--bg3);
-  border-radius:12px;padding:3px;margin-bottom:10px;
-}
+.m3-seg{display:flex;gap:4px;background:var(--bg3);border-radius:12px;padding:3px;margin-bottom:10px}
 .m3-seg-btn{
-  flex:1;padding:9px 6px;
-  font-size:12px;font-weight:700;
-  border:none;border-radius:9px;cursor:pointer;
-  font-family:inherit;background:transparent;color:var(--hint);
-  transition:background .12s,color .12s,box-shadow .12s;
-  white-space:nowrap;
+  flex:1;padding:10px 6px;font-size:13px;font-weight:700;
+  border:none;border-radius:9px;cursor:pointer;font-family:inherit;
+  background:transparent;color:var(--hint);
+  transition:background .12s,color .12s,box-shadow .12s;white-space:nowrap;
 }
 .m3-seg-btn:active{transform:scale(.97)}
 .m3-seg-btn.on{background:var(--bg2);color:var(--text);box-shadow:0 1px 5px rgba(0,0,0,.09)}
 .tg-dark .m3-seg-btn.on{background:rgba(255,255,255,.16)}
 .m3-seg-emoji .m3-seg-btn{font-size:22px;padding:7px 4px}
 
+/* ── +/- STEPPER ── */
+.stepper-wrap{
+  display:flex;align-items:center;gap:0;
+  background:var(--bg3);border-radius:16px;
+  overflow:hidden;
+}
+.stepper-btn{
+  width:56px;height:64px;
+  background:transparent;border:none;cursor:pointer;
+  font-size:26px;font-weight:700;color:var(--sun);
+  font-family:inherit;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .1s;
+  -webkit-tap-highlight-color:transparent;
+}
+.stepper-btn:active{background:rgba(255,107,53,.12)}
+.stepper-val{
+  flex:1;text-align:center;
+  font-size:40px;font-weight:900;letter-spacing:-.03em;
+  color:var(--text);padding:0 4px;
+  user-select:none;
+}
+.stepper-val .unit{font-size:14px;font-weight:700;color:var(--hint);margin-left:4px}
+
+/* Двойной степпер (кг + .X) */
+.dual-stepper{display:flex;gap:8px;align-items:stretch}
+.dual-stepper .stepper-wrap{flex:1}
+
+/* ── BIG VALUE DISPLAY ── */
+.big-val-card{
+  background:linear-gradient(135deg,rgba(255,107,53,.07),rgba(255,171,64,.04));
+  border-radius:20px;padding:24px 20px;
+  text-align:center;margin-bottom:16px;
+}
+.big-val{font-size:64px;font-weight:900;letter-spacing:-.04em;line-height:1;color:var(--text)}
+.big-val-unit{font-size:16px;font-weight:700;color:var(--hint);margin-top:4px}
+.big-val-range{font-size:12px;font-weight:600;color:var(--hint);margin-top:6px}
+
 /* ── ISLAND NAV ── */
 #nav{
-  position:fixed;bottom:12px;
-  left:0;right:0;margin:0 auto;
+  position:fixed;bottom:12px;left:0;right:0;margin:0 auto;
   width:fit-content;z-index:9999;
   display:flex;align-items:center;gap:3px;padding:5px;
-  background:rgba(255,255,255,.94);
+  background:rgba(255,255,255,.95);
   border:1px solid rgba(255,255,255,.9);
   border-radius:24px;
   box-shadow:0 6px 24px rgba(0,0,0,.12),0 2px 6px rgba(0,0,0,.06);
-  transition:bottom .28s ease,opacity .2s ease;
+  transition:bottom .28s ease,opacity .22s ease;
 }
-.tg-dark #nav{background:rgba(24,18,10,.95);border-color:rgba(255,255,255,.1)}
-#nav.gone{bottom:calc(-100px - var(--sb));opacity:0;pointer-events:none}
+.tg-dark #nav{background:rgba(24,18,10,.96);border-color:rgba(255,255,255,.1)}
+#nav.gone{bottom:calc(-120px - var(--sb));opacity:0;pointer-events:none}
 .nt{
   width:50px;height:50px;border-radius:16px;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
@@ -204,23 +194,24 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 /* ── TYPOGRAPHY ── */
 .t1{font-size:26px;font-weight:900;line-height:1.1;letter-spacing:-.02em}
 .t2{font-size:20px;font-weight:900;letter-spacing:-.02em}
-.t3{font-size:14px;font-weight:800}
 .t5{font-size:12px;font-weight:600;color:var(--hint)}
 .grad{background:linear-gradient(105deg,var(--sun),var(--sun2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 
-/* ── CARDS ── */
+/* ── CARDS / LAYOUT ── */
 .card{background:var(--bg2);border-radius:var(--r-lg);padding:16px;box-shadow:var(--sh);position:relative;overflow:hidden}
 .tg-dark .card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);box-shadow:none}
 .pad{padding:0 16px}
 .gap{margin-top:10px}
 .sec{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--hint);padding:14px 20px 6px}
+.tg-dark .sec{color:rgba(255,255,255,.35)}
 
 /* ── LIST TILE ── */
-.lt{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--brd);cursor:pointer;transition:opacity .12s}
+.lt{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--brd);cursor:pointer;transition:opacity .12s}
 .lt:last-child{border-bottom:none;padding-bottom:0}
 .lt:first-child{padding-top:0}
 .lt:active{opacity:.55}
 .lt-ic{width:32px;height:32px;border-radius:10px;background:var(--bg3);display:flex;align-items:center;justify-content:center;color:var(--hint);flex-shrink:0}
+.tg-dark .lt-ic{background:rgba(255,255,255,.08)}
 .lt-lbl{flex:1;font-size:14px;font-weight:700}
 .lt-val{font-size:12px;color:var(--hint);font-weight:600;flex-shrink:0}
 .lt-chev{color:var(--hint);opacity:.4;flex-shrink:0}
@@ -266,10 +257,11 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .p-later{background:rgba(0,0,0,.05);color:var(--hint)}
 .ac-bar{margin-top:7px;height:4px;background:rgba(0,0,0,.06);border-radius:99px;overflow:hidden}
 .ac-barf{height:100%;border-radius:99px;transition:width .4s ease}
+.tg-dark .ac-bar{background:rgba(255,255,255,.1)}
 
 /* ── SLEEP DOTS ── */
 .sq{display:flex;gap:3px}
-.sqd{width:14px;height:4px;border-radius:99px;background:rgba(0,0,0,.07);transition:background .3s}
+.sqd{width:14px;height:4px;border-radius:99px;background:rgba(0,0,0,.07)}
 .sqd.on{background:var(--sleep)}
 .tg-dark .sqd{background:rgba(255,255,255,.14)}
 
@@ -295,7 +287,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 /* ── BTNS ── */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;cursor:pointer;font-family:inherit;font-weight:800;transition:transform .1s ease,opacity .12s}
 .btn:active{transform:scale(.96);opacity:.85}
-.btn-p{background:linear-gradient(135deg,var(--sun),var(--sun2));color:#fff;padding:14px 20px;font-size:15px;border-radius:14px;box-shadow:0 4px 16px rgba(255,107,53,.28);width:100%;letter-spacing:.01em}
+.btn-p{background:linear-gradient(135deg,var(--sun),var(--sun2));color:#fff;padding:15px 20px;font-size:15px;border-radius:14px;box-shadow:0 4px 16px rgba(255,107,53,.28);width:100%;letter-spacing:.01em}
 .btn-g{background:var(--bg3);color:var(--text);padding:11px 16px;font-size:13px;border-radius:11px}
 .btn-water{background:rgba(78,174,229,.1);color:var(--water);padding:13px 8px;font-size:13px;border-radius:12px;flex:1;font-weight:800}
 .tg-dark .btn-g{background:rgba(255,255,255,.1);color:#fff}
@@ -321,36 +313,16 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 /* ── TOAST ── */
 #toast{
-  position:fixed;bottom:calc(86px + var(--sb) + 12px);left:50%;
+  position:fixed;bottom:calc(var(--nav-h) + 12px);left:50%;
   transform:translateX(-50%) translateY(8px);
-  background:rgba(28,22,14,.88);color:#fff;
+  background:rgba(28,22,14,.9);color:#fff;
   padding:9px 18px;border-radius:99px;font-size:13px;font-weight:800;
-  white-space:nowrap;z-index:200;opacity:0;pointer-events:none;
+  white-space:nowrap;z-index:9998;opacity:0;pointer-events:none;
   transition:opacity .18s,transform .18s cubic-bezier(.34,1.2,.64,1);
 }
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* ── WHEEL PICKER ── */
-.wp{position:relative;overflow:hidden;border-radius:12px;background:var(--bg3);cursor:grab;touch-action:none}
-.wp:active{cursor:grabbing}
-.wp-track{position:absolute;top:0;left:0;right:0;will-change:transform}
-.wp-item{height:40px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:var(--hint);pointer-events:none;user-select:none;transition:color .08s}
-.wp-item.sel{color:var(--text);font-size:22px;font-weight:800}
-.wp-sel{position:absolute;top:50%;left:5px;right:5px;height:40px;transform:translateY(-50%);background:rgba(255,107,53,.08);border-radius:8px;border:1.5px solid rgba(255,107,53,.2);pointer-events:none}
-.wp-ft{position:absolute;left:0;right:0;height:80px;pointer-events:none;z-index:2}
-.wp-ft-t{top:0;background:linear-gradient(to bottom,var(--bg3) 0%,transparent 100%)}
-.wp-ft-b{bottom:0;background:linear-gradient(to top,var(--bg3) 0%,transparent 100%)}
-.wp-row{display:flex;justify-content:center;gap:6px;padding:0 2px 6px;align-items:flex-start}
-.wp-col{display:flex;flex-direction:column;align-items:stretch;gap:3px;flex:1;min-width:0}
-.wp-lbl{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--hint);text-align:center;margin-bottom:2px}
-.wp-sep{font-size:20px;font-weight:800;color:var(--hint);line-height:40px;align-self:center;padding-top:18px;flex:none}
-.tg-dark .wp-ft-t{background:linear-gradient(to bottom,var(--bg3) 0%,transparent 100%)}
-.tg-dark .wp-ft-b{background:linear-gradient(to top,var(--bg3) 0%,transparent 100%)}
-.tg-dark .wp-item{color:rgba(255,255,255,.3)}
-.tg-dark .wp-item.sel{color:#fff}
-.tg-dark .wp-sel{background:rgba(255,107,53,.15);border-color:rgba(255,107,53,.3)}
-
-/* ── TYPE GRID (activity) ── */
+/* ── ACTIVITY: TYPE GRID ── */
 .type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
 .type-card{
   padding:14px 10px;border-radius:14px;border:2px solid transparent;
@@ -370,42 +342,20 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   padding:10px 6px;border-radius:10px;border:2px solid transparent;
   background:var(--bg3);cursor:pointer;text-align:center;
   font-size:12px;font-weight:800;color:var(--hint);
-  font-family:inherit;
-  transition:all .12s ease;
+  font-family:inherit;transition:all .12s ease;
 }
 .dur-btn:active{transform:scale(.95)}
 .dur-btn.on{background:rgba(255,107,53,.08);border-color:var(--sun);color:var(--sun)}
 .tg-dark .dur-btn{background:rgba(255,255,255,.07)}
 .tg-dark .dur-btn.on{background:rgba(255,107,53,.18)}
 
-/* ── TIME INPUT ── */
-.time-input-wrap{
-  background:var(--bg3);border-radius:12px;
-  padding:14px 16px;
-  display:flex;align-items:center;justify-content:center;
-}
-.time-input{
-  font-family:'Onest',sans-serif;
-  font-size:32px;font-weight:900;letter-spacing:-.02em;
-  color:var(--text);
-  background:transparent;border:none;outline:none;
-  -webkit-appearance:none;
-  text-align:center;
-  width:100%;
-  cursor:pointer;
-}
-.time-input::-webkit-calendar-picker-indicator{opacity:0;position:absolute}
-
-/* ── STEP INDICATOR (activity) ── */
+/* ── STEP INDICATOR ── */
 .step-ind{display:flex;align-items:center;gap:6px;margin-bottom:20px}
 .step-pip{width:8px;height:8px;border-radius:50%;background:var(--bg3);transition:all .25s ease}
 .step-pip.on{width:22px;border-radius:4px;background:var(--sun)}
 .step-pip.done{background:var(--green);width:8px;border-radius:50%}
-
-/* ── ACTIVITY STEPS ── */
 .act-step{display:none}
 .act-step.active{display:block}
-.act-q{font-size:19px;font-weight:800;line-height:1.2;margin-bottom:4px;letter-spacing:-.02em}
 .act-hint{font-size:12px;color:var(--hint);font-weight:500;margin-bottom:16px}
 
 /* ── TOGGLE ROW ── */
@@ -433,43 +383,28 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 /* ── DARK OVERRIDES ── */
 .tg-dark{
   --bg3:rgba(255,255,255,.07);
-  --bg4:rgba(255,255,255,.05);
   --brd:rgba(255,255,255,.09);
   --sh:0 2px 12px rgba(0,0,0,.4);
 }
-.tg-dark .push-page{background:var(--bg)}
-.tg-dark .scr{background:var(--bg)}
-.tg-dark .scr-hdr,.tg-dark .scr-foot{background:var(--bg)}
-.tg-dark .pb{background:rgba(255,255,255,.1)}
-.tg-dark .wp{background:rgba(255,255,255,.08)}
-.tg-dark .sec{color:rgba(255,255,255,.35)}
+.tg-dark .push-page,.tg-dark .pp-hdr{background:var(--bg)}
 .tg-dark .t5{color:rgba(255,255,255,.4)}
 .tg-dark #nav{background:rgba(20,14,8,.96);border-color:rgba(255,255,255,.1)}
 .tg-dark .empty svg{opacity:.15}
-.tg-dark .lt-ic{background:rgba(255,255,255,.08)}
-.tg-dark .time-input{color:#fff}
-.tg-dark .ac-bar{background:rgba(255,255,255,.1)}
-.tg-dark .pp-hdr{background:var(--bg);border-bottom-color:rgba(255,255,255,.08)}
-
-/* ── ANIMATIONS ── */
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.page.active .card,.page.active .sbox,.page.active .banner,.page.active .ac{animation:fadeUp .22s ease both}
-@keyframes stepIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
-.act-step.active{animation:stepIn .2s ease both}
+.tg-dark .banner::after{opacity:.5}
 </style>
 </head>
 <body>
 <div id="root">
 <div id="pages">
 
-<!-- ══════════ HOME ══════════ -->
+<!-- ══ HOME ══ -->
 <div class="page active" id="p-home">
 <div class="pad" style="display:flex;align-items:flex-start;justify-content:space-between;padding-top:2px">
   <div>
     <div class="t1">привет, <span class="grad" id="h-name">…</span></div>
     <div class="t5" style="margin-top:3px" id="h-date">загружается…</div>
   </div>
-  <div style="text-align:right;padding-top:3px">
+  <div style="text-align:right;padding-top:4px">
     <div class="t5">до лета</div>
     <div style="font-size:22px;font-weight:900;color:var(--sun);line-height:1.1" id="h-days">—</div>
     <div class="t5" id="h-dunit">дней</div>
@@ -477,11 +412,11 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 </div>
 
 <div class="pad gap">
-  <div class="banner">
-    <div style="font-size:13px;font-weight:800;opacity:.88;margin-bottom:2px">путь к лету</div>
-    <div style="font-size:28px;font-weight:900;line-height:1.1"><span id="h-ddays">—</span> дней</div>
-    <div style="font-size:11px;opacity:.72;font-weight:600;margin-top:3px">ты делаешь это каждый день</div>
-  </div>
+<div class="banner">
+  <div style="font-size:13px;font-weight:800;opacity:.88;margin-bottom:2px">путь к лету</div>
+  <div style="font-size:28px;font-weight:900;line-height:1.1"><span id="h-ddays">—</span> дней</div>
+  <div style="font-size:11px;opacity:.72;font-weight:600;margin-top:3px">ты делаешь это каждый день</div>
+</div>
 </div>
 
 <div class="pad gap">
@@ -489,12 +424,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   <div style="display:flex;justify-content:space-around;align-items:center">
     <div style="text-align:center;cursor:pointer" onclick="navTo('track')">
       <div class="aw">
-        <svg width="68" height="68" viewBox="0 0 68 68">
-          <circle cx="34" cy="34" r="26" fill="none" stroke="rgba(78,174,229,.15)" stroke-width="5"/>
-          <circle cx="34" cy="34" r="26" fill="none" stroke="var(--water)" stroke-width="5"
-            stroke-linecap="round" stroke-dasharray="163.4" id="arc-w" stroke-dashoffset="163.4"
-            transform="rotate(-90 34 34)" style="transition:stroke-dashoffset .9s cubic-bezier(.34,1.1,.64,1)"/>
-        </svg>
+        <svg width="68" height="68" viewBox="0 0 68 68"><circle cx="34" cy="34" r="26" fill="none" stroke="rgba(78,174,229,.15)" stroke-width="5"/><circle cx="34" cy="34" r="26" fill="none" stroke="var(--water)" stroke-width="5" stroke-linecap="round" stroke-dasharray="163.4" id="arc-w" stroke-dashoffset="163.4" transform="rotate(-90 34 34)" style="transition:stroke-dashoffset .9s cubic-bezier(.34,1.1,.64,1)"/></svg>
         <div class="ai"><div style="font-size:13px;font-weight:900;color:var(--water)" id="arc-wpct">0%</div></div>
       </div>
       <div style="font-size:11px;font-weight:900;margin-top:4px" id="arc-wml">0</div>
@@ -502,12 +432,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     </div>
     <div style="text-align:center;cursor:pointer" onclick="navTo('track')">
       <div class="aw">
-        <svg width="82" height="82" viewBox="0 0 82 82">
-          <circle cx="41" cy="41" r="33" fill="none" stroke="rgba(244,129,74,.15)" stroke-width="6"/>
-          <circle cx="41" cy="41" r="33" fill="none" stroke="var(--cal)" stroke-width="6"
-            stroke-linecap="round" stroke-dasharray="207.3" id="arc-c" stroke-dashoffset="207.3"
-            transform="rotate(-90 41 41)" style="transition:stroke-dashoffset .9s cubic-bezier(.34,1.1,.64,1)"/>
-        </svg>
+        <svg width="82" height="82" viewBox="0 0 82 82"><circle cx="41" cy="41" r="33" fill="none" stroke="rgba(244,129,74,.15)" stroke-width="6"/><circle cx="41" cy="41" r="33" fill="none" stroke="var(--cal)" stroke-width="6" stroke-linecap="round" stroke-dasharray="207.3" id="arc-c" stroke-dashoffset="207.3" transform="rotate(-90 41 41)" style="transition:stroke-dashoffset .9s cubic-bezier(.34,1.1,.64,1)"/></svg>
         <div class="ai"><div style="font-size:15px;font-weight:900;color:var(--cal)" id="arc-cpct">0%</div></div>
       </div>
       <div style="font-size:13px;font-weight:900;margin-top:4px" id="arc-cval">0</div>
@@ -515,12 +440,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     </div>
     <div style="text-align:center;cursor:pointer" onclick="navTo('sleep')">
       <div class="aw">
-        <svg width="68" height="68" viewBox="0 0 68 68">
-          <circle cx="34" cy="34" r="26" fill="none" stroke="rgba(139,127,212,.15)" stroke-width="5"/>
-          <circle cx="34" cy="34" r="26" fill="none" stroke="var(--sleep)" stroke-width="5"
-            stroke-linecap="round" stroke-dasharray="163.4" id="arc-s" stroke-dashoffset="163.4"
-            transform="rotate(-90 34 34)" style="transition:stroke-dashoffset .9s cubic-bezier(.34,1.1,.64,1)"/>
-        </svg>
+        <svg width="68" height="68" viewBox="0 0 68 68"><circle cx="34" cy="34" r="26" fill="none" stroke="rgba(139,127,212,.15)" stroke-width="5"/><circle cx="34" cy="34" r="26" fill="none" stroke="var(--sleep)" stroke-width="5" stroke-linecap="round" stroke-dasharray="163.4" id="arc-s" stroke-dashoffset="163.4" transform="rotate(-90 34 34)" style="transition:stroke-dashoffset .9s cubic-bezier(.34,1.1,.64,1)"/></svg>
         <div class="ai"><div style="font-size:13px;font-weight:900;color:var(--sleep)" id="arc-sh">—</div></div>
       </div>
       <div class="sq" id="arc-sq" style="justify-content:center;margin-top:4px"></div>
@@ -555,7 +475,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 </div>
 
 <div class="pad" id="h-streak-w" style="margin-top:10px;display:none">
-  <div style="background:linear-gradient(90deg,rgba(255,107,53,.07),rgba(255,171,64,.05));border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;gap:10px">
+  <div style="background:linear-gradient(90deg,rgba(255,107,53,.07),rgba(255,171,64,.04));border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;gap:10px">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--sun)"><path d="M12 2c0 5.5-5 7-5 11a5 5 0 0 0 10 0c0-4-5-5.5-5-11z"/></svg>
     <div>
       <div style="font-size:13px;font-weight:900" id="h-sval">7 дней подряд</div>
@@ -566,7 +486,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 <div style="height:8px"></div>
 </div>
 
-<!-- ══════════ TRACK ══════════ -->
+<!-- ══ TRACK ══ -->
 <div class="page" id="p-track">
 <div style="position:sticky;top:0;background:var(--bg);z-index:10;padding:calc(var(--st)+12px) 16px 10px">
   <div class="ttabs">
@@ -574,7 +494,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     <button class="ttab" id="tt-cal" onclick="setTTab('cal')">калории</button>
   </div>
 </div>
-
 <div id="tt-water-body">
 <div class="pad">
 <div class="card" style="margin-top:4px;text-align:center;padding:20px 16px;background:linear-gradient(160deg,rgba(78,174,229,.06),rgba(78,174,229,.02))">
@@ -597,7 +516,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 </div>
 </div>
 </div>
-
 <div id="tt-cal-body" style="display:none">
 <div class="pad">
 <div class="card" style="margin-top:4px;text-align:center;padding:20px 16px">
@@ -607,12 +525,12 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   <div class="pb" style="margin-top:12px;height:7px"><div class="pbf pb-sun" id="c-bar" style="width:0%"></div></div>
 </div>
 <div class="card gap" style="padding:12px 14px"><div id="c-meals"></div></div>
-<button class="btn btn-p gap" onclick="openScr('scr-cal')">добавить еду</button>
+<button class="btn btn-p gap" onclick="pushPage('pp-cal')">добавить еду</button>
 </div>
 </div>
 </div>
 
-<!-- ══════════ PLAN ══════════ -->
+<!-- ══ PLAN ══ -->
 <div class="page" id="p-plan">
 <div class="pad">
   <div class="t2" style="margin-bottom:1px">план</div>
@@ -627,11 +545,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     </div>
     <svg width="52" height="52" viewBox="0 0 52 52">
       <circle cx="26" cy="26" r="20" fill="none" stroke="rgba(0,0,0,.06)" stroke-width="4.5"/>
-      <circle cx="26" cy="26" r="20" fill="none" stroke="var(--sun)" stroke-width="4.5"
-        stroke-linecap="round" stroke-dasharray="125.7"
-        id="pl-ring" stroke-dashoffset="125.7"
-        transform="rotate(-90 26 26)"
-        style="transition:stroke-dashoffset .6s cubic-bezier(.34,1.1,.64,1)"/>
+      <circle cx="26" cy="26" r="20" fill="none" stroke="var(--sun)" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="125.7" id="pl-ring" stroke-dashoffset="125.7" transform="rotate(-90 26 26)" style="transition:stroke-dashoffset .6s cubic-bezier(.34,1.1,.64,1)"/>
     </svg>
   </div>
 </div>
@@ -648,7 +562,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 <div style="height:8px"></div>
 </div>
 
-<!-- ══════════ SLEEP ══════════ -->
+<!-- ══ SLEEP ══ -->
 <div class="page" id="p-sleep">
 <div class="pad">
   <div class="t2" style="margin-bottom:1px">сон</div>
@@ -669,7 +583,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
 </div>
 </div>
-<button class="btn btn-p" style="margin:10px 16px 0;width:calc(100% - 32px)" onclick="openScr('scr-sleep')">записать сон</button>
+<button class="btn btn-p" style="margin:10px 16px 0;width:calc(100% - 32px)" onclick="pushPage('pp-sleep')">записать сон</button>
 <div class="sec">последние 7 ночей</div>
 <div class="pad"><div class="card" id="sl-hist" style="padding:10px 12px"></div></div>
 <div class="sec">среднее за неделю</div>
@@ -680,7 +594,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 <div style="height:8px"></div>
 </div>
 
-<!-- ══════════ PROGRESS ══════════ -->
+<!-- ══ PROGRESS ══ -->
 <div class="page" id="p-progress">
 <div class="pad">
   <div class="t2" style="margin-bottom:1px">прогресс</div>
@@ -703,7 +617,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   <div id="pr-forecast" style="margin-top:7px;font-size:11px;font-weight:800;color:var(--green)"></div>
 </div>
 </div>
-
 <div class="pad gap">
 <div class="card" style="padding:14px">
   <div class="t5" style="margin-bottom:8px">динамика веса</div>
@@ -712,19 +625,15 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
 </div>
 </div>
-
 <div class="sec">эта неделя</div>
 <div class="pad sb-row">
   <div class="sbox"><div class="sv" style="color:var(--water)" id="pw-water">—</div><div class="sl">вода мл</div></div>
   <div class="sbox"><div class="sv" style="color:var(--cal)" id="pw-cal">—</div><div class="sl">ккал</div></div>
   <div class="sbox"><div class="sv" style="color:var(--sleep)" id="pw-sleep">—</div><div class="sl">сон ч</div></div>
 </div>
-
-<button class="btn btn-p" style="margin:10px 16px 0;width:calc(100% - 32px)" onclick="openScr('scr-weight')">записать вес</button>
-
+<button class="btn btn-p" style="margin:10px 16px 0;width:calc(100% - 32px)" onclick="pushPage('pp-weight')">записать вес</button>
 <div class="sec">история веса</div>
 <div class="pad"><div class="card" id="pr-whist" style="padding:10px 12px"></div></div>
-
 <div class="sec">за всё время</div>
 <div class="pad sb-row">
   <div class="sbox"><div class="sv grad" id="at-t">0</div><div class="sl">тренировок</div></div>
@@ -734,7 +643,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 <div style="height:8px"></div>
 </div>
 
-<!-- ══════════ PROFILE ══════════ -->
+<!-- ══ PROFILE ══ -->
 <div class="page" id="p-profile">
 <div style="display:flex;align-items:center;gap:14px;padding:4px 16px 0">
   <div class="pav" id="pf-av">А</div>
@@ -743,7 +652,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     <div class="t5" id="pf-meta" style="margin-top:2px">—</div>
   </div>
 </div>
-
 <div id="pf-bmi-row" style="margin-top:12px;padding:0 16px;display:none">
   <div class="sb-row">
     <div class="sbox"><div class="sv" id="pf-bmi">—</div><div class="sl">ИМТ</div></div>
@@ -751,7 +659,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     <div class="sbox"><div class="sv" id="pf-bmr">—</div><div class="sl">BMR</div></div>
   </div>
 </div>
-
 <div class="sec">настройки</div>
 <div class="pad">
 <div class="card">
@@ -769,37 +676,32 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
 </div>
 </div>
-
 <div class="sec">физические данные</div>
 <div class="pad">
 <div class="card">
   <div class="lt">
     <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-    <span class="lt-lbl">рост</span>
-    <span class="lt-val" id="pf-height">—</span>
+    <span class="lt-lbl">рост</span><span class="lt-val" id="pf-height">—</span>
   </div>
   <div class="lt">
     <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
-    <span class="lt-lbl">возраст</span>
-    <span class="lt-val" id="pf-age">—</span>
+    <span class="lt-lbl">возраст</span><span class="lt-val" id="pf-age">—</span>
   </div>
   <div class="lt" style="padding-bottom:0;border:none">
-    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a5 5 0 0 1 0 10M12 12c-5 0-8 2-8 6v2h16v-2c0-4-3-6-8-6z"/></svg></div>
-    <span class="lt-lbl">норма воды</span>
-    <span class="lt-val" id="pf-gwater">—</span>
+    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M12 6v6l4 2"/></svg></div>
+    <span class="lt-lbl">норма воды</span><span class="lt-val" id="pf-gwater">—</span>
   </div>
 </div>
 </div>
-
 <div class="sec">приложение</div>
 <div class="pad">
 <div class="card">
   <div class="lt" onclick="pushPage('pp-sett')">
-    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg></div>
-    <span class="lt-lbl">настройки отображения</span>
+    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+    <span class="lt-lbl">настройки</span>
     <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
   </div>
-  <div class="lt" style="padding-bottom:0;border:none" onclick="openScr('scr-weight')">
+  <div class="lt" style="padding-bottom:0;border:none" onclick="pushPage('pp-weight')">
     <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zm-8 5h.01"/></svg></div>
     <span class="lt-lbl">записать вес</span>
     <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
@@ -812,18 +714,150 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 </div><!-- /pages -->
 
-<!-- ══ PUSH PAGES ══ -->
+<!-- ══════ PUSH PAGES ══════ -->
+
+<!-- PP: Записать вес -->
+<div class="push-page" id="pp-weight">
+  <div class="pp-hdr">
+    <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <div>
+      <div class="pp-title">записать вес</div>
+      <div class="pp-subtitle" style="margin-top:1px">текущий вес в килограммах</div>
+    </div>
+  </div>
+  <div class="pp-body">
+    <!-- Big display -->
+    <div class="big-val-card">
+      <div class="big-val"><span id="wt-int">70</span><span style="font-size:28px;color:var(--hint)">.</span><span id="wt-dec">0</span></div>
+      <div class="big-val-unit">кг</div>
+    </div>
+    <!-- Kg stepper -->
+    <div class="m3-sec">килограммы</div>
+    <div class="m3-card" style="padding:8px">
+      <div class="stepper-wrap">
+        <button class="stepper-btn" onclick="stepW('int',-1)">−</button>
+        <div class="stepper-val" id="wt-int-disp">70</div>
+        <button class="stepper-btn" onclick="stepW('int',1)">+</button>
+      </div>
+    </div>
+    <!-- Decimal stepper -->
+    <div class="m3-sec">десятые</div>
+    <div class="m3-card" style="padding:8px">
+      <div class="stepper-wrap">
+        <button class="stepper-btn" onclick="stepW('dec',-1)">−</button>
+        <div class="stepper-val" id="wt-dec-disp">.0</div>
+        <button class="stepper-btn" onclick="stepW('dec',1)">+</button>
+      </div>
+    </div>
+    <button class="btn btn-p" style="margin-top:20px" onclick="submitWeight()">сохранить вес</button>
+  </div>
+</div>
+
+<!-- PP: Записать сон -->
+<div class="push-page" id="pp-sleep">
+  <div class="pp-hdr">
+    <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <div>
+      <div class="pp-title">записать сон</div>
+      <div class="pp-subtitle" style="margin-top:1px">сколько спал прошлой ночью?</div>
+    </div>
+  </div>
+  <div class="pp-body">
+    <div class="big-val-card" style="background:linear-gradient(135deg,rgba(139,127,212,.08),rgba(139,127,212,.03))">
+      <div class="big-val" style="color:var(--sleep)"><span id="sl-val-disp">8</span><span style="font-size:28px;color:var(--hint)">.0</span></div>
+      <div class="big-val-unit">часов</div>
+    </div>
+    <!-- Hours stepper -->
+    <div class="m3-sec">часов сна</div>
+    <div class="m3-card" style="padding:8px">
+      <div class="stepper-wrap">
+        <button class="stepper-btn" style="color:var(--sleep)" onclick="stepSl('h',-1)">−</button>
+        <div class="stepper-val" id="sl-h-disp" style="color:var(--sleep)">8</div>
+        <button class="stepper-btn" style="color:var(--sleep)" onclick="stepSl('h',1)">+</button>
+      </div>
+    </div>
+    <!-- Half-hours -->
+    <div class="m3-sec">минуты</div>
+    <div class="m3-card" style="padding:10px">
+      <div class="m3-seg" style="margin-bottom:0">
+        <button class="m3-seg-btn on" id="sl-m0" onclick="setSleepMin(0)">:00</button>
+        <button class="m3-seg-btn" id="sl-m30" onclick="setSleepMin(30)">:30</button>
+      </div>
+    </div>
+    <!-- Quality -->
+    <div class="m3-sec">качество сна</div>
+    <div class="m3-card" style="padding:10px">
+      <div class="m3-seg m3-seg-emoji" id="seg-sleepq" style="margin-bottom:0">
+        <button class="m3-seg-btn" onclick="setSleepQ(1)" data-q="1">😫</button>
+        <button class="m3-seg-btn" onclick="setSleepQ(2)" data-q="2">😴</button>
+        <button class="m3-seg-btn on" onclick="setSleepQ(3)" data-q="3">😑</button>
+        <button class="m3-seg-btn" onclick="setSleepQ(4)" data-q="4">🙂</button>
+        <button class="m3-seg-btn" onclick="setSleepQ(5)" data-q="5">🌟</button>
+      </div>
+    </div>
+    <button class="btn btn-p" style="margin-top:20px" onclick="submitSleep()">сохранить сон</button>
+  </div>
+</div>
+
+<!-- PP: Добавить еду -->
+<div class="push-page" id="pp-cal">
+  <div class="pp-hdr">
+    <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <div>
+      <div class="pp-title">добавить еду</div>
+      <div class="pp-subtitle" style="margin-top:1px">запиши что съел</div>
+    </div>
+  </div>
+  <div class="pp-body">
+    <!-- Current total -->
+    <div class="big-val-card" style="background:linear-gradient(135deg,rgba(244,129,74,.08),rgba(244,129,74,.03))">
+      <div class="big-val" style="color:var(--cal)" id="cal-preview">500</div>
+      <div class="big-val-unit">ккал</div>
+    </div>
+    <!-- Cal stepper -->
+    <div class="m3-sec">калорий</div>
+    <div class="m3-card" style="padding:8px">
+      <div class="stepper-wrap">
+        <button class="stepper-btn" style="color:var(--cal)" onclick="stepCal(-50)">−</button>
+        <div class="stepper-val" style="color:var(--cal)" id="cal-step-disp">500</div>
+        <button class="stepper-btn" style="color:var(--cal)" onclick="stepCal(50)">+</button>
+      </div>
+    </div>
+    <!-- Quick amounts -->
+    <div class="dur-grid" style="margin-bottom:10px">
+      <button class="dur-btn" onclick="setCalVal(100)">100</button>
+      <button class="dur-btn" onclick="setCalVal(200)">200</button>
+      <button class="dur-btn" onclick="setCalVal(350)">350</button>
+      <button class="dur-btn" onclick="setCalVal(500)">500</button>
+      <button class="dur-btn" onclick="setCalVal(650)">650</button>
+      <button class="dur-btn" onclick="setCalVal(800)">800</button>
+      <button class="dur-btn" onclick="setCalVal(1000)">1000</button>
+      <button class="dur-btn" onclick="setCalVal(1200)">1200</button>
+    </div>
+    <!-- Name input -->
+    <div class="m3-sec">блюдо (необязательно)</div>
+    <div class="m3-card" style="padding:8px 12px">
+      <input class="m3-input" id="inp-cal-desc" type="text" placeholder="гречка, курица, суп…" style="padding:12px 2px;background:transparent;border-radius:0;min-height:44px">
+    </div>
+    <!-- Meal type -->
+    <div class="m3-sec">приём пищи</div>
+    <div class="m3-seg" id="seg-meal" style="margin-bottom:0">
+      <button class="m3-seg-btn on" onclick="setMeal('breakfast')" data-m="breakfast">завтрак</button>
+      <button class="m3-seg-btn" onclick="setMeal('lunch')" data-m="lunch">обед</button>
+      <button class="m3-seg-btn" onclick="setMeal('dinner')" data-m="dinner">ужин</button>
+      <button class="m3-seg-btn" onclick="setMeal('snack')" data-m="snack">перекус</button>
+    </div>
+    <button class="btn btn-p" style="margin-top:20px" onclick="submitCal()">добавить</button>
+  </div>
+</div>
 
 <!-- PP: Данные профиля -->
 <div class="push-page" id="pp-pdata">
   <div class="pp-hdr">
-    <button class="scr-back" onclick="popPage()">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
-    </button>
-    <span class="pp-title">данные профиля</span>
+    <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <div><div class="pp-title">данные профиля</div></div>
   </div>
-  <div style="padding:16px">
-    <div class="m3-sec">личные данные</div>
+  <div class="pp-body">
     <div class="m3-card">
       <div class="m3-field">
         <div class="m3-label">имя</div>
@@ -843,20 +877,17 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       <button class="m3-seg-btn on" onclick="setGender('male')" data-g="male">♂ мужской</button>
       <button class="m3-seg-btn" onclick="setGender('female')" data-g="female">♀ женский</button>
     </div>
-    <button class="btn btn-p" style="margin-top:16px" onclick="submitProfile()">сохранить</button>
+    <button class="btn btn-p" style="margin-top:8px" onclick="submitProfile()">сохранить</button>
   </div>
 </div>
 
 <!-- PP: Цели -->
 <div class="push-page" id="pp-goals">
   <div class="pp-hdr">
-    <button class="scr-back" onclick="popPage()">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
-    </button>
-    <span class="pp-title">мои цели</span>
+    <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <div><div class="pp-title">мои цели</div></div>
   </div>
-  <div style="padding:16px">
-    <div class="m3-sec">параметры</div>
+  <div class="pp-body">
     <div class="m3-card">
       <div class="m3-field">
         <div class="m3-label">целевой вес, кг</div>
@@ -871,20 +902,18 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
         <input class="m3-input num" id="inp-gcal" type="number" inputmode="numeric" step="50" placeholder="2000">
       </div>
     </div>
-    <button class="btn btn-p" style="margin-top:16px" onclick="submitGoals()">сохранить цели</button>
+    <button class="btn btn-p" style="margin-top:8px" onclick="submitGoals()">сохранить цели</button>
   </div>
 </div>
 
 <!-- PP: Настройки -->
 <div class="push-page" id="pp-sett">
   <div class="pp-hdr">
-    <button class="scr-back" onclick="popPage()">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
-    </button>
-    <span class="pp-title">настройки</span>
+    <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <div><div class="pp-title">настройки</div></div>
   </div>
-  <div style="padding:16px">
-    <div class="m3-sec">отображение</div>
+  <div class="pp-body">
+    <div style="margin-bottom:4px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--hint)">отображение</div>
     <div class="m3-tog-row" onclick="toggleSett('w')">
       <div class="m3-tog-ic">⚖️</div>
       <div class="m3-tog-lbl">показывать вес</div>
@@ -905,20 +934,19 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       <div class="m3-tog-lbl">показывать сон</div>
       <div class="tog on" id="tog-sleep"></div>
     </div>
-    <div class="m3-sec">данные</div>
+    <div style="margin-top:16px;margin-bottom:4px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--hint)">данные</div>
     <div class="m3-tog-row" onclick="confirmReset()">
       <div class="m3-tog-ic">🗑️</div>
       <div class="m3-tog-lbl" style="color:var(--red)">сбросить все данные</div>
     </div>
+    <div style="text-align:center;padding:24px 0 0"><div class="t5">letify · ver 4.0</div></div>
   </div>
 </div>
 
-<!-- PP: Добавить активность (MULTI-STEP) -->
+<!-- PP: Добавить активность -->
 <div class="push-page" id="pp-act">
   <div class="pp-hdr">
-    <button class="scr-back" id="pp-act-back" onclick="actBackOrPop()">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
-    </button>
+    <button class="pp-back" id="pp-act-back" onclick="actBackOrPop()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
     <div style="flex:1">
       <div class="step-ind">
         <div class="step-pip on" id="sp1"></div>
@@ -928,65 +956,46 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       <div class="pp-title" id="act-step-title">название</div>
     </div>
   </div>
-  <div style="padding:16px">
-
-    <!-- Шаг 1: Тип активности -->
+  <div class="pp-body">
+    <!-- Step 1 -->
     <div class="act-step active" id="act-s1">
       <div class="act-hint">как называется активность?</div>
-      <div class="m3-card" style="padding:12px">
-        <div class="m3-field">
-          <div class="m3-label">название активности</div>
+      <div class="m3-card" style="padding:10px 12px;margin-bottom:0">
+        <div class="m3-field" style="margin-bottom:0">
+          <div class="m3-label">название</div>
           <input class="m3-input" id="inp-aname" type="text" placeholder="пробежка, йога, зал…" autocomplete="off">
         </div>
       </div>
-      <div class="m3-sec">или выбери</div>
+      <div style="margin:14px 0 8px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--hint)">или выбери</div>
       <div class="type-grid" id="act-quick">
-        <div class="type-card on" onclick="actQuick('пробежка','run',this)">
-          <div class="type-card-ico">🏃</div><div class="type-card-lbl">пробежка</div>
-        </div>
-        <div class="type-card" onclick="actQuick('зал','gym',this)">
-          <div class="type-card-ico">💪</div><div class="type-card-lbl">зал</div>
-        </div>
-        <div class="type-card" onclick="actQuick('йога','yoga',this)">
-          <div class="type-card-ico">🧘</div><div class="type-card-lbl">йога</div>
-        </div>
-        <div class="type-card" onclick="actQuick('ходьба','walk',this)">
-          <div class="type-card-ico">🚶</div><div class="type-card-lbl">ходьба</div>
-        </div>
-        <div class="type-card" onclick="actQuick('велосипед','bike',this)">
-          <div class="type-card-ico">🚴</div><div class="type-card-lbl">велосипед</div>
-        </div>
-        <div class="type-card" onclick="actQuick('другое','other',this)">
-          <div class="type-card-ico">✨</div><div class="type-card-lbl">другое</div>
-        </div>
+        <div class="type-card on" onclick="actQuick('пробежка','run',this)"><div class="type-card-ico">🏃</div><div class="type-card-lbl">пробежка</div></div>
+        <div class="type-card" onclick="actQuick('зал','gym',this)"><div class="type-card-ico">💪</div><div class="type-card-lbl">зал</div></div>
+        <div class="type-card" onclick="actQuick('йога','yoga',this)"><div class="type-card-ico">🧘</div><div class="type-card-lbl">йога</div></div>
+        <div class="type-card" onclick="actQuick('ходьба','walk',this)"><div class="type-card-ico">🚶</div><div class="type-card-lbl">ходьба</div></div>
+        <div class="type-card" onclick="actQuick('велосипед','bike',this)"><div class="type-card-ico">🚴</div><div class="type-card-lbl">велосипед</div></div>
+        <div class="type-card" onclick="actQuick('другое','other',this)"><div class="type-card-ico">✨</div><div class="type-card-lbl">другое</div></div>
       </div>
     </div>
-
-    <!-- Шаг 2: Время и длительность -->
+    <!-- Step 2 -->
     <div class="act-step" id="act-s2">
       <div class="act-hint">выбери время и длительность</div>
-      <div class="m3-sec">время начала</div>
+      <div style="margin-bottom:8px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--hint)">время начала</div>
       <div class="m3-card" style="padding:12px">
-        <div class="time-input-wrap">
-          <input type="time" class="time-input" id="inp-atime" value="08:00">
-        </div>
+        <input type="time" id="inp-atime" value="08:00" style="font-family:'Onest',sans-serif;font-size:32px;font-weight:900;letter-spacing:-.02em;color:var(--text);background:transparent;border:none;outline:none;width:100%;text-align:center;-webkit-appearance:none;cursor:pointer">
       </div>
-      <div class="m3-sec">длительность</div>
-      <div class="m3-card" style="padding:12px">
-        <div class="dur-grid" id="dur-grid">
-          <button class="dur-btn" onclick="setDur(15,this)">15 мин</button>
-          <button class="dur-btn" onclick="setDur(20,this)">20 мин</button>
-          <button class="dur-btn" onclick="setDur(30,this)">30 мин</button>
-          <button class="dur-btn on" onclick="setDur(45,this)">45 мин</button>
-          <button class="dur-btn" onclick="setDur(60,this)">60 мин</button>
-          <button class="dur-btn" onclick="setDur(75,this)">75 мин</button>
-          <button class="dur-btn" onclick="setDur(90,this)">90 мин</button>
-          <button class="dur-btn" onclick="setDur(120,this)">2 часа</button>
-        </div>
+      <div style="margin:14px 0 8px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--hint)">длительность</div>
+      <div class="dur-grid" id="dur-grid">
+        <button class="dur-btn" onclick="setDur(15,this)">15 мин</button>
+        <button class="dur-btn" onclick="setDur(20,this)">20 мин</button>
+        <button class="dur-btn" onclick="setDur(30,this)">30 мин</button>
+        <button class="dur-btn on" onclick="setDur(45,this)">45 мин</button>
+        <button class="dur-btn" onclick="setDur(60,this)">60 мин</button>
+        <button class="dur-btn" onclick="setDur(75,this)">75 мин</button>
+        <button class="dur-btn" onclick="setDur(90,this)">90 мин</button>
+        <button class="dur-btn" onclick="setDur(120,this)">2 ч</button>
       </div>
     </div>
-
-    <!-- Шаг 3: Подтверждение -->
+    <!-- Step 3 -->
     <div class="act-step" id="act-s3">
       <div class="act-hint">проверь и добавь в план</div>
       <div style="text-align:center;padding:16px 0 12px">
@@ -1001,110 +1010,9 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
         </div>
       </div>
     </div>
-
     <button class="btn btn-p" id="act-next-btn" onclick="actStepNext()" style="margin-top:20px">далее →</button>
   </div>
 </div>
-
-<!-- Scr overlays -->
-<div id="scr-overlay" onclick="closeScr()"></div>
-
-<div id="slayer">
-<!-- Scr: Вес -->
-<div class="scr" id="scr-weight">
-  <div class="scr-handle"></div>
-  <div class="scr-hdr">
-    <button class="scr-back" onclick="closeScr()">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
-    </button>
-    <div class="scr-hdr-text">
-      <div class="scr-title">записать вес</div>
-      <div class="scr-subtitle">потяни барабан чтобы выбрать</div>
-    </div>
-  </div>
-  <div class="scr-body">
-    <div class="m3-card" style="padding:16px">
-      <div style="display:flex;justify-content:space-between;padding:0 8px;margin-bottom:8px">
-        <span style="font-size:11px;font-weight:800;color:var(--hint);text-transform:uppercase;letter-spacing:.08em">КГ</span>
-        <span style="font-size:11px;font-weight:800;color:var(--hint);text-transform:uppercase;letter-spacing:.08em">.X</span>
-      </div>
-      <div class="wp-row" id="wp-weight-wrap"></div>
-    </div>
-  </div>
-  <div class="scr-foot">
-    <button class="btn btn-p" onclick="submitWeight()">сохранить вес</button>
-  </div>
-</div>
-
-<!-- Scr: Сон -->
-<div class="scr" id="scr-sleep">
-  <div class="scr-handle"></div>
-  <div class="scr-hdr">
-    <button class="scr-back" onclick="closeScr()">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
-    </button>
-    <div class="scr-hdr-text">
-      <div class="scr-title">записать сон</div>
-      <div class="scr-subtitle">сколько спал прошлой ночью?</div>
-    </div>
-  </div>
-  <div class="scr-body">
-    <div class="m3-card" style="padding:16px">
-      <div class="wp-row" id="wp-sleep-wrap"></div>
-    </div>
-    <div class="m3-card" style="padding:14px">
-      <div style="font-size:14px;font-weight:800;margin-bottom:12px">качество сна</div>
-      <div class="m3-seg m3-seg-emoji" id="seg-sleepq">
-        <button class="m3-seg-btn" onclick="setSleepQ(1)" data-q="1">😫</button>
-        <button class="m3-seg-btn" onclick="setSleepQ(2)" data-q="2">😴</button>
-        <button class="m3-seg-btn on" onclick="setSleepQ(3)" data-q="3">😑</button>
-        <button class="m3-seg-btn" onclick="setSleepQ(4)" data-q="4">🙂</button>
-        <button class="m3-seg-btn" onclick="setSleepQ(5)" data-q="5">🌟</button>
-      </div>
-    </div>
-  </div>
-  <div class="scr-foot">
-    <button class="btn btn-p" onclick="submitSleep()">сохранить сон</button>
-  </div>
-</div>
-
-<!-- Scr: Калории -->
-<div class="scr" id="scr-cal">
-  <div class="scr-handle"></div>
-  <div class="scr-hdr">
-    <button class="scr-back" onclick="closeScr()">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
-    </button>
-    <div class="scr-hdr-text">
-      <div class="scr-title">добавить еду</div>
-      <div class="scr-subtitle">запиши что съел</div>
-    </div>
-  </div>
-  <div class="scr-body">
-    <div class="m3-sec">приём пищи</div>
-    <div class="m3-seg" id="seg-meal" style="margin-bottom:12px">
-      <button class="m3-seg-btn on" onclick="setMeal('breakfast')" data-m="breakfast">завтрак</button>
-      <button class="m3-seg-btn" onclick="setMeal('lunch')" data-m="lunch">обед</button>
-      <button class="m3-seg-btn" onclick="setMeal('dinner')" data-m="dinner">ужин</button>
-      <button class="m3-seg-btn" onclick="setMeal('snack')" data-m="snack">перекус</button>
-    </div>
-    <div class="m3-sec">данные</div>
-    <div class="m3-card">
-      <div class="m3-field">
-        <div class="m3-label">калорий, ккал</div>
-        <input class="m3-input num" id="inp-cal" type="number" inputmode="numeric" step="10" min="0" max="3000" placeholder="500">
-      </div>
-      <div class="m3-field">
-        <div class="m3-label">название блюда</div>
-        <input class="m3-input" id="inp-cal-desc" type="text" placeholder="гречка, курица…">
-      </div>
-    </div>
-  </div>
-  <div class="scr-foot">
-    <button class="btn btn-p" onclick="submitCal()">добавить</button>
-  </div>
-</div>
-</div><!-- /slayer -->
 
 <div id="toast"></div>
 
@@ -1139,7 +1047,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 </div><!-- /root -->
 
 <script>
-/* ════ TG INIT ════ */
+/* ══ TG INIT ══ */
 const tg=window.Telegram?.WebApp;
 if(tg){
   tg.ready();tg.expand();
@@ -1151,25 +1059,18 @@ if(tg){
   tg.onEvent('viewportChanged',_applySA);
   tg.onEvent('safeAreaChanged',_applySA);
   tg.onEvent('fullscreenChanged',_applySA);
-  setTimeout(_applySA,100);
-  setTimeout(_applySA,500);
+  setTimeout(_applySA,80);setTimeout(_applySA,400);
 }
 function _applySA(){
   const saTop=Math.max(tg?.safeAreaInset?.top??0,0);
   const csaTop=Math.max(tg?.contentSafeAreaInset?.top??0,0);
-  const top=saTop+csaTop;
+  const top=Math.min(saTop+csaTop,120);
   const saBot=Math.max(tg?.safeAreaInset?.bottom??0,0);
   const csaBot=Math.max(tg?.contentSafeAreaInset?.bottom??0,0);
-  const bot=saBot+csaBot;
-  const st=Math.min(Math.max(top,0),120);
-  const sb=Math.min(Math.max(bot,0),80);
-  document.documentElement.style.setProperty('--st',st+'px');
-  document.documentElement.style.setProperty('--sb',sb+'px');
-  if(!navHidden)_setNavBot(sb);
-}
-function _setNavBot(sb){
-  const nav=document.getElementById('nav');
-  if(nav)nav.style.bottom=(12+(sb||0))+'px';
+  const bot=Math.min(saBot+csaBot,80);
+  document.documentElement.style.setProperty('--st',top+'px');
+  document.documentElement.style.setProperty('--sb',bot+'px');
+  if(!navHidden){const nav=document.getElementById('nav');if(nav)nav.style.bottom=(12+bot)+'px';}
 }
 function applyTheme(){
   const p=tg?.themeParams||{};
@@ -1188,19 +1089,17 @@ function applyTheme(){
 }
 applyTheme();
 
-/* ════ API & DATA ════ */
+/* ══ DATA ══ */
 const API_BASE='https://letify-production.up.railway.app';
 const tgUser=tg?.initDataUnsafe?.user;
 const UID=tgUser?.id||null;
 const TODAY=new Date().toLocaleDateString('en-CA');
-
 let C={
   user:{name:'…',height:0,age:0,start_weight:0,goal_weight:0,water_goal:2000,cal_goal:2000,gender:'male'},
   settings:{show_weight:1,show_water:1,show_calories:1,show_sleep:1},
   water:{total:0,entries:[],streak:0},calories:{},
   weight_log:[],sleep_log:[],acts_today:[],products:[]
 };
-
 async function loadData(){
   if(!UID){_demo();return;}
   try{
@@ -1228,14 +1127,13 @@ function _demo(){
       {id:1,name:'пробежка',type:'run',scheduled_at:'2024-01-01T07:00',duration:30,completed:1},
       {id:2,name:'зал',type:'gym',scheduled_at:'2024-01-01T18:30',duration:60,completed:0},
       {id:3,name:'йога',type:'yoga',scheduled_at:'2024-01-01T21:00',duration:25,completed:0}
-    ]);
-    s('ds',1);
+    ]);s('ds',1);
   }
   const u=g('user')||{},wd=g('wd_'+TODAY)||{total:0,entries:[]},cd=g('cd_'+TODAY)||{};
   C.user=u;C.settings={show_weight:1,show_water:1,show_calories:1,show_sleep:1};
   C.water={total:wd.total||0,entries:wd.entries||[],streak:g('streak')||0};
   C.calories=cd;C.weight_log=g('wlog')||[];C.sleep_log=g('slog')||[];
-  C.acts_today=g('acts_'+TODAY)||[];C.products=[];
+  C.acts_today=g('acts_'+TODAY)||[];
 }
 async function apiPost(path,body){
   if(!UID)return;
@@ -1250,26 +1148,23 @@ const gU=()=>C.user;
 const gSS=()=>({w:!!C.settings?.show_weight,water:!!C.settings?.show_water,cal:!!C.settings?.show_calories,sleep:!!C.settings?.show_sleep});
 const gWL=()=>C.weight_log.map(r=>({weight:r.weight,logged_at:(r.logged_at||'').slice(0,10)}));
 const gSL=()=>C.sleep_log.map(r=>({hours:r.hours,quality:r.quality,logged_at:(r.logged_at||'').slice(0,10)}));
-const gWD=()=>C.water;
-const gCD=()=>C.calories;
+const gWD=()=>C.water;const gCD=()=>C.calories;
 const gActs=()=>C.acts_today.map(a=>({...a,time:(a.scheduled_at||'').slice(11,16)||'00:00',completed:!!a.completed}));
 const gStreak=()=>C.water.streak||0;
 const totalCal=()=>Object.values(gCD()).reduce((a,b)=>a+b,0);
 
-/* ════ NAVIGATION ════ */
+/* ══ NAVIGATION ══ */
 const TABS=['home','track','plan','sleep','progress','profile'];
-let curTab='home',trackTab='water',curScr=null;
-let navHidden=false;
+let curTab='home',trackTab='water',navHidden=false;
 
 function navTo(tab){
-  if(tab===curTab&&!curScr&&!curPushPage)return;
-  if(curScr)closeScr(false);
+  if(tab===curTab&&!curPushPage)return;
   if(curPushPage)popPage(false);
   curTab=tab;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const pg=document.getElementById('p-'+tab);
   if(pg){pg.scrollTop=0;pg.classList.add('active');}
-  TABS.forEach(t=>{const el=document.getElementById('nt-'+t);if(el)el.classList.toggle('on',t===tab);});
+  TABS.forEach(t=>{document.getElementById('nt-'+t)?.classList.toggle('on',t===tab);});
   const renders={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};
   renders[tab]?.();
   tg?.HapticFeedback?.selectionChanged();
@@ -1283,34 +1178,47 @@ function setTTab(t){
   renderTrack(t);
 }
 
-/* ════ PUSH PAGES ════ */
+/* ══ PUSH PAGES ══ */
 let curPushPage=null;
 function pushPage(id){
   curPushPage=id;
   navHidden=true;
-  const nav=document.getElementById('nav');
-  nav?.classList.add('gone');
+  document.getElementById('nav')?.classList.add('gone');
   const pp=document.getElementById(id);
-  if(pp){pp.classList.add('open');pp.scrollTop=0;}
+  if(pp){pp.classList.add('open');pp.scrollTop=0;const body=pp.querySelector('.pp-body');if(body)body.scrollTop=0;}
   _populatePP(id);
   if(tg?.BackButton){tg.BackButton.show();tg.BackButton.onClick(popPage);}
   tg?.HapticFeedback?.impactOccurred('light');
 }
 function popPage(doRender=true){
   if(!curPushPage)return;
-  const pp=document.getElementById(curPushPage);
-  if(pp)pp.classList.remove('open');
-  curPushPage=null;
-  navHidden=false;
-  const nav=document.getElementById('nav');
-  nav?.classList.remove('gone');
+  document.getElementById(curPushPage)?.classList.remove('open');
+  curPushPage=null;navHidden=false;
+  document.getElementById('nav')?.classList.remove('gone');
   const sb=Math.min(Math.max(tg?.safeAreaInset?.bottom??0,0),80);
-  _setNavBot(sb);
+  const nav=document.getElementById('nav');if(nav)nav.style.bottom=(12+sb)+'px';
   if(tg?.BackButton){tg.BackButton.hide();tg.BackButton.offClick(popPage);}
   if(doRender){const renders={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};renders[curTab]?.();}
 }
 function _populatePP(id){
   const u=gU(),ss=gSS();
+  if(id==='pp-weight'){
+    const wl=gWL();const iw=wl.length?wl[wl.length-1].weight:70;
+    _wtInt=Math.round(Math.floor(iw));_wtDec=Math.round((iw-Math.floor(iw))*10);
+    _updateWeightDisplay();
+  }
+  if(id==='pp-sleep'){
+    const sl=gSL();const ih=sl.length?sl[sl.length-1].hours:8;
+    _slH=Math.floor(ih);_slMin=ih%1>=.5?30:0;_sleepQ=3;
+    _updateSleepDisplay();
+    document.querySelectorAll('#seg-sleepq .m3-seg-btn').forEach(b=>b.classList.toggle('on',+b.dataset.q===3));
+  }
+  if(id==='pp-cal'){
+    _calVal=500;_mealType='breakfast';
+    document.getElementById('inp-cal-desc').value='';
+    _updateCalDisplay();
+    document.querySelectorAll('#seg-meal .m3-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.m==='breakfast'));
+  }
   if(id==='pp-pdata'){
     const ni=document.getElementById('inp-pname');if(ni)ni.value=u.name||'';
     const hi=document.getElementById('inp-height');if(hi)hi.value=u.height||'';
@@ -1333,153 +1241,101 @@ function _populatePP(id){
     actStep=1;_actType='run';_actDur=45;
     const ni=document.getElementById('inp-aname');if(ni)ni.value='пробежка';
     document.querySelectorAll('#act-quick .type-card').forEach((c,i)=>c.classList.toggle('on',i===0));
-    document.querySelectorAll('#dur-grid .dur-btn').forEach(b=>b.classList.toggle('on',parseInt(b.textContent)===45||b.textContent==='45 мин'));
+    document.querySelectorAll('#dur-grid .dur-btn').forEach(b=>b.classList.toggle('on',b.textContent==='45 мин'));
     _renderActStep();
   }
 }
 
-/* ════ BOTTOM SHEETS ════ */
-function openScr(id){
-  curScr=id;
-  navHidden=true;
-  const nav=document.getElementById('nav');
-  nav?.classList.add('gone');
-  document.getElementById('scr-overlay')?.classList.add('show');
-  const scr=document.getElementById(id);
-  if(scr)scr.classList.add('open');
-  setTimeout(()=>_populateScr(id),80);
-  if(tg?.BackButton){tg.BackButton.show();tg.BackButton.onClick(closeScr);}
-  tg?.HapticFeedback?.impactOccurred('light');
+/* ══ WEIGHT STEPPER ══ */
+let _wtInt=70,_wtDec=0;
+function _updateWeightDisplay(){
+  const T=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  T('wt-int',_wtInt);T('wt-dec',_wtDec);
+  T('wt-int-disp',_wtInt);T('wt-dec-disp','.'+_wtDec);
 }
-function closeScr(doNav=true){
-  if(!curScr)return;
-  document.getElementById(curScr)?.classList.remove('open');
-  curScr=null;
-  navHidden=false;
-  document.getElementById('scr-overlay')?.classList.remove('show');
-  const nav=document.getElementById('nav');
-  nav?.classList.remove('gone');
-  const sb=Math.min(Math.max(tg?.safeAreaInset?.bottom??0,0),80);
-  _setNavBot(sb);
-  if(tg?.BackButton){tg.BackButton.hide();tg.BackButton.offClick(closeScr);}
-}
-function _populateScr(id){
-  if(id==='scr-weight')requestAnimationFrame(()=>initWeightPicker());
-  if(id==='scr-sleep')requestAnimationFrame(()=>initSleepPicker());
+function stepW(part,dir){
+  if(part==='int'){_wtInt=Math.max(30,Math.min(250,_wtInt+dir));}
+  else{_wtDec=(_wtDec+dir+10)%10;}
+  _updateWeightDisplay();
+  tg?.HapticFeedback?.selectionChanged();
 }
 
-/* ════ WHEEL PICKER ════ */
-const PKR={};
-const IH=40;
-function mkPicker(container,items,initIdx){
-  container.innerHTML='';
-  container.className='wp';
-  container.style.height=(IH*5)+'px';
-  container.innerHTML=`<div class="wp-sel"></div><div class="wp-ft wp-ft-t"></div><div class="wp-ft wp-ft-b"></div><div class="wp-track"></div>`;
-  const track=container.querySelector('.wp-track');
-  let si=Math.max(0,Math.min(initIdx,items.length-1));
-  function renderItems(){
-    let h='<div class="wp-item"></div><div class="wp-item"></div>';
-    items.forEach((it,i)=>h+=`<div class="wp-item${i===si?' sel':''}">${it.l}</div>`);
-    h+='<div class="wp-item"></div><div class="wp-item"></div>';
-    track.innerHTML=h;
-  }
-  renderItems();
-  const yFor=i=>-i*IH;
-  let cy=yFor(si);
-  const setY=(y,anim)=>{track.style.transition=anim?'transform .22s cubic-bezier(.25,.46,.45,.94)':'none';track.style.transform=`translateY(${y}px)`;};
-  setY(cy,false);
-  const clampY=y=>Math.max(-(items.length-1)*IH,Math.min(0,y));
-  const updHL=()=>{Array.from(track.children).slice(2,items.length+2).forEach((el,i)=>{el.classList.toggle('sel',i===si);el.style.fontSize=i===si?'22px':'17px';});};
-  let sy=null,so,lv=0,lt=0;
-  container.addEventListener('pointerdown',e=>{sy=e.clientY;so=cy;lv=0;lt=Date.now();track.style.transition='none';container.setPointerCapture(e.pointerId);e.preventDefault();},{passive:false});
-  container.addEventListener('pointermove',e=>{if(sy===null)return;const now=Date.now(),dt=Math.max(1,now-lt);lv=(e.clientY-sy)/Math.max(1,dt);lt=now;cy=clampY(so+(e.clientY-sy));track.style.transform=`translateY(${cy}px)`;const ni=Math.max(0,Math.min(Math.round(-cy/IH),items.length-1));if(ni!==si){si=ni;updHL();}},{passive:false});
-  function snap(){if(sy===null)return;sy=null;si=Math.max(0,Math.min(Math.round(-(cy+lv*60)/IH),items.length-1));cy=yFor(si);setY(cy,true);updHL();tg?.HapticFeedback?.selectionChanged();}
-  container.addEventListener('pointerup',snap);container.addEventListener('pointercancel',snap);
-  return{get:()=>items[si],setIdx(i){si=Math.max(0,Math.min(i,items.length-1));cy=yFor(si);setY(cy,false);updHL();}};
+/* ══ SLEEP STEPPER ══ */
+let _slH=8,_slMin=0,_sleepQ=3;
+function _updateSleepDisplay(){
+  const e=document.getElementById('sl-val-disp');if(e)e.textContent=_slH;
+  const hd=document.getElementById('sl-h-disp');if(hd)hd.textContent=_slH;
+  const m0=document.getElementById('sl-m0'),m30=document.getElementById('sl-m30');
+  if(m0){m0.classList.toggle('on',_slMin===0);m0.classList.toggle('off',_slMin!==0);}
+  if(m30){m30.classList.toggle('on',_slMin===30);m30.classList.toggle('off',_slMin!==30);}
+}
+function stepSl(part,dir){
+  if(part==='h'){_slH=Math.max(1,Math.min(20,_slH+dir));}
+  _updateSleepDisplay();
+  tg?.HapticFeedback?.selectionChanged();
+}
+function setSleepMin(m){_slMin=m;_updateSleepDisplay();}
+function setSleepQ(q){_sleepQ=q;document.querySelectorAll('#seg-sleepq .m3-seg-btn').forEach(b=>b.classList.toggle('on',+b.dataset.q===q));}
+
+/* ══ CAL STEPPER ══ */
+let _calVal=500;
+function _updateCalDisplay(){
+  const e=document.getElementById('cal-preview');if(e)e.textContent=_calVal;
+  const d=document.getElementById('cal-step-disp');if(d)d.textContent=_calVal;
+}
+function stepCal(delta){_calVal=Math.max(50,Math.min(3000,_calVal+delta));_updateCalDisplay();tg?.HapticFeedback?.selectionChanged();}
+function setCalVal(v){
+  _calVal=v;_updateCalDisplay();
+  document.querySelectorAll('.dur-grid .dur-btn').forEach(b=>b.classList.toggle('on',parseInt(b.textContent)===v));
+  tg?.HapticFeedback?.selectionChanged();
 }
 
-function initWeightPicker(){
-  const wl=gWL();const iw=wl.length?wl[wl.length-1].weight:70;
-  const ii=Math.floor(iw),id=Math.round((iw-ii)*10);
-  const intItems=Array.from({length:171},(_,i)=>({l:String(30+i),v:30+i}));
-  const decItems=Array.from({length:10},(_,i)=>({l:'.'+i,v:i/10}));
-  const wrap=document.getElementById('wp-weight-wrap');
-  wrap.innerHTML='<div class="wp-col" style="flex:3"><div class="wp-lbl">кг</div><div id="wpi-i"></div></div><div class="wp-sep"> </div><div class="wp-col" style="flex:1;min-width:80px"><div class="wp-lbl">.X</div><div id="wpi-d"></div></div>';
-  PKR.wi=mkPicker(document.getElementById('wpi-i'),intItems,ii-30);
-  PKR.wd=mkPicker(document.getElementById('wpi-d'),decItems,id);
-}
-function initSleepPicker(){
-  const sl=gSL();const ih=sl.length?sl[sl.length-1].hours:8;
-  const ihh=Math.floor(ih),idd=ih-ihh>=0.5?1:0;
-  const hItems=Array.from({length:14},(_,i)=>({l:String(1+i),v:1+i}));
-  const dItems=[{l:'.0',v:0},{l:'.5',v:.5}];
-  const wrap=document.getElementById('wp-sleep-wrap');
-  wrap.innerHTML='<div class="wp-col" style="flex:3"><div class="wp-lbl">часов</div><div id="wps-h"></div></div><div class="wp-col" style="flex:1;min-width:70px"><div class="wp-lbl">.X</div><div id="wps-d"></div></div>';
-  PKR.sh=mkPicker(document.getElementById('wps-h'),hItems,Math.max(0,ihh-1));
-  PKR.sd=mkPicker(document.getElementById('wps-d'),dItems,idd);
+/* ══ OTHER SETTERS ══ */
+let _mealType='breakfast',_gender='male';
+function setMeal(m){_mealType=m;document.querySelectorAll('#seg-meal .m3-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.m===m));}
+function setGender(g){_gender=g;document.querySelectorAll('#seg-gender .m3-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.g===g));}
+function toggleSett(key){
+  const ss=gSS();const nv=!ss[key];
+  const fm={w:'show_weight',water:'show_water',cal:'show_calories',sleep:'show_sleep'};
+  if(fm[key])C.settings[fm[key]]=nv?1:0;
+  const tog=document.getElementById('tog-'+key);if(tog){tog.classList.toggle('on',nv);tog.classList.toggle('off',!nv);}
+  toast(nv?'показывается':'скрыто');
+  apiPost('/api/settings',{[fm[key]]:nv?1:0});
 }
 
-/* ════ HELPERS ════ */
-const $=id=>document.getElementById(id);
-const T=(id,v)=>{const e=$(id);if(e)e.textContent=v;};
-const H=(id,v)=>{const e=$(id);if(e)e.innerHTML=v;};
-function dts(){const n=new Date(),y=n.getMonth()>=5?n.getFullYear()+1:n.getFullYear();return Math.ceil((new Date(y,5,1)-n)/86400000);}
-function pD(n){const a=Math.abs(n)%100;if(a>=11&&a<=19)return'дней';if(a%10===1)return'день';if(a%10>=2&&a%10<=4)return'дня';return'дней';}
-function fmtD(s){if(!s)return'—';try{const d=new Date(s+'T00:00:00');const m=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];return d.getDate()+' '+m[d.getMonth()];}catch{return s;}}
-function fmtMD(s){try{const d=new Date(s+'T00:00:00');return(d.getMonth()+1)+'/'+(d.getDate());}catch{return'';}}
-function qIco(q){return['','😫','😴','😑','🙂','🌟'][q]||'😑';}
-const ACT_ICO={run:'🏃',walk:'🚶',bike:'🚴',gym:'💪',yoga:'🧘',swim:'🏊',other:'✨'};
-const ACT_COL={run:'#FF6B35',walk:'#52C177',bike:'#4EAEE5',gym:'#E91E63',yoga:'#8B7FD4',swim:'#00BCD4',other:'#FFAB40'};
-
-/* ════ ACTIVITY FORM ════ */
+/* ══ ACTIVITY FORM ══ */
 let actStep=1,_actType='run',_actDur=45;
 const ACT_TITLES=['название','когда?','готово!'];
-
 function _renderActStep(){
   [1,2,3].forEach(i=>{
     document.getElementById('act-s'+i)?.classList.toggle('active',i===actStep);
     const pip=document.getElementById('sp'+i);
-    if(pip){
-      pip.classList.toggle('on',i===actStep);
-      pip.classList.toggle('done',i<actStep);
-      if(i<actStep)pip.classList.remove('on');
-    }
+    if(pip){pip.classList.toggle('on',i===actStep);pip.classList.toggle('done',i<actStep);if(i<actStep)pip.classList.remove('on');}
   });
-  T('act-step-title',ACT_TITLES[actStep-1]);
-  const btn=$('act-next-btn');
+  document.getElementById('act-step-title').textContent=ACT_TITLES[actStep-1];
+  const btn=document.getElementById('act-next-btn');
   if(btn)btn.textContent=actStep===3?'✓ добавить в план':'далее →';
-  if(actStep===3)_updateActConfirm();
+  if(actStep===3){
+    const name=document.getElementById('inp-aname')?.value||'—';
+    const time=document.getElementById('inp-atime')?.value||'08:00';
+    const ico={run:'🏃',walk:'🚶',bike:'🚴',gym:'💪',yoga:'🧘',swim:'🏊',other:'✨'}[_actType]||'✨';
+    const ci=document.getElementById('act-confirm-ico');if(ci)ci.textContent=ico;
+    const cn=document.getElementById('act-confirm-name');if(cn)cn.textContent=name;
+    const ct=document.getElementById('act-confirm-time');if(ct)ct.textContent=time+' · '+_actDur+' мин';
+  }
   tg?.HapticFeedback?.selectionChanged();
 }
-function _updateActConfirm(){
-  const name=$('inp-aname')?.value||'—';
-  const time=$('inp-atime')?.value||'08:00';
-  const ico=ACT_ICO[_actType]||'✨';
-  if($('act-confirm-ico'))$('act-confirm-ico').textContent=ico;
-  if($('act-confirm-name'))$('act-confirm-name').textContent=name;
-  if($('act-confirm-time'))$('act-confirm-time').textContent=time+' · '+_actDur+' мин';
-}
-function actBackOrPop(){
-  if(actStep>1){actStep--;_renderActStep();}
-  else{popPage();}
-}
+function actBackOrPop(){if(actStep>1){actStep--;_renderActStep();}else popPage();}
 function actStepNext(){
-  if(actStep===1){
-    const name=$('inp-aname')?.value?.trim();
-    if(!name){toast('введи название');return;}
-    actStep=2;_renderActStep();
-  }else if(actStep===2){
-    actStep=3;_renderActStep();
-  }else{
-    submitAct();
-  }
+  if(actStep===1){if(!(document.getElementById('inp-aname')?.value?.trim())){toast('введи название');return;}actStep=2;_renderActStep();}
+  else if(actStep===2){actStep=3;_renderActStep();}
+  else submitAct();
 }
 function actQuick(name,type,el){
   _actType=type;
   document.querySelectorAll('#act-quick .type-card').forEach(c=>c.classList.remove('on'));
   el?.classList.add('on');
-  const inp=$('inp-aname');if(inp)inp.value=name;
+  const inp=document.getElementById('inp-aname');if(inp)inp.value=name;
 }
 function setDur(val,el){
   _actDur=val;
@@ -1487,113 +1343,74 @@ function setDur(val,el){
   el?.classList.add('on');
 }
 
-/* ════ OTHER SETTERS ════ */
-let _sleepQ=3,_mealType='breakfast',_gender='male';
-function setSleepQ(q){_sleepQ=q;document.querySelectorAll('#seg-sleepq .m3-seg-btn').forEach(b=>b.classList.toggle('on',+b.dataset.q===q));}
-function setMeal(m){_mealType=m;document.querySelectorAll('#seg-meal .m3-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.m===m));}
-function setGender(g){_gender=g;document.querySelectorAll('#seg-gender .m3-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.g===g));}
-function toggleSett(key){
-  const ss=gSS();const nv=!ss[key];
-  const fm={w:'show_weight',water:'show_water',cal:'show_calories',sleep:'show_sleep'};
-  if(fm[key])C.settings[fm[key]]=nv?1:0;
-  const tog=$('tog-'+key);if(tog){tog.classList.toggle('on',nv);tog.classList.toggle('off',!nv);}
-  toast(nv?'показывается':'скрыто');
-  apiPost('/api/settings',{[fm[key]]:nv?1:0});
-}
-
-/* ════ SUBMIT ACTIONS ════ */
+/* ══ SUBMIT ACTIONS ══ */
 let _addWBusy=false;
 async function addW(ml){
   if(_addWBusy)return;_addWBusy=true;
-  C.water.total=(C.water.total||0)+ml;
-  C.water.entries=[...(C.water.entries||[]),ml];
-  renderTrack('water');renderHome();
-  toast('+'+ml+' мл');tg?.HapticFeedback?.impactOccurred('light');
-  apiPost('/api/water',{amount:ml});
-  setTimeout(()=>{_addWBusy=false;},250);
+  C.water.total=(C.water.total||0)+ml;C.water.entries=[...(C.water.entries||[]),ml];
+  renderTrack('water');renderHome();toast('+'+ml+' мл');tg?.HapticFeedback?.impactOccurred('light');
+  apiPost('/api/water',{amount:ml});setTimeout(()=>{_addWBusy=false;},250);
 }
 async function undoW(){
   if(!C.water.entries?.length){toast('нечего отменять');return;}
-  const last=C.water.entries.pop();
-  C.water.total=Math.max(0,(C.water.total||0)-last);
-  renderTrack('water');renderHome();toast('отменено −'+last+' мл');
-  apiPost('/api/water/undo',{});
+  const last=C.water.entries.pop();C.water.total=Math.max(0,(C.water.total||0)-last);
+  renderTrack('water');renderHome();toast('отменено −'+last+' мл');apiPost('/api/water/undo',{});
 }
 async function completeAct(id){
   const a=gActs().find(x=>x.id===id);if(!a)return;
-  const ns=!a.completed;
-  C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:ns?1:0}:x);
-  renderPlan();renderHome();
-  toast(ns?'выполнено':'отменено');
-  tg?.HapticFeedback?.notificationOccurred(ns?'success':'warning');
-  await apiPost(ns?'/api/activity/complete':'/api/activity/uncomplete',{act_id:id});
-  await reload();
+  const ns=!a.completed;C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:ns?1:0}:x);
+  renderPlan();renderHome();toast(ns?'выполнено':'отменено');tg?.HapticFeedback?.notificationOccurred(ns?'success':'warning');
+  await apiPost(ns?'/api/activity/complete':'/api/activity/uncomplete',{act_id:id});await reload();
 }
 async function submitWeight(){
-  const iv=PKR.wi?.get(),dv=PKR.wd?.get();
-  const v=iv&&dv!=null?iv.v+dv.v:null;
-  if(!v||v<30||v>300){toast('выбери вес');return;}
-  closeScr();
+  const v=_wtInt+_wtDec/10;
+  if(v<30||v>300){toast('некорректный вес');return;}
+  popPage();
   C.weight_log=[...(C.weight_log||[]),{weight:v,logged_at:TODAY}];
   if(!C.user.start_weight)C.user.start_weight=v;
-  renderProgress();renderHome();
-  toast('вес '+v.toFixed(1)+' кг сохранён');
-  tg?.HapticFeedback?.notificationOccurred('success');
+  renderProgress();renderHome();toast('вес '+v.toFixed(1)+' кг сохранён');tg?.HapticFeedback?.notificationOccurred('success');
   await apiPost('/api/weight',{weight:v});await reload();
 }
 async function submitSleep(){
-  const hv=PKR.sh?.get(),dv=PKR.sd?.get();
-  const hrs=hv&&dv!=null?hv.v+(dv?.v||0):null;
-  if(!hrs||hrs<.5||hrs>20){toast('выбери часы сна');return;}
-  closeScr();
+  const hrs=_slH+(_slMin/60);
+  popPage();
   C.sleep_log=[...(C.sleep_log||[]),{hours:hrs,quality:_sleepQ,logged_at:TODAY}];
-  renderSleep();renderHome();
-  toast('сон '+hrs+' ч сохранён');
-  tg?.HapticFeedback?.notificationOccurred('success');
+  renderSleep();renderHome();toast('сон '+(_slH+(  _slMin?'.5':''))+' ч сохранён');tg?.HapticFeedback?.notificationOccurred('success');
   await apiPost('/api/sleep',{hours:hrs,quality:_sleepQ});await reload();
 }
 async function submitCal(){
-  const cal=parseInt($('inp-cal')?.value);
-  const desc=$('inp-cal-desc')?.value||'';
-  if(!cal||cal<1){toast('введи калории');return;}
-  closeScr();
-  if(!C.calories)C.calories={};
-  C.calories[_mealType]=(C.calories[_mealType]||0)+cal;
-  renderTrack('cal');renderHome();
-  toast('+'+cal+' ккал');
-  tg?.HapticFeedback?.notificationOccurred('success');
-  await apiPost('/api/calories',{amount:cal,meal_type:_mealType,description:desc});await reload();
+  const desc=document.getElementById('inp-cal-desc')?.value||'';
+  if(!_calVal||_calVal<10){toast('выбери калории');return;}
+  popPage();
+  if(!C.calories)C.calories={};C.calories[_mealType]=(C.calories[_mealType]||0)+_calVal;
+  renderTrack('cal');renderHome();toast('+'+_calVal+' ккал');tg?.HapticFeedback?.notificationOccurred('success');
+  await apiPost('/api/calories',{amount:_calVal,meal_type:_mealType,description:desc});await reload();
 }
 async function submitProfile(){
-  const name=$('inp-pname')?.value?.trim();
-  const height=parseInt($('inp-height')?.value);
-  const age=parseInt($('inp-age')?.value);
+  const name=document.getElementById('inp-pname')?.value?.trim();
+  const height=parseInt(document.getElementById('inp-height')?.value);
+  const age=parseInt(document.getElementById('inp-age')?.value);
   if(!name){toast('введи имя');return;}
-  popPage();
-  C.user={...C.user,name,height:height||0,age:age||0,gender:_gender};
-  renderProfile();renderHome();toast('профиль обновлён');
-  tg?.HapticFeedback?.notificationOccurred('success');
+  popPage();C.user={...C.user,name,height:height||0,age:age||0,gender:_gender};
+  renderProfile();renderHome();toast('профиль обновлён');tg?.HapticFeedback?.notificationOccurred('success');
   await apiPost('/api/profile',{name,height:height||0,age:age||0,gender:_gender});await reload();
 }
 async function submitGoals(){
-  const gw=parseFloat($('inp-gw')?.value)||0;
-  const gwat=parseInt($('inp-gwat')?.value)||2000;
-  const gcal=parseInt($('inp-gcal')?.value)||2000;
-  popPage();
-  C.user={...C.user,goal_weight:gw,water_goal:gwat,cal_goal:gcal};
-  renderProfile();renderHome();toast('цели обновлены');
-  tg?.HapticFeedback?.notificationOccurred('success');
+  const gw=parseFloat(document.getElementById('inp-gw')?.value)||0;
+  const gwat=parseInt(document.getElementById('inp-gwat')?.value)||2000;
+  const gcal=parseInt(document.getElementById('inp-gcal')?.value)||2000;
+  popPage();C.user={...C.user,goal_weight:gw,water_goal:gwat,cal_goal:gcal};
+  renderProfile();renderHome();toast('цели обновлены');tg?.HapticFeedback?.notificationOccurred('success');
   await apiPost('/api/goals',{goal_weight:gw,water_goal:gwat,cal_goal:gcal});await reload();
 }
 async function submitAct(){
-  const name=$('inp-aname')?.value?.trim();
-  const time=$('inp-atime')?.value||'08:00';
+  const name=document.getElementById('inp-aname')?.value?.trim();
+  const time=document.getElementById('inp-atime')?.value||'08:00';
   if(!name){toast('введи название');return;}
   popPage();
   const fid=Date.now();
   C.acts_today=[...(C.acts_today||[]),{id:fid,name,type:_actType,scheduled_at:`${TODAY}T${time}:00`,duration:_actDur,completed:0}];
-  renderPlan();renderHome();toast(name+' добавлено 🎉');
-  tg?.HapticFeedback?.notificationOccurred('success');
+  renderPlan();renderHome();toast(name+' добавлено 🎉');tg?.HapticFeedback?.notificationOccurred('success');
   await apiPost('/api/activity/create',{name,type:_actType,time,duration:_actDur});await reload();
 }
 function confirmReset(){
@@ -1603,33 +1420,33 @@ function confirmReset(){
   popPage();renderHome();renderProfile();toast('данные сброшены');
 }
 
-/* ════ ACTIVITY STATUS ════ */
+/* ══ HELPERS ══ */
+const ACT_ICO={run:'🏃',walk:'🚶',bike:'🚴',gym:'💪',yoga:'🧘',swim:'🏊',other:'✨'};
+const ACT_COL={run:'#FF6B35',walk:'#52C177',bike:'#4EAEE5',gym:'#E91E63',yoga:'#8B7FD4',swim:'#00BCD4',other:'#FFAB40'};
+const $=id=>document.getElementById(id);
+const T=(id,v)=>{const e=$(id);if(e)e.textContent=v;};
+const H=(id,v)=>{const e=$(id);if(e)e.innerHTML=v;};
+function dts(){const n=new Date(),y=n.getMonth()>=5?n.getFullYear()+1:n.getFullYear();return Math.ceil((new Date(y,5,1)-n)/86400000);}
+function pD(n){const a=Math.abs(n)%100;if(a>=11&&a<=19)return'дней';if(a%10===1)return'день';if(a%10>=2&&a%10<=4)return'дня';return'дней';}
+function fmtD(s){if(!s)return'—';try{const d=new Date(s+'T00:00:00');const m=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];return d.getDate()+' '+m[d.getMonth()];}catch{return s;}}
+function fmtMD(s){try{const d=new Date(s+'T00:00:00');return(d.getMonth()+1)+'/'+(d.getDate());}catch{return'';}}
+function qIco(q){return['','😫','😴','😑','🙂','🌟'][q]||'😑';}
 function actStatus(a){
   const now=new Date(),[hh,mm]=(a.time||'00:00').split(':').map(Number);
-  const st=new Date();st.setHours(hh,mm,0,0);
-  const en=new Date(st.getTime()+(a.duration||30)*60000);
-  if(a.completed)return{s:'done',l:'выполнено'};
-  if(now>en)return{s:'late',l:'просрочено'};
+  const st=new Date();st.setHours(hh,mm,0,0);const en=new Date(st.getTime()+(a.duration||30)*60000);
+  if(a.completed)return{s:'done',l:'выполнено'};if(now>en)return{s:'late',l:'просрочено'};
   if(now>=st&&now<=en){const r=Math.round((en-now)/60000);return{s:'now',l:'идёт · ещё '+r+' мин',p:(now-st)/(en-st)};}
-  const df=Math.round((st-now)/60000);
-  if(df<=30)return{s:'soon',l:'через '+df+' мин'};
-  return{s:'later',l:'в '+a.time};
+  const df=Math.round((st-now)/60000);if(df<=30)return{s:'soon',l:'через '+df+' мин'};return{s:'later',l:'в '+a.time};
 }
 function fmtRange(a){
   const[hh,mm]=(a.time||'00:00').split(':').map(Number);
   const eh=hh+Math.floor((mm+(a.duration||30))/60),em=(mm+(a.duration||30))%60;
   return`${a.time}–${String(eh%24).padStart(2,'0')}:${String(em).padStart(2,'0')}`;
 }
-
-/* ════ TOAST ════ */
 let _tt;
-function toast(msg){
-  const el=$('toast');if(!el)return;
-  el.textContent=msg;el.classList.add('show');
-  clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),1800);
-}
+function toast(msg){const el=$('toast');if(!el)return;el.textContent=msg;el.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),1800);}
 
-/* ════ CHART ════ */
+/* ══ CHART ══ */
 let _chartRaf=null;
 function drawChart(data){
   const canvas=$('wchart');if(!canvas)return;
@@ -1637,49 +1454,40 @@ function drawChart(data){
   _chartRaf=requestAnimationFrame(()=>{
     const dpr=Math.min(window.devicePixelRatio||1,2);
     const containerW=canvas.parentElement.clientWidth||280;
-    // Make chart wider if many data points
-    const W=Math.max(containerW,data&&data.length>5?data.length*52:containerW);
+    const W=Math.max(containerW,data&&data.length>5?data.length*54:containerW);
     const H=90;
-    canvas.width=W*dpr;canvas.height=H*dpr;
-    canvas.style.width=W+'px';canvas.style.height=H+'px';
-    const ctx=canvas.getContext('2d');
-    ctx.scale(dpr,dpr);
+    canvas.width=W*dpr;canvas.height=H*dpr;canvas.style.width=W+'px';canvas.style.height=H+'px';
+    const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
     const cs=getComputedStyle(document.documentElement);
     const sun=cs.getPropertyValue('--sun').trim()||'#FF6B35';
     const hint=cs.getPropertyValue('--hint').trim()||'#A89F90';
-    const bg=cs.getPropertyValue('--bg2').trim()||'#fff';
+    const bg2=cs.getPropertyValue('--bg2').trim()||'#fff';
     ctx.clearRect(0,0,W,H);
-    if(!data||data.length<2){
-      ctx.fillStyle=hint;ctx.font='600 11px Onest,sans-serif';ctx.textAlign='center';ctx.fillText('нет данных',W/2,H/2);return;
-    }
+    if(!data||data.length<2){ctx.fillStyle=hint;ctx.font='600 11px Onest,sans-serif';ctx.textAlign='center';ctx.fillText('нет данных',W/2,H/2);return;}
     const ws=data.map(d=>d.weight);
     const mn=Math.min(...ws)-.3,mx=Math.max(...ws)+.3,rng=mx-mn||1;
     const pl={l:8,r:8,t:18,b:20};
     const xs=(W-pl.l-pl.r)/(data.length-1);
     const yf=w=>pl.t+(1-(w-mn)/rng)*(H-pl.t-pl.b);
     const pts=data.map((d,i)=>[pl.l+i*xs,yf(d.weight)]);
-    // gradient area
     const grad=ctx.createLinearGradient(0,0,0,H);
     grad.addColorStop(0,'rgba(255,107,53,.16)');grad.addColorStop(1,'rgba(255,107,53,0)');
     ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);
     for(let i=0;i<pts.length-1;i++){const cx=(pts[i][0]+pts[i+1][0])/2;ctx.bezierCurveTo(cx,pts[i][1],cx,pts[i+1][1],pts[i+1][0],pts[i+1][1]);}
-    ctx.lineTo(pts[pts.length-1][0],H);ctx.lineTo(pts[0][0],H);ctx.closePath();
-    ctx.fillStyle=grad;ctx.fill();
-    // line
+    ctx.lineTo(pts[pts.length-1][0],H);ctx.lineTo(pts[0][0],H);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
     ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);
     for(let i=0;i<pts.length-1;i++){const cx=(pts[i][0]+pts[i+1][0])/2;ctx.bezierCurveTo(cx,pts[i][1],cx,pts[i+1][1],pts[i+1][0],pts[i+1][1]);}
     ctx.strokeStyle=sun;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.lineCap='round';ctx.stroke();
-    // dots + labels
     pts.forEach((p,i)=>{
       ctx.beginPath();ctx.arc(p[0],p[1],4,0,Math.PI*2);ctx.fillStyle=sun;ctx.fill();
-      ctx.beginPath();ctx.arc(p[0],p[1],2.5,0,Math.PI*2);ctx.fillStyle=bg;ctx.fill();
+      ctx.beginPath();ctx.arc(p[0],p[1],2.5,0,Math.PI*2);ctx.fillStyle=bg2;ctx.fill();
       ctx.fillStyle=sun;ctx.font='700 9px Onest,sans-serif';ctx.textAlign='center';ctx.fillText(data[i].weight,p[0],p[1]-8);
       ctx.fillStyle=hint;ctx.font='700 8px Onest,sans-serif';ctx.fillText(fmtMD(data[i].logged_at),p[0],H-2);
     });
   });
 }
 
-/* ════ RENDERS ════ */
+/* ══ RENDERS ══ */
 function renderHome(){
   const u=gU(),wl=gWL(),sl=gSL(),wd=gWD();
   T('h-name',u.name||'—');
@@ -1697,17 +1505,14 @@ function renderHome(){
   if(sl.length){
     const last=sl[sl.length-1];
     const sqEl=$('arc-sq');if(sqEl)sqEl.innerHTML=Array.from({length:5},(_,i)=>`<div class="sqd${i<last.quality?' on':''}"></div>`).join('');
-    const sp=Math.min(1,last.hours/9);
-    requestAnimationFrame(()=>{const a=$('arc-s');if(a)a.setAttribute('stroke-dashoffset',163.4*(1-sp));});
+    requestAnimationFrame(()=>{const a=$('arc-s');if(a)a.setAttribute('stroke-dashoffset',163.4*(1-Math.min(1,last.hours/9)));});
     T('arc-sh',last.hours.toFixed(1));
   }
   if(wl.length){
     const cw=wl[wl.length-1].weight,sw=u.start_weight||wl[0].weight||cw,gw=u.goal_weight;
     T('h-wcur',cw.toFixed(1));T('h-wgoal',gw?gw.toFixed(1):'—');
-    const tot=Math.abs(sw-gw)||1,lost=sw-cw;
-    const pct=gw?Math.min(100,Math.max(0,Math.round(lost/tot*100))):0;
-    T('h-wpct',pct+'%');
-    requestAnimationFrame(()=>{const b=$('h-wbar');if(b)b.style.width=pct+'%';});
+    const tot=Math.abs(sw-gw)||1,pct=gw?Math.min(100,Math.max(0,Math.round((sw-cw)/tot*100))):0;
+    T('h-wpct',pct+'%');requestAnimationFrame(()=>{const b=$('h-wbar');if(b)b.style.width=pct+'%';});
   }
   const streak=gStreak();
   const sw=$('h-streak-w');if(sw)sw.style.display=streak>=2?'':'none';
@@ -1717,13 +1522,11 @@ function renderHome(){
   if(ps&&pl){
     if(!acts.length){ps.style.display='none';}
     else{
-      ps.style.display='';
-      const nt=new Date();
+      ps.style.display='';const nt=new Date();
       pl.innerHTML=acts.map(a=>{
         const ico=ACT_ICO[a.type]||'✨',col=ACT_COL[a.type]||'#FF9800',done=a.completed;
         const[hh,mm]=(a.time||'00:00').split(':').map(Number);
-        const at=new Date();at.setHours(hh,mm,0,0);
-        const et=new Date(at.getTime()+(a.duration||30)*60000);
+        const at=new Date();at.setHours(hh,mm,0,0);const et=new Date(at.getTime()+(a.duration||30)*60000);
         const ts=`${a.time}–${String(et.getHours()).padStart(2,'0')}:${String(et.getMinutes()).padStart(2,'0')}`;
         const late=!done&&nt>et;
         const badge=done?`<span class="pill p-ok">✓</span>`:late?`<span class="pill p-late">просрочено</span>`:`<span class="pill p-soon">${a.time}</span>`;
@@ -1732,8 +1535,7 @@ function renderHome(){
     }
   }
 }
-
-function renderTrack(tab){if(tab==='water')renderWater();else if(tab==='cal')renderCal();}
+function renderTrack(tab){if(tab==='water')renderWater();else renderCal();}
 function renderWater(){
   const u=gU(),wd=gWD();
   const wt=wd.total||0,wg=u.water_goal||2000,wp=Math.min(100,Math.round(wt/wg*100));
@@ -1752,10 +1554,8 @@ function renderCal(){
   const MEALS=[{k:'breakfast',i:'🌅',n:'завтрак',col:'#FF9800'},{k:'lunch',i:'☀️',n:'обед',col:'#FF6B35'},{k:'dinner',i:'🌙',n:'ужин',col:'#8B7FD4'},{k:'snack',i:'🍑',n:'перекус',col:'#52C177'},{k:'other',i:'🌿',n:'другое',col:'#607D8B'}];
   H('c-meals',MEALS.map(m=>`<div class="mr"><div class="mr-ico" style="background:${m.col}18;color:${m.col}">${m.i}</div><div style="flex:1"><div class="mr-name">${m.n}</div>${!cd[m.k]?`<div class="t5" style="font-size:10px">не записано</div>`:''}</div><div class="mr-kcal" style="${cd[m.k]?'color:var(--cal)':'color:var(--hint)'}">${cd[m.k]||'—'} ${cd[m.k]?'ккал':''}</div></div>`).join(''));
 }
-
 function renderPlan(){
-  const acts=gActs();
-  const now=new Date();
+  const acts=gActs();const now=new Date();
   const mons=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
   T('pl-date','сегодня · '+now.getDate()+' '+mons[now.getMonth()]);
   const done=acts.filter(a=>a.completed).length,total=acts.length;
@@ -1785,26 +1585,19 @@ function renderPlan(){
   }).join('');
 }
 setInterval(()=>{if(curTab==='plan')renderPlan();},30000);
-
 function renderSleep(){
   const sl=gSL();
   if(sl.length){const last=sl[sl.length-1];T('sl-h',last.hours.toFixed(1));T('sl-qico',qIco(last.quality));H('sl-dots',Array.from({length:5},(_,i)=>`<div class="sqd${i<last.quality?' on':''}"></div>`).join(''));}
   else{T('sl-h','—');T('sl-qico','—');H('sl-dots','');}
   const l7=sl.slice(-7).reverse();
   H('sl-hist',l7.length?l7.map(e=>`<div class="hr"><div class="hr-d">${fmtD(e.logged_at)}</div><div style="display:flex;align-items:center;gap:7px;flex:1"><div class="hr-v">${e.hours.toFixed(1)} ч</div><div class="sq">${Array.from({length:5},(_,i)=>`<div class="sqd${i<e.quality?' on':''}"></div>`).join('')}</div></div><div style="font-size:16px">${qIco(e.quality)}</div></div>`).join(''):'<div style="text-align:center;padding:14px;color:var(--hint);font-size:12px;font-weight:600">нет записей</div>');
-  if(l7.length){
-    const ah=+(l7.reduce((a,b)=>a+b.hours,0)/l7.length).toFixed(1);
-    const aq=+(l7.reduce((a,b)=>a+(b.quality||3),0)/l7.length).toFixed(1);
-    T('sl-avg-h',ah);T('sl-avg-q',qIco(Math.round(aq))+' '+aq);
-  }
+  if(l7.length){T('sl-avg-h',+(l7.reduce((a,b)=>a+b.hours,0)/l7.length).toFixed(1));T('sl-avg-q',qIco(Math.round(l7.reduce((a,b)=>a+(b.quality||3),0)/l7.length))+' '+(l7.reduce((a,b)=>a+(b.quality||3),0)/l7.length).toFixed(1));}
 }
-
 function renderProgress(){
   const u=gU(),wl=gWL(),sl=gSL(),wd=gWD(),acts=gActs();
   if(wl.length){
     const cw=wl[wl.length-1].weight,sw=u.start_weight||wl[0].weight||cw,gw=u.goal_weight;
-    T('pr-wcur',cw.toFixed(1));T('pr-wgoal',gw?gw.toFixed(1)+' кг':'—');
-    T('pr-wgoal2',gw?gw.toFixed(1):'—');T('pr-wstart',sw.toFixed(1));
+    T('pr-wcur',cw.toFixed(1));T('pr-wgoal',gw?gw.toFixed(1)+' кг':'—');T('pr-wgoal2',gw?gw.toFixed(1):'—');T('pr-wstart',sw.toFixed(1));
     const tot=Math.abs(sw-(gw||sw))||1,lost=sw-cw;
     const pct=gw?Math.min(100,Math.max(0,Math.round(lost/tot*100))):0;
     T('pr-wpct',pct+'%');T('pr-winfo',`потеряно ${Math.abs(lost).toFixed(1)} кг · осталось ${Math.max(0,cw-(gw||cw)).toFixed(1)} кг`);
@@ -1815,42 +1608,31 @@ function renderProgress(){
       if(rate>.01){const dl=Math.ceil((cw-gw)/rate*7),eta=new Date();eta.setDate(eta.getDate()+dl);const mons=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];T('pr-forecast','прогноз: '+eta.getDate()+' '+mons[eta.getMonth()]+' · темп '+rate.toFixed(2)+' кг/нед');}
     }catch{}}
   }
-  // Show all weight data in chart with scroll
-  const chartData=wl.length>14?wl.slice(-14):wl;
-  setTimeout(()=>drawChart(chartData),50);
+  setTimeout(()=>drawChart(wl.length>14?wl.slice(-14):wl),50);
   T('pw-water',wd.total||0);T('pw-cal',totalCal());
-  if(sl.length)T('pw-sleep',+(sl.slice(-7).reduce((a,b)=>a+b.hours,0)/Math.min(7,sl.length)).toFixed(1));
-  else T('pw-sleep','—');
+  T('pw-sleep',sl.length?+(sl.slice(-7).reduce((a,b)=>a+b.hours,0)/Math.min(7,sl.length)).toFixed(1):'—');
   const l6=wl.slice(-6).reverse();
   H('pr-whist',l6.length?l6.map((e,i)=>{const prev=l6[i+1];const diff=prev?+(e.weight-prev.weight).toFixed(1):0;return`<div class="hr"><div class="hr-d">${fmtD(e.logged_at)}</div><div class="hr-v">${e.weight.toFixed(1)} кг</div>${diff?`<div class="hr-diff ${diff<0?'d-neg':'d-pos'}">${diff>0?'+':''}${diff}</div>`:'<div></div>'}</div>`;}).join(''):'<div style="text-align:center;padding:12px;color:var(--hint);font-size:12px;font-weight:600">нет записей</div>');
-  T('at-t',acts.filter(a=>a.completed).length);
-  T('at-w',+((wd.total||0)/1000).toFixed(1));
-  T('at-s',gStreak());
+  T('at-t',acts.filter(a=>a.completed).length);T('at-w',+((wd.total||0)/1000).toFixed(1));T('at-s',gStreak());
 }
-
 function renderProfile(){
-  const u=gU(),ss=gSS(),wl=gWL();
+  const u=gU(),wl=gWL();
   const av=$('pf-av');if(av)av.textContent=(u.name||'?').charAt(0).toUpperCase();
   T('pf-name',u.name||'—');
   const meta=[];if(u.age)meta.push(u.age+' лет');if(u.height)meta.push(u.height+' см');if(u.gender)meta.push(u.gender==='male'?'♂':'♀');
   T('pf-meta',meta.join(' · ')||'—');
-  T('pf-gw',u.goal_weight?u.goal_weight+' кг':'—');
-  T('pf-pname',u.name||'—');
-  T('pf-height',u.height?u.height+' см':'—');
-  T('pf-age',u.age?u.age+' лет':'—');
-  T('pf-gwater',(u.water_goal||2000)+' мл');
+  T('pf-gw',u.goal_weight?u.goal_weight+' кг':'—');T('pf-pname',u.name||'—');
+  T('pf-height',u.height?u.height+' см':'—');T('pf-age',u.age?u.age+' лет':'—');T('pf-gwater',(u.water_goal||2000)+' мл');
   const bmiRow=$('pf-bmi-row');
   if(u.height&&wl.length){
     const cw=wl[wl.length-1].weight,h2=u.height/100;
-    const bmi=+(cw/h2/h2).toFixed(1);
-    const ideal=+((u.height-100)*.9).toFixed(1);
-    const bmr=Math.round(u.gender==='female'?10*cw+6.25*u.height-5*(u.age||25)-161:10*cw+6.25*u.height-5*(u.age||25)+5);
+    T('pf-bmi',+(cw/h2/h2).toFixed(1));T('pf-ideal',+((u.height-100)*.9).toFixed(1));
+    T('pf-bmr',Math.round(u.gender==='female'?10*cw+6.25*u.height-5*(u.age||25)-161:10*cw+6.25*u.height-5*(u.age||25)+5));
     if(bmiRow)bmiRow.style.display='';
-    T('pf-bmi',bmi);T('pf-ideal',ideal);T('pf-bmr',bmr);
   }else if(bmiRow)bmiRow.style.display='none';
 }
 
-/* ════ INIT ════ */
+/* ══ INIT ══ */
 document.addEventListener('DOMContentLoaded',async()=>{
   const dark=tg?.colorScheme==='dark'||window.matchMedia?.('(prefers-color-scheme:dark)').matches;
   if(dark)document.body.classList.add('tg-dark');
