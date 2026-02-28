@@ -2812,9 +2812,10 @@ def start_flask():
             uid, w = d.get("uid"), d.get("weight")
             if not uid or w is None: return jsonify({"error":"uid and weight required"}),400
             with _db() as c:
+                # Only insert a new log entry — NEVER auto-update start_weight here.
+                # start_weight is set ONLY via /api/profile (pp-start-weight screen).
+                c.execute("INSERT OR IGNORE INTO users (user_id) VALUES (?)", (uid,))
                 c.execute("INSERT INTO weight_log (user_id,weight) VALUES (?,?)",(uid,w))
-                u = c.execute("SELECT start_weight FROM users WHERE user_id=?",(uid,)).fetchone()
-                if u and not u["start_weight"]: c.execute("UPDATE users SET start_weight=? WHERE user_id=?",(w,uid))
             return jsonify({"ok":True})
 
         # ── Активности ────────────────────────────────────────────────
@@ -2832,6 +2833,14 @@ def start_flask():
             uid, aid = d.get("uid"), d.get("act_id")
             if not uid or not aid: return jsonify({"error":"uid and act_id required"}),400
             with _db() as c: c.execute("UPDATE activities SET completed=0,ended_at=NULL WHERE id=? AND user_id=?",(aid,uid))
+            return jsonify({"ok":True})
+
+        @flask_app.route("/api/activity/delete", methods=["POST"])
+        def _delete_act():
+            d = request.json or {}
+            uid, aid = d.get("uid"), d.get("act_id")
+            if not uid or not aid: return jsonify({"error":"uid and act_id required"}),400
+            with _db() as c: c.execute("DELETE FROM activities WHERE id=? AND user_id=?",(aid,uid))
             return jsonify({"ok":True})
 
         # ── Профиль ───────────────────────────────────────────────────
