@@ -51,14 +51,15 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
 #slayer{position:fixed;inset:0;z-index:70;pointer-events:none}
 .scr{
   position:absolute;inset:0;background:var(--bg);
+  overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
+  touch-action:pan-y;scrollbar-width:none;
   pointer-events:none;
   transform:translateY(100%);
   transition:transform .3s cubic-bezier(.4,0,.2,1);
   contain:layout style;
   display:flex;flex-direction:column;
-  height:100%;
-  overflow:hidden;
 }
+.scr::-webkit-scrollbar{display:none}
 .scr.open{transform:none;pointer-events:all}
 /* Заголовок экрана */
 .scr-hdr{
@@ -69,24 +70,27 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
 }
 .scr-title{font-size:22px;font-weight:900;letter-spacing:-.02em}
 .scr-subtitle{font-size:13px;font-weight:600;color:var(--hint);margin-top:3px}
-/* Скроллируемое тело — заполняет всё пространство между хедером и футером */
+/* Скроллируемое тело с кнопкой внутри */
 .scr-body{
   flex:1;
-  overflow-y:auto;
-  overflow-x:hidden;
-  -webkit-overflow-scrolling:touch;
+  overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
   scrollbar-width:none;
-  padding:20px 16px 8px;
+  padding:20px 16px calc(var(--sb)+28px);
+  display:flex;flex-direction:column;
 }
 .scr-body::-webkit-scrollbar{display:none}
-/* Кнопка ПРИБИТА К НИЗУ ЭКРАНА */
+/* Кнопка сохранения — прямо в теле, не фиксированная снизу */
 .scr-foot{
   flex-shrink:0;
-  padding:12px 16px calc(var(--sb)+16px);
+  padding:0 16px calc(var(--sb)+20px);
   background:var(--bg);
-  border-top:1px solid var(--brd);
 }
-.scr-btn-wrap{display:none}
+/* spacer чтобы кнопка не прилипала к контенту */
+.scr-foot-gap{height:20px;flex-shrink:0}
+/* Альтернатива: кнопка сразу под контентом */
+.scr-btn-wrap{
+  margin-top:24px;
+}
 
 /* ── ISLAND NAV ── */
 #nav{
@@ -671,7 +675,6 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
 </div>
 
 <button class="btn btn-p" style="margin:10px 16px 0;width:calc(100% - 32px)" onclick="openScr('scr-weight')">Записать вес</button>
-<button class="btn btn-g" style="margin:8px 16px 0;width:calc(100% - 32px);padding:14px;font-size:14px;font-weight:800;border-radius:18px" onclick="openScr('scr-whist')">📊 История веса</button>
 
 <div class="sec">История веса</div>
 <div class="pad"><div class="card" id="pr-whist" style="padding:10px 12px"></div></div>
@@ -766,16 +769,19 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
     <div class="scr-subtitle">потяни барабан чтобы выбрать</div>
   </div>
   <div class="scr-body">
-    <div class="card" style="padding:20px 16px">
+    <div class="card" style="padding:20px 16px;margin-bottom:0">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 4px">
         <span style="font-size:12px;font-weight:800;color:var(--hint);text-transform:uppercase;letter-spacing:.06em">КГ</span>
         <span style="font-size:12px;font-weight:800;color:var(--hint);text-transform:uppercase;letter-spacing:.06em">.X</span>
       </div>
       <div class="wp-row" id="wp-weight-wrap"></div>
     </div>
-  </div>
-  <div class="scr-foot">
-    <button class="btn btn-p" onclick="submitWeight()">Сохранить вес</button>
+    <div class="scr-btn-wrap">
+      <button class="btn btn-p" onclick="submitWeight()">Сохранить вес</button>
+    </div>
+    <div style="margin-top:12px">
+      <button class="btn btn-g" style="width:100%;padding:14px;border-radius:18px;font-size:14px;font-weight:800" onclick="openScr('scr-whist')">📊 История веса</button>
+    </div>
   </div>
 </div>
 
@@ -799,9 +805,9 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
         <button class="seg-btn" onclick="setSleepQ(5)" data-q="5">🌟</button>
       </div>
     </div>
-  </div>
-  <div class="scr-foot">
-    <button class="btn btn-p" onclick="submitSleep()">Сохранить сон</button>
+    <div class="scr-btn-wrap">
+      <button class="btn btn-p" onclick="submitSleep()">Сохранить сон</button>
+    </div>
   </div>
 </div>
 
@@ -831,9 +837,9 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
         <input class="f-inp f-inp-wide" id="inp-cal-desc" type="text" placeholder="гречка, курица…">
       </div>
     </div>
-  </div>
-  <div class="scr-foot">
-    <button class="btn btn-p" onclick="submitCal()">Добавить</button>
+    <div class="scr-btn-wrap">
+      <button class="btn btn-p" onclick="submitCal()">Добавить</button>
+    </div>
   </div>
 </div>
 
@@ -918,9 +924,9 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
         <button class="seg-btn" onclick="setGender('female')" data-g="female">Женский</button>
       </div>
     </div>
-  </div>
-  <div class="scr-foot">
-    <button class="btn btn-p" onclick="submitProfile()">Сохранить</button>
+    <div class="scr-btn-wrap">
+      <button class="btn btn-p" onclick="submitProfile()">Сохранить</button>
+    </div>
   </div>
 </div>
 
@@ -935,9 +941,9 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
       <div class="f-row"><span class="f-lbl">Норма воды, мл</span><input class="f-inp" id="inp-gwat" type="number" inputmode="numeric" step="100" placeholder="2000"></div>
       <div class="f-row" style="padding-bottom:0"><span class="f-lbl">Норма калорий</span><input class="f-inp" id="inp-gcal" type="number" inputmode="numeric" step="50" placeholder="2000"></div>
     </div>
-  </div>
-  <div class="scr-foot">
-    <button class="btn btn-p" onclick="submitGoals()">Сохранить цели</button>
+    <div class="scr-btn-wrap">
+      <button class="btn btn-p" onclick="submitGoals()">Сохранить цели</button>
+    </div>
   </div>
 </div>
 
