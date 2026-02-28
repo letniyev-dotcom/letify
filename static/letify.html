@@ -3,30 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
+<meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
 <title>letify</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-/* ── RESET ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
 :root{
-  --bg:#FAF7F2;--bg2:#fff;--bg3:rgba(0,0,0,.05);
-  --text:#1C1608;--hint:#A89F90;--brd:rgba(0,0,0,.06);
+  --bg:#FAF7F2;--bg2:#fff;--bg3:rgba(0,0,0,.05);--bg4:rgba(0,0,0,.04);
+  --text:#1C1608;--hint:#A89F90;--brd:rgba(0,0,0,.07);
   --sun:#FF6B35;--sun2:#FFAB40;--water:#4EAEE5;--cal:#F4814A;
   --sleep:#8B7FD4;--green:#52C177;--red:#F45C5C;
-  --r:16px;--r-lg:20px;
-  --st:0px;
-  --sb:0px;
-  --sh:0 2px 12px rgba(0,0,0,.07);
-  --page-bot:calc(80px + var(--sb) + 20px);
-  --page-top:calc(var(--st) + 18px);
+  --r:14px;--r-lg:18px;
+  --st:0px;--sb:0px;
+  --sh:0 1px 8px rgba(0,0,0,.06),0 2px 4px rgba(0,0,0,.04);
+  --page-bot:calc(76px + var(--sb) + 16px);
+  --page-top:calc(var(--st) + 16px);
 }
 html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overscroll-behavior:none;user-select:none}
 
-/* ── LAYOUT ── */
 #root{position:fixed;inset:0}
 #pages{position:absolute;inset:0}
 
@@ -40,266 +35,204 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   padding-top:var(--page-top);
   padding-bottom:var(--page-bot);
   opacity:0;pointer-events:none;
-  transform:translateY(14px);
-  transition:opacity .24s cubic-bezier(.4,0,.2,1),transform .28s cubic-bezier(.4,0,.2,1);
-  contain:layout style;
+  transform:translateY(8px);
+  transition:opacity .2s ease,transform .22s ease;
 }
 .page::-webkit-scrollbar{display:none}
 .page.active{opacity:1;pointer-events:all;transform:none}
 
-/* ══ SCREEN OVERLAY ══ */
-#scr-overlay{
-  position:fixed;inset:0;z-index:69;
-  background:rgba(0,0,0,.5);
-  opacity:0;pointer-events:none;
-  transition:opacity .2s ease;
-  contain:strict;
-}
-#scr-overlay.show{opacity:1;pointer-events:all}
-
-/* ══ SCREEN LAYER — bottom sheet ══ */
-#slayer{position:fixed;inset:0;z-index:70;pointer-events:none}
-.scr{
-  position:absolute;
-  bottom:0;left:0;right:0;
-  max-height:90dvh;
+/* ── PUSH SCREENS (slide from right) ── */
+.push-page{
+  position:fixed;inset:0;z-index:60;
   background:var(--bg);
-  pointer-events:none;
-  transform:translate3d(0,100%,0);
-  transition:transform .26s cubic-bezier(.32,.72,0,1);
-  display:flex;flex-direction:column;
-  border-radius:20px 20px 0 0;
-  overflow:hidden;
-  will-change:transform;
-  backface-visibility:hidden;
-  -webkit-backface-visibility:hidden;
-  contain:layout style;
-}
-.scr.open{transform:translate3d(0,0,0);pointer-events:all}
-
-/* ── Handle ── */
-.scr-handle{
-  width:34px;height:3px;border-radius:99px;
-  background:rgba(0,0,0,.12);
-  margin:7px auto 0;
-  flex-shrink:0;
-}
-.tg-dark .scr-handle{background:rgba(255,255,255,.2)}
-
-/* ── Хедер экрана ── */
-.scr-hdr{
-  flex-shrink:0;
-  background:var(--bg);
-  padding:6px 14px 10px;
-  display:flex;align-items:center;gap:8px;
-}
-.scr-back{
-  width:32px;height:32px;border-radius:10px;
-  background:var(--bg3);
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;flex-shrink:0;
-  border:none;color:var(--text);
-  transition:transform .1s,background .1s;
-  -webkit-tap-highlight-color:transparent;
-}
-.scr-back:active{transform:scale(.92);background:rgba(0,0,0,.1)}
-.scr-hdr-text{flex:1;min-width:0}
-.scr-title{font-size:17px;font-weight:800;letter-spacing:-.02em;line-height:1.2}
-.scr-subtitle{font-size:11px;font-weight:500;color:var(--hint);margin-top:1px}
-
-/* ── Тело экрана ── */
-.scr-body{
   overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
   scrollbar-width:none;
-  padding:2px 14px 6px;
-}
-.scr-body::-webkit-scrollbar{display:none}
-
-/* ── Футер с кнопкой прибит к низу ── */
-.scr-foot{
-  flex-shrink:0;
-  padding:8px 16px calc(max(var(--sb), env(safe-area-inset-bottom, 0px)) + 12px);
-  background:var(--bg);
-}
-.scr-btn-wrap{display:none}
-
-/* ══ MD3 ПОЛЯ ВВОДА ══ */
-.md-field{
-  position:relative;
-  margin-bottom:6px;
-}
-.md-field:last-child{margin-bottom:0}
-.md-input{
-  width:100%;
-  min-height:46px;
-  padding:14px 12px 4px;
-  font-family:inherit;font-size:15px;font-weight:700;
-  color:var(--text);
-  background:var(--bg3);
-  border:none;outline:none;
-  border-radius:12px;
-  -webkit-appearance:none;
-  transition:background .15s,box-shadow .15s;
-  display:block;
-}
-.md-input:focus{
-  background:rgba(255,107,53,.07);
-  box-shadow:0 0 0 2px rgba(255,107,53,.25);
-}
-.tg-dark .md-input:focus{background:rgba(255,107,53,.12)}
-.md-label{
-  position:absolute;top:6px;left:12px;
-  font-size:10px;font-weight:700;color:var(--hint);
-  letter-spacing:.04em;text-transform:uppercase;
+  padding-top:var(--page-top);
+  padding-bottom:calc(var(--sb) + 100px);
+  transform:translateX(100%);
+  transition:transform .28s cubic-bezier(.4,0,.2,1);
   pointer-events:none;
 }
-.md-input::placeholder{color:var(--hint);font-size:14px;font-weight:500}
-/* Числовые поля — текст справа */
-.md-input.num{text-align:right;padding:14px 12px 4px}
+.push-page::-webkit-scrollbar{display:none}
+.push-page.open{transform:translateX(0);pointer-events:all}
 
-/* ══ MD3 КАРТОЧКА ПОЛЕЙ ══ */
-.md-card{
+/* ── BOTTOM SHEETS ── */
+#scr-overlay{
+  position:fixed;inset:0;z-index:69;
+  background:rgba(0,0,0,.45);
+  opacity:0;pointer-events:none;
+  transition:opacity .2s ease;
+}
+#scr-overlay.show{opacity:1;pointer-events:all}
+
+#slayer{position:fixed;inset:0;z-index:70;pointer-events:none}
+.scr{
+  position:absolute;bottom:0;left:0;right:0;
+  max-height:88dvh;
+  background:var(--bg);
+  pointer-events:none;
+  transform:translateY(100%);
+  transition:transform .24s cubic-bezier(.32,.72,0,1);
+  display:flex;flex-direction:column;
+  border-radius:24px 24px 0 0;
+  overflow:hidden;
+}
+.scr.open{transform:translateY(0);pointer-events:all}
+
+.scr-handle{width:36px;height:4px;border-radius:99px;background:rgba(0,0,0,.1);margin:8px auto 0;flex-shrink:0}
+.tg-dark .scr-handle{background:rgba(255,255,255,.18)}
+
+.scr-hdr{
+  flex-shrink:0;background:var(--bg);
+  padding:8px 16px 10px;
+  display:flex;align-items:center;gap:10px;
+}
+.scr-back{
+  width:34px;height:34px;border-radius:10px;
+  background:var(--bg3);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;border:none;color:var(--text);
+  transition:transform .12s,background .12s;
+}
+.scr-back:active{transform:scale(.9)}
+.scr-hdr-text{flex:1;min-width:0}
+.scr-title{font-size:17px;font-weight:800;letter-spacing:-.02em;line-height:1.2}
+.scr-subtitle{font-size:11px;font-weight:500;color:var(--hint);margin-top:1px}
+.scr-body{overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:4px 16px 8px;flex:1}
+.scr-body::-webkit-scrollbar{display:none}
+.scr-foot{flex-shrink:0;padding:8px 16px calc(max(var(--sb),env(safe-area-inset-bottom,0px))+12px);background:var(--bg)}
+
+/* ── PUSH PAGE HEADER ── */
+.pp-hdr{
+  position:sticky;top:0;z-index:5;
+  background:var(--bg);
+  padding:calc(var(--page-top) - 8px) 16px 10px;
+  display:flex;align-items:center;gap:10px;
+  margin-top:calc(0px - var(--page-top) + 8px);
+  border-bottom:1px solid var(--brd);
+  margin-bottom:0;
+}
+.pp-title{font-size:17px;font-weight:800;letter-spacing:-.02em}
+
+/* ── MD3 ПОЛЯ ── */
+.m3-field{
+  position:relative;margin-bottom:8px;
+}
+.m3-field:last-child{margin-bottom:0}
+.m3-input{
+  width:100%;min-height:52px;
+  padding:18px 14px 6px;
+  font-family:inherit;font-size:15px;font-weight:700;
+  color:var(--text);background:var(--bg3);
+  border:none;outline:none;border-radius:12px;
+  -webkit-appearance:none;
+  transition:background .15s,box-shadow .15s;
+}
+.m3-input:focus{background:rgba(255,107,53,.07);box-shadow:0 0 0 2px rgba(255,107,53,.3)}
+.tg-dark .m3-input:focus{background:rgba(255,107,53,.14)}
+.m3-label{
+  position:absolute;top:7px;left:14px;
+  font-size:10px;font-weight:700;color:var(--hint);
+  letter-spacing:.05em;text-transform:uppercase;
+  pointer-events:none;
+}
+.m3-input.num{text-align:right}
+.m3-input::placeholder{color:var(--hint);font-size:14px;font-weight:500}
+
+/* ── MD3 CARD ── */
+.m3-card{
   background:var(--bg2);
   border-radius:16px;
-  padding:10px;
+  padding:12px;
   box-shadow:var(--sh);
   margin-bottom:10px;
 }
-.tg-dark .md-card{
-  background:rgba(255,255,255,.06) !important;
-  border:1px solid rgba(255,255,255,.08);
-  box-shadow:none;
-}
+.tg-dark .m3-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);box-shadow:none}
 
-/* ══ MD3 СЕГМЕНТ ══ */
-.md-seg{
-  display:flex;gap:5px;
-  background:var(--bg3);
-  border-radius:12px;
-  padding:3px;
-}
-.md-seg-btn{
-  flex:1;padding:8px 6px;
-  font-size:12px;font-weight:700;
-  border:none;border-radius:9px;
-  cursor:pointer;font-family:inherit;
-  background:transparent;color:var(--hint);
-  transition:background .14s,color .14s,box-shadow .14s;
-  line-height:1.3;white-space:nowrap;
-  -webkit-tap-highlight-color:transparent;
-}
-.md-seg-btn:active{transform:scale(.97)}
-.md-seg-btn.on{
-  background:var(--bg2);color:var(--text);
-  box-shadow:0 1px 6px rgba(0,0,0,.1);
-}
-.tg-dark .md-seg-btn.on{background:rgba(255,255,255,.18)}
-
-/* ══ MD3 EMOJI СЕГМЕНТ (качество сна) ══ */
-.md-seg-emoji .md-seg-btn{font-size:22px;padding:7px 4px}
-
-/* ══ СЕКЦИЯ ЗАГОЛОВОК ══ */
-.md-sec{
-  font-size:10px;font-weight:700;
-  letter-spacing:.08em;text-transform:uppercase;
+/* ── MD3 SECTION LABEL ── */
+.m3-sec{
+  font-size:11px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;
   color:var(--hint);
-  padding:10px 2px 5px;
+  padding:12px 2px 6px;
 }
 
-/* ══ TOGGLE ROW MD3 ══ */
-.md-tog-row{
-  display:flex;align-items:center;gap:12px;
-  padding:12px 14px;
-  background:var(--bg2);
-  border-radius:14px;
-  margin-bottom:6px;
-  cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
-  transition:opacity .12s;
+/* ── MD3 SEGMENT ── */
+.m3-seg{
+  display:flex;gap:4px;background:var(--bg3);
+  border-radius:12px;padding:3px;margin-bottom:10px;
 }
-.md-tog-row:active{opacity:.7}
-.md-tog-ic{font-size:20px;flex-shrink:0;width:28px;text-align:center}
-.md-tog-lbl{flex:1;font-size:14px;font-weight:700}
-.tg-dark .md-tog-row{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.07)}
-
-/* ══ PICKER ЭКРАНЫ ══ */
-.scr-picker-body{
-  overflow-y:auto;overflow-x:hidden;
-  padding:6px 14px;
+.m3-seg-btn{
+  flex:1;padding:9px 6px;
+  font-size:12px;font-weight:700;
+  border:none;border-radius:9px;cursor:pointer;
+  font-family:inherit;background:transparent;color:var(--hint);
+  transition:background .12s,color .12s,box-shadow .12s;
+  white-space:nowrap;
 }
+.m3-seg-btn:active{transform:scale(.97)}
+.m3-seg-btn.on{background:var(--bg2);color:var(--text);box-shadow:0 1px 5px rgba(0,0,0,.09)}
+.tg-dark .m3-seg-btn.on{background:rgba(255,255,255,.16)}
+.m3-seg-emoji .m3-seg-btn{font-size:22px;padding:7px 4px}
 
 /* ── ISLAND NAV ── */
 #nav{
-  position:fixed;
-  bottom:12px;
-  left:0;right:0;
-  margin:0 auto;
-  width:fit-content;
-  z-index:9999;
-  display:flex;align-items:center;gap:4px;
-  padding:6px;
-  background:rgba(255,255,255,.92);
-  backdrop-filter:blur(30px) saturate(2);
-  -webkit-backdrop-filter:blur(30px) saturate(2);
+  position:fixed;bottom:12px;
+  left:0;right:0;margin:0 auto;
+  width:fit-content;z-index:9999;
+  display:flex;align-items:center;gap:3px;padding:5px;
+  background:rgba(255,255,255,.94);
   border:1px solid rgba(255,255,255,.9);
-  border-radius:26px;
-  box-shadow:0 8px 30px rgba(0,0,0,.13),0 2px 6px rgba(0,0,0,.06);
-  transition:bottom .3s,opacity .3s;
-  transform:none !important;
+  border-radius:24px;
+  box-shadow:0 6px 24px rgba(0,0,0,.12),0 2px 6px rgba(0,0,0,.06);
+  transition:bottom .28s ease,opacity .2s ease;
 }
-.tg-dark #nav{background:rgba(28,22,14,.92);border-color:rgba(255,255,255,.08)}
+.tg-dark #nav{background:rgba(24,18,10,.95);border-color:rgba(255,255,255,.1)}
 #nav.gone{bottom:calc(-100px - var(--sb));opacity:0;pointer-events:none}
 .nt{
-  width:52px;height:52px;border-radius:18px;
+  width:50px;height:50px;border-radius:16px;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
   cursor:pointer;color:var(--hint);
-  transition:color .18s,background .18s,transform .16s cubic-bezier(.34,1.56,.64,1);
-  -webkit-tap-highlight-color:transparent;
+  transition:color .16s,background .16s,transform .14s cubic-bezier(.34,1.4,.64,1);
 }
-.nt.on{color:var(--sun);background:rgba(255,107,53,.11)}
-.nt:active{transform:scale(.88)!important}
+.nt.on{color:var(--sun);background:rgba(255,107,53,.1)}
+.nt:active{transform:scale(.87)}
 .nt svg{width:22px;height:22px;flex-shrink:0}
-.nt-dot{width:4px;height:4px;border-radius:50%;background:var(--sun);opacity:0;transition:opacity .18s;margin-top:-1px}
+.nt-dot{width:4px;height:4px;border-radius:50%;background:var(--sun);opacity:0;transition:opacity .16s}
 .nt.on .nt-dot{opacity:1}
 
 /* ── TYPOGRAPHY ── */
-.t1{font-size:25px;font-weight:900;line-height:1.1;letter-spacing:-.02em}
-.t2{font-size:18px;font-weight:900;letter-spacing:-.015em}
+.t1{font-size:26px;font-weight:900;line-height:1.1;letter-spacing:-.02em}
+.t2{font-size:20px;font-weight:900;letter-spacing:-.02em}
 .t3{font-size:14px;font-weight:800}
 .t5{font-size:12px;font-weight:600;color:var(--hint)}
-.tnum-sm{font-size:24px;font-weight:900;letter-spacing:-.02em}
 .grad{background:linear-gradient(105deg,var(--sun),var(--sun2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 
 /* ── CARDS ── */
 .card{background:var(--bg2);border-radius:var(--r-lg);padding:16px;box-shadow:var(--sh);position:relative;overflow:hidden}
+.tg-dark .card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);box-shadow:none}
 .pad{padding:0 16px}
 .gap{margin-top:10px}
-.sec{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--hint);padding:16px 20px 8px}
+.sec{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--hint);padding:14px 20px 6px}
 
 /* ── LIST TILE ── */
-.lt{
-  display:flex;align-items:center;gap:12px;
-  padding:11px 0;border-bottom:1px solid var(--brd);
-  cursor:pointer;transition:opacity .12s;-webkit-tap-highlight-color:transparent;
-}
+.lt{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--brd);cursor:pointer;transition:opacity .12s}
 .lt:last-child{border-bottom:none;padding-bottom:0}
 .lt:first-child{padding-top:0}
 .lt:active{opacity:.55}
-.lt-ic{
-  width:32px;height:32px;border-radius:10px;background:var(--bg3);
-  display:flex;align-items:center;justify-content:center;color:var(--hint);flex-shrink:0;
-}
+.lt-ic{width:32px;height:32px;border-radius:10px;background:var(--bg3);display:flex;align-items:center;justify-content:center;color:var(--hint);flex-shrink:0}
 .lt-lbl{flex:1;font-size:14px;font-weight:700}
 .lt-val{font-size:12px;color:var(--hint);font-weight:600;flex-shrink:0}
-.lt-chev{color:var(--hint);opacity:.45;flex-shrink:0}
+.lt-chev{color:var(--hint);opacity:.4;flex-shrink:0}
+.tg-dark .lt{border-bottom-color:rgba(255,255,255,.08)}
 
 /* ── PROGRESS BAR ── */
 .pb{height:6px;background:rgba(0,0,0,.06);border-radius:99px;overflow:hidden;margin-top:10px}
-.pbf{height:100%;border-radius:99px;transition:width 1.1s cubic-bezier(.34,1.1,.64,1)}
+.pbf{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.34,1.1,.64,1)}
 .pb-sun{background:linear-gradient(90deg,var(--sun),var(--sun2))}
 .pb-water{background:var(--water)}
 .pb-sleep{background:var(--sleep)}
+.tg-dark .pb{background:rgba(255,255,255,.1)}
 
 /* ── ARC ── */
 .aw{position:relative;display:inline-flex;align-items:center;justify-content:center}
@@ -307,24 +240,26 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 /* ── STAT BOX ── */
 .sb-row{display:flex;gap:8px}
-.sbox{flex:1;background:var(--bg2);border-radius:var(--r);padding:13px;box-shadow:var(--sh);text-align:center}
+.sbox{flex:1;background:var(--bg2);border-radius:var(--r);padding:12px;box-shadow:var(--sh);text-align:center}
+.tg-dark .sbox{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);box-shadow:none}
 .sv{font-size:19px;font-weight:900;margin-bottom:2px}
 .sl{font-size:10px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.06em}
 
 /* ── BANNER ── */
 .banner{background:linear-gradient(130deg,#FF6B35,#FFAB40);border-radius:var(--r-lg);padding:16px;color:#fff;position:relative;overflow:hidden}
-.banner::after{content:'';position:absolute;right:-10px;top:-10px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.1);pointer-events:none}
+.banner::after{content:'';position:absolute;right:-10px;top:-10px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.1);pointer-events:none}
 
-/* ── ACT CARD (plan) ── */
-.ac{background:var(--bg2);border-radius:var(--r);padding:12px 14px;display:flex;align-items:flex-start;gap:10px;box-shadow:var(--sh);margin-bottom:8px;transition:opacity .18s}
+/* ── ACT CARD ── */
+.ac{background:var(--bg2);border-radius:var(--r);padding:12px;display:flex;align-items:flex-start;gap:10px;box-shadow:var(--sh);margin-bottom:8px;transition:opacity .16s}
+.tg-dark .ac{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);box-shadow:none}
 .ac.done{opacity:.42}
-.ac-ico{width:42px;height:42px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.ac-ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 .ac-body{flex:1;min-width:0}
 .ac-name{font-size:14px;font-weight:800;margin-bottom:2px}
 .ac-name.done-text{text-decoration:line-through;opacity:.6}
 .ac-sub{font-size:11px;color:var(--hint);font-weight:600}
 .pill{display:inline-flex;align-items:center;padding:3px 9px;border-radius:99px;font-size:10px;font-weight:800;white-space:nowrap;margin-top:5px}
-.p-ok{background:rgba(82,193,119,.13);color:var(--green)}
+.p-ok{background:rgba(82,193,119,.12);color:var(--green)}
 .p-late{background:rgba(244,92,92,.1);color:var(--red)}
 .p-soon{background:rgba(255,107,53,.1);color:var(--sun)}
 .p-now{background:rgba(78,174,229,.12);color:var(--water)}
@@ -334,8 +269,9 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 /* ── SLEEP DOTS ── */
 .sq{display:flex;gap:3px}
-.sqd{width:15px;height:4px;border-radius:99px;background:rgba(0,0,0,.07);transition:background .3s}
+.sqd{width:14px;height:4px;border-radius:99px;background:rgba(0,0,0,.07);transition:background .3s}
 .sqd.on{background:var(--sleep)}
+.tg-dark .sqd{background:rgba(255,255,255,.14)}
 
 /* ── HISTORY ROW ── */
 .hr{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid var(--brd);gap:10px}
@@ -345,6 +281,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .hr-v{font-size:15px;font-weight:900;flex:1}
 .hr-diff{font-size:11px;font-weight:800}
 .d-neg{color:var(--green)}.d-pos{color:var(--red)}
+.tg-dark .hr{border-bottom-color:rgba(255,255,255,.08)}
 
 /* ── MEAL ROW ── */
 .mr{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--brd)}
@@ -353,45 +290,43 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .mr-ico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
 .mr-name{font-size:13px;font-weight:800}
 .mr-kcal{font-size:13px;font-weight:900;flex-shrink:0}
-
-/* ── PROD ROW ── */
-.pr{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--brd)}
-.pr:last-child{border-bottom:none;padding-bottom:0}
-.pr:first-child{padding-top:0}
-.pr-name{font-size:13px;font-weight:800}
-.pr-meta{font-size:10px;color:var(--hint);font-weight:600}
-.pr-kcal{font-size:15px;font-weight:900;color:var(--cal)}
+.tg-dark .mr{border-bottom-color:rgba(255,255,255,.08)}
 
 /* ── BTNS ── */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;cursor:pointer;font-family:inherit;font-weight:800;transition:transform .1s ease,opacity .12s}
 .btn:active{transform:scale(.96);opacity:.85}
-.btn-p{background:linear-gradient(135deg,var(--sun),var(--sun2));color:#fff;padding:13px 20px;font-size:14px;font-weight:800;border-radius:14px;box-shadow:0 4px 18px rgba(255,107,53,.3),0 2px 6px rgba(255,107,53,.15);width:100%;letter-spacing:.01em}
+.btn-p{background:linear-gradient(135deg,var(--sun),var(--sun2));color:#fff;padding:14px 20px;font-size:15px;border-radius:14px;box-shadow:0 4px 16px rgba(255,107,53,.28);width:100%;letter-spacing:.01em}
 .btn-g{background:var(--bg3);color:var(--text);padding:11px 16px;font-size:13px;border-radius:11px}
-.btn-water{background:rgba(78,174,229,.11);color:var(--water);padding:13px 8px;font-size:13px;border-radius:11px;flex:1}
+.btn-water{background:rgba(78,174,229,.1);color:var(--water);padding:13px 8px;font-size:13px;border-radius:12px;flex:1;font-weight:800}
+.tg-dark .btn-g{background:rgba(255,255,255,.1);color:#fff}
+.tg-dark .btn-water{background:rgba(78,174,229,.18);color:#7ecef5}
 
 /* ── TOGGLE ── */
-.tog{width:48px;height:26px;border-radius:99px;position:relative;cursor:pointer;flex-shrink:0;transition:background .22s}
-.tog::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:3px;transition:left .24s cubic-bezier(.34,1.5,.64,1);box-shadow:0 1px 5px rgba(0,0,0,.16)}
+.tog{width:46px;height:26px;border-radius:99px;position:relative;cursor:pointer;flex-shrink:0;transition:background .2s}
+.tog::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:3px;transition:left .22s cubic-bezier(.34,1.5,.64,1);box-shadow:0 1px 5px rgba(0,0,0,.16)}
 .tog.on{background:var(--sun)}.tog.off{background:rgba(0,0,0,.16)}
-.tog.on::after{left:25px}.tog.off::after{left:3px}
+.tog.on::after{left:23px}.tog.off::after{left:3px}
+.tg-dark .tog.off{background:rgba(255,255,255,.22)}
 
 /* ── TRACK TABS ── */
 .ttabs{display:flex;gap:3px;background:rgba(0,0,0,.05);border-radius:12px;padding:3px}
-.ttab{flex:1;padding:8px 4px;font-size:12px;font-weight:800;border:none;border-radius:9px;cursor:pointer;font-family:inherit;background:transparent;color:var(--hint);transition:background .16s,color .16s,box-shadow .16s}
+.ttab{flex:1;padding:8px 4px;font-size:12px;font-weight:800;border:none;border-radius:9px;cursor:pointer;font-family:inherit;background:transparent;color:var(--hint);transition:background .14s,color .14s,box-shadow .14s}
 .ttab.on{background:var(--bg2);color:var(--text);box-shadow:0 1px 5px rgba(0,0,0,.08)}
+.tg-dark .ttabs{background:rgba(255,255,255,.08)}
+.tg-dark .ttab.on{background:rgba(255,255,255,.16);color:#fff}
+.tg-dark .ttab{color:rgba(255,255,255,.4)}
 
 /* ── AVATAR ── */
-.pav{width:68px;height:68px;border-radius:20px;background:linear-gradient(135deg,var(--sun),var(--sun2));display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;color:#fff;box-shadow:0 6px 22px rgba(255,107,53,.28);flex-shrink:0}
+.pav{width:64px;height:64px;border-radius:20px;background:linear-gradient(135deg,var(--sun),var(--sun2));display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;color:#fff;box-shadow:0 5px 18px rgba(255,107,53,.25);flex-shrink:0}
 
 /* ── TOAST ── */
 #toast{
-  position:fixed;bottom:calc(90px + var(--sb) + 14px);left:50%;
-  transform:translateX(-50%) translateY(10px);
-  background:rgba(28,22,14,.86);color:#fff;
+  position:fixed;bottom:calc(86px + var(--sb) + 12px);left:50%;
+  transform:translateX(-50%) translateY(8px);
+  background:rgba(28,22,14,.88);color:#fff;
   padding:9px 18px;border-radius:99px;font-size:13px;font-weight:800;
   white-space:nowrap;z-index:200;opacity:0;pointer-events:none;
-  backdrop-filter:blur(12px);
-  transition:opacity .2s,transform .2s cubic-bezier(.34,1.2,.64,1);
+  transition:opacity .18s,transform .18s cubic-bezier(.34,1.2,.64,1);
 }
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
@@ -399,133 +334,128 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .wp{position:relative;overflow:hidden;border-radius:12px;background:var(--bg3);cursor:grab;touch-action:none}
 .wp:active{cursor:grabbing}
 .wp-track{position:absolute;top:0;left:0;right:0;will-change:transform}
-.wp-item{height:38px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--hint);pointer-events:none;user-select:none}
+.wp-item{height:40px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:var(--hint);pointer-events:none;user-select:none;transition:color .08s}
 .wp-item.sel{color:var(--text);font-size:22px;font-weight:800}
-.wp-sel{position:absolute;top:50%;left:5px;right:5px;height:38px;transform:translateY(-50%);background:rgba(255,107,53,.09);border-radius:8px;border:1.5px solid rgba(255,107,53,.18);pointer-events:none}
-.wp-ft{position:absolute;left:0;right:0;height:76px;pointer-events:none;z-index:2}
-.wp-ft-t{top:0;background:linear-gradient(to bottom,var(--bg2) 0%,transparent 100%)}
-.wp-ft-b{bottom:0;background:linear-gradient(to top,var(--bg2) 0%,transparent 100%)}
+.wp-sel{position:absolute;top:50%;left:5px;right:5px;height:40px;transform:translateY(-50%);background:rgba(255,107,53,.08);border-radius:8px;border:1.5px solid rgba(255,107,53,.2);pointer-events:none}
+.wp-ft{position:absolute;left:0;right:0;height:80px;pointer-events:none;z-index:2}
+.wp-ft-t{top:0;background:linear-gradient(to bottom,var(--bg3) 0%,transparent 100%)}
+.wp-ft-b{bottom:0;background:linear-gradient(to top,var(--bg3) 0%,transparent 100%)}
 .wp-row{display:flex;justify-content:center;gap:6px;padding:0 2px 6px;align-items:flex-start}
 .wp-col{display:flex;flex-direction:column;align-items:stretch;gap:3px;flex:1;min-width:0}
-.wp-lbl{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--hint);text-align:center}
-.wp-sep{font-size:20px;font-weight:800;color:var(--hint);line-height:38px;align-self:center;padding-top:16px;flex:none}
-
-/* ── FORM FIELDS (screens) ── */
-.f-row{display:flex;align-items:center;justify-content:space-between;padding:0 0 14px}
-.f-lbl{font-size:14px;font-weight:700}
-.f-inp{border:none;outline:none;background:var(--bg3);border-radius:10px;padding:10px 13px;font-family:inherit;font-size:15px;font-weight:800;color:var(--text);text-align:right;width:130px;-webkit-appearance:none}
-.f-inp-wide{width:100%;text-align:left;margin-top:8px;display:block}
-.seg{display:flex;gap:3px;background:rgba(0,0,0,.05);border-radius:10px;padding:3px;margin-top:8px}
-.seg-btn{flex:1;padding:8px 6px;font-size:13px;font-weight:800;border:none;border-radius:7px;cursor:pointer;font-family:inherit;background:transparent;color:var(--hint);transition:background .14s,color .14s;line-height:1.4;white-space:nowrap}
-.seg-btn.on{background:var(--bg2);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.09)}
-/* Эмодзи-версия сегмента */
-/* emoji seg handled by .md-seg-emoji */
-
-/* ── EMPTY ── */
-.empty{text-align:center;padding:44px 24px}
-.empty svg{opacity:.25;margin-bottom:12px}
-.empty-t{font-size:15px;font-weight:800;margin-bottom:5px}
-.empty-s{font-size:12px;color:var(--hint);font-weight:600}
-
-/* ── DARK ── */
-.tg-dark .wp-ft-t{background:linear-gradient(to bottom,var(--bg2) 0%,transparent 100%)}
-.tg-dark .wp-ft-b{background:linear-gradient(to top,var(--bg2) 0%,transparent 100%)}
-.tg-dark .wp-ft-t,.tg-dark .wp-ft-b{opacity:1}
-
-/* Dark: переопределяем переменные */
-.tg-dark{
-  --bg3:rgba(255,255,255,.07);
-  --brd:rgba(255,255,255,.09);
-  --sh:0 2px 14px rgba(0,0,0,.45);
-}
-/* Dark: карточки */
-.tg-dark .card{
-  background:rgba(255,255,255,.06) !important;
-  border:1px solid rgba(255,255,255,.08);
-  box-shadow:none;
-}
-.tg-dark .sbox{
-  background:rgba(255,255,255,.06) !important;
-  border:1px solid rgba(255,255,255,.08);
-}
-/* Dark: список */
-.tg-dark .lt{border-bottom-color:rgba(255,255,255,.07)}
-.tg-dark .lt-ic{background:rgba(255,255,255,.07)}
-/* Dark: сегмент-переключатель */
-.tg-dark .seg{background:rgba(255,255,255,.08)}
-.tg-dark .seg-btn{color:rgba(255,255,255,.45);font-size:13px}
-.tg-dark .seg-btn.on{background:rgba(255,255,255,.16);color:#fff;box-shadow:0 1px 5px rgba(0,0,0,.5)}
-/* Dark: track tabs */
-.tg-dark .ttabs{background:rgba(255,255,255,.07)}
-.tg-dark .ttab.on{background:rgba(255,255,255,.14);color:#fff}
-.tg-dark .ttab{color:rgba(255,255,255,.4)}
-/* Dark: input поля */
-.tg-dark .f-inp{background:rgba(255,255,255,.09);color:#fff;border:1px solid rgba(255,255,255,.1)}
-/* Dark: toggle — самый важный! */
-.tg-dark .tog.on{background:var(--sun) !important}
-.tg-dark .tog.off{background:rgba(255,255,255,.22) !important}
-.tg-dark .tog::after{background:#fff !important}
-/* Dark: progress bar track */
-.tg-dark .pb{background:rgba(255,255,255,.09)}
-/* Dark: water btn */
-.tg-dark .btn-water{background:rgba(78,174,229,.18);color:#7ecef5}
-.tg-dark .btn-g{background:rgba(255,255,255,.09);color:#fff}
-/* Dark: section header */
-.tg-dark .sec{color:rgba(255,255,255,.35)}
-/* Dark: hint text */
-.tg-dark .t5{color:rgba(255,255,255,.4)}
-/* Dark: picker highlight */
-.tg-dark .wp{background:rgba(255,255,255,.07)}
+.wp-lbl{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--hint);text-align:center;margin-bottom:2px}
+.wp-sep{font-size:20px;font-weight:800;color:var(--hint);line-height:40px;align-self:center;padding-top:18px;flex:none}
+.tg-dark .wp-ft-t{background:linear-gradient(to bottom,var(--bg3) 0%,transparent 100%)}
+.tg-dark .wp-ft-b{background:linear-gradient(to top,var(--bg3) 0%,transparent 100%)}
 .tg-dark .wp-item{color:rgba(255,255,255,.3)}
 .tg-dark .wp-item.sel{color:#fff}
 .tg-dark .wp-sel{background:rgba(255,107,53,.15);border-color:rgba(255,107,53,.3)}
-/* Dark: scr body bg */
-.tg-dark .scr{background:var(--bg)}
-.tg-dark .scr-hdr{background:var(--bg);border-bottom-color:rgba(255,255,255,.08)}
-.tg-dark .scr-foot{background:var(--bg);border-top-color:rgba(255,255,255,.08)}
-/* Dark: nav */
-.tg-dark #nav{background:rgba(20,16,10,.94);border-color:rgba(255,255,255,.1)}
-/* Dark: history rows */
-.tg-dark .hr{border-bottom-color:rgba(255,255,255,.07)}
-.tg-dark .mr{border-bottom-color:rgba(255,255,255,.07)}
-.tg-dark .pr{border-bottom-color:rgba(255,255,255,.07)}
-/* Dark: sleep dots */
-.tg-dark .sqd{background:rgba(255,255,255,.15)}
-/* Dark: avatar */
-.tg-dark .scr-hdr{background:var(--bg);border-bottom-color:rgba(255,255,255,.08)}
-/* Dark: activity card */
-.tg-dark .ac{background:rgba(255,255,255,.06) !important;border:1px solid rgba(255,255,255,.07)}
-/* Dark: пустой экран */
-.tg-dark .empty svg{opacity:.15}
 
-/* ── ANIMATIONS ── */
-@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-.page.active .reveal{animation:fu .28s cubic-bezier(.4,0,.2,1) both}
-@keyframes stepIn{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
-@keyframes stepOut{from{opacity:1;transform:none}to{opacity:0;transform:translateX(-28px)}}
-
-/* ── MULTI-STEP ACTIVITY ── */
-.act-step{display:none}
-.act-step.active{display:block;animation:stepIn .28s cubic-bezier(.4,0,.2,1) both}
-.step-ind{display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 0 20px}
-.step-pip{width:8px;height:8px;border-radius:50%;background:var(--bg3);transition:all .3s}
-.step-pip.on{width:22px;border-radius:4px;background:var(--sun)}
-.step-pip.done{background:var(--green)}
-.act-q{font-size:19px;font-weight:800;line-height:1.2;margin-bottom:3px;letter-spacing:-.02em}
-.act-hint{font-size:12px;color:var(--hint);font-weight:500;margin-bottom:14px}
-/* Type grid */
-.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:4px}
+/* ── TYPE GRID (activity) ── */
+.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
 .type-card{
-  padding:11px 10px;border-radius:12px;border:2px solid transparent;
+  padding:14px 10px;border-radius:14px;border:2px solid transparent;
   background:var(--bg3);cursor:pointer;text-align:center;
   transition:all .14s ease;
 }
 .type-card:active{transform:scale(.97)}
 .type-card.on{background:rgba(255,107,53,.08);border-color:var(--sun)}
-.type-card-ico{font-size:24px;margin-bottom:3px;line-height:1}
+.type-card-ico{font-size:28px;margin-bottom:4px;line-height:1}
 .type-card-lbl{font-size:12px;font-weight:700;color:var(--text)}
 .tg-dark .type-card{background:rgba(255,255,255,.07)}
-.tg-dark .type-card.on{background:rgba(255,107,53,.15)}
+.tg-dark .type-card.on{background:rgba(255,107,53,.16)}
+
+/* ── DURATION GRID ── */
+.dur-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:4px}
+.dur-btn{
+  padding:10px 6px;border-radius:10px;border:2px solid transparent;
+  background:var(--bg3);cursor:pointer;text-align:center;
+  font-size:12px;font-weight:800;color:var(--hint);
+  font-family:inherit;
+  transition:all .12s ease;
+}
+.dur-btn:active{transform:scale(.95)}
+.dur-btn.on{background:rgba(255,107,53,.08);border-color:var(--sun);color:var(--sun)}
+.tg-dark .dur-btn{background:rgba(255,255,255,.07)}
+.tg-dark .dur-btn.on{background:rgba(255,107,53,.18)}
+
+/* ── TIME INPUT ── */
+.time-input-wrap{
+  background:var(--bg3);border-radius:12px;
+  padding:14px 16px;
+  display:flex;align-items:center;justify-content:center;
+}
+.time-input{
+  font-family:'Onest',sans-serif;
+  font-size:32px;font-weight:900;letter-spacing:-.02em;
+  color:var(--text);
+  background:transparent;border:none;outline:none;
+  -webkit-appearance:none;
+  text-align:center;
+  width:100%;
+  cursor:pointer;
+}
+.time-input::-webkit-calendar-picker-indicator{opacity:0;position:absolute}
+
+/* ── STEP INDICATOR (activity) ── */
+.step-ind{display:flex;align-items:center;gap:6px;margin-bottom:20px}
+.step-pip{width:8px;height:8px;border-radius:50%;background:var(--bg3);transition:all .25s ease}
+.step-pip.on{width:22px;border-radius:4px;background:var(--sun)}
+.step-pip.done{background:var(--green);width:8px;border-radius:50%}
+
+/* ── ACTIVITY STEPS ── */
+.act-step{display:none}
+.act-step.active{display:block}
+.act-q{font-size:19px;font-weight:800;line-height:1.2;margin-bottom:4px;letter-spacing:-.02em}
+.act-hint{font-size:12px;color:var(--hint);font-weight:500;margin-bottom:16px}
+
+/* ── TOGGLE ROW ── */
+.m3-tog-row{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 14px;background:var(--bg2);
+  border-radius:14px;margin-bottom:6px;cursor:pointer;
+  transition:opacity .12s;
+}
+.m3-tog-row:active{opacity:.7}
+.m3-tog-ic{font-size:20px;flex-shrink:0;width:26px;text-align:center}
+.m3-tog-lbl{flex:1;font-size:14px;font-weight:700}
+.tg-dark .m3-tog-row{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08)}
+
+/* ── CHART SCROLL ── */
+.chart-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin:0 -4px;padding:0 4px}
+.chart-scroll::-webkit-scrollbar{display:none}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:40px 20px}
+.empty svg{opacity:.22;margin-bottom:12px}
+.empty-t{font-size:15px;font-weight:800;margin-bottom:5px}
+.empty-s{font-size:12px;color:var(--hint);font-weight:600}
+
+/* ── DARK OVERRIDES ── */
+.tg-dark{
+  --bg3:rgba(255,255,255,.07);
+  --bg4:rgba(255,255,255,.05);
+  --brd:rgba(255,255,255,.09);
+  --sh:0 2px 12px rgba(0,0,0,.4);
+}
+.tg-dark .push-page{background:var(--bg)}
+.tg-dark .scr{background:var(--bg)}
+.tg-dark .scr-hdr,.tg-dark .scr-foot{background:var(--bg)}
+.tg-dark .pb{background:rgba(255,255,255,.1)}
+.tg-dark .wp{background:rgba(255,255,255,.08)}
+.tg-dark .sec{color:rgba(255,255,255,.35)}
+.tg-dark .t5{color:rgba(255,255,255,.4)}
+.tg-dark #nav{background:rgba(20,14,8,.96);border-color:rgba(255,255,255,.1)}
+.tg-dark .empty svg{opacity:.15}
+.tg-dark .lt-ic{background:rgba(255,255,255,.08)}
+.tg-dark .time-input{color:#fff}
+.tg-dark .ac-bar{background:rgba(255,255,255,.1)}
+.tg-dark .pp-hdr{background:var(--bg);border-bottom-color:rgba(255,255,255,.08)}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.page.active .card,.page.active .sbox,.page.active .banner,.page.active .ac{animation:fadeUp .22s ease both}
+@keyframes stepIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+.act-step.active{animation:stepIn .2s ease both}
 </style>
 </head>
 <body>
@@ -534,11 +464,9 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 <!-- ══════════ HOME ══════════ -->
 <div class="page active" id="p-home">
-<div class="reveal">
-
-<div class="pad" style="display:flex;align-items:flex-start;justify-content:space-between">
+<div class="pad" style="display:flex;align-items:flex-start;justify-content:space-between;padding-top:2px">
   <div>
-    <div class="t1">Привет, <span class="grad" id="h-name">…</span></div>
+    <div class="t1">привет, <span class="grad" id="h-name">…</span></div>
     <div class="t5" style="margin-top:3px" id="h-date">загружается…</div>
   </div>
   <div style="text-align:right;padding-top:3px">
@@ -559,44 +487,41 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 <div class="pad gap">
 <div class="card" style="padding:16px 6px 12px">
   <div style="display:flex;justify-content:space-around;align-items:center">
-    <!-- water -->
     <div style="text-align:center;cursor:pointer" onclick="navTo('track')">
       <div class="aw">
-        <svg width="72" height="72" viewBox="0 0 72 72">
-          <circle cx="36" cy="36" r="28" fill="none" stroke="rgba(78,174,229,.15)" stroke-width="5.5"/>
-          <circle cx="36" cy="36" r="28" fill="none" stroke="var(--water)" stroke-width="5.5"
-            stroke-linecap="round" stroke-dasharray="175.9" id="arc-w" stroke-dashoffset="175.9"
-            transform="rotate(-90 36 36)" style="transition:stroke-dashoffset 1s cubic-bezier(.34,1.1,.64,1)"/>
+        <svg width="68" height="68" viewBox="0 0 68 68">
+          <circle cx="34" cy="34" r="26" fill="none" stroke="rgba(78,174,229,.15)" stroke-width="5"/>
+          <circle cx="34" cy="34" r="26" fill="none" stroke="var(--water)" stroke-width="5"
+            stroke-linecap="round" stroke-dasharray="163.4" id="arc-w" stroke-dashoffset="163.4"
+            transform="rotate(-90 34 34)" style="transition:stroke-dashoffset .9s cubic-bezier(.34,1.1,.64,1)"/>
         </svg>
-        <div class="ai"><div style="font-size:14px;font-weight:900;color:var(--water)" id="arc-wpct">0%</div></div>
+        <div class="ai"><div style="font-size:13px;font-weight:900;color:var(--water)" id="arc-wpct">0%</div></div>
       </div>
       <div style="font-size:11px;font-weight:900;margin-top:4px" id="arc-wml">0</div>
       <div class="t5" style="font-size:10px">мл</div>
     </div>
-    <!-- cal -->
     <div style="text-align:center;cursor:pointer" onclick="navTo('track')">
       <div class="aw">
-        <svg width="86" height="86" viewBox="0 0 86 86">
-          <circle cx="43" cy="43" r="35" fill="none" stroke="rgba(244,129,74,.15)" stroke-width="6.5"/>
-          <circle cx="43" cy="43" r="35" fill="none" stroke="var(--cal)" stroke-width="6.5"
-            stroke-linecap="round" stroke-dasharray="219.9" id="arc-c" stroke-dashoffset="219.9"
-            transform="rotate(-90 43 43)" style="transition:stroke-dashoffset 1s cubic-bezier(.34,1.1,.64,1)"/>
+        <svg width="82" height="82" viewBox="0 0 82 82">
+          <circle cx="41" cy="41" r="33" fill="none" stroke="rgba(244,129,74,.15)" stroke-width="6"/>
+          <circle cx="41" cy="41" r="33" fill="none" stroke="var(--cal)" stroke-width="6"
+            stroke-linecap="round" stroke-dasharray="207.3" id="arc-c" stroke-dashoffset="207.3"
+            transform="rotate(-90 41 41)" style="transition:stroke-dashoffset .9s cubic-bezier(.34,1.1,.64,1)"/>
         </svg>
-        <div class="ai"><div style="font-size:16px;font-weight:900;color:var(--cal)" id="arc-cpct">0%</div></div>
+        <div class="ai"><div style="font-size:15px;font-weight:900;color:var(--cal)" id="arc-cpct">0%</div></div>
       </div>
       <div style="font-size:13px;font-weight:900;margin-top:4px" id="arc-cval">0</div>
       <div class="t5" style="font-size:10px">ккал</div>
     </div>
-    <!-- sleep -->
     <div style="text-align:center;cursor:pointer" onclick="navTo('sleep')">
       <div class="aw">
-        <svg width="72" height="72" viewBox="0 0 72 72">
-          <circle cx="36" cy="36" r="28" fill="none" stroke="rgba(139,127,212,.15)" stroke-width="5.5"/>
-          <circle cx="36" cy="36" r="28" fill="none" stroke="var(--sleep)" stroke-width="5.5"
-            stroke-linecap="round" stroke-dasharray="175.9" id="arc-s" stroke-dashoffset="175.9"
-            transform="rotate(-90 36 36)" style="transition:stroke-dashoffset 1s cubic-bezier(.34,1.1,.64,1)"/>
+        <svg width="68" height="68" viewBox="0 0 68 68">
+          <circle cx="34" cy="34" r="26" fill="none" stroke="rgba(139,127,212,.15)" stroke-width="5"/>
+          <circle cx="34" cy="34" r="26" fill="none" stroke="var(--sleep)" stroke-width="5"
+            stroke-linecap="round" stroke-dasharray="163.4" id="arc-s" stroke-dashoffset="163.4"
+            transform="rotate(-90 34 34)" style="transition:stroke-dashoffset .9s cubic-bezier(.34,1.1,.64,1)"/>
         </svg>
-        <div class="ai"><div style="font-size:14px;font-weight:900;color:var(--sleep)" id="arc-sh">—</div></div>
+        <div class="ai"><div style="font-size:13px;font-weight:900;color:var(--sleep)" id="arc-sh">—</div></div>
       </div>
       <div class="sq" id="arc-sq" style="justify-content:center;margin-top:4px"></div>
       <div class="t5" style="font-size:10px;margin-top:2px">часов</div>
@@ -609,9 +534,9 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 <div class="card" style="cursor:pointer" onclick="navTo('progress')">
   <div style="display:flex;align-items:center;justify-content:space-between">
     <div>
-      <div class="t5" style="margin-bottom:3px">Вес</div>
+      <div class="t5" style="margin-bottom:3px">вес</div>
       <div style="display:flex;align-items:baseline;gap:5px">
-        <span class="tnum-sm" id="h-wcur">—</span>
+        <span style="font-size:26px;font-weight:900;letter-spacing:-.02em" id="h-wcur">—</span>
         <span class="t5">→ <b style="color:var(--text)" id="h-wgoal">—</b> кг</span>
       </div>
     </div>
@@ -625,76 +550,72 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 </div>
 
 <div id="h-plan-sec" style="display:none">
-  <div class="sec">Сегодня</div>
+  <div class="sec">сегодня</div>
   <div class="pad" id="h-plan-list"></div>
 </div>
 
 <div class="pad" id="h-streak-w" style="margin-top:10px;display:none">
-  <div style="background:linear-gradient(90deg,rgba(255,107,53,.08),rgba(255,171,64,.06));border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;gap:10px">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="var(--sun)"><path d="M12 2c0 5.5-5 7-5 11a5 5 0 0 0 10 0c0-4-5-5.5-5-11z"/></svg>
+  <div style="background:linear-gradient(90deg,rgba(255,107,53,.07),rgba(255,171,64,.05));border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;gap:10px">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--sun)"><path d="M12 2c0 5.5-5 7-5 11a5 5 0 0 0 10 0c0-4-5-5.5-5-11z"/></svg>
     <div>
       <div style="font-size:13px;font-weight:900" id="h-sval">7 дней подряд</div>
-      <div class="t5">серия воды не прерывается</div>
+      <div class="t5">серия воды</div>
     </div>
   </div>
 </div>
 <div style="height:8px"></div>
 </div>
-</div>
 
 <!-- ══════════ TRACK ══════════ -->
 <div class="page" id="p-track">
-<div style="position:sticky;top:0;background:var(--bg);z-index:10;padding:calc(var(--st)+14px) 16px 10px">
+<div style="position:sticky;top:0;background:var(--bg);z-index:10;padding:calc(var(--st)+12px) 16px 10px">
   <div class="ttabs">
-    <button class="ttab on" id="tt-water" onclick="setTTab('water')">Вода</button>
-    <button class="ttab" id="tt-cal" onclick="setTTab('cal')">Калории</button>
+    <button class="ttab on" id="tt-water" onclick="setTTab('water')">вода</button>
+    <button class="ttab" id="tt-cal" onclick="setTTab('cal')">калории</button>
   </div>
 </div>
 
 <div id="tt-water-body">
-<div class="pad reveal">
-<div class="card" style="margin-top:6px;text-align:center;padding:22px 16px;background:linear-gradient(160deg,rgba(78,174,229,.07),rgba(78,174,229,.02))">
+<div class="pad">
+<div class="card" style="margin-top:4px;text-align:center;padding:20px 16px;background:linear-gradient(160deg,rgba(78,174,229,.06),rgba(78,174,229,.02))">
   <div class="t5">выпито сегодня</div>
-  <div style="font-size:54px;font-weight:900;color:var(--water);line-height:1.1;margin:5px 0" id="w-total">0</div>
+  <div style="font-size:52px;font-weight:900;color:var(--water);line-height:1.1;margin:6px 0" id="w-total">0</div>
   <div class="t5">из <span id="w-goal">2000</span> мл</div>
   <div class="pb" style="margin-top:12px;height:7px"><div class="pbf pb-water" id="w-bar" style="width:0%"></div></div>
   <div id="w-streak" style="margin-top:9px"></div>
 </div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px">
   <button class="btn btn-water" onclick="addW(150)">+150 мл</button>
   <button class="btn btn-water" onclick="addW(200)">+200 мл</button>
   <button class="btn btn-water" onclick="addW(250)">+250 мл</button>
   <button class="btn btn-water" onclick="addW(500)">+500 мл</button>
 </div>
-<button class="btn btn-g" style="margin-top:7px;width:100%;padding:12px" onclick="undoW()">Отменить последнее</button>
+<button class="btn btn-g" style="margin-top:7px;width:100%;padding:12px" onclick="undoW()">отменить последнее</button>
 <div style="margin-top:12px">
-  <div class="t5" style="margin-bottom:6px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em">История сегодня</div>
+  <div class="t5" style="margin-bottom:6px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em">история сегодня</div>
   <div class="card" id="w-entries" style="padding:10px 12px"></div>
 </div>
 </div>
 </div>
 
 <div id="tt-cal-body" style="display:none">
-<div class="pad reveal">
-<div class="card" style="margin-top:6px;text-align:center;padding:20px 16px">
+<div class="pad">
+<div class="card" style="margin-top:4px;text-align:center;padding:20px 16px">
   <div class="t5">калорий сегодня</div>
-  <div style="font-size:50px;font-weight:900;color:var(--cal);line-height:1.1;margin:5px 0" id="c-total">0</div>
+  <div style="font-size:48px;font-weight:900;color:var(--cal);line-height:1.1;margin:6px 0" id="c-total">0</div>
   <div class="t5">из <span id="c-goal">2000</span> ккал</div>
   <div class="pb" style="margin-top:12px;height:7px"><div class="pbf pb-sun" id="c-bar" style="width:0%"></div></div>
 </div>
 <div class="card gap" style="padding:12px 14px"><div id="c-meals"></div></div>
-<button class="btn btn-p gap" onclick="openScr('scr-cal')">Добавить еду</button>
+<button class="btn btn-p gap" onclick="openScr('scr-cal')">добавить еду</button>
 </div>
-</div>
-
 </div>
 </div>
 
 <!-- ══════════ PLAN ══════════ -->
 <div class="page" id="p-plan">
-<div class="reveal">
 <div class="pad">
-  <div class="t2" style="margin-bottom:1px">План</div>
+  <div class="t2" style="margin-bottom:1px">план</div>
   <div class="t5" id="pl-date">сегодня</div>
 </div>
 <div class="pad gap">
@@ -710,37 +631,32 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
         stroke-linecap="round" stroke-dasharray="125.7"
         id="pl-ring" stroke-dashoffset="125.7"
         transform="rotate(-90 26 26)"
-        style="transition:stroke-dashoffset .7s cubic-bezier(.34,1.1,.64,1)"/>
+        style="transition:stroke-dashoffset .6s cubic-bezier(.34,1.1,.64,1)"/>
     </svg>
   </div>
 </div>
 </div>
-
 <div id="pl-empty" class="empty" style="display:none">
   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
-  <div class="empty-t">Нет задач на сегодня</div>
-  <div class="empty-s">Нажми кнопку ниже чтобы добавить</div>
+  <div class="empty-t">нет задач на сегодня</div>
+  <div class="empty-s">нажми кнопку ниже чтобы добавить</div>
 </div>
-
 <div class="pad" id="pl-list" style="margin-top:4px"></div>
-
 <div class="pad gap">
-  <button class="btn btn-p" onclick="openScr('scr-act')">Добавить активность</button>
+  <button class="btn btn-p" onclick="pushPage('pp-act')">добавить активность</button>
 </div>
 <div style="height:8px"></div>
-</div>
 </div>
 
 <!-- ══════════ SLEEP ══════════ -->
 <div class="page" id="p-sleep">
-<div class="reveal">
 <div class="pad">
-  <div class="t2" style="margin-bottom:1px">Сон</div>
+  <div class="t2" style="margin-bottom:1px">сон</div>
   <div class="t5">хороший сон — основа всего</div>
 </div>
 <div class="pad gap">
 <div class="card">
-  <div class="t5" style="margin-bottom:7px">Прошлая ночь</div>
+  <div class="t5" style="margin-bottom:7px">прошлая ночь</div>
   <div style="display:flex;align-items:center;gap:16px">
     <div>
       <div style="font-size:48px;font-weight:900;line-height:1;color:var(--sleep)" id="sl-h">—</div>
@@ -753,28 +669,26 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
 </div>
 </div>
-<button class="btn btn-p" style="margin:10px 16px 0;width:calc(100% - 32px)" onclick="openScr('scr-sleep')">Записать сон</button>
-<div class="sec">Последние 7 ночей</div>
+<button class="btn btn-p" style="margin:10px 16px 0;width:calc(100% - 32px)" onclick="openScr('scr-sleep')">записать сон</button>
+<div class="sec">последние 7 ночей</div>
 <div class="pad"><div class="card" id="sl-hist" style="padding:10px 12px"></div></div>
-<div class="sec">Среднее за неделю</div>
+<div class="sec">среднее за неделю</div>
 <div class="pad sb-row">
   <div class="sbox"><div class="sv" id="sl-avg-h" style="color:var(--sleep)">—</div><div class="sl">часов</div></div>
   <div class="sbox"><div class="sv" id="sl-avg-q">—</div><div class="sl">качество</div></div>
 </div>
 <div style="height:8px"></div>
 </div>
-</div>
 
 <!-- ══════════ PROGRESS ══════════ -->
 <div class="page" id="p-progress">
-<div class="reveal">
 <div class="pad">
-  <div class="t2" style="margin-bottom:1px">Прогресс</div>
+  <div class="t2" style="margin-bottom:1px">прогресс</div>
   <div class="t5">твой путь к лету</div>
 </div>
 <div class="pad gap">
 <div class="card">
-  <div class="t5" style="margin-bottom:5px">Прогресс веса</div>
+  <div class="t5" style="margin-bottom:5px">прогресс веса</div>
   <div style="display:flex;align-items:flex-end;gap:7px;margin-bottom:3px">
     <span style="font-size:38px;font-weight:900;line-height:1" id="pr-wcur">—</span>
     <span class="t5" style="padding-bottom:4px">кг · цель <b style="color:var(--text)" id="pr-wgoal">—</b></span>
@@ -792,24 +706,26 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 <div class="pad gap">
 <div class="card" style="padding:14px">
-  <div class="t5" style="margin-bottom:8px">Динамика веса</div>
-  <canvas id="wchart" height="90" style="width:100%;display:block"></canvas>
+  <div class="t5" style="margin-bottom:8px">динамика веса</div>
+  <div class="chart-scroll">
+    <canvas id="wchart" height="90" style="display:block"></canvas>
+  </div>
 </div>
 </div>
 
-<div class="sec">Эта неделя</div>
+<div class="sec">эта неделя</div>
 <div class="pad sb-row">
   <div class="sbox"><div class="sv" style="color:var(--water)" id="pw-water">—</div><div class="sl">вода мл</div></div>
   <div class="sbox"><div class="sv" style="color:var(--cal)" id="pw-cal">—</div><div class="sl">ккал</div></div>
   <div class="sbox"><div class="sv" style="color:var(--sleep)" id="pw-sleep">—</div><div class="sl">сон ч</div></div>
 </div>
 
-<button class="btn btn-p" style="margin:10px 16px 0;width:calc(100% - 32px)" onclick="openScr('scr-weight')">Записать вес</button>
+<button class="btn btn-p" style="margin:10px 16px 0;width:calc(100% - 32px)" onclick="openScr('scr-weight')">записать вес</button>
 
-<div class="sec">История веса</div>
+<div class="sec">история веса</div>
 <div class="pad"><div class="card" id="pr-whist" style="padding:10px 12px"></div></div>
 
-<div class="sec">За всё время</div>
+<div class="sec">за всё время</div>
 <div class="pad sb-row">
   <div class="sbox"><div class="sv grad" id="at-t">0</div><div class="sl">тренировок</div></div>
   <div class="sbox"><div class="sv grad" id="at-w">0</div><div class="sl">воды л</div></div>
@@ -817,12 +733,9 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 </div>
 <div style="height:8px"></div>
 </div>
-</div>
 
 <!-- ══════════ PROFILE ══════════ -->
 <div class="page" id="p-profile">
-<div class="reveal">
-
 <div style="display:flex;align-items:center;gap:14px;padding:4px 16px 0">
   <div class="pav" id="pf-av">А</div>
   <div>
@@ -839,56 +752,264 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
 </div>
 
-<div class="sec">Настройки</div>
+<div class="sec">настройки</div>
 <div class="pad">
 <div class="card">
-  <div class="lt" onclick="openScr('scr-pdata')">
+  <div class="lt" onclick="pushPage('pp-pdata')">
     <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
-    <span class="lt-lbl">Данные профиля</span>
+    <span class="lt-lbl">данные профиля</span>
     <span class="lt-val" id="pf-pname">—</span>
     <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
   </div>
-  <div class="lt" style="padding-bottom:0;border:none" onclick="openScr('scr-goals')">
+  <div class="lt" style="padding-bottom:0;border:none" onclick="pushPage('pp-goals')">
     <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg></div>
-    <span class="lt-lbl">Мои цели</span>
+    <span class="lt-lbl">мои цели</span>
     <span class="lt-val"><span id="pf-gw">—</span></span>
     <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
   </div>
 </div>
 </div>
 
-<div class="sec">Физические данные</div>
+<div class="sec">физические данные</div>
 <div class="pad">
 <div class="card">
   <div class="lt">
     <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-    <span class="lt-lbl">Рост</span>
+    <span class="lt-lbl">рост</span>
     <span class="lt-val" id="pf-height">—</span>
   </div>
   <div class="lt">
-    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM12 12h.01M8 12h.01M16 12h.01"/></svg></div>
-    <span class="lt-lbl">Возраст</span>
+    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+    <span class="lt-lbl">возраст</span>
     <span class="lt-val" id="pf-age">—</span>
   </div>
   <div class="lt" style="padding-bottom:0;border:none">
-    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM8 12h8M12 8v8"/></svg></div>
-    <span class="lt-lbl">Норма воды</span>
+    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a5 5 0 0 1 0 10M12 12c-5 0-8 2-8 6v2h16v-2c0-4-3-6-8-6z"/></svg></div>
+    <span class="lt-lbl">норма воды</span>
     <span class="lt-val" id="pf-gwater">—</span>
   </div>
 </div>
 </div>
 
-<div style="height:8px"></div>
+<div class="sec">приложение</div>
+<div class="pad">
+<div class="card">
+  <div class="lt" onclick="pushPage('pp-sett')">
+    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg></div>
+    <span class="lt-lbl">настройки отображения</span>
+    <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+  </div>
+  <div class="lt" style="padding-bottom:0;border:none" onclick="openScr('scr-weight')">
+    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zm-8 5h.01"/></svg></div>
+    <span class="lt-lbl">записать вес</span>
+    <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+  </div>
 </div>
+</div>
+<div style="text-align:center;padding:16px 0 8px"><div class="t5">letify · ver 4.0</div></div>
+<div style="height:8px"></div>
 </div>
 
 </div><!-- /pages -->
 
+<!-- ══ PUSH PAGES ══ -->
+
+<!-- PP: Данные профиля -->
+<div class="push-page" id="pp-pdata">
+  <div class="pp-hdr">
+    <button class="scr-back" onclick="popPage()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+    </button>
+    <span class="pp-title">данные профиля</span>
+  </div>
+  <div style="padding:16px">
+    <div class="m3-sec">личные данные</div>
+    <div class="m3-card">
+      <div class="m3-field">
+        <div class="m3-label">имя</div>
+        <input class="m3-input" id="inp-pname" type="text" placeholder="Алексей">
+      </div>
+      <div class="m3-field">
+        <div class="m3-label">рост, см</div>
+        <input class="m3-input num" id="inp-height" type="number" inputmode="numeric" min="100" max="250" placeholder="175">
+      </div>
+      <div class="m3-field">
+        <div class="m3-label">возраст</div>
+        <input class="m3-input num" id="inp-age" type="number" inputmode="numeric" min="10" max="100" placeholder="25">
+      </div>
+    </div>
+    <div class="m3-sec">пол</div>
+    <div class="m3-seg" id="seg-gender">
+      <button class="m3-seg-btn on" onclick="setGender('male')" data-g="male">♂ мужской</button>
+      <button class="m3-seg-btn" onclick="setGender('female')" data-g="female">♀ женский</button>
+    </div>
+    <button class="btn btn-p" style="margin-top:16px" onclick="submitProfile()">сохранить</button>
+  </div>
+</div>
+
+<!-- PP: Цели -->
+<div class="push-page" id="pp-goals">
+  <div class="pp-hdr">
+    <button class="scr-back" onclick="popPage()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+    </button>
+    <span class="pp-title">мои цели</span>
+  </div>
+  <div style="padding:16px">
+    <div class="m3-sec">параметры</div>
+    <div class="m3-card">
+      <div class="m3-field">
+        <div class="m3-label">целевой вес, кг</div>
+        <input class="m3-input num" id="inp-gw" type="number" inputmode="decimal" step="0.5" placeholder="70">
+      </div>
+      <div class="m3-field">
+        <div class="m3-label">норма воды, мл</div>
+        <input class="m3-input num" id="inp-gwat" type="number" inputmode="numeric" step="100" placeholder="2000">
+      </div>
+      <div class="m3-field">
+        <div class="m3-label">норма калорий</div>
+        <input class="m3-input num" id="inp-gcal" type="number" inputmode="numeric" step="50" placeholder="2000">
+      </div>
+    </div>
+    <button class="btn btn-p" style="margin-top:16px" onclick="submitGoals()">сохранить цели</button>
+  </div>
+</div>
+
+<!-- PP: Настройки -->
+<div class="push-page" id="pp-sett">
+  <div class="pp-hdr">
+    <button class="scr-back" onclick="popPage()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+    </button>
+    <span class="pp-title">настройки</span>
+  </div>
+  <div style="padding:16px">
+    <div class="m3-sec">отображение</div>
+    <div class="m3-tog-row" onclick="toggleSett('w')">
+      <div class="m3-tog-ic">⚖️</div>
+      <div class="m3-tog-lbl">показывать вес</div>
+      <div class="tog on" id="tog-w"></div>
+    </div>
+    <div class="m3-tog-row" onclick="toggleSett('water')">
+      <div class="m3-tog-ic">💧</div>
+      <div class="m3-tog-lbl">показывать воду</div>
+      <div class="tog on" id="tog-water"></div>
+    </div>
+    <div class="m3-tog-row" onclick="toggleSett('cal')">
+      <div class="m3-tog-ic">🔥</div>
+      <div class="m3-tog-lbl">показывать калории</div>
+      <div class="tog on" id="tog-cal"></div>
+    </div>
+    <div class="m3-tog-row" onclick="toggleSett('sleep')">
+      <div class="m3-tog-ic">🌙</div>
+      <div class="m3-tog-lbl">показывать сон</div>
+      <div class="tog on" id="tog-sleep"></div>
+    </div>
+    <div class="m3-sec">данные</div>
+    <div class="m3-tog-row" onclick="confirmReset()">
+      <div class="m3-tog-ic">🗑️</div>
+      <div class="m3-tog-lbl" style="color:var(--red)">сбросить все данные</div>
+    </div>
+  </div>
+</div>
+
+<!-- PP: Добавить активность (MULTI-STEP) -->
+<div class="push-page" id="pp-act">
+  <div class="pp-hdr">
+    <button class="scr-back" id="pp-act-back" onclick="actBackOrPop()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+    </button>
+    <div style="flex:1">
+      <div class="step-ind">
+        <div class="step-pip on" id="sp1"></div>
+        <div class="step-pip" id="sp2"></div>
+        <div class="step-pip" id="sp3"></div>
+      </div>
+      <div class="pp-title" id="act-step-title">название</div>
+    </div>
+  </div>
+  <div style="padding:16px">
+
+    <!-- Шаг 1: Тип активности -->
+    <div class="act-step active" id="act-s1">
+      <div class="act-hint">как называется активность?</div>
+      <div class="m3-card" style="padding:12px">
+        <div class="m3-field">
+          <div class="m3-label">название активности</div>
+          <input class="m3-input" id="inp-aname" type="text" placeholder="пробежка, йога, зал…" autocomplete="off">
+        </div>
+      </div>
+      <div class="m3-sec">или выбери</div>
+      <div class="type-grid" id="act-quick">
+        <div class="type-card on" onclick="actQuick('пробежка','run',this)">
+          <div class="type-card-ico">🏃</div><div class="type-card-lbl">пробежка</div>
+        </div>
+        <div class="type-card" onclick="actQuick('зал','gym',this)">
+          <div class="type-card-ico">💪</div><div class="type-card-lbl">зал</div>
+        </div>
+        <div class="type-card" onclick="actQuick('йога','yoga',this)">
+          <div class="type-card-ico">🧘</div><div class="type-card-lbl">йога</div>
+        </div>
+        <div class="type-card" onclick="actQuick('ходьба','walk',this)">
+          <div class="type-card-ico">🚶</div><div class="type-card-lbl">ходьба</div>
+        </div>
+        <div class="type-card" onclick="actQuick('велосипед','bike',this)">
+          <div class="type-card-ico">🚴</div><div class="type-card-lbl">велосипед</div>
+        </div>
+        <div class="type-card" onclick="actQuick('другое','other',this)">
+          <div class="type-card-ico">✨</div><div class="type-card-lbl">другое</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Шаг 2: Время и длительность -->
+    <div class="act-step" id="act-s2">
+      <div class="act-hint">выбери время и длительность</div>
+      <div class="m3-sec">время начала</div>
+      <div class="m3-card" style="padding:12px">
+        <div class="time-input-wrap">
+          <input type="time" class="time-input" id="inp-atime" value="08:00">
+        </div>
+      </div>
+      <div class="m3-sec">длительность</div>
+      <div class="m3-card" style="padding:12px">
+        <div class="dur-grid" id="dur-grid">
+          <button class="dur-btn" onclick="setDur(15,this)">15 мин</button>
+          <button class="dur-btn" onclick="setDur(20,this)">20 мин</button>
+          <button class="dur-btn" onclick="setDur(30,this)">30 мин</button>
+          <button class="dur-btn on" onclick="setDur(45,this)">45 мин</button>
+          <button class="dur-btn" onclick="setDur(60,this)">60 мин</button>
+          <button class="dur-btn" onclick="setDur(75,this)">75 мин</button>
+          <button class="dur-btn" onclick="setDur(90,this)">90 мин</button>
+          <button class="dur-btn" onclick="setDur(120,this)">2 часа</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Шаг 3: Подтверждение -->
+    <div class="act-step" id="act-s3">
+      <div class="act-hint">проверь и добавь в план</div>
+      <div style="text-align:center;padding:16px 0 12px">
+        <div id="act-confirm-ico" style="font-size:60px;margin-bottom:12px">🏃</div>
+        <div id="act-confirm-name" style="font-size:24px;font-weight:900;letter-spacing:-.02em;margin-bottom:6px">—</div>
+        <div id="act-confirm-time" style="font-size:15px;color:var(--hint);font-weight:700">—</div>
+      </div>
+      <div class="m3-card" style="padding:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:14px;font-weight:700">напоминание</span>
+          <div class="tog on" id="tog-act-rem" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-p" id="act-next-btn" onclick="actStepNext()" style="margin-top:20px">далее →</button>
+  </div>
+</div>
+
+<!-- Scr overlays -->
 <div id="scr-overlay" onclick="closeScr()"></div>
 
-<!-- ══════════ SCREEN LAYER ══════════ -->
 <div id="slayer">
-
 <!-- Scr: Вес -->
 <div class="scr" id="scr-weight">
   <div class="scr-handle"></div>
@@ -897,12 +1018,12 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
     </button>
     <div class="scr-hdr-text">
-      <div class="scr-title">Записать вес</div>
+      <div class="scr-title">записать вес</div>
       <div class="scr-subtitle">потяни барабан чтобы выбрать</div>
     </div>
   </div>
-  <div class="scr-picker-body">
-    <div class="md-card" style="padding:20px 16px">
+  <div class="scr-body">
+    <div class="m3-card" style="padding:16px">
       <div style="display:flex;justify-content:space-between;padding:0 8px;margin-bottom:8px">
         <span style="font-size:11px;font-weight:800;color:var(--hint);text-transform:uppercase;letter-spacing:.08em">КГ</span>
         <span style="font-size:11px;font-weight:800;color:var(--hint);text-transform:uppercase;letter-spacing:.08em">.X</span>
@@ -911,7 +1032,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     </div>
   </div>
   <div class="scr-foot">
-    <button class="btn btn-p" onclick="submitWeight()">Сохранить вес</button>
+    <button class="btn btn-p" onclick="submitWeight()">сохранить вес</button>
   </div>
 </div>
 
@@ -923,27 +1044,27 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
     </button>
     <div class="scr-hdr-text">
-      <div class="scr-title">Записать сон</div>
+      <div class="scr-title">записать сон</div>
       <div class="scr-subtitle">сколько спал прошлой ночью?</div>
     </div>
   </div>
-  <div class="scr-picker-body">
-    <div class="md-card" style="padding:20px 16px">
+  <div class="scr-body">
+    <div class="m3-card" style="padding:16px">
       <div class="wp-row" id="wp-sleep-wrap"></div>
     </div>
-    <div class="md-card" style="padding:16px">
-      <div style="font-size:14px;font-weight:800;margin-bottom:12px">Качество сна</div>
-      <div class="md-seg md-seg-emoji" id="seg-sleepq">
-        <button class="md-seg-btn" onclick="setSleepQ(1)" data-q="1">😫</button>
-        <button class="md-seg-btn" onclick="setSleepQ(2)" data-q="2">😴</button>
-        <button class="md-seg-btn on" onclick="setSleepQ(3)" data-q="3">😑</button>
-        <button class="md-seg-btn" onclick="setSleepQ(4)" data-q="4">🙂</button>
-        <button class="md-seg-btn" onclick="setSleepQ(5)" data-q="5">🌟</button>
+    <div class="m3-card" style="padding:14px">
+      <div style="font-size:14px;font-weight:800;margin-bottom:12px">качество сна</div>
+      <div class="m3-seg m3-seg-emoji" id="seg-sleepq">
+        <button class="m3-seg-btn" onclick="setSleepQ(1)" data-q="1">😫</button>
+        <button class="m3-seg-btn" onclick="setSleepQ(2)" data-q="2">😴</button>
+        <button class="m3-seg-btn on" onclick="setSleepQ(3)" data-q="3">😑</button>
+        <button class="m3-seg-btn" onclick="setSleepQ(4)" data-q="4">🙂</button>
+        <button class="m3-seg-btn" onclick="setSleepQ(5)" data-q="5">🌟</button>
       </div>
     </div>
   </div>
   <div class="scr-foot">
-    <button class="btn btn-p" onclick="submitSleep()">Сохранить сон</button>
+    <button class="btn btn-p" onclick="submitSleep()">сохранить сон</button>
   </div>
 </div>
 
@@ -955,269 +1076,60 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
     </button>
     <div class="scr-hdr-text">
-      <div class="scr-title">Добавить еду</div>
+      <div class="scr-title">добавить еду</div>
       <div class="scr-subtitle">запиши что съел</div>
     </div>
   </div>
   <div class="scr-body">
-    <div class="md-sec">Приём пищи</div>
-    <div class="md-seg" id="seg-meal" style="margin-bottom:12px">
-      <button class="md-seg-btn on" onclick="setMeal('breakfast')" data-m="breakfast">Завтрак</button>
-      <button class="md-seg-btn" onclick="setMeal('lunch')" data-m="lunch">Обед</button>
-      <button class="md-seg-btn" onclick="setMeal('dinner')" data-m="dinner">Ужин</button>
-      <button class="md-seg-btn" onclick="setMeal('snack')" data-m="snack">Перекус</button>
+    <div class="m3-sec">приём пищи</div>
+    <div class="m3-seg" id="seg-meal" style="margin-bottom:12px">
+      <button class="m3-seg-btn on" onclick="setMeal('breakfast')" data-m="breakfast">завтрак</button>
+      <button class="m3-seg-btn" onclick="setMeal('lunch')" data-m="lunch">обед</button>
+      <button class="m3-seg-btn" onclick="setMeal('dinner')" data-m="dinner">ужин</button>
+      <button class="m3-seg-btn" onclick="setMeal('snack')" data-m="snack">перекус</button>
     </div>
-    <div class="md-sec">Данные</div>
-    <div class="md-card">
-      <div class="md-field">
-        <div class="md-label">Калорий, ккал</div>
-        <input class="md-input num" id="inp-cal" type="number" inputmode="numeric" step="10" min="0" max="3000" placeholder="500">
+    <div class="m3-sec">данные</div>
+    <div class="m3-card">
+      <div class="m3-field">
+        <div class="m3-label">калорий, ккал</div>
+        <input class="m3-input num" id="inp-cal" type="number" inputmode="numeric" step="10" min="0" max="3000" placeholder="500">
       </div>
-      <div class="md-field">
-        <div class="md-label">Название блюда</div>
-        <input class="md-input" id="inp-cal-desc" type="text" placeholder="гречка, курица…">
-      </div>
-    </div>
-  </div>
-  <div class="scr-foot">
-    <button class="btn btn-p" onclick="submitCal()">Добавить</button>
-  </div>
-</div>
-
-<!-- Scr: Активность — MULTI-STEP -->
-<div class="scr" id="scr-act">
-  <div class="scr-handle"></div>
-  <div class="scr-hdr">
-    <button class="scr-back" onclick="closeScr()">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
-    </button>
-    <div class="scr-hdr-text">
-      <div class="step-ind" style="justify-content:flex-start;padding:0 0 4px">
-        <div class="step-pip on" id="sp1"></div>
-        <div class="step-pip" id="sp2"></div>
-        <div class="step-pip" id="sp3"></div>
-      </div>
-      <div class="scr-title" id="act-step-title">Название</div>
-      <div class="scr-subtitle" id="act-step-sub">как называется активность?</div>
-    </div>
-  </div>
-  <div class="scr-body">
-
-    <!-- Шаг 1: Название -->
-    <div class="act-step active" id="act-s1">
-      <div class="md-field" style="margin-bottom:16px">
-        <div class="md-label">Название активности</div>
-        <input class="md-input" id="inp-aname" type="text" placeholder="Пробежка, йога, зал…" autocomplete="off">
-      </div>
-      <div class="md-sec" style="padding-top:4px">Или выбери</div>
-      <div class="type-grid" id="act-quick">
-        <div class="type-card on" onclick="actQuick('Пробежка','run')"><div class="type-card-ico">🏃</div><div class="type-card-lbl">Пробежка</div></div>
-        <div class="type-card" onclick="actQuick('Зал','gym')"><div class="type-card-ico">💪</div><div class="type-card-lbl">Зал</div></div>
-        <div class="type-card" onclick="actQuick('Йога','yoga')"><div class="type-card-ico">🧘</div><div class="type-card-lbl">Йога</div></div>
-        <div class="type-card" onclick="actQuick('Ходьба','walk')"><div class="type-card-ico">🚶</div><div class="type-card-lbl">Ходьба</div></div>
-        <div class="type-card" onclick="actQuick('Велосипед','bike')"><div class="type-card-ico">🚴</div><div class="type-card-lbl">Велосипед</div></div>
-        <div class="type-card" onclick="actQuick('Другое','other')"><div class="type-card-ico">✨</div><div class="type-card-lbl">Другое</div></div>
-      </div>
-    </div>
-
-    <!-- Шаг 2: Время и длительность -->
-    <div class="act-step" id="act-s2">
-      <div class="md-sec" style="padding-top:4px">Время начала</div>
-      <div class="md-card" style="padding:16px;margin-bottom:0">
-        <div class="wp-row" id="wp-time-wrap"></div>
-      </div>
-      <div class="md-sec">Длительность</div>
-      <div class="md-card" style="padding:16px">
-        <div class="wp-row" id="wp-dur-wrap"></div>
-      </div>
-    </div>
-
-    <!-- Шаг 3: Подтверждение -->
-    <div class="act-step" id="act-s3">
-      <div style="text-align:center;padding:20px 0 10px">
-        <div id="act-confirm-ico" style="font-size:56px;margin-bottom:12px">🏃</div>
-        <div id="act-confirm-name" style="font-size:24px;font-weight:900;letter-spacing:-.02em;margin-bottom:6px">—</div>
-        <div id="act-confirm-time" style="font-size:15px;color:var(--hint);font-weight:700">—</div>
-      </div>
-      <div class="md-card" style="padding:16px;margin-top:8px">
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <span style="font-size:14px;font-weight:800">Напоминание</span>
-          <div class="tog on" id="tog-act-rem" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-  <div class="scr-foot" id="act-foot">
-    <button class="btn btn-p" id="act-next-btn" onclick="actStepNext()">Далее →</button>
-  </div>
-</div>
-
-<!-- Scr: Данные профиля -->
-<div class="scr" id="scr-pdata">
-  <div class="scr-handle"></div>
-  <div class="scr-hdr">
-    <button class="scr-back" onclick="closeScr()">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
-    </button>
-    <div class="scr-hdr-text">
-      <div class="scr-title">Данные профиля</div>
-    </div>
-  </div>
-  <div class="scr-body">
-    <div class="md-sec">Личные данные</div>
-    <div class="md-card">
-      <div class="md-field">
-        <div class="md-label">Имя</div>
-        <input class="md-input" id="inp-pname" type="text" placeholder="Алексей">
-      </div>
-      <div class="md-field">
-        <div class="md-label">Рост, см</div>
-        <input class="md-input num" id="inp-height" type="number" inputmode="numeric" min="100" max="250" placeholder="175">
-      </div>
-      <div class="md-field">
-        <div class="md-label">Возраст</div>
-        <input class="md-input num" id="inp-age" type="number" inputmode="numeric" min="10" max="100" placeholder="25">
-      </div>
-    </div>
-    <div class="md-sec">Пол</div>
-    <div class="md-seg" id="seg-gender">
-      <button class="md-seg-btn on" onclick="setGender('male')" data-g="male">♂ Мужской</button>
-      <button class="md-seg-btn" onclick="setGender('female')" data-g="female">♀ Женский</button>
-    </div>
-  </div>
-  <div class="scr-foot">
-    <button class="btn btn-p" onclick="submitProfile()">Сохранить</button>
-  </div>
-</div>
-
-<!-- Scr: Цели -->
-<div class="scr" id="scr-goals">
-  <div class="scr-handle"></div>
-  <div class="scr-hdr">
-    <button class="scr-back" onclick="closeScr()">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
-    </button>
-    <div class="scr-hdr-text">
-      <div class="scr-title">Мои цели</div>
-    </div>
-  </div>
-  <div class="scr-body">
-    <div class="md-sec">Параметры</div>
-    <div class="md-card">
-      <div class="md-field">
-        <div class="md-label">Целевой вес, кг</div>
-        <input class="md-input num" id="inp-gw" type="number" inputmode="decimal" step="0.5" placeholder="70">
-      </div>
-      <div class="md-field">
-        <div class="md-label">Норма воды, мл</div>
-        <input class="md-input num" id="inp-gwat" type="number" inputmode="numeric" step="100" placeholder="2000">
-      </div>
-      <div class="md-field">
-        <div class="md-label">Норма калорий</div>
-        <input class="md-input num" id="inp-gcal" type="number" inputmode="numeric" step="50" placeholder="2000">
+      <div class="m3-field">
+        <div class="m3-label">название блюда</div>
+        <input class="m3-input" id="inp-cal-desc" type="text" placeholder="гречка, курица…">
       </div>
     </div>
   </div>
   <div class="scr-foot">
-    <button class="btn btn-p" onclick="submitGoals()">Сохранить цели</button>
+    <button class="btn btn-p" onclick="submitCal()">добавить</button>
   </div>
 </div>
-
-<!-- Scr: Настройки (тогглы отображения) -->
-<div class="scr" id="scr-appsett">
-  <div class="scr-handle"></div>
-  <div class="scr-hdr">
-    <button class="scr-back" onclick="closeScr()">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
-    </button>
-    <div class="scr-hdr-text">
-      <div class="scr-title">Настройки</div>
-    </div>
-  </div>
-  <div class="scr-body">
-    <div class="md-sec">Отображение</div>
-    <div class="md-tog-row" onclick="toggleSett('w')">
-      <div class="md-tog-ic">⚖️</div>
-      <div class="md-tog-lbl">Показывать вес</div>
-      <div class="tog on" id="tog-w"></div>
-    </div>
-    <div class="md-tog-row" onclick="toggleSett('water')">
-      <div class="md-tog-ic">💧</div>
-      <div class="md-tog-lbl">Показывать воду</div>
-      <div class="tog on" id="tog-water"></div>
-    </div>
-    <div class="md-tog-row" onclick="toggleSett('cal')">
-      <div class="md-tog-ic">🔥</div>
-      <div class="md-tog-lbl">Показывать калории</div>
-      <div class="tog on" id="tog-cal"></div>
-    </div>
-    <div class="md-tog-row" onclick="toggleSett('sleep')">
-      <div class="md-tog-ic">🌙</div>
-      <div class="md-tog-lbl">Показывать сон</div>
-      <div class="tog on" id="tog-sleep"></div>
-    </div>
-    <div class="md-sec">Данные</div>
-    <div class="md-tog-row" style="color:var(--red)" onclick="confirmReset()">
-      <div class="md-tog-ic">🗑️</div>
-      <div class="md-tog-lbl" style="color:var(--red)">Сбросить все данные</div>
-    </div>
-    <div style="text-align:center;padding:24px 0 8px">
-      <div class="t5">letify · ver 3.0</div>
-    </div>
-  </div>
-</div>
-<!-- Scr: История веса -->
-<div class="scr" id="scr-whist">
-  <div class="scr-handle"></div>
-  <div class="scr-hdr">
-    <button class="scr-back" onclick="closeScr()">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
-    </button>
-    <div class="scr-hdr-text">
-      <div class="scr-title">История веса</div>
-      <div class="scr-subtitle">все записанные измерения</div>
-    </div>
-  </div>
-  <div class="scr-body">
-    <div class="md-card" style="padding:10px 14px" id="scr-whist-list">
-      <div style="text-align:center;padding:20px;color:var(--hint);font-size:13px;font-weight:600">Нет записей</div>
-    </div>
-  </div>
-</div>
-
 </div><!-- /slayer -->
 
 <div id="toast"></div>
 
-<!-- ══════════ ISLAND NAV ══════════ -->
+<!-- NAV -->
 <nav id="nav">
-  <!-- Home -->
   <div class="nt on" id="nt-home" onclick="navTo('home')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
     <div class="nt-dot"></div>
   </div>
-  <!-- Track -->
   <div class="nt" id="nt-track" onclick="navTo('track')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>
     <div class="nt-dot"></div>
   </div>
-  <!-- Plan -->
   <div class="nt" id="nt-plan" onclick="navTo('plan')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/></svg>
     <div class="nt-dot"></div>
   </div>
-  <!-- Sleep -->
   <div class="nt" id="nt-sleep" onclick="navTo('sleep')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     <div class="nt-dot"></div>
   </div>
-  <!-- Progress -->
   <div class="nt" id="nt-progress" onclick="navTo('progress')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-4 4 4 4-6"/></svg>
     <div class="nt-dot"></div>
   </div>
-  <!-- Profile -->
   <div class="nt" id="nt-profile" onclick="navTo('profile')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
     <div class="nt-dot"></div>
@@ -1225,8 +1137,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 </nav>
 
 </div><!-- /root -->
-
-<!-- nav moved outside root to avoid stacking context issues -->
 
 <script>
 /* ════ TG INIT ════ */
@@ -1241,7 +1151,8 @@ if(tg){
   tg.onEvent('viewportChanged',_applySA);
   tg.onEvent('safeAreaChanged',_applySA);
   tg.onEvent('fullscreenChanged',_applySA);
-  setTimeout(_applySA,120);setTimeout(_applySA,600);
+  setTimeout(_applySA,100);
+  setTimeout(_applySA,500);
 }
 function _applySA(){
   const saTop=Math.max(tg?.safeAreaInset?.top??0,0);
@@ -1254,29 +1165,30 @@ function _applySA(){
   const sb=Math.min(Math.max(bot,0),80);
   document.documentElement.style.setProperty('--st',st+'px');
   document.documentElement.style.setProperty('--sb',sb+'px');
+  if(!navHidden)_setNavBot(sb);
+}
+function _setNavBot(sb){
   const nav=document.getElementById('nav');
-  if(nav&&!nav.classList.contains('gone'))nav.style.bottom=(12+sb)+'px';
+  if(nav)nav.style.bottom=(12+(sb||0))+'px';
 }
 function applyTheme(){
   const p=tg?.themeParams||{};
   const dark=tg?.colorScheme==='dark'||window.matchMedia?.('(prefers-color-scheme:dark)').matches;
   document.body.classList.toggle('tg-dark',dark);
   if(dark){
-    // В тёмном режиме используем фиксированные цвета чтобы не было чёрного на чёрном
     const bg=p.bg_color||'#17212b';
     document.documentElement.style.setProperty('--bg',bg);
     document.documentElement.style.setProperty('--bg2',bg);
     document.documentElement.style.setProperty('--text',p.text_color||'#ffffff');
     document.documentElement.style.setProperty('--hint',p.hint_color||'#708499');
   }else{
-    // Светлый режим — берём цвета из Telegram
     const m={'--bg':p.bg_color,'--bg2':p.secondary_bg_color||p.bg_color,'--text':p.text_color,'--hint':p.hint_color};
     for(const[k,v]of Object.entries(m))if(v)document.documentElement.style.setProperty(k,v);
   }
 }
 applyTheme();
 
-/* ════ API ════ */
+/* ════ API & DATA ════ */
 const API_BASE='https://letify-production.up.railway.app';
 const tgUser=tg?.initDataUnsafe?.user;
 const UID=tgUser?.id||null;
@@ -1297,8 +1209,8 @@ async function loadData(){
     const d=await r.json();
     C.user=d.user||C.user;C.settings=d.settings||C.settings;
     C.water=d.water||C.water;C.calories=d.calories||C.calories;
-    C.weight_log=d.weight_log||C.weight_log;C.sleep_log=d.sleep_log||C.sleep_log;
-    C.acts_today=d.acts_today||C.acts_today;C.products=d.products||C.products;
+    C.weight_log=d.weight_log||[];C.sleep_log=d.sleep_log||[];
+    C.acts_today=d.acts_today||[];C.products=d.products||[];
   }catch{_demo();}
 }
 function _demo(){
@@ -1309,22 +1221,25 @@ function _demo(){
     const now=new Date(),wl=[],sl=[];
     for(let i=13;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);wl.push({weight:+(85-((13-i)*.25)+(Math.random()-.5)*.3).toFixed(1),logged_at:d.toLocaleDateString('en-CA')});}
     for(let i=6;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);sl.push({hours:+(6.5+Math.random()*2).toFixed(1),quality:3+Math.floor(Math.random()*3),logged_at:d.toLocaleDateString('en-CA')});}
-    s('wlog',wl);s('slog',sl);s('wd_'+TODAY,{total:1350,entries:[250,200,150,250,200,150,150]});
+    s('wlog',wl);s('slog',sl);
+    s('wd_'+TODAY,{total:1350,entries:[250,200,150,250,200,150,150]});
     s('cd_'+TODAY,{breakfast:420,lunch:680,dinner:0,snack:185,other:0});s('streak',7);
-    s('acts_'+TODAY,[{id:1,name:'Пробежка',type:'run',scheduled_at:'2024-01-01T07:00',duration:30,completed:1},{id:2,name:'Зал',type:'gym',scheduled_at:'2024-01-01T18:30',duration:60,completed:0},{id:3,name:'Йога',type:'yoga',scheduled_at:'2024-01-01T21:00',duration:25,completed:0}]);
+    s('acts_'+TODAY,[
+      {id:1,name:'пробежка',type:'run',scheduled_at:'2024-01-01T07:00',duration:30,completed:1},
+      {id:2,name:'зал',type:'gym',scheduled_at:'2024-01-01T18:30',duration:60,completed:0},
+      {id:3,name:'йога',type:'yoga',scheduled_at:'2024-01-01T21:00',duration:25,completed:0}
+    ]);
     s('ds',1);
   }
   const u=g('user')||{},wd=g('wd_'+TODAY)||{total:0,entries:[]},cd=g('cd_'+TODAY)||{};
   C.user=u;C.settings={show_weight:1,show_water:1,show_calories:1,show_sleep:1};
   C.water={total:wd.total||0,entries:wd.entries||[],streak:g('streak')||0};
   C.calories=cd;C.weight_log=g('wlog')||[];C.sleep_log=g('slog')||[];
-  C.acts_today=g('acts_'+TODAY)||[];
-  C.products=[{id:1,name:'банан',calories:89,protein:1.1,fat:0.3,carbs:23},{id:2,name:'яблоко',calories:52,protein:0.3,fat:0.2,carbs:14},{id:3,name:'куриная грудка',calories:165,protein:31,fat:3.6,carbs:0},{id:4,name:'яйцо',calories:155,protein:13,fat:11,carbs:1.1},{id:5,name:'творог 5%',calories:121,protein:17,fat:5,carbs:3},{id:6,name:'гречка',calories:92,protein:3.4,fat:1,carbs:20}];
+  C.acts_today=g('acts_'+TODAY)||[];C.products=[];
 }
 async function apiPost(path,body){
   if(!UID)return;
-  try{await fetch(`${API_BASE}${path}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uid:UID,...body})});}
-  catch{}
+  try{await fetch(`${API_BASE}${path}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uid:UID,...body})});}catch{}
 }
 async function reload(){
   await loadData();
@@ -1338,17 +1253,18 @@ const gSL=()=>C.sleep_log.map(r=>({hours:r.hours,quality:r.quality,logged_at:(r.
 const gWD=()=>C.water;
 const gCD=()=>C.calories;
 const gActs=()=>C.acts_today.map(a=>({...a,time:(a.scheduled_at||'').slice(11,16)||'00:00',completed:!!a.completed}));
-const gProds=()=>C.products;
 const gStreak=()=>C.water.streak||0;
 const totalCal=()=>Object.values(gCD()).reduce((a,b)=>a+b,0);
 
 /* ════ NAVIGATION ════ */
 const TABS=['home','track','plan','sleep','progress','profile'];
 let curTab='home',trackTab='water',curScr=null;
+let navHidden=false;
 
 function navTo(tab){
-  if(tab===curTab&&!curScr)return;
+  if(tab===curTab&&!curScr&&!curPushPage)return;
   if(curScr)closeScr(false);
+  if(curPushPage)popPage(false);
   curTab=tab;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const pg=document.getElementById('p-'+tab);
@@ -1358,7 +1274,6 @@ function navTo(tab){
   renders[tab]?.();
   tg?.HapticFeedback?.selectionChanged();
 }
-
 function setTTab(t){
   trackTab=t;
   ['water','cal'].forEach(k=>{
@@ -1368,195 +1283,141 @@ function setTTab(t){
   renderTrack(t);
 }
 
-/* ════ SCREENS ════ */
-function openScr(id){
-  curScr=id;
-  const navEl=document.getElementById('nav');
-  navEl?.classList.add('gone');
-  if(navEl)navEl.style.bottom='-120px';
-  const overlay=document.getElementById('scr-overlay');
-  if(overlay)overlay.classList.add('show');
-  const scr=document.getElementById(id);
-  if(scr)scr.classList.add('open');
-  // Populate AFTER animation starts to avoid jank
-  requestAnimationFrame(()=>{
-    setTimeout(()=>{
-      _populateScr(id);
-      if(id==='scr-act'){actStep=1;_renderActStep();}
-    },60);
-  });
-  if(tg?.BackButton){tg.BackButton.show();tg.BackButton.onClick(closeScr);}
+/* ════ PUSH PAGES ════ */
+let curPushPage=null;
+function pushPage(id){
+  curPushPage=id;
+  navHidden=true;
+  const nav=document.getElementById('nav');
+  nav?.classList.add('gone');
+  const pp=document.getElementById(id);
+  if(pp){pp.classList.add('open');pp.scrollTop=0;}
+  _populatePP(id);
+  if(tg?.BackButton){tg.BackButton.show();tg.BackButton.onClick(popPage);}
   tg?.HapticFeedback?.impactOccurred('light');
 }
-function closeScr(doNav=true){
-  if(!curScr)return;
-  const scr=document.getElementById(curScr);
-  if(scr)scr.classList.remove('open');
-  curScr=null;
-  const overlay=document.getElementById('scr-overlay');
-  if(overlay)overlay.classList.remove('show');
-  const navEl=document.getElementById('nav');
-  navEl?.classList.remove('gone');
+function popPage(doRender=true){
+  if(!curPushPage)return;
+  const pp=document.getElementById(curPushPage);
+  if(pp)pp.classList.remove('open');
+  curPushPage=null;
+  navHidden=false;
+  const nav=document.getElementById('nav');
+  nav?.classList.remove('gone');
   const sb=Math.min(Math.max(tg?.safeAreaInset?.bottom??0,0),80);
-  if(navEl)navEl.style.bottom=(12+sb)+'px';
-  if(tg?.BackButton){tg.BackButton.hide();tg.BackButton.offClick(closeScr);}
+  _setNavBot(sb);
+  if(tg?.BackButton){tg.BackButton.hide();tg.BackButton.offClick(popPage);}
+  if(doRender){const renders={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};renders[curTab]?.();}
 }
-function _populateScr(id){
+function _populatePP(id){
   const u=gU(),ss=gSS();
-  if(id==='scr-pdata'){
+  if(id==='pp-pdata'){
     const ni=document.getElementById('inp-pname');if(ni)ni.value=u.name||'';
     const hi=document.getElementById('inp-height');if(hi)hi.value=u.height||'';
     const ai=document.getElementById('inp-age');if(ai)ai.value=u.age||'';
     _gender=u.gender||'male';
-    document.querySelectorAll('#seg-gender .md-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.g===_gender));
+    document.querySelectorAll('#seg-gender .m3-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.g===_gender));
   }
-  if(id==='scr-goals'){
+  if(id==='pp-goals'){
     const gi=document.getElementById('inp-gw');if(gi)gi.value=u.goal_weight||'';
     const wi=document.getElementById('inp-gwat');if(wi)wi.value=u.water_goal||2000;
     const ci=document.getElementById('inp-gcal');if(ci)ci.value=u.cal_goal||2000;
   }
-  if(id==='scr-appsett'){
+  if(id==='pp-sett'){
     ['w','water','cal','sleep'].forEach(k=>{
       const tog=document.getElementById('tog-'+k),on=ss[k]!==false;
       if(tog){tog.classList.toggle('on',on);tog.classList.toggle('off',!on);}
     });
   }
-  if(id==='scr-act'){
-    // Reset input
-    const ni=document.getElementById('inp-aname');if(ni)ni.value='';
-    _actType='run';
+  if(id==='pp-act'){
+    actStep=1;_actType='run';_actDur=45;
+    const ni=document.getElementById('inp-aname');if(ni)ni.value='пробежка';
     document.querySelectorAll('#act-quick .type-card').forEach((c,i)=>c.classList.toggle('on',i===0));
+    document.querySelectorAll('#dur-grid .dur-btn').forEach(b=>b.classList.toggle('on',parseInt(b.textContent)===45||b.textContent==='45 мин'));
+    _renderActStep();
   }
-  // Init pickers after layout
+}
+
+/* ════ BOTTOM SHEETS ════ */
+function openScr(id){
+  curScr=id;
+  navHidden=true;
+  const nav=document.getElementById('nav');
+  nav?.classList.add('gone');
+  document.getElementById('scr-overlay')?.classList.add('show');
+  const scr=document.getElementById(id);
+  if(scr)scr.classList.add('open');
+  setTimeout(()=>_populateScr(id),80);
+  if(tg?.BackButton){tg.BackButton.show();tg.BackButton.onClick(closeScr);}
+  tg?.HapticFeedback?.impactOccurred('light');
+}
+function closeScr(doNav=true){
+  if(!curScr)return;
+  document.getElementById(curScr)?.classList.remove('open');
+  curScr=null;
+  navHidden=false;
+  document.getElementById('scr-overlay')?.classList.remove('show');
+  const nav=document.getElementById('nav');
+  nav?.classList.remove('gone');
+  const sb=Math.min(Math.max(tg?.safeAreaInset?.bottom??0,0),80);
+  _setNavBot(sb);
+  if(tg?.BackButton){tg.BackButton.hide();tg.BackButton.offClick(closeScr);}
+}
+function _populateScr(id){
   if(id==='scr-weight')requestAnimationFrame(()=>initWeightPicker());
   if(id==='scr-sleep')requestAnimationFrame(()=>initSleepPicker());
-  if(id==='scr-whist'){
-    const wl=gWL().slice().reverse();
-    const el=document.getElementById('scr-whist-list');
-    if(el){
-      if(!wl.length){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--hint);font-size:13px;font-weight:600">Нет записей</div>';}
-      else{
-        el.innerHTML=wl.map((e,i)=>{
-          const prev=wl[i+1];
-          const diff=prev?+(e.weight-prev.weight).toFixed(1):0;
-          return`<div class="hr"><div class="hr-d">${fmtD(e.logged_at)}</div><div class="hr-v">${e.weight.toFixed(1)} кг</div>${diff?`<div class="hr-diff ${diff<0?'d-neg':'d-pos'}">${diff>0?'+':''}${diff}</div>`:'<div style="min-width:32px"></div>'}</div>`;
-        }).join('');
-      }
-    }
-  }
 }
 
 /* ════ WHEEL PICKER ════ */
 const PKR={};
-const ITEM_H=38;
-
-function mkPicker(container,items,initVal){
+const IH=40;
+function mkPicker(container,items,initIdx){
   container.innerHTML='';
   container.className='wp';
-  container.style.width='100%';container.style.height=(ITEM_H*5)+'px';
-
-  let selIdx=Math.max(0,items.findIndex(it=>String(it.v)===String(initVal)));
-
-  container.innerHTML=`<div class="wp-sel"></div>
-    <div class="wp-ft wp-ft-t"></div>
-    <div class="wp-ft wp-ft-b"></div>
-    <div class="wp-track"></div>`;
-
+  container.style.height=(IH*5)+'px';
+  container.innerHTML=`<div class="wp-sel"></div><div class="wp-ft wp-ft-t"></div><div class="wp-ft wp-ft-b"></div><div class="wp-track"></div>`;
   const track=container.querySelector('.wp-track');
-
-  function render(){
-    const pads=2;
-    let h='';
-    for(let i=0;i<pads;i++)h+=`<div class="wp-item"></div>`;
-    items.forEach((it,i)=>h+=`<div class="wp-item${i===selIdx?' sel':''}">${it.l}</div>`);
-    for(let i=0;i<pads;i++)h+=`<div class="wp-item"></div>`;
+  let si=Math.max(0,Math.min(initIdx,items.length-1));
+  function renderItems(){
+    let h='<div class="wp-item"></div><div class="wp-item"></div>';
+    items.forEach((it,i)=>h+=`<div class="wp-item${i===si?' sel':''}">${it.l}</div>`);
+    h+='<div class="wp-item"></div><div class="wp-item"></div>';
     track.innerHTML=h;
   }
-  render();
-
-  function setY(y,anim){
-    track.style.transition=anim?'transform .25s cubic-bezier(.25,.46,.45,.94)':'none';
-    track.style.transform=`translateY(${y}px)`;
-  }
-  function yFor(idx){return -idx*ITEM_H;}
-  let curY=yFor(selIdx);
-  setY(curY,false);
-
-  function clampY(y){return Math.max(-( items.length-1)*ITEM_H,Math.min(0,y));}
-  function updateHighlight(){
-    track.querySelectorAll('.wp-item:not([class~="wp-item wp-item"])');//no-op
-    Array.from(track.children).slice(2,items.length+2).forEach((el,i)=>el.classList.toggle('sel',i===selIdx));
-  }
-
-  let sy=null,so,ly,lt,vel=0;
-  container.addEventListener('pointerdown',e=>{
-    sy=e.clientY;so=curY;ly=e.clientY;lt=Date.now();vel=0;
-    track.style.transition='none';
-    container.setPointerCapture(e.pointerId);
-    e.preventDefault();
-  },{passive:false});
-  container.addEventListener('pointermove',e=>{
-    if(sy===null)return;
-    const now=Date.now(),dt=Math.max(1,now-lt);
-    vel=(e.clientY-ly)/dt*16;ly=e.clientY;lt=now;
-    curY=clampY(so+(e.clientY-sy));
-    track.style.transform=`translateY(${curY}px)`;
-    const li=Math.max(0,Math.min(Math.round(-curY/ITEM_H),items.length-1));
-    if(li!==selIdx){selIdx=li;updateHighlight();}
-  },{passive:false});
-  function snap(){
-    if(sy===null)return;sy=null;
-    selIdx=Math.max(0,Math.min(Math.round(-(curY+vel*4)/ITEM_H),items.length-1));
-    curY=yFor(selIdx);setY(curY,true);updateHighlight();
-    tg?.HapticFeedback?.selectionChanged();
-  }
-  container.addEventListener('pointerup',snap);
-  container.addEventListener('pointercancel',snap);
-
-  return{get:()=>items[selIdx],setIdx(i){selIdx=Math.max(0,Math.min(i,items.length-1));curY=yFor(selIdx);setY(curY,false);updateHighlight();}};
+  renderItems();
+  const yFor=i=>-i*IH;
+  let cy=yFor(si);
+  const setY=(y,anim)=>{track.style.transition=anim?'transform .22s cubic-bezier(.25,.46,.45,.94)':'none';track.style.transform=`translateY(${y}px)`;};
+  setY(cy,false);
+  const clampY=y=>Math.max(-(items.length-1)*IH,Math.min(0,y));
+  const updHL=()=>{Array.from(track.children).slice(2,items.length+2).forEach((el,i)=>{el.classList.toggle('sel',i===si);el.style.fontSize=i===si?'22px':'17px';});};
+  let sy=null,so,lv=0,lt=0;
+  container.addEventListener('pointerdown',e=>{sy=e.clientY;so=cy;lv=0;lt=Date.now();track.style.transition='none';container.setPointerCapture(e.pointerId);e.preventDefault();},{passive:false});
+  container.addEventListener('pointermove',e=>{if(sy===null)return;const now=Date.now(),dt=Math.max(1,now-lt);lv=(e.clientY-sy)/Math.max(1,dt);lt=now;cy=clampY(so+(e.clientY-sy));track.style.transform=`translateY(${cy}px)`;const ni=Math.max(0,Math.min(Math.round(-cy/IH),items.length-1));if(ni!==si){si=ni;updHL();}},{passive:false});
+  function snap(){if(sy===null)return;sy=null;si=Math.max(0,Math.min(Math.round(-(cy+lv*60)/IH),items.length-1));cy=yFor(si);setY(cy,true);updHL();tg?.HapticFeedback?.selectionChanged();}
+  container.addEventListener('pointerup',snap);container.addEventListener('pointercancel',snap);
+  return{get:()=>items[si],setIdx(i){si=Math.max(0,Math.min(i,items.length-1));cy=yFor(si);setY(cy,false);updHL();}};
 }
 
 function initWeightPicker(){
-  const wl=gWL();
-  const iw=wl.length?wl[wl.length-1].weight:70;
+  const wl=gWL();const iw=wl.length?wl[wl.length-1].weight:70;
   const ii=Math.floor(iw),id=Math.round((iw-ii)*10);
   const intItems=Array.from({length:171},(_,i)=>({l:String(30+i),v:30+i}));
   const decItems=Array.from({length:10},(_,i)=>({l:'.'+i,v:i/10}));
   const wrap=document.getElementById('wp-weight-wrap');
   wrap.innerHTML='<div class="wp-col" style="flex:3"><div class="wp-lbl">кг</div><div id="wpi-i"></div></div><div class="wp-sep"> </div><div class="wp-col" style="flex:1;min-width:80px"><div class="wp-lbl">.X</div><div id="wpi-d"></div></div>';
-  PKR.wi=mkPicker(document.getElementById('wpi-i'),intItems,ii);
-  PKR.wd=mkPicker(document.getElementById('wpi-d'),decItems,id/10);
-  PKR.wi.setIdx(intItems.findIndex(x=>x.v===ii));
-  PKR.wd.setIdx(id);
+  PKR.wi=mkPicker(document.getElementById('wpi-i'),intItems,ii-30);
+  PKR.wd=mkPicker(document.getElementById('wpi-d'),decItems,id);
 }
 function initSleepPicker(){
-  const sl=gSL();
-  const ih=sl.length?sl[sl.length-1].hours:8;
+  const sl=gSL();const ih=sl.length?sl[sl.length-1].hours:8;
   const ihh=Math.floor(ih),idd=ih-ihh>=0.5?1:0;
   const hItems=Array.from({length:14},(_,i)=>({l:String(1+i),v:1+i}));
   const dItems=[{l:'.0',v:0},{l:'.5',v:.5}];
   const wrap=document.getElementById('wp-sleep-wrap');
   wrap.innerHTML='<div class="wp-col" style="flex:3"><div class="wp-lbl">часов</div><div id="wps-h"></div></div><div class="wp-col" style="flex:1;min-width:70px"><div class="wp-lbl">.X</div><div id="wps-d"></div></div>';
-  PKR.sh=mkPicker(document.getElementById('wps-h'),hItems,ihh);
-  PKR.sd=mkPicker(document.getElementById('wps-d'),dItems,idd===1?.5:0);
-  PKR.sh.setIdx(hItems.findIndex(x=>x.v===ihh));
-  PKR.sd.setIdx(idd);
-}
-function initTimePicker(){
-  const hItems=Array.from({length:24},(_,i)=>({l:String(i).padStart(2,'0'),v:i}));
-  const mItems=Array.from({length:12},(_,i)=>({l:String(i*5).padStart(2,'0'),v:i*5}));
-  const wrap=document.getElementById('wp-time-wrap');
-  wrap.innerHTML='<div class="wp-col"><div class="wp-lbl">ч</div><div id="wpt-h"></div></div><div class="wp-sep">:</div><div class="wp-col"><div class="wp-lbl">мин</div><div id="wpt-m"></div></div>';
-  PKR.th=mkPicker(document.getElementById('wpt-h'),hItems,8);
-  PKR.tm=mkPicker(document.getElementById('wpt-m'),mItems,0);
-  PKR.th.setIdx(8);PKR.tm.setIdx(0);
-}
-function initDurPicker(){
-  const dItems=[5,10,15,20,25,30,40,45,60,75,90,120].map(v=>({l:v+' мин',v}));
-  const wrap=document.getElementById('wp-dur-wrap');
-  wrap.innerHTML='<div class="wp-col" style="width:100%"><div class="wp-lbl">длительность</div><div id="wpt-dur" style="width:100%"></div></div>';
-  PKR.dur=mkPicker(document.getElementById('wpt-dur'),dItems,30);
-  PKR.dur.setIdx(5);
+  PKR.sh=mkPicker(document.getElementById('wps-h'),hItems,Math.max(0,ihh-1));
+  PKR.sd=mkPicker(document.getElementById('wps-d'),dItems,idd);
 }
 
 /* ════ HELPERS ════ */
@@ -1568,28 +1429,94 @@ function pD(n){const a=Math.abs(n)%100;if(a>=11&&a<=19)return'дней';if(a%10=
 function fmtD(s){if(!s)return'—';try{const d=new Date(s+'T00:00:00');const m=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];return d.getDate()+' '+m[d.getMonth()];}catch{return s;}}
 function fmtMD(s){try{const d=new Date(s+'T00:00:00');return(d.getMonth()+1)+'/'+(d.getDate());}catch{return'';}}
 function qIco(q){return['','😫','😴','😑','🙂','🌟'][q]||'😑';}
-
 const ACT_ICO={run:'🏃',walk:'🚶',bike:'🚴',gym:'💪',yoga:'🧘',swim:'🏊',other:'✨'};
 const ACT_COL={run:'#FF6B35',walk:'#52C177',bike:'#4EAEE5',gym:'#E91E63',yoga:'#8B7FD4',swim:'#00BCD4',other:'#FFAB40'};
 
-/* ════ ACTIONS ════ */
+/* ════ ACTIVITY FORM ════ */
+let actStep=1,_actType='run',_actDur=45;
+const ACT_TITLES=['название','когда?','готово!'];
+
+function _renderActStep(){
+  [1,2,3].forEach(i=>{
+    document.getElementById('act-s'+i)?.classList.toggle('active',i===actStep);
+    const pip=document.getElementById('sp'+i);
+    if(pip){
+      pip.classList.toggle('on',i===actStep);
+      pip.classList.toggle('done',i<actStep);
+      if(i<actStep)pip.classList.remove('on');
+    }
+  });
+  T('act-step-title',ACT_TITLES[actStep-1]);
+  const btn=$('act-next-btn');
+  if(btn)btn.textContent=actStep===3?'✓ добавить в план':'далее →';
+  if(actStep===3)_updateActConfirm();
+  tg?.HapticFeedback?.selectionChanged();
+}
+function _updateActConfirm(){
+  const name=$('inp-aname')?.value||'—';
+  const time=$('inp-atime')?.value||'08:00';
+  const ico=ACT_ICO[_actType]||'✨';
+  if($('act-confirm-ico'))$('act-confirm-ico').textContent=ico;
+  if($('act-confirm-name'))$('act-confirm-name').textContent=name;
+  if($('act-confirm-time'))$('act-confirm-time').textContent=time+' · '+_actDur+' мин';
+}
+function actBackOrPop(){
+  if(actStep>1){actStep--;_renderActStep();}
+  else{popPage();}
+}
+function actStepNext(){
+  if(actStep===1){
+    const name=$('inp-aname')?.value?.trim();
+    if(!name){toast('введи название');return;}
+    actStep=2;_renderActStep();
+  }else if(actStep===2){
+    actStep=3;_renderActStep();
+  }else{
+    submitAct();
+  }
+}
+function actQuick(name,type,el){
+  _actType=type;
+  document.querySelectorAll('#act-quick .type-card').forEach(c=>c.classList.remove('on'));
+  el?.classList.add('on');
+  const inp=$('inp-aname');if(inp)inp.value=name;
+}
+function setDur(val,el){
+  _actDur=val;
+  document.querySelectorAll('#dur-grid .dur-btn').forEach(b=>b.classList.remove('on'));
+  el?.classList.add('on');
+}
+
+/* ════ OTHER SETTERS ════ */
+let _sleepQ=3,_mealType='breakfast',_gender='male';
+function setSleepQ(q){_sleepQ=q;document.querySelectorAll('#seg-sleepq .m3-seg-btn').forEach(b=>b.classList.toggle('on',+b.dataset.q===q));}
+function setMeal(m){_mealType=m;document.querySelectorAll('#seg-meal .m3-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.m===m));}
+function setGender(g){_gender=g;document.querySelectorAll('#seg-gender .m3-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.g===g));}
+function toggleSett(key){
+  const ss=gSS();const nv=!ss[key];
+  const fm={w:'show_weight',water:'show_water',cal:'show_calories',sleep:'show_sleep'};
+  if(fm[key])C.settings[fm[key]]=nv?1:0;
+  const tog=$('tog-'+key);if(tog){tog.classList.toggle('on',nv);tog.classList.toggle('off',!nv);}
+  toast(nv?'показывается':'скрыто');
+  apiPost('/api/settings',{[fm[key]]:nv?1:0});
+}
+
+/* ════ SUBMIT ACTIONS ════ */
 let _addWBusy=false;
 async function addW(ml){
-  if(_addWBusy)return;
-  _addWBusy=true;
+  if(_addWBusy)return;_addWBusy=true;
   C.water.total=(C.water.total||0)+ml;
   C.water.entries=[...(C.water.entries||[]),ml];
   renderTrack('water');renderHome();
-  toast('+'+ml+' мл');
-  tg?.HapticFeedback?.impactOccurred('light');
+  toast('+'+ml+' мл');tg?.HapticFeedback?.impactOccurred('light');
   apiPost('/api/water',{amount:ml});
-  setTimeout(()=>{_addWBusy=false;},300);
+  setTimeout(()=>{_addWBusy=false;},250);
 }
 async function undoW(){
-  if(!C.water.entries?.length){toast('Нечего отменять');return;}
+  if(!C.water.entries?.length){toast('нечего отменять');return;}
   const last=C.water.entries.pop();
   C.water.total=Math.max(0,(C.water.total||0)-last);
-  renderTrack('water');renderHome();toast('Отменено −'+last+' мл');
+  renderTrack('water');renderHome();toast('отменено −'+last+' мл');
   apiPost('/api/water/undo',{});
 }
 async function completeAct(id){
@@ -1597,100 +1524,38 @@ async function completeAct(id){
   const ns=!a.completed;
   C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:ns?1:0}:x);
   renderPlan();renderHome();
-  toast(ns?'Выполнено':'Отменено');
+  toast(ns?'выполнено':'отменено');
   tg?.HapticFeedback?.notificationOccurred(ns?'success':'warning');
   await apiPost(ns?'/api/activity/complete':'/api/activity/uncomplete',{act_id:id});
   await reload();
 }
-function toggleSett(key){
-  const ss=gSS();const nv=!ss[key];
-  const fm={w:'show_weight',water:'show_water',cal:'show_calories',sleep:'show_sleep'};
-  if(fm[key])C.settings[fm[key]]=nv?1:0;
-  const tog=$('tog-'+key);if(tog){tog.classList.toggle('on',nv);tog.classList.toggle('off',!nv);}
-  toast(nv?'Показывается':'Скрыто');
-  apiPost('/api/settings',{[fm[key]]:nv?1:0});
-}
-
-let _sleepQ=3,_mealType='breakfast',_actType='run',_gender='male';
-let actStep=1;
-const ACT_STEPS_TITLE=['Название','Когда?','Готово!'];
-const ACT_STEPS_SUB=['как называется активность?','выбери время и длительность','проверь и добавь в план'];
-
-function _renderActStep(){
-  [1,2,3].forEach(i=>{
-    document.getElementById('act-s'+i)?.classList.toggle('active',i===actStep);
-    const pip=document.getElementById('sp'+i);
-    if(pip){pip.classList.toggle('on',i===actStep);pip.classList.toggle('done',i<actStep);}
-  });
-  const t=document.getElementById('act-step-title'),s=document.getElementById('act-step-sub');
-  if(t)t.textContent=ACT_STEPS_TITLE[actStep-1];
-  if(s)s.textContent=ACT_STEPS_SUB[actStep-1];
-  const btn=document.getElementById('act-next-btn');
-  if(btn)btn.textContent=actStep===3?'✓ Добавить в план':'Далее →';
-  // Init pickers on step 2
-  if(actStep===2)requestAnimationFrame(()=>{initTimePicker();initDurPicker();});
-  // Update confirm on step 3
-  if(actStep===3){
-    const name=document.getElementById('inp-aname')?.value||'—';
-    const hv=PKR.th?.get(),mv=PKR.tm?.get(),dv=PKR.dur?.get();
-    const time=hv&&mv?String(hv.v).padStart(2,'0')+':'+String(mv.v).padStart(2,'0'):'—';
-    const dur=dv?dv.v:30;
-    const ico=ACT_ICO[_actType]||'✨';
-    document.getElementById('act-confirm-ico')&&(document.getElementById('act-confirm-ico').textContent=ico);
-    document.getElementById('act-confirm-name')&&(document.getElementById('act-confirm-name').textContent=name);
-    document.getElementById('act-confirm-time')&&(document.getElementById('act-confirm-time').textContent=time+' · '+dur+' мин');
-  }
-  tg?.HapticFeedback?.selectionChanged();
-}
-function actStepNext(){
-  if(actStep===1){
-    const name=document.getElementById('inp-aname')?.value?.trim();
-    if(!name){toast('Введи название');return;}
-    actStep=2;_renderActStep();
-  } else if(actStep===2){
-    actStep=3;_renderActStep();
-  } else {
-    submitAct();
-  }
-}
-function actQuick(name,type){
-  _actType=type;
-  document.querySelectorAll('#act-quick .type-card').forEach(c=>c.classList.remove('on'));
-  event?.target?.closest('.type-card')?.classList.add('on');
-  const inp=document.getElementById('inp-aname');if(inp)inp.value=name;
-}
-function setSleepQ(q){_sleepQ=q;document.querySelectorAll('#seg-sleepq .md-seg-btn').forEach(b=>b.classList.toggle('on',+b.dataset.q===q));}
-function setMeal(m){_mealType=m;document.querySelectorAll('#seg-meal .md-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.m===m));}
-function setGender(g){_gender=g;document.querySelectorAll('#seg-gender .md-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.g===g));}
-function setActType(at){_actType=at;document.querySelectorAll('#seg-atype .seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.t===at));}
-
 async function submitWeight(){
   const iv=PKR.wi?.get(),dv=PKR.wd?.get();
   const v=iv&&dv!=null?iv.v+dv.v:null;
-  if(!v||v<30||v>300){toast('Выбери вес');return;}
+  if(!v||v<30||v>300){toast('выбери вес');return;}
   closeScr();
   C.weight_log=[...(C.weight_log||[]),{weight:v,logged_at:TODAY}];
   if(!C.user.start_weight)C.user.start_weight=v;
   renderProgress();renderHome();
-  toast('Вес '+v.toFixed(1)+' кг сохранён');
+  toast('вес '+v.toFixed(1)+' кг сохранён');
   tg?.HapticFeedback?.notificationOccurred('success');
   await apiPost('/api/weight',{weight:v});await reload();
 }
 async function submitSleep(){
   const hv=PKR.sh?.get(),dv=PKR.sd?.get();
   const hrs=hv&&dv!=null?hv.v+(dv?.v||0):null;
-  if(!hrs||hrs<.5||hrs>20){toast('Выбери часы сна');return;}
+  if(!hrs||hrs<.5||hrs>20){toast('выбери часы сна');return;}
   closeScr();
   C.sleep_log=[...(C.sleep_log||[]),{hours:hrs,quality:_sleepQ,logged_at:TODAY}];
   renderSleep();renderHome();
-  toast('Сон '+hrs+' ч сохранён');
+  toast('сон '+hrs+' ч сохранён');
   tg?.HapticFeedback?.notificationOccurred('success');
   await apiPost('/api/sleep',{hours:hrs,quality:_sleepQ});await reload();
 }
 async function submitCal(){
   const cal=parseInt($('inp-cal')?.value);
   const desc=$('inp-cal-desc')?.value||'';
-  if(!cal||cal<1){toast('Введи калории');return;}
+  if(!cal||cal<1){toast('введи калории');return;}
   closeScr();
   if(!C.calories)C.calories={};
   C.calories[_mealType]=(C.calories[_mealType]||0)+cal;
@@ -1703,10 +1568,10 @@ async function submitProfile(){
   const name=$('inp-pname')?.value?.trim();
   const height=parseInt($('inp-height')?.value);
   const age=parseInt($('inp-age')?.value);
-  if(!name){toast('Введи имя');return;}
-  closeScr();
+  if(!name){toast('введи имя');return;}
+  popPage();
   C.user={...C.user,name,height:height||0,age:age||0,gender:_gender};
-  renderProfile();renderHome();toast('Профиль обновлён');
+  renderProfile();renderHome();toast('профиль обновлён');
   tg?.HapticFeedback?.notificationOccurred('success');
   await apiPost('/api/profile',{name,height:height||0,age:age||0,gender:_gender});await reload();
 }
@@ -1714,30 +1579,28 @@ async function submitGoals(){
   const gw=parseFloat($('inp-gw')?.value)||0;
   const gwat=parseInt($('inp-gwat')?.value)||2000;
   const gcal=parseInt($('inp-gcal')?.value)||2000;
-  closeScr();
+  popPage();
   C.user={...C.user,goal_weight:gw,water_goal:gwat,cal_goal:gcal};
-  renderProfile();renderHome();toast('Цели обновлены');
+  renderProfile();renderHome();toast('цели обновлены');
   tg?.HapticFeedback?.notificationOccurred('success');
   await apiPost('/api/goals',{goal_weight:gw,water_goal:gwat,cal_goal:gcal});await reload();
 }
 async function submitAct(){
   const name=$('inp-aname')?.value?.trim();
-  const hv=PKR.th?.get(),mv=PKR.tm?.get(),dv=PKR.dur?.get();
-  const time=hv&&mv?String(hv.v).padStart(2,'0')+':'+String(mv.v).padStart(2,'0'):'08:00';
-  const dur=dv?dv.v:30;
-  if(!name){toast('Введи название');return;}
-  closeScr();
+  const time=$('inp-atime')?.value||'08:00';
+  if(!name){toast('введи название');return;}
+  popPage();
   const fid=Date.now();
-  C.acts_today=[...(C.acts_today||[]),{id:fid,name,type:_actType,scheduled_at:`${TODAY}T${time}:00`,duration:dur,completed:0}];
+  C.acts_today=[...(C.acts_today||[]),{id:fid,name,type:_actType,scheduled_at:`${TODAY}T${time}:00`,duration:_actDur,completed:0}];
   renderPlan();renderHome();toast(name+' добавлено 🎉');
   tg?.HapticFeedback?.notificationOccurred('success');
-  await apiPost('/api/activity/create',{name,type:_actType,time,duration:dur});await reload();
+  await apiPost('/api/activity/create',{name,type:_actType,time,duration:_actDur});await reload();
 }
 function confirmReset(){
-  if(!confirm('Сбросить все данные?'))return;
+  if(!confirm('сбросить все данные?'))return;
   localStorage.clear();
   C={user:{name:'…',water_goal:2000,cal_goal:2000},settings:{show_weight:1,show_water:1,show_calories:1,show_sleep:1},water:{total:0,entries:[],streak:0},calories:{},weight_log:[],sleep_log:[],acts_today:[],products:[]};
-  renderHome();renderProfile();toast('Данные сброшены');
+  popPage();renderHome();renderProfile();toast('данные сброшены');
 }
 
 /* ════ ACTIVITY STATUS ════ */
@@ -1745,34 +1608,38 @@ function actStatus(a){
   const now=new Date(),[hh,mm]=(a.time||'00:00').split(':').map(Number);
   const st=new Date();st.setHours(hh,mm,0,0);
   const en=new Date(st.getTime()+(a.duration||30)*60000);
-  if(a.completed)return{s:'done',l:'Выполнено'};
-  if(now>en)return{s:'late',l:'Просрочено'};
-  if(now>=st&&now<=en){const r=Math.round((en-now)/60000);return{s:'now',l:'Идёт · ещё '+r+' мин',p:(now-st)/(en-st)};}
+  if(a.completed)return{s:'done',l:'выполнено'};
+  if(now>en)return{s:'late',l:'просрочено'};
+  if(now>=st&&now<=en){const r=Math.round((en-now)/60000);return{s:'now',l:'идёт · ещё '+r+' мин',p:(now-st)/(en-st)};}
   const df=Math.round((st-now)/60000);
-  if(df<=30)return{s:'soon',l:'Через '+df+' мин'};
-  return{s:'later',l:'В '+a.time};
+  if(df<=30)return{s:'soon',l:'через '+df+' мин'};
+  return{s:'later',l:'в '+a.time};
 }
 function fmtRange(a){
   const[hh,mm]=(a.time||'00:00').split(':').map(Number);
   const eh=hh+Math.floor((mm+(a.duration||30))/60),em=(mm+(a.duration||30))%60;
-  return`${a.time} – ${String(eh%24).padStart(2,'0')}:${String(em).padStart(2,'0')}`;
+  return`${a.time}–${String(eh%24).padStart(2,'0')}:${String(em).padStart(2,'0')}`;
 }
 
 /* ════ TOAST ════ */
 let _tt;
 function toast(msg){
-  const el=$('toast');el.textContent=msg;el.classList.add('show');
-  clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),2000);
+  const el=$('toast');if(!el)return;
+  el.textContent=msg;el.classList.add('show');
+  clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),1800);
 }
 
-/* ════ CHART (Canvas) ════ */
+/* ════ CHART ════ */
 let _chartRaf=null;
 function drawChart(data){
   const canvas=$('wchart');if(!canvas)return;
   cancelAnimationFrame(_chartRaf);
   _chartRaf=requestAnimationFrame(()=>{
-    const dpr=window.devicePixelRatio||1;
-    const W=canvas.parentElement.offsetWidth||280,H=90;
+    const dpr=Math.min(window.devicePixelRatio||1,2);
+    const containerW=canvas.parentElement.clientWidth||280;
+    // Make chart wider if many data points
+    const W=Math.max(containerW,data&&data.length>5?data.length*52:containerW);
+    const H=90;
     canvas.width=W*dpr;canvas.height=H*dpr;
     canvas.style.width=W+'px';canvas.style.height=H+'px';
     const ctx=canvas.getContext('2d');
@@ -1780,21 +1647,20 @@ function drawChart(data){
     const cs=getComputedStyle(document.documentElement);
     const sun=cs.getPropertyValue('--sun').trim()||'#FF6B35';
     const hint=cs.getPropertyValue('--hint').trim()||'#A89F90';
-    const bg2=cs.getPropertyValue('--bg2').trim()||'#fff';
+    const bg=cs.getPropertyValue('--bg2').trim()||'#fff';
     ctx.clearRect(0,0,W,H);
     if(!data||data.length<2){
-      ctx.fillStyle=hint;ctx.font='600 11px Onest,sans-serif';
-      ctx.textAlign='center';ctx.fillText('нет данных',W/2,H/2);return;
+      ctx.fillStyle=hint;ctx.font='600 11px Onest,sans-serif';ctx.textAlign='center';ctx.fillText('нет данных',W/2,H/2);return;
     }
     const ws=data.map(d=>d.weight);
-    const mn=Math.min(...ws)-.5,mx=Math.max(...ws)+.5,rng=mx-mn||1;
-    const pl={l:10,r:10,t:18,b:20};
+    const mn=Math.min(...ws)-.3,mx=Math.max(...ws)+.3,rng=mx-mn||1;
+    const pl={l:8,r:8,t:18,b:20};
     const xs=(W-pl.l-pl.r)/(data.length-1);
     const yf=w=>pl.t+(1-(w-mn)/rng)*(H-pl.t-pl.b);
     const pts=data.map((d,i)=>[pl.l+i*xs,yf(d.weight)]);
-    // area
+    // gradient area
     const grad=ctx.createLinearGradient(0,0,0,H);
-    grad.addColorStop(0,'rgba(255,107,53,.18)');grad.addColorStop(1,'rgba(255,107,53,0)');
+    grad.addColorStop(0,'rgba(255,107,53,.16)');grad.addColorStop(1,'rgba(255,107,53,0)');
     ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);
     for(let i=0;i<pts.length-1;i++){const cx=(pts[i][0]+pts[i+1][0])/2;ctx.bezierCurveTo(cx,pts[i][1],cx,pts[i+1][1],pts[i+1][0],pts[i+1][1]);}
     ctx.lineTo(pts[pts.length-1][0],H);ctx.lineTo(pts[0][0],H);ctx.closePath();
@@ -1805,19 +1671,15 @@ function drawChart(data){
     ctx.strokeStyle=sun;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.lineCap='round';ctx.stroke();
     // dots + labels
     pts.forEach((p,i)=>{
-      ctx.beginPath();ctx.arc(p[0],p[1],4,0,Math.PI*2);
-      ctx.fillStyle=sun;ctx.fill();
-      ctx.beginPath();ctx.arc(p[0],p[1],2.5,0,Math.PI*2);
-      ctx.fillStyle=bg2;ctx.fill();
-      ctx.fillStyle=sun;ctx.font='700 9px Onest,sans-serif';ctx.textAlign='center';
-      ctx.fillText(data[i].weight,p[0],p[1]-8);
-      ctx.fillStyle=hint;ctx.font='700 8px Onest,sans-serif';
-      ctx.fillText(fmtMD(data[i].logged_at),p[0],H-2);
+      ctx.beginPath();ctx.arc(p[0],p[1],4,0,Math.PI*2);ctx.fillStyle=sun;ctx.fill();
+      ctx.beginPath();ctx.arc(p[0],p[1],2.5,0,Math.PI*2);ctx.fillStyle=bg;ctx.fill();
+      ctx.fillStyle=sun;ctx.font='700 9px Onest,sans-serif';ctx.textAlign='center';ctx.fillText(data[i].weight,p[0],p[1]-8);
+      ctx.fillStyle=hint;ctx.font='700 8px Onest,sans-serif';ctx.fillText(fmtMD(data[i].logged_at),p[0],H-2);
     });
   });
 }
 
-/* ════ RENDER HOME ════ */
+/* ════ RENDERS ════ */
 function renderHome(){
   const u=gU(),wl=gWL(),sl=gSL(),wd=gWD();
   T('h-name',u.name||'—');
@@ -1826,24 +1688,19 @@ function renderHome(){
   const mons=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
   T('h-date',days[now.getDay()]+', '+now.getDate()+' '+mons[now.getMonth()]);
   const dsl=dts();T('h-days',dsl);T('h-dunit',pD(dsl));T('h-ddays',dsl);
-  // water arc
   const wt=wd.total||0,wg=u.water_goal||2000,wp=Math.min(1,wt/wg);
   T('arc-wpct',Math.round(wp*100)+'%');T('arc-wml',wt);
-  requestAnimationFrame(()=>{const a=$('arc-w');if(a)a.setAttribute('stroke-dashoffset',175.9*(1-wp));});
-  // cal arc
+  requestAnimationFrame(()=>{const a=$('arc-w');if(a)a.setAttribute('stroke-dashoffset',163.4*(1-wp));});
   const ct=totalCal(),cg=u.cal_goal||2000,cp=Math.min(1,ct/cg);
   T('arc-cpct',Math.round(cp*100)+'%');T('arc-cval',ct);
-  requestAnimationFrame(()=>{const a=$('arc-c');if(a)a.setAttribute('stroke-dashoffset',219.9*(1-cp));});
-  // sleep arc
+  requestAnimationFrame(()=>{const a=$('arc-c');if(a)a.setAttribute('stroke-dashoffset',207.3*(1-cp));});
   if(sl.length){
     const last=sl[sl.length-1];
-    const sqEl=$('arc-sq');
-    if(sqEl)sqEl.innerHTML=Array.from({length:5},(_,i)=>`<div class="sqd${i<last.quality?' on':''}"></div>`).join('');
+    const sqEl=$('arc-sq');if(sqEl)sqEl.innerHTML=Array.from({length:5},(_,i)=>`<div class="sqd${i<last.quality?' on':''}"></div>`).join('');
     const sp=Math.min(1,last.hours/9);
-    requestAnimationFrame(()=>{const a=$('arc-s');if(a)a.setAttribute('stroke-dashoffset',175.9*(1-sp));});
+    requestAnimationFrame(()=>{const a=$('arc-s');if(a)a.setAttribute('stroke-dashoffset',163.4*(1-sp));});
     T('arc-sh',last.hours.toFixed(1));
   }
-  // weight
   if(wl.length){
     const cw=wl[wl.length-1].weight,sw=u.start_weight||wl[0].weight||cw,gw=u.goal_weight;
     T('h-wcur',cw.toFixed(1));T('h-wgoal',gw?gw.toFixed(1):'—');
@@ -1852,11 +1709,9 @@ function renderHome(){
     T('h-wpct',pct+'%');
     requestAnimationFrame(()=>{const b=$('h-wbar');if(b)b.style.width=pct+'%';});
   }
-  // streak
   const streak=gStreak();
   const sw=$('h-streak-w');if(sw)sw.style.display=streak>=2?'':'none';
   T('h-sval',streak+' дней подряд');
-  // plan preview
   const acts=gActs();
   const ps=$('h-plan-sec'),pl=$('h-plan-list');
   if(ps&&pl){
@@ -1871,18 +1726,14 @@ function renderHome(){
         const et=new Date(at.getTime()+(a.duration||30)*60000);
         const ts=`${a.time}–${String(et.getHours()).padStart(2,'0')}:${String(et.getMinutes()).padStart(2,'0')}`;
         const late=!done&&nt>et;
-        const badge=done?`<span class="pill p-ok">✓</span>`:late?`<span class="pill p-late">Просрочено</span>`:`<span class="pill p-soon">${a.time}</span>`;
-        return`<div class="ac${done?' done':''}"><div class="ac-ico" style="background:${col}16">${done?'✅':ico}</div><div class="ac-body"><div class="ac-name">${a.name}</div><div class="ac-sub">${ts} · ${a.duration} мин</div></div>${badge}</div>`;
+        const badge=done?`<span class="pill p-ok">✓</span>`:late?`<span class="pill p-late">просрочено</span>`:`<span class="pill p-soon">${a.time}</span>`;
+        return`<div class="ac${done?' done':''}"><div class="ac-ico" style="background:${col}18">${done?'✅':ico}</div><div class="ac-body"><div class="ac-name">${a.name}</div><div class="ac-sub">${ts} · ${a.duration} мин</div></div>${badge}</div>`;
       }).join('');
     }
   }
 }
 
-/* ════ RENDER TRACK ════ */
-function renderTrack(tab){
-  if(tab==='water')renderWater();
-  else if(tab==='cal')renderCal();
-}
+function renderTrack(tab){if(tab==='water')renderWater();else if(tab==='cal')renderCal();}
 function renderWater(){
   const u=gU(),wd=gWD();
   const wt=wd.total||0,wg=u.water_goal||2000,wp=Math.min(100,Math.round(wt/wg*100));
@@ -1891,21 +1742,17 @@ function renderWater(){
   const st=gStreak();
   H('w-streak',st>=2?`<div style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,107,53,.1);color:var(--sun);padding:4px 12px;border-radius:99px;font-size:11px;font-weight:800">🔥 ${st} дней подряд</div>`:'');
   const entries=wd.entries||[];
-  H('w-entries',entries.length?[...entries].reverse().slice(0,8).map((e,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(0,0,0,.04)${i===0?';border-bottom:none':''}"><span style="font-size:12px;font-weight:700;color:var(--water)">+${e} мл</span><span class="t5" style="font-size:11px">стакан ${entries.length-i}</span></div>`).join(''):'<div style="text-align:center;padding:12px;color:var(--hint);font-size:12px;font-weight:600">Пока ничего не записано</div>');
+  H('w-entries',entries.length?[...entries].reverse().slice(0,8).map((e,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--brd)${i===0?';border-bottom:none':''}"><span style="font-size:12px;font-weight:700;color:var(--water)">+${e} мл</span><span class="t5" style="font-size:11px">стакан ${entries.length-i}</span></div>`).join(''):'<div style="text-align:center;padding:12px;color:var(--hint);font-size:12px;font-weight:600">пока ничего не записано</div>');
 }
 function renderCal(){
   const u=gU(),cd=gCD();
   const ct=totalCal(),cg=u.cal_goal||2000,cp=Math.min(100,Math.round(ct/cg*100));
   T('c-total',ct);T('c-goal',cg);
   requestAnimationFrame(()=>{const b=$('c-bar');if(b)b.style.width=cp+'%';});
-  const MEALS=[{k:'breakfast',i:'🌅',n:'Завтрак',col:'#FF9800'},{k:'lunch',i:'☀️',n:'Обед',col:'#FF6B35'},{k:'dinner',i:'🌙',n:'Ужин',col:'#8B7FD4'},{k:'snack',i:'🍑',n:'Перекус',col:'#52C177'},{k:'other',i:'🌿',n:'Другое',col:'#607D8B'}];
-  H('c-meals',MEALS.map(m=>`<div class="mr"><div class="mr-ico" style="background:${m.col}15;color:${m.col}">${m.i}</div><div style="flex:1"><div class="mr-name">${m.n}</div>${!cd[m.k]?`<div class="t5" style="font-size:10px">не записано</div>`:''}</div><div class="mr-kcal" style="${cd[m.k]?'color:var(--cal)':'color:var(--hint)'}">${cd[m.k]||'—'} ${cd[m.k]?'ккал':''}</div></div>`).join(''));
-}
-function renderProds(){
-  H('prod-list',gProds().slice(0,10).map(p=>`<div class="pr"><div><div class="pr-name">${p.name}</div><div class="pr-meta">Б${p.protein} · Ж${p.fat} · У${p.carbs}</div></div><div class="pr-kcal">${p.calories}</div></div>`).join(''));
+  const MEALS=[{k:'breakfast',i:'🌅',n:'завтрак',col:'#FF9800'},{k:'lunch',i:'☀️',n:'обед',col:'#FF6B35'},{k:'dinner',i:'🌙',n:'ужин',col:'#8B7FD4'},{k:'snack',i:'🍑',n:'перекус',col:'#52C177'},{k:'other',i:'🌿',n:'другое',col:'#607D8B'}];
+  H('c-meals',MEALS.map(m=>`<div class="mr"><div class="mr-ico" style="background:${m.col}18;color:${m.col}">${m.i}</div><div style="flex:1"><div class="mr-name">${m.n}</div>${!cd[m.k]?`<div class="t5" style="font-size:10px">не записано</div>`:''}</div><div class="mr-kcal" style="${cd[m.k]?'color:var(--cal)':'color:var(--hint)'}">${cd[m.k]||'—'} ${cd[m.k]?'ккал':''}</div></div>`).join(''));
 }
 
-/* ════ RENDER PLAN ════ */
 function renderPlan(){
   const acts=gActs();
   const now=new Date();
@@ -1923,30 +1770,28 @@ function renderPlan(){
     const pc={done:'p-ok',now:'p-now',soon:'p-soon',late:'p-late',later:'p-later'}[st.s]||'p-later';
     const pct=st.s==='now'?Math.round((st.p||0)*100):st.s==='done'?100:0;
     const bar=['done','now','soon'].includes(st.s);
-    const en=a.name.replace(/'/g,"\\'");
     return`<div class="ac${a.completed?' done':''}">
-      <div class="ac-ico" style="background:${col}16">${a.completed?'✅':ico}</div>
+      <div class="ac-ico" style="background:${col}18">${a.completed?'✅':ico}</div>
       <div class="ac-body">
         <div class="ac-name${a.completed?' done-text':''}">${a.name}</div>
         <div class="ac-sub">${fmtRange(a)} · ${a.duration} мин</div>
         <span class="pill ${pc}">${st.l}</span>
         ${bar?`<div class="ac-bar"><div class="ac-barf" style="width:${st.s==='soon'?80:pct}%;background:${st.s==='done'?'var(--green)':st.s==='now'?'var(--water)':'rgba(255,107,53,.35)'}"></div></div>`:''}
       </div>
-      <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
-        <button class="btn btn-g" style="padding:6px 10px;font-size:12px;border-radius:9px" onclick="completeAct(${a.id})">${a.completed?'↩':'✓'}</button>
+      <div style="flex-shrink:0">
+        <button class="btn btn-g" style="padding:7px 11px;font-size:12px;border-radius:9px" onclick="completeAct(${a.id})">${a.completed?'↩':'✓'}</button>
       </div>
     </div>`;
   }).join('');
 }
 setInterval(()=>{if(curTab==='plan')renderPlan();},30000);
 
-/* ════ RENDER SLEEP ════ */
 function renderSleep(){
   const sl=gSL();
   if(sl.length){const last=sl[sl.length-1];T('sl-h',last.hours.toFixed(1));T('sl-qico',qIco(last.quality));H('sl-dots',Array.from({length:5},(_,i)=>`<div class="sqd${i<last.quality?' on':''}"></div>`).join(''));}
   else{T('sl-h','—');T('sl-qico','—');H('sl-dots','');}
   const l7=sl.slice(-7).reverse();
-  H('sl-hist',l7.length?l7.map(e=>`<div class="hr"><div class="hr-d">${fmtD(e.logged_at)}</div><div style="display:flex;align-items:center;gap:7px;flex:1"><div class="hr-v">${e.hours.toFixed(1)} ч</div><div class="sq">${Array.from({length:5},(_,i)=>`<div class="sqd${i<e.quality?' on':''}"></div>`).join('')}</div></div><div style="font-size:16px">${qIco(e.quality)}</div></div>`).join(''):'<div style="text-align:center;padding:14px;color:var(--hint);font-size:12px;font-weight:600">Нет записей</div>');
+  H('sl-hist',l7.length?l7.map(e=>`<div class="hr"><div class="hr-d">${fmtD(e.logged_at)}</div><div style="display:flex;align-items:center;gap:7px;flex:1"><div class="hr-v">${e.hours.toFixed(1)} ч</div><div class="sq">${Array.from({length:5},(_,i)=>`<div class="sqd${i<e.quality?' on':''}"></div>`).join('')}</div></div><div style="font-size:16px">${qIco(e.quality)}</div></div>`).join(''):'<div style="text-align:center;padding:14px;color:var(--hint);font-size:12px;font-weight:600">нет записей</div>');
   if(l7.length){
     const ah=+(l7.reduce((a,b)=>a+b.hours,0)/l7.length).toFixed(1);
     const aq=+(l7.reduce((a,b)=>a+(b.quality||3),0)/l7.length).toFixed(1);
@@ -1954,7 +1799,6 @@ function renderSleep(){
   }
 }
 
-/* ════ RENDER PROGRESS ════ */
 function renderProgress(){
   const u=gU(),wl=gWL(),sl=gSL(),wd=gWD(),acts=gActs();
   if(wl.length){
@@ -1968,21 +1812,22 @@ function renderProgress(){
     if(wl.length>=2&&gw&&cw>gw){try{
       const d1=new Date(wl[0].logged_at+'T00:00:00'),d2=new Date(wl[wl.length-1].logged_at+'T00:00:00');
       const dd=Math.max(1,(d2-d1)/86400000),rate=(wl[0].weight-wl[wl.length-1].weight)/dd*7;
-      if(rate>.01){const dl=Math.ceil((cw-gw)/rate*7),eta=new Date();eta.setDate(eta.getDate()+dl);const mons=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];T('pr-forecast','Прогноз: '+eta.getDate()+' '+mons[eta.getMonth()]+' · темп '+rate.toFixed(2)+' кг/нед');}
+      if(rate>.01){const dl=Math.ceil((cw-gw)/rate*7),eta=new Date();eta.setDate(eta.getDate()+dl);const mons=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];T('pr-forecast','прогноз: '+eta.getDate()+' '+mons[eta.getMonth()]+' · темп '+rate.toFixed(2)+' кг/нед');}
     }catch{}}
   }
-  drawChart(wl.slice(-7));
+  // Show all weight data in chart with scroll
+  const chartData=wl.length>14?wl.slice(-14):wl;
+  setTimeout(()=>drawChart(chartData),50);
   T('pw-water',wd.total||0);T('pw-cal',totalCal());
   if(sl.length)T('pw-sleep',+(sl.slice(-7).reduce((a,b)=>a+b.hours,0)/Math.min(7,sl.length)).toFixed(1));
   else T('pw-sleep','—');
   const l6=wl.slice(-6).reverse();
-  H('pr-whist',l6.length?l6.map((e,i)=>{const prev=l6[i+1];const diff=prev?+(e.weight-prev.weight).toFixed(1):0;return`<div class="hr"><div class="hr-d">${fmtD(e.logged_at)}</div><div class="hr-v">${e.weight.toFixed(1)} кг</div>${diff?`<div class="hr-diff ${diff<0?'d-neg':'d-pos'}">${diff>0?'+':''}${diff}</div>`:'<div></div>'}</div>`;}).join(''):'<div style="text-align:center;padding:12px;color:var(--hint);font-size:12px;font-weight:600">Нет записей</div>');
+  H('pr-whist',l6.length?l6.map((e,i)=>{const prev=l6[i+1];const diff=prev?+(e.weight-prev.weight).toFixed(1):0;return`<div class="hr"><div class="hr-d">${fmtD(e.logged_at)}</div><div class="hr-v">${e.weight.toFixed(1)} кг</div>${diff?`<div class="hr-diff ${diff<0?'d-neg':'d-pos'}">${diff>0?'+':''}${diff}</div>`:'<div></div>'}</div>`;}).join(''):'<div style="text-align:center;padding:12px;color:var(--hint);font-size:12px;font-weight:600">нет записей</div>');
   T('at-t',acts.filter(a=>a.completed).length);
   T('at-w',+((wd.total||0)/1000).toFixed(1));
   T('at-s',gStreak());
 }
 
-/* ════ RENDER PROFILE ════ */
 function renderProfile(){
   const u=gU(),ss=gSS(),wl=gWL();
   const av=$('pf-av');if(av)av.textContent=(u.name||'?').charAt(0).toUpperCase();
@@ -2003,20 +1848,15 @@ function renderProfile(){
     if(bmiRow)bmiRow.style.display='';
     T('pf-bmi',bmi);T('pf-ideal',ideal);T('pf-bmr',bmr);
   }else if(bmiRow)bmiRow.style.display='none';
-  ['w','water','cal','sleep'].forEach(k=>{
-    const tog=$('tog-'+k),on=ss[k]!==false;
-    if(tog){tog.classList.toggle('on',on);tog.classList.toggle('off',!on);}
-  });
 }
 
 /* ════ INIT ════ */
 document.addEventListener('DOMContentLoaded',async()=>{
   const dark=tg?.colorScheme==='dark'||window.matchMedia?.('(prefers-color-scheme:dark)').matches;
   if(dark)document.body.classList.add('tg-dark');
-  tg?.onEvent('themeChanged',()=>document.body.classList.toggle('tg-dark',tg?.colorScheme==='dark'));
+  tg?.onEvent('themeChanged',()=>{document.body.classList.toggle('tg-dark',tg?.colorScheme==='dark');applyTheme();});
   await loadData();
   renderHome();
-  setTimeout(renderHome,150);
   setInterval(async()=>{if(curTab==='home'){await loadData();renderHome();}},30000);
 });
 </script>
