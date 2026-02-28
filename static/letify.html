@@ -474,16 +474,108 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 /* ══ CLEAR BTN HINT ══ */
 .clear-hint{font-size:10px;font-weight:600;color:var(--hint);text-align:center;margin-top:6px;padding:0 4px}
 
-/* ══ PLAN ADD BTN — sticky so it doesn't jump ══ */
-#pl-add-btn-wrap{
-  position:sticky;
-  bottom:calc(var(--sb) + 16px);
-  z-index:5;
-  background:linear-gradient(to top, var(--bg) 75%, transparent);
-  padding-top:12px;
-  padding-bottom:4px;
-  margin-top:8px;
+/* ══ PLAN ADD BTN — no longer used, kept for compat ══ */
+#pl-add-btn-wrap{display:none}
+
+/* ══ PLAN PAGE MD3 ══ */
+#p-plan{
+  display:flex;flex-direction:column;
+  overflow:hidden !important;
+  padding-top:0 !important;
+  padding-bottom:0 !important;
 }
+#p-plan .plan-hdr{
+  flex-shrink:0;padding:0 16px 10px;
+}
+#pl-tasks-outer{
+  flex:1;
+  overflow:hidden;
+  display:flex;flex-direction:column;
+  margin:0 14px 12px;
+}
+#pl-tasks-container{
+  flex:1;
+  background:var(--bg2);
+  border-radius:20px;
+  border:1px solid var(--brd);
+  overflow:hidden;
+  display:flex;flex-direction:column;
+}
+.tg-dark #pl-tasks-container{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1)}
+#pl-tasks-scroll{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;
+  padding:10px 12px 10px;
+}
+#pl-tasks-scroll::-webkit-scrollbar{display:none}
+.pl-empty{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:30px 16px;
+  gap:8px;opacity:.5;
+}
+.pl-empty svg{opacity:.3}
+#pl-add-sticky{
+  flex-shrink:0;
+  padding:10px 14px 14px;
+  background:var(--bg2);
+  border-top:1px solid var(--brd);
+}
+.tg-dark #pl-add-sticky{background:rgba(255,255,255,.05);border-top-color:rgba(255,255,255,.08)}
+
+/* ══ PLAN SETTINGS DAYS ══ */
+.ps-days{display:flex;gap:4px;padding:0;margin-bottom:14px}
+.ps-day-btn{
+  flex:1;height:38px;border:none;border-radius:10px;
+  font-family:inherit;font-size:12px;font-weight:800;
+  background:var(--bg3);color:var(--hint);cursor:pointer;
+  transition:background .12s,color .12s,transform .12s;
+}
+.ps-day-btn.on{background:var(--sun);color:#fff}
+.ps-day-btn:active{transform:scale(.94)}
+
+/* ══ SCANNER ══ */
+.scanner-viewport{
+  width:100%;aspect-ratio:1/1;
+  border-radius:24px;overflow:hidden;
+  position:relative;background:#000;
+  box-shadow:0 8px 32px rgba(0,0,0,.25);
+  margin-bottom:16px;
+}
+#scanner-video{
+  width:100%;height:100%;object-fit:cover;display:block;
+}
+.scanner-overlay{
+  position:absolute;inset:0;pointer-events:none;
+}
+.scanner-corner{
+  position:absolute;width:28px;height:28px;
+  border-color:var(--scan-border,rgba(255,255,255,.4));border-style:solid;border-width:0;
+}
+.scanner-corner.tl{top:16px;left:16px;border-top-width:3px;border-left-width:3px;border-radius:6px 0 0 0}
+.scanner-corner.tr{top:16px;right:16px;border-top-width:3px;border-right-width:3px;border-radius:0 6px 0 0}
+.scanner-corner.bl{bottom:16px;left:16px;border-bottom-width:3px;border-left-width:3px;border-radius:0 0 0 6px}
+.scanner-corner.br{bottom:16px;right:16px;border-bottom-width:3px;border-right-width:3px;border-radius:0 0 6px 0}
+.scanner-viewport.found .scanner-corner{--scan-border:var(--green) !important;}
+.scanner-found-card{
+  background:var(--bg2);border-radius:18px;padding:16px;
+  box-shadow:var(--sh);margin-bottom:16px;
+  animation:fadeUp .25s ease;
+}
+.tg-dark .scanner-found-card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.kbzhu-row{display:flex;gap:6px;margin-top:10px}
+.kbzhu-box{flex:1;background:var(--bg3);border-radius:12px;padding:8px;text-align:center}
+.kbzhu-v{font-size:16px;font-weight:900;color:var(--text)}
+.kbzhu-l{font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+.scan-ico-btn{
+  width:42px;height:42px;border-radius:14px;
+  background:rgba(255,107,53,.1);color:var(--sun);
+  display:flex;align-items:center;justify-content:center;
+  border:none;cursor:pointer;flex-shrink:0;
+  transition:background .12s,transform .12s;
+}
+.scan-ico-btn:active{transform:scale(.93);background:rgba(255,107,53,.18)}
 </style>
 </head>
 <body>
@@ -632,32 +724,40 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 <!-- ══ PLAN ══ -->
 <div class="page" id="p-plan">
-<div class="pad">
-  <div class="t2" style="margin-bottom:1px">план</div>
-  <div class="t5" id="pl-date">сегодня</div>
-</div>
-<div class="pad gap">
-<div class="card" style="cursor:pointer" onclick="openDoneActs()">
-  <div style="display:flex;align-items:center;justify-content:space-between">
+<div class="plan-hdr" style="padding-top:var(--page-top)">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:6px">
     <div>
-      <div style="font-size:34px;font-weight:900;line-height:1" id="pl-cnt">0/0</div>
-      <div class="t5" style="margin-top:2px">задач выполнено <span style="color:var(--hint);font-size:10px">→</span></div>
+      <div class="t2">план</div>
+      <div class="t5" id="pl-date">сегодня</div>
     </div>
-    <svg width="52" height="52" viewBox="0 0 52 52">
-      <circle cx="26" cy="26" r="20" fill="none" stroke="rgba(0,0,0,.06)" stroke-width="4.5"/>
-      <circle cx="26" cy="26" r="20" fill="none" stroke="var(--sun)" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="125.7" id="pl-ring" stroke-dashoffset="125.7" transform="rotate(-90 26 26)" style="transition:stroke-dashoffset .6s cubic-bezier(.34,1.1,.64,1)"/>
-    </svg>
+    <div style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="openDoneActs()">
+      <div style="text-align:right">
+        <div style="font-size:26px;font-weight:900;line-height:1;color:var(--sun)" id="pl-cnt">0/0</div>
+        <div class="t5" style="font-size:9px">выполнено →</div>
+      </div>
+      <svg width="44" height="44" viewBox="0 0 52 52">
+        <circle cx="26" cy="26" r="20" fill="none" stroke="rgba(255,107,53,.12)" stroke-width="4.5"/>
+        <circle cx="26" cy="26" r="20" fill="none" stroke="var(--sun)" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="125.7" id="pl-ring" stroke-dashoffset="125.7" transform="rotate(-90 26 26)" style="transition:stroke-dashoffset .6s cubic-bezier(.34,1.1,.64,1)"/>
+      </svg>
+    </div>
+  </div>
+  <div style="font-size:9px;font-weight:700;color:var(--hint);text-align:center;letter-spacing:.04em;opacity:.7;padding-bottom:8px">удержи карточку чтобы удалить</div>
+</div>
+<div id="pl-tasks-outer">
+  <div id="pl-tasks-container">
+    <div id="pl-tasks-scroll">
+      <div id="pl-list"></div>
+      <div id="pl-empty" style="display:none" class="pl-empty">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/></svg>
+        <div style="font-size:13px;font-weight:700">нет задач на сегодня</div>
+      </div>
+    </div>
+    <div id="pl-add-sticky">
+      <button class="btn btn-p" style="width:100%" onclick="pushPage('pp-act')">+ добавить активность</button>
+    </div>
   </div>
 </div>
-</div>
-<div class="pad" style="margin-top:4px">
-  <div style="font-size:10px;font-weight:700;color:var(--hint);text-align:center;padding:6px 0 2px;letter-spacing:.04em">удержи карточку чтобы удалить</div>
-</div>
-<div class="pad" id="pl-list" style="margin-top:4px"></div>
-<div class="pad" id="pl-add-btn-wrap">
-  <button class="btn btn-p" onclick="pushPage('pp-act')">добавить активность</button>
-</div>
-<div style="height:8px"></div>
+<div style="height:4px;flex-shrink:0"></div>
 </div>
 
 <!-- ══ SLEEP ══ -->
@@ -776,6 +876,12 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg></div>
     <span class="lt-lbl">мои цели</span>
     <span class="lt-val"><span id="pf-gw">—</span></span>
+    <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+  </div>
+  <div class="lt" style="padding-bottom:0;border:none" onclick="pushPage('pp-plan-settings')">
+    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/></svg></div>
+    <span class="lt-lbl">план по дням</span>
+    <span class="lt-val">расписание</span>
     <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
   </div>
 </div>
@@ -910,6 +1016,9 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       <div class="step-ind"><div class="step-pip on" id="cp1"></div><div class="step-pip" id="cp2"></div></div>
       <div class="pp-title" id="cal-step-title">название блюда</div>
     </div>
+    <button class="scan-ico-btn" onclick="pushPage('pp-scanner')" title="сканировать штрихкод">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="10" height="10" rx="1"/></svg>
+    </button>
   </div>
   <div class="pp-body">
     <div class="act-step active" id="cal-s1">
@@ -965,7 +1074,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
   <div class="pp-body">
     <div class="m3-card">
-      <div class="m3-field"><div class="m3-label">имя</div><input class="m3-input" id="inp-pname" type="text" placeholder="Алексей"></div>
+      <div class="m3-field"><div class="m3-label">имя</div><input class="m3-input" id="inp-pname" type="text" placeholder="данечка"></div>
       <div class="m3-field"><div class="m3-label">рост, см</div><input class="m3-input num" id="inp-height" type="number" inputmode="numeric" min="100" max="250" placeholder="175"></div>
       <div class="m3-field"><div class="m3-label">возраст</div><input class="m3-input num" id="inp-age" type="number" inputmode="numeric" min="10" max="100" placeholder="25"></div>
     </div>
@@ -1184,6 +1293,83 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
 </div>
 
+<!-- PP: Настройки плана по дням -->
+<div class="push-page" id="pp-plan-settings">
+  <div class="pp-hdr">
+    <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <div><div class="pp-title">план</div><div class="pp-subtitle">расписание по дням</div></div>
+  </div>
+  <div class="pp-body">
+    <div class="ps-days" id="ps-days-bar">
+      <button class="ps-day-btn on" data-dow="1" onclick="psDaySelect(1,this)">пн</button>
+      <button class="ps-day-btn" data-dow="2" onclick="psDaySelect(2,this)">вт</button>
+      <button class="ps-day-btn" data-dow="3" onclick="psDaySelect(3,this)">ср</button>
+      <button class="ps-day-btn" data-dow="4" onclick="psDaySelect(4,this)">чт</button>
+      <button class="ps-day-btn" data-dow="5" onclick="psDaySelect(5,this)">пт</button>
+      <button class="ps-day-btn" data-dow="6" onclick="psDaySelect(6,this)">сб</button>
+      <button class="ps-day-btn" data-dow="0" onclick="psDaySelect(0,this)">вс</button>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--hint);margin-bottom:8px;letter-spacing:.04em" id="ps-day-label">задачи на понедельник</div>
+    <div id="ps-tasks-list">
+      <div style="text-align:center;padding:24px;color:var(--hint);font-size:13px;font-weight:600">нет задач</div>
+    </div>
+    <button class="btn btn-p" style="margin-top:16px" onclick="popPage();pushPage('pp-act')">+ добавить активность</button>
+  </div>
+</div>
+
+<!-- PP: Сканер штрихкода -->
+<div class="push-page" id="pp-scanner">
+  <div class="pp-hdr">
+    <button class="pp-back" onclick="stopScanner();popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <div><div class="pp-title">сканировать</div><div class="pp-subtitle">наведи на штрихкод</div></div>
+  </div>
+  <div class="pp-body" style="padding:16px">
+    <div class="scanner-viewport" id="scanner-viewport">
+      <video id="scanner-video" autoplay playsinline muted></video>
+      <div class="scanner-overlay">
+        <div class="scanner-corner tl"></div>
+        <div class="scanner-corner tr"></div>
+        <div class="scanner-corner bl"></div>
+        <div class="scanner-corner br"></div>
+      </div>
+      <div id="scanner-status" style="position:absolute;bottom:12px;left:0;right:0;text-align:center;font-size:12px;font-weight:700;color:rgba(255,255,255,.7);text-shadow:0 1px 3px rgba(0,0,0,.5)">наведи на штрихкод</div>
+    </div>
+    <div id="scanner-result" style="display:none">
+      <div class="scanner-found-card">
+        <div style="font-size:16px;font-weight:900;margin-bottom:4px" id="sc-name">—</div>
+        <div class="t5" id="sc-brand"></div>
+        <div class="kbzhu-row">
+          <div class="kbzhu-box"><div class="kbzhu-v" id="sc-kcal" style="color:var(--cal)">—</div><div class="kbzhu-l">ккал/100г</div></div>
+          <div class="kbzhu-box"><div class="kbzhu-v" id="sc-prot" style="color:var(--green)">—</div><div class="kbzhu-l">белки</div></div>
+          <div class="kbzhu-box"><div class="kbzhu-v" id="sc-fat" style="color:var(--sun)">—</div><div class="kbzhu-l">жиры</div></div>
+          <div class="kbzhu-box"><div class="kbzhu-v" id="sc-carb" style="color:var(--sleep)">—</div><div class="kbzhu-l">углев.</div></div>
+        </div>
+      </div>
+      <div class="m3-sec">сколько грамм?</div>
+      <div class="m3-card" style="padding:8px">
+        <div class="stepper-wrap">
+          <button class="stepper-btn" onclick="stepScGrams(-10)">−</button>
+          <div class="stepper-val" id="sc-grams-disp">100<span class="unit">г</span></div>
+          <button class="stepper-btn" onclick="stepScGrams(10)">+</button>
+        </div>
+      </div>
+      <div class="m3-sec">приём пищи</div>
+      <div class="m3-seg" id="seg-sc-meal" style="margin-bottom:0">
+        <button class="m3-seg-btn on" onclick="setScMeal('breakfast')" data-m="breakfast">завтрак</button>
+        <button class="m3-seg-btn" onclick="setScMeal('lunch')" data-m="lunch">обед</button>
+        <button class="m3-seg-btn" onclick="setScMeal('dinner')" data-m="dinner">ужин</button>
+        <button class="m3-seg-btn" onclick="setScMeal('snack')" data-m="snack">перекус</button>
+      </div>
+      <button class="btn btn-p" style="margin-top:20px" onclick="submitScanned()">добавить</button>
+    </div>
+    <div id="scanner-not-found" style="display:none;text-align:center;padding:16px 0">
+      <div style="font-size:14px;font-weight:700;color:var(--hint);margin-bottom:8px">продукт не найден</div>
+      <div class="t5" style="margin-bottom:12px">штрихкод: <span id="sc-barcode-val">—</span></div>
+      <button class="btn btn-g" onclick="scannerRetry()">попробовать снова</button>
+    </div>
+  </div>
+</div>
+
 <!-- NAV — no dots, icon centered -->
 <nav id="nav">
   <div class="nt on" id="nt-home" onclick="navTo('home')">
@@ -1290,7 +1476,7 @@ async function loadData(){
 
 function _demo(){
   if(!lsGet('ds')){
-    lsSet('user',{name:tgUser?.first_name||'Алекс',height:175,age:27,start_weight:85,goal_weight:75,water_goal:2500,cal_goal:2000,gender:'male',goal_type:'lose'});
+    lsSet('user',{name:tgUser?.first_name||'данечка',height:175,age:27,start_weight:85,goal_weight:75,water_goal:2500,cal_goal:2000,gender:'male',goal_type:'lose'});
     const now=new Date(),wl=[],sl=[];
     for(let i=13;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);wl.push({weight:+(85-((13-i)*.25)+(Math.random()-.5)*.3).toFixed(1),logged_at:d.toLocaleDateString('en-CA')});}
     for(let i=6;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);sl.push({hours:+(6.5+Math.random()*2).toFixed(1),quality:3+Math.floor(Math.random()*3),logged_at:d.toLocaleDateString('en-CA')});}
@@ -1306,7 +1492,7 @@ function _demo(){
   const u=lsGet('user')||{};
   const wd=lsGet('wd_'+TODAY)||{total:0,entries:[]};
   const cd=lsGet('cd_'+TODAY)||{};
-  C.user={...{name:'Алекс',height:0,age:0,start_weight:0,goal_weight:0,water_goal:2000,cal_goal:2000,gender:'male',goal_type:'lose'},...u};
+  C.user={...{name:'данечка',height:0,age:0,start_weight:0,goal_weight:0,water_goal:2000,cal_goal:2000,gender:'male',goal_type:'lose'},...u};
   // user_sw is the authoritative source for start_weight (survives reloads & server overwrites)
   const sw=lsGet('user_sw');
   if(sw?.start_weight>0)C.user.start_weight=sw.start_weight;
@@ -1379,6 +1565,7 @@ function popPage(doRender=true){
   if(!curPushPage)return;
   if(curPushPage==='pp-pdata')_saveProfileSilent();
   if(curPushPage==='pp-goals')_saveGoalsSilent();
+  if(curPushPage==='pp-scanner')stopScanner();
   if(curPushPage==='pp-weight-chart'){
     const wrap=document.getElementById('wchart-svg-wrap');
     if(wrap)wrap.innerHTML='';
@@ -1498,6 +1685,21 @@ function _populatePP(id){
         return`<div class="ac done" style="margin-bottom:8px"><div class="ac-ico" style="background:${col}18">✅</div><div class="ac-body"><div class="ac-name done-text">${a.name}</div><div class="ac-sub">${fmtRange(a)} · ${a.duration} мин</div></div><span class="pill p-ok">✓</span></div>`;
       }).join('');}
     }
+  }
+  if(id==='pp-plan-settings'){
+    const todayJs=new Date().getDay(); // 0=вс,1=пн...
+    _psDow=todayJs===0?0:todayJs;
+    document.querySelectorAll('.ps-day-btn').forEach(b=>b.classList.toggle('on',+b.dataset.dow===_psDow));
+    T('ps-day-label','задачи на '+(_dowLabels[_psDow]||'день'));
+    _renderPsTasksList();
+  }
+  if(id==='pp-scanner'){
+    _scFoundProduct=null;
+    _scGrams=100;_scMealType='breakfast';
+    const r=$('scanner-result');if(r)r.style.display='none';
+    const nf=$('scanner-not-found');if(nf)nf.style.display='none';
+    const vp=$('scanner-viewport');if(vp)vp.classList.remove('found');
+    setTimeout(startScanner,200);
   }
 }
 
@@ -2180,13 +2382,15 @@ function renderPlan(){
   T('pl-cnt',total?`${done}/${total}`:'0/0');
   requestAnimationFrame(()=>{const r=$('pl-ring');if(r)r.setAttribute('stroke-dashoffset',125.7*(1-(total?done/total:0)));});
   const list=$('pl-list');
+  const empty=$('pl-empty');
   const activeTasks=acts.filter(a=>!a.completed);
   if(!list)return;
   if(!activeTasks.length){
     list.innerHTML='';
-    return; // No empty-state shown — button is always visible via sticky
+    if(empty)empty.style.display='flex';
+    return;
   }
-  list.style.display='';
+  if(empty)empty.style.display='none';
   list.innerHTML=activeTasks.map(a=>{
     const ico=ACT_ICO[a.type]||'✨',col=ACT_COL[a.type]||'#FF9800';
     const st=actStatus(a);
@@ -2296,6 +2500,201 @@ function renderProfile(){
     T('pf-bmr',Math.round(u.gender==='female'?10*cw+6.25*u.height-5*(u.age||25)-161:10*cw+6.25*u.height-5*(u.age||25)+5));
     if(bmiRow)bmiRow.style.display='';
   }else if(bmiRow)bmiRow.style.display='none';
+}
+
+/* ══ PLAN SETTINGS ══ */
+let _psDow = 1; // current selected day of week (1=Mon..7=Sun, 0=Sun)
+const _dowLabels = ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
+
+function psDaySelect(dow, el){
+  _psDow = dow;
+  document.querySelectorAll('.ps-day-btn').forEach(b=>b.classList.toggle('on',+b.dataset.dow===dow));
+  const lbl = _dowLabels[dow]||'день';
+  T('ps-day-label','задачи на '+lbl);
+  _renderPsTasksList();
+  tg?.HapticFeedback?.selectionChanged();
+}
+
+function _renderPsTasksList(){
+  const el = $('ps-tasks-list'); if(!el)return;
+  // All acts that repeat on this day (days_of_week includes _psDow) OR are daily (days_of_week empty)
+  const allActs = C.acts_today || [];
+  // We also look at repeat_days from activities directly
+  // For now filter from C.acts_today using repeat_days or days_of_week
+  const filtered = allActs.filter(a=>{
+    if(!a.repeat_days && !a.days_of_week) return true; // daily
+    const days = a.repeat_days||[];
+    const dw = typeof a.days_of_week==='string'
+      ? a.days_of_week.split(',').filter(Boolean).map(Number)
+      : [];
+    const combined = [...new Set([...days,...dw])];
+    if(!combined.length) return true; // daily
+    return combined.includes(_psDow);
+  });
+  if(!filtered.length){
+    el.innerHTML='<div style="text-align:center;padding:24px;color:var(--hint);font-size:13px;font-weight:600">нет задач</div>';
+    return;
+  }
+  el.innerHTML = filtered.map(a=>{
+    const ico=ACT_ICO[a.type]||'✨',col=ACT_COL[a.type]||'#FF9800';
+    const time=(a.scheduled_at||'').slice(11,16)||'00:00';
+    return`<div class="ac" style="margin-bottom:8px" ontouchstart="startPsLongPress(${a.id},this)" ontouchend="cancelLongPress()" ontouchmove="cancelLongPress()" oncontextmenu="event.preventDefault()">
+      <div class="ac-ico" style="background:${col}18">${ico}</div>
+      <div class="ac-body">
+        <div class="ac-name">${a.name}</div>
+        <div class="ac-sub">${time} · ${a.duration||30} мин</div>
+      </div>
+      <div style="flex-shrink:0;font-size:10px;color:var(--hint);font-weight:700">удержи<br>чтобы<br>удалить</div>
+    </div>`;
+  }).join('');
+}
+
+let _psLpTimer=null,_psLpEl=null;
+function startPsLongPress(id,el){
+  if(_psLpEl)cancelLongPress();
+  _psLpEl=el;
+  _psLpTimer=setTimeout(()=>{
+    _psLpTimer=null; const saved=_psLpEl; _psLpEl=null;
+    tg?.HapticFeedback?.notificationOccurred('warning');
+    navigator.vibrate?.([30,10,40]);
+    const name=saved?.querySelector('.ac-name')?.textContent||'задача';
+    if(confirm('удалить «'+name+'»?')){
+      C.acts_today=C.acts_today.filter(x=>x.id!==id);
+      if(!UID)lsSet('acts_'+TODAY,C.acts_today);
+      if(saved&&saved.parentNode){
+        saved.style.transition='opacity .2s';saved.style.opacity='0';
+        setTimeout(()=>{if(saved.parentNode)saved.remove();},200);
+      }
+      _renderPsTasksList();
+      renderPlan();renderHome();
+      toast('удалено');
+      apiPost('/api/activity/delete',{act_id:id});
+    }
+  },700);
+}
+
+/* ══ SCANNER ══ */
+let _scanStream=null,_scanInterval=null,_scGrams=100,_scMealType='breakfast';
+let _scFoundProduct=null;
+
+async function startScanner(){
+  const vp=$('scanner-viewport');
+  const vid=$('scanner-video');
+  const status=$('scanner-status');
+  $('scanner-result') && ($('scanner-result').style.display='none');
+  $('scanner-not-found') && ($('scanner-not-found').style.display='none');
+  if(vp)vp.classList.remove('found');
+  if(status)status.textContent='наведи на штрихкод';
+  try{
+    _scanStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280}}});
+    if(vid){vid.srcObject=_scanStream;await vid.play();}
+    _startBarcodeDetect(vid);
+  }catch(e){
+    if(status)status.textContent='нет доступа к камере';
+  }
+}
+
+function stopScanner(){
+  if(_scanInterval){clearInterval(_scanInterval);_scanInterval=null;}
+  if(_scanStream){_scanStream.getTracks().forEach(t=>t.stop());_scanStream=null;}
+}
+
+function _startBarcodeDetect(vid){
+  if(!('BarcodeDetector' in window)){
+    const st=$('scanner-status');if(st)st.textContent='сканер не поддерживается — введи штрихкод вручную';
+    return;
+  }
+  const detector=new BarcodeDetector({formats:['ean_13','ean_8','upc_a','upc_e','code_128','code_39']});
+  let scanning=true;
+  _scanInterval=setInterval(async()=>{
+    if(!scanning||!vid||vid.readyState<2)return;
+    try{
+      const codes=await detector.detect(vid);
+      if(codes.length>0){
+        scanning=false;
+        clearInterval(_scanInterval);
+        const barcode=codes[0].rawValue;
+        _onBarcodeDetected(barcode);
+      }
+    }catch{}
+  },400);
+}
+
+async function _onBarcodeDetected(barcode){
+  const st=$('scanner-status');if(st)st.textContent='штрихкод найден: '+barcode;
+  tg?.HapticFeedback?.notificationOccurred('success');
+  navigator.vibrate?.([50]);
+  // Lookup in Open Food Facts
+  try{
+    const resp=await fetch(`https://world.openfoodfacts.org/api/v2/product/${barcode}.json?fields=product_name,brands,nutriments`);
+    const data=await resp.json();
+    if(data.status===1&&data.product){
+      const p=data.product;
+      const n=p.nutriments||{};
+      _scFoundProduct={
+        name:p.product_name||'Неизвестный продукт',
+        brand:p.brands||'',
+        kcal:Math.round(n['energy-kcal_100g']||n['energy_100g']||0),
+        prot:+(n.proteins_100g||0).toFixed(1),
+        fat:+(n.fat_100g||0).toFixed(1),
+        carb:+(n.carbohydrates_100g||0).toFixed(1),
+      };
+      _showScannerResult();
+    }else{
+      _showScannerNotFound(barcode);
+    }
+  }catch{_showScannerNotFound(barcode);}
+}
+
+function _showScannerResult(){
+  const p=_scFoundProduct;if(!p)return;
+  const vp=$('scanner-viewport');if(vp)vp.classList.add('found');
+  T('sc-name',p.name);T('sc-brand',p.brand);
+  T('sc-kcal',p.kcal);T('sc-prot',p.prot);T('sc-fat',p.fat);T('sc-carb',p.carb);
+  _scGrams=100;T('sc-grams-disp',_scGrams+'г');
+  document.querySelectorAll('#seg-sc-meal .m3-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.m==='breakfast'));
+  _scMealType='breakfast';
+  const r=$('scanner-result');if(r)r.style.display='';
+  const nf=$('scanner-not-found');if(nf)nf.style.display='none';
+}
+
+function _showScannerNotFound(barcode){
+  T('sc-barcode-val',barcode);
+  const nf=$('scanner-not-found');if(nf)nf.style.display='';
+  const r=$('scanner-result');if(r)r.style.display='none';
+}
+
+function scannerRetry(){
+  $('scanner-not-found') && ($('scanner-not-found').style.display='none');
+  const vp=$('scanner-viewport');if(vp)vp.classList.remove('found');
+  const st=$('scanner-status');if(st)st.textContent='наведи на штрихкод';
+  if(_scanStream){_startBarcodeDetect($('scanner-video'));}
+  else{startScanner();}
+}
+
+function stepScGrams(d){
+  _scGrams=Math.max(10,Math.min(1000,_scGrams+d));
+  T('sc-grams-disp',_scGrams+'г');
+  tg?.HapticFeedback?.selectionChanged();
+}
+function setScMeal(m){
+  _scMealType=m;
+  document.querySelectorAll('#seg-sc-meal .m3-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
+}
+async function submitScanned(){
+  if(!_scFoundProduct){toast('нет данных о продукте');return;}
+  const p=_scFoundProduct;
+  const kcal=Math.round(p.kcal*_scGrams/100);
+  const desc=p.name+' '+_scGrams+'г';
+  stopScanner();popPage();
+  if(!C.calories)C.calories={};
+  C.calories[_scMealType]=(C.calories[_scMealType]||0)+kcal;
+  if(!UID)lsSet('cd_'+TODAY,C.calories);
+  renderTrack('cal');renderHome();
+  toast('+'+kcal+' ккал · '+desc);
+  tg?.HapticFeedback?.notificationOccurred('success');
+  await apiPost('/api/calories',{amount:kcal,meal_type:_scMealType,description:desc});
+  await reload();
 }
 
 /* ══ INIT ══ */
