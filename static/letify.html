@@ -491,7 +491,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   flex:1;
   overflow:hidden;
   display:flex;flex-direction:column;
-  margin:0 14px 12px;
+  margin:0 14px var(--page-bot);
 }
 #pl-tasks-container{
   flex:1;
@@ -505,7 +505,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 #pl-tasks-scroll{
   flex:1;overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;scrollbar-width:none;
-  padding:10px 12px 10px;
+  padding:10px 12px 14px;
 }
 #pl-tasks-scroll::-webkit-scrollbar{display:none}
 .pl-empty{
@@ -515,13 +515,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   gap:8px;opacity:.5;
 }
 .pl-empty svg{opacity:.3}
-#pl-add-sticky{
-  flex-shrink:0;
-  padding:10px 14px 14px;
-  background:var(--bg2);
-  border-top:1px solid var(--brd);
-}
-.tg-dark #pl-add-sticky{background:rgba(255,255,255,.05);border-top-color:rgba(255,255,255,.08)}
 
 /* ══ PLAN SETTINGS DAYS ══ */
 .ps-days{display:flex;gap:4px;padding:0;margin-bottom:14px}
@@ -548,15 +541,24 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .scanner-overlay{
   position:absolute;inset:0;pointer-events:none;
 }
+.scanner-line{
+  position:absolute;left:20px;right:20px;height:2px;
+  background:linear-gradient(90deg,transparent,var(--sun),var(--sun2),var(--sun),transparent);
+  border-radius:99px;top:50%;transform:translateY(-50%);
+  animation:sc-scan 2.4s ease-in-out infinite;
+  box-shadow:0 0 12px rgba(255,107,53,.6);
+}
+@keyframes sc-scan{0%,100%{top:20%}50%{top:80%}}
 .scanner-corner{
   position:absolute;width:28px;height:28px;
-  border-color:var(--scan-border,rgba(255,255,255,.4));border-style:solid;border-width:0;
+  border-color:var(--scan-border,rgba(255,255,255,.7));border-style:solid;border-width:0;
 }
 .scanner-corner.tl{top:16px;left:16px;border-top-width:3px;border-left-width:3px;border-radius:6px 0 0 0}
 .scanner-corner.tr{top:16px;right:16px;border-top-width:3px;border-right-width:3px;border-radius:0 6px 0 0}
 .scanner-corner.bl{bottom:16px;left:16px;border-bottom-width:3px;border-left-width:3px;border-radius:0 0 0 6px}
 .scanner-corner.br{bottom:16px;right:16px;border-bottom-width:3px;border-right-width:3px;border-radius:0 0 6px 0}
 .scanner-viewport.found .scanner-corner{--scan-border:var(--green) !important;}
+.scanner-viewport.found .scanner-line{background:linear-gradient(90deg,transparent,var(--green),var(--green),transparent);box-shadow:0 0 12px rgba(82,193,119,.7);animation:none;top:50%}
 .scanner-found-card{
   background:var(--bg2);border-radius:18px;padding:16px;
   box-shadow:var(--sh);margin-bottom:16px;
@@ -576,6 +578,32 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   transition:background .12s,transform .12s;
 }
 .scan-ico-btn:active{transform:scale(.93);background:rgba(255,107,53,.18)}
+/* Scanner step pages */
+.sc-step{display:none}
+.sc-step.active{display:block}
+.sc-product-hero{
+  background:linear-gradient(135deg,rgba(255,107,53,.08),rgba(255,171,64,.04));
+  border-radius:20px;padding:20px 16px;margin-bottom:16px;
+}
+.sc-product-name{font-size:20px;font-weight:900;letter-spacing:-.02em;margin-bottom:4px}
+.sc-product-brand{font-size:12px;font-weight:600;color:var(--hint)}
+.sc-calc-box{
+  background:linear-gradient(135deg,rgba(244,129,74,.1),rgba(255,171,64,.06));
+  border-radius:16px;padding:16px;text-align:center;margin-bottom:16px;
+}
+.sc-calc-kcal{font-size:48px;font-weight:900;color:var(--cal);line-height:1}
+.sc-calc-unit{font-size:13px;font-weight:700;color:var(--hint);margin-top:3px}
+.sc-calc-macros{display:flex;gap:8px;margin-top:12px}
+.sc-calc-macro{flex:1;background:rgba(0,0,0,.04);border-radius:10px;padding:8px;text-align:center}
+.tg-dark .sc-calc-macro{background:rgba(255,255,255,.07)}
+.sc-calc-macro-v{font-size:15px;font-weight:900}
+.sc-calc-macro-l{font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.04em;margin-top:1px}
+/* КБЖУ track row on calories tab */
+.kbzhu-track-row{display:flex;gap:6px;margin-top:10px}
+.kbzhu-track-box{flex:1;background:var(--bg2);border-radius:12px;padding:10px 8px;text-align:center;box-shadow:var(--sh)}
+.tg-dark .kbzhu-track-box{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);box-shadow:none}
+.kbzhu-track-v{font-size:17px;font-weight:900}
+.kbzhu-track-l{font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
 </style>
 </head>
 <body>
@@ -630,6 +658,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       </div>
       <div style="font-size:13px;font-weight:900;margin-top:4px" id="arc-cval">0</div>
       <div class="t5" style="font-size:10px">ккал</div>
+      <div id="arc-macros" style="margin-top:4px;display:flex;gap:4px;justify-content:center"></div>
     </div>
     <div style="text-align:center;cursor:pointer" onclick="navTo('sleep')">
       <div class="aw">
@@ -715,6 +744,11 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   <div style="font-size:48px;font-weight:900;color:var(--cal);line-height:1.1;margin:6px 0" id="c-total">0</div>
   <div class="t5">из <span id="c-goal">2000</span> ккал</div>
   <div class="pb" style="margin-top:12px;height:7px"><div class="pbf pb-sun" id="c-bar" style="width:0%"></div></div>
+  <div class="kbzhu-track-row" style="margin-top:14px">
+    <div class="kbzhu-track-box"><div class="kbzhu-track-v" id="c-prot" style="color:var(--green)">0</div><div class="kbzhu-track-l">белки г</div></div>
+    <div class="kbzhu-track-box"><div class="kbzhu-track-v" id="c-fat" style="color:var(--sun)">0</div><div class="kbzhu-track-l">жиры г</div></div>
+    <div class="kbzhu-track-box"><div class="kbzhu-track-v" id="c-carb" style="color:var(--sleep)">0</div><div class="kbzhu-track-l">углев. г</div></div>
+  </div>
 </div>
 <div class="card gap" style="padding:12px 14px"><div id="c-meals"></div></div>
 <button class="btn btn-p gap" onclick="pushPage('pp-cal')">добавить еду</button>
@@ -752,12 +786,8 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
         <div style="font-size:13px;font-weight:700">нет задач на сегодня</div>
       </div>
     </div>
-    <div id="pl-add-sticky">
-      <button class="btn btn-p" style="width:100%" onclick="pushPage('pp-act')">+ добавить активность</button>
-    </div>
   </div>
 </div>
-<div style="height:4px;flex-shrink:0"></div>
 </div>
 
 <!-- ══ SLEEP ══ -->
@@ -1061,6 +1091,22 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
         <button class="m3-seg-btn" onclick="setMeal('dinner')" data-m="dinner">ужин</button>
         <button class="m3-seg-btn" onclick="setMeal('snack')" data-m="snack">перекус</button>
       </div>
+      <div style="margin-top:14px">
+        <div onclick="toggleCalMacros()" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg3);border-radius:12px;cursor:pointer">
+          <span style="font-size:13px;font-weight:700;color:var(--hint)">+ указать КБЖУ (необязательно)</span>
+          <span id="cal-macros-arrow" style="color:var(--hint);font-size:16px;transition:transform .2s">▼</span>
+        </div>
+        <div id="cal-macros-wrap" style="display:none;margin-top:8px">
+          <div class="m3-card">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <div class="m3-field" style="margin-bottom:0"><div class="m3-label">белки, г</div><input class="m3-input num" id="inp-prot" type="number" inputmode="decimal" step="0.1" placeholder="0"></div>
+              <div class="m3-field" style="margin-bottom:0"><div class="m3-label">жиры, г</div><input class="m3-input num" id="inp-fat" type="number" inputmode="decimal" step="0.1" placeholder="0"></div>
+              <div class="m3-field" style="margin-bottom:0"><div class="m3-label">углеводы, г</div><input class="m3-input num" id="inp-carb" type="number" inputmode="decimal" step="0.1" placeholder="0"></div>
+              <div style="display:flex;align-items:center;padding:8px;background:var(--bg3);border-radius:12px;font-size:11px;font-weight:600;color:var(--hint)">необязательно, но полезно</div>
+            </div>
+          </div>
+        </div>
+      </div>
       <button class="btn btn-p" style="margin-top:20px" onclick="submitCal()">добавить</button>
     </div>
   </div>
@@ -1320,53 +1366,95 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 <!-- PP: Сканер штрихкода -->
 <div class="push-page" id="pp-scanner">
   <div class="pp-hdr">
-    <button class="pp-back" onclick="stopScanner();popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
-    <div><div class="pp-title">сканировать</div><div class="pp-subtitle">наведи на штрихкод</div></div>
+    <button class="pp-back" onclick="scannerBack()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <div style="flex:1">
+      <div class="step-ind">
+        <div class="step-pip on" id="scp1"></div>
+        <div class="step-pip" id="scp2"></div>
+        <div class="step-pip" id="scp3"></div>
+      </div>
+      <div class="pp-title" id="sc-step-title">сканирование</div>
+    </div>
   </div>
   <div class="pp-body" style="padding:16px">
-    <div class="scanner-viewport" id="scanner-viewport">
-      <video id="scanner-video" autoplay playsinline muted></video>
-      <div class="scanner-overlay">
-        <div class="scanner-corner tl"></div>
-        <div class="scanner-corner tr"></div>
-        <div class="scanner-corner bl"></div>
-        <div class="scanner-corner br"></div>
+
+    <!-- Step 1: Camera -->
+    <div class="sc-step active" id="sc-s1">
+      <div class="scanner-viewport" id="scanner-viewport">
+        <video id="scanner-video" autoplay playsinline muted></video>
+        <div class="scanner-overlay">
+          <div class="scanner-corner tl"></div>
+          <div class="scanner-corner tr"></div>
+          <div class="scanner-corner bl"></div>
+          <div class="scanner-corner br"></div>
+          <div class="scanner-line"></div>
+        </div>
+        <div id="scanner-status" style="position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:12px;font-weight:700;color:rgba(255,255,255,.85);text-shadow:0 1px 4px rgba(0,0,0,.7);letter-spacing:.02em">наведи на штрихкод</div>
       </div>
-      <div id="scanner-status" style="position:absolute;bottom:12px;left:0;right:0;text-align:center;font-size:12px;font-weight:700;color:rgba(255,255,255,.7);text-shadow:0 1px 3px rgba(0,0,0,.5)">наведи на штрихкод</div>
+      <div style="text-align:center;padding:8px 0 4px">
+        <div style="font-size:13px;font-weight:600;color:var(--hint)">или введи штрихкод вручную</div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <input class="m3-input" id="inp-barcode-manual" type="text" inputmode="numeric" placeholder="4600000000000" style="flex:1;padding:14px 14px 14px" autocomplete="off">
+          <button class="btn btn-p" style="padding:14px 18px;flex-shrink:0;font-size:14px" onclick="manualBarcode()">→</button>
+        </div>
+      </div>
+      <div id="scanner-not-found" style="display:none;text-align:center;padding:16px 0">
+        <div style="font-size:32px;margin-bottom:8px">🔍</div>
+        <div style="font-size:15px;font-weight:800;margin-bottom:4px">продукт не найден</div>
+        <div class="t5" style="margin-bottom:16px">штрихкод: <span id="sc-barcode-val">—</span></div>
+        <button class="btn btn-g" style="width:100%;padding:13px" onclick="scannerRetry()">попробовать снова</button>
+      </div>
     </div>
-    <div id="scanner-result" style="display:none">
-      <div class="scanner-found-card">
-        <div style="font-size:16px;font-weight:900;margin-bottom:4px" id="sc-name">—</div>
-        <div class="t5" id="sc-brand"></div>
-        <div class="kbzhu-row">
+
+    <!-- Step 2: Product info + grams -->
+    <div class="sc-step" id="sc-s2">
+      <div class="sc-product-hero">
+        <div class="sc-product-name" id="sc-name">—</div>
+        <div class="sc-product-brand" id="sc-brand"></div>
+        <div class="kbzhu-row" style="margin-top:12px">
           <div class="kbzhu-box"><div class="kbzhu-v" id="sc-kcal" style="color:var(--cal)">—</div><div class="kbzhu-l">ккал/100г</div></div>
           <div class="kbzhu-box"><div class="kbzhu-v" id="sc-prot" style="color:var(--green)">—</div><div class="kbzhu-l">белки</div></div>
           <div class="kbzhu-box"><div class="kbzhu-v" id="sc-fat" style="color:var(--sun)">—</div><div class="kbzhu-l">жиры</div></div>
           <div class="kbzhu-box"><div class="kbzhu-v" id="sc-carb" style="color:var(--sleep)">—</div><div class="kbzhu-l">углев.</div></div>
         </div>
       </div>
-      <div class="m3-sec">сколько грамм?</div>
-      <div class="m3-card" style="padding:8px">
+      <div class="m3-sec">вес порции</div>
+      <div class="m3-card" style="padding:8px;margin-bottom:12px">
         <div class="stepper-wrap">
           <button class="stepper-btn" onclick="stepScGrams(-10)">−</button>
           <div class="stepper-val" id="sc-grams-disp">100<span class="unit">г</span></div>
           <button class="stepper-btn" onclick="stepScGrams(10)">+</button>
         </div>
       </div>
-      <div class="m3-sec">приём пищи</div>
-      <div class="m3-seg" id="seg-sc-meal" style="margin-bottom:0">
-        <button class="m3-seg-btn on" onclick="setScMeal('breakfast')" data-m="breakfast">завтрак</button>
-        <button class="m3-seg-btn" onclick="setScMeal('lunch')" data-m="lunch">обед</button>
-        <button class="m3-seg-btn" onclick="setScMeal('dinner')" data-m="dinner">ужин</button>
-        <button class="m3-seg-btn" onclick="setScMeal('snack')" data-m="snack">перекус</button>
+      <div class="sc-calc-box" id="sc-calc-box">
+        <div class="sc-calc-kcal" id="sc-calc-kcal">—</div>
+        <div class="sc-calc-unit">ккал за <span id="sc-grams-label">100</span>г</div>
+        <div class="sc-calc-macros">
+          <div class="sc-calc-macro"><div class="sc-calc-macro-v" id="sc-calc-prot" style="color:var(--green)">—</div><div class="sc-calc-macro-l">белки г</div></div>
+          <div class="sc-calc-macro"><div class="sc-calc-macro-v" id="sc-calc-fat" style="color:var(--sun)">—</div><div class="sc-calc-macro-l">жиры г</div></div>
+          <div class="sc-calc-macro"><div class="sc-calc-macro-v" id="sc-calc-carb" style="color:var(--sleep)">—</div><div class="sc-calc-macro-l">углев. г</div></div>
+        </div>
       </div>
-      <button class="btn btn-p" style="margin-top:20px" onclick="submitScanned()">добавить</button>
+      <button class="btn btn-p" style="margin-top:4px;width:100%" onclick="scGotoMeal()">продолжить →</button>
     </div>
-    <div id="scanner-not-found" style="display:none;text-align:center;padding:16px 0">
-      <div style="font-size:14px;font-weight:700;color:var(--hint);margin-bottom:8px">продукт не найден</div>
-      <div class="t5" style="margin-bottom:12px">штрихкод: <span id="sc-barcode-val">—</span></div>
-      <button class="btn btn-g" onclick="scannerRetry()">попробовать снова</button>
+
+    <!-- Step 3: Meal type selection -->
+    <div class="sc-step" id="sc-s3">
+      <div style="text-align:center;padding:12px 0 20px">
+        <div style="font-size:40px;margin-bottom:10px">🍽️</div>
+        <div style="font-size:18px;font-weight:900;margin-bottom:4px" id="sc-confirm-name">—</div>
+        <div style="font-size:14px;font-weight:700;color:var(--cal)" id="sc-confirm-kcal">—</div>
+      </div>
+      <div class="m3-sec">приём пищи</div>
+      <div class="type-grid" style="grid-template-columns:1fr 1fr">
+        <div class="type-card on" id="scm-breakfast" onclick="setScMeal('breakfast',this)"><div class="type-card-ico">🌅</div><div class="type-card-lbl">завтрак</div></div>
+        <div class="type-card" id="scm-lunch" onclick="setScMeal('lunch',this)"><div class="type-card-ico">☀️</div><div class="type-card-lbl">обед</div></div>
+        <div class="type-card" id="scm-dinner" onclick="setScMeal('dinner',this)"><div class="type-card-ico">🌙</div><div class="type-card-lbl">ужин</div></div>
+        <div class="type-card" id="scm-snack" onclick="setScMeal('snack',this)"><div class="type-card-ico">🍎</div><div class="type-card-lbl">перекус</div></div>
+      </div>
+      <button class="btn btn-p" style="margin-top:20px;width:100%" onclick="submitScanned()">добавить ✓</button>
     </div>
+
   </div>
 </div>
 
@@ -1451,7 +1539,7 @@ const lsSet=(k,v)=>{try{localStorage.setItem('lf2_'+k,JSON.stringify(v))}catch{}
 let C={
   user:{name:'…',height:0,age:0,start_weight:0,goal_weight:0,water_goal:2000,cal_goal:2000,gender:'male',goal_type:'lose'},
   settings:{show_weight:1,show_water:1,show_calories:1,show_sleep:1},
-  water:{total:0,entries:[],streak:0},calories:{},
+  water:{total:0,entries:[],streak:0},calories:{},macros:{prot:0,fat:0,carb:0},
   weight_log:[],sleep_log:[],acts_today:[],products:[]
 };
 
@@ -1463,6 +1551,7 @@ async function loadData(){
     const d=await r.json();
     C.user=d.user||C.user;C.settings=d.settings||C.settings;
     C.water=d.water||C.water;C.calories=d.calories||C.calories;
+    C.macros=d.macros||lsGet('macros_'+TODAY)||{prot:0,fat:0,carb:0};
     C.weight_log=d.weight_log||[];C.sleep_log=d.sleep_log||[];
     C.acts_today=d.acts_today||[];C.products=d.products||[];
     // Always restore start_weight/goal_type from localStorage — server may not store them
@@ -1500,6 +1589,7 @@ function _demo(){
   C.settings={show_weight:1,show_water:1,show_calories:1,show_sleep:1};
   C.water={total:wd.total||0,entries:wd.entries||[],streak:lsGet('streak')||0};
   C.calories=cd;
+  C.macros=lsGet('macros_'+TODAY)||{prot:0,fat:0,carb:0};
   C.weight_log=lsGet('wlog')||[];
   C.sleep_log=lsGet('slog')||[];
   C.acts_today=lsGet('acts_'+TODAY)||[];
@@ -1696,9 +1786,19 @@ function _populatePP(id){
   if(id==='pp-scanner'){
     _scFoundProduct=null;
     _scGrams=100;_scMealType='breakfast';
-    const r=$('scanner-result');if(r)r.style.display='none';
+    _scStep=1;
+    // Reset all steps
+    [1,2,3].forEach(i=>{
+      document.getElementById('sc-s'+i)?.classList.toggle('active',i===1);
+      const pip=document.getElementById('scp'+i);
+      if(pip){pip.classList.toggle('on',i===1);pip.classList.remove('done');}
+    });
+    T('sc-step-title','сканирование');
     const nf=$('scanner-not-found');if(nf)nf.style.display='none';
     const vp=$('scanner-viewport');if(vp)vp.classList.remove('found');
+    const st=$('scanner-status');if(st)st.textContent='наведи на штрихкод';
+    // Reset meal type selection
+    ['breakfast','lunch','dinner','snack'].forEach(x=>{document.getElementById('scm-'+x)?.classList.toggle('on',x==='breakfast');});
     setTimeout(startScanner,200);
   }
 }
@@ -1828,6 +1928,13 @@ function stepTime(part,dir){
 let _mealType='breakfast',_gender='male';
 function setMeal(m){_mealType=m;document.querySelectorAll('#seg-meal .m3-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.m===m));}
 function setGender(g){_gender=g;document.querySelectorAll('#seg-gender .m3-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.g===g));}
+function toggleCalMacros(){
+  const wrap=$('cal-macros-wrap');const arrow=$('cal-macros-arrow');
+  if(!wrap)return;
+  const open=wrap.style.display==='none'||!wrap.style.display;
+  wrap.style.display=open?'block':'none';
+  if(arrow)arrow.style.transform=open?'rotate(180deg)':'rotate(0deg)';
+}
 
 /* ══ ACTIVITY FORM ══ */
 let actStep=1,_actType='run',_actDur=45,_actDays=[];
@@ -2110,11 +2217,18 @@ async function submitSleep(){
 async function submitCal(){
   const desc=document.getElementById('inp-cal-desc')?.value||'';
   if(!_calVal||_calVal<10){toast('выбери калории');return;}
+  const prot=parseFloat(document.getElementById('inp-prot')?.value)||0;
+  const fat=parseFloat(document.getElementById('inp-fat')?.value)||0;
+  const carb=parseFloat(document.getElementById('inp-carb')?.value)||0;
   popPage();
   if(!C.calories)C.calories={};C.calories[_mealType]=(C.calories[_mealType]||0)+_calVal;
-  if(!UID)lsSet('cd_'+TODAY,C.calories);
+  if(!C.macros)C.macros={prot:0,fat:0,carb:0};
+  C.macros.prot=+(( C.macros.prot||0)+prot).toFixed(1);
+  C.macros.fat=+((C.macros.fat||0)+fat).toFixed(1);
+  C.macros.carb=+((C.macros.carb||0)+carb).toFixed(1);
+  if(!UID){lsSet('cd_'+TODAY,C.calories);lsSet('macros_'+TODAY,C.macros);}
   renderTrack('cal');renderHome();toast('+'+_calVal+' ккал');tg?.HapticFeedback?.notificationOccurred('success');
-  await apiPost('/api/calories',{amount:_calVal,meal_type:_mealType,description:desc});await reload();
+  await apiPost('/api/calories',{amount:_calVal,meal_type:_mealType,description:desc,prot,fat,carb});await reload();
 }
 function _saveProfileSilent(){
   const name=document.getElementById('inp-pname')?.value?.trim();
@@ -2296,6 +2410,14 @@ function renderHome(){
   const ct=totalCal(),cg=u.cal_goal||2000,cp=Math.min(1,ct/cg);
   T('arc-cpct',Math.round(cp*100)+'%');T('arc-cval',ct);
   requestAnimationFrame(()=>{const a=$('arc-c');if(a)a.setAttribute('stroke-dashoffset',207.3*(1-cp));});
+  // Show КБЖУ macros below calorie arc if any data
+  const mac=C.macros||{};
+  const amEl=$('arc-macros');
+  if(amEl){
+    if((mac.prot||0)+(mac.fat||0)+(mac.carb||0)>0){
+      amEl.innerHTML=`<span style="font-size:9px;font-weight:800;color:var(--green)">${mac.prot||0}б</span><span style="font-size:9px;font-weight:800;color:var(--sun)">${mac.fat||0}ж</span><span style="font-size:9px;font-weight:800;color:var(--sleep)">${mac.carb||0}у</span>`;
+    }else{amEl.innerHTML='';}
+  }
   if(sl.length){
     const last=sl[sl.length-1];
     const sqEl=$('arc-sq');if(sqEl)sqEl.innerHTML=Array.from({length:5},(_,i)=>`<div class="sqd${i<last.quality?' on':''}"></div>`).join('');
@@ -2369,6 +2491,8 @@ function renderCal(){
   const ct=totalCal(),cg=u.cal_goal||2000,cp=Math.min(100,Math.round(ct/cg*100));
   T('c-total',ct);T('c-goal',cg);
   requestAnimationFrame(()=>{const b=$('c-bar');if(b)b.style.width=cp+'%';});
+  const m=C.macros||{prot:0,fat:0,carb:0};
+  T('c-prot',m.prot||0);T('c-fat',m.fat||0);T('c-carb',m.carb||0);
   const MEALS=[{k:'breakfast',i:'🌅',n:'завтрак',col:'#FF9800'},{k:'lunch',i:'☀️',n:'обед',col:'#FF6B35'},{k:'dinner',i:'🌙',n:'ужин',col:'#8B7FD4'},{k:'snack',i:'🍑',n:'перекус',col:'#52C177'},{k:'other',i:'🌿',n:'другое',col:'#607D8B'}];
   H('c-meals',MEALS.map(m=>`<div class="mr"><div class="mr-ico" style="background:${m.col}18;color:${m.col}">${m.i}</div><div style="flex:1"><div class="mr-name">${m.n}</div>${!cd[m.k]?`<div class="t5" style="font-size:10px">не записано</div>`:''}</div><div class="mr-kcal" style="${cd[m.k]?'color:var(--cal)':'color:var(--hint)'}">${cd[m.k]||'—'} ${cd[m.k]?'ккал':''}</div></div>`).join(''));
 }
@@ -2575,18 +2699,35 @@ function startPsLongPress(id,el){
 
 /* ══ SCANNER ══ */
 let _scanStream=null,_scanInterval=null,_scGrams=100,_scMealType='breakfast';
-let _scFoundProduct=null;
+let _scFoundProduct=null,_scStep=1;
+
+function _setScanStep(n){
+  _scStep=n;
+  [1,2,3].forEach(i=>{
+    document.getElementById('sc-s'+i)?.classList.toggle('active',i===n);
+    const pip=document.getElementById('scp'+i);
+    if(pip){pip.classList.toggle('on',i===n);pip.classList.toggle('done',i<n);if(i<n)pip.classList.remove('on');}
+  });
+  const titles=['сканирование','продукт и порция','добавить в приём'];
+  T('sc-step-title',titles[n-1]);
+}
+
+function scannerBack(){
+  if(_scStep>1){_setScanStep(_scStep-1);if(_scStep===1)startScanner();}
+  else{stopScanner();popPage();}
+}
 
 async function startScanner(){
   const vp=$('scanner-viewport');
   const vid=$('scanner-video');
   const status=$('scanner-status');
-  $('scanner-result') && ($('scanner-result').style.display='none');
-  $('scanner-not-found') && ($('scanner-not-found').style.display='none');
+  const nf=$('scanner-not-found');if(nf)nf.style.display='none';
   if(vp)vp.classList.remove('found');
   if(status)status.textContent='наведи на штрихкод';
   try{
-    _scanStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280}}});
+    if(!_scanStream){
+      _scanStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}}});
+    }
     if(vid){vid.srcObject=_scanStream;await vid.play();}
     _startBarcodeDetect(vid);
   }catch(e){
@@ -2600,11 +2741,12 @@ function stopScanner(){
 }
 
 function _startBarcodeDetect(vid){
+  if(_scanInterval){clearInterval(_scanInterval);_scanInterval=null;}
   if(!('BarcodeDetector' in window)){
-    const st=$('scanner-status');if(st)st.textContent='сканер не поддерживается — введи штрихкод вручную';
+    const st=$('scanner-status');if(st)st.textContent='введи штрихкод вручную';
     return;
   }
-  const detector=new BarcodeDetector({formats:['ean_13','ean_8','upc_a','upc_e','code_128','code_39']});
+  const detector=new BarcodeDetector({formats:['ean_13','ean_8','upc_a','upc_e','code_128','code_39','itf']});
   let scanning=true;
   _scanInterval=setInterval(async()=>{
     if(!scanning||!vid||vid.readyState<2)return;
@@ -2612,88 +2754,149 @@ function _startBarcodeDetect(vid){
       const codes=await detector.detect(vid);
       if(codes.length>0){
         scanning=false;
-        clearInterval(_scanInterval);
+        clearInterval(_scanInterval);_scanInterval=null;
         const barcode=codes[0].rawValue;
-        _onBarcodeDetected(barcode);
+        tg?.HapticFeedback?.notificationOccurred('success');
+        navigator.vibrate?.([60]);
+        const st=$('scanner-status');if(st)st.textContent='✓ найден: '+barcode;
+        const vp=$('scanner-viewport');if(vp)vp.classList.add('found');
+        await _lookupBarcode(barcode);
       }
     }catch{}
-  },400);
+  },350);
 }
 
-async function _onBarcodeDetected(barcode){
-  const st=$('scanner-status');if(st)st.textContent='штрихкод найден: '+barcode;
-  tg?.HapticFeedback?.notificationOccurred('success');
-  navigator.vibrate?.([50]);
-  // Lookup in Open Food Facts
+function manualBarcode(){
+  const inp=$('inp-barcode-manual');
+  const code=(inp?.value||'').trim();
+  if(!code){toast('введи штрихкод');return;}
+  stopScanner();
+  _lookupBarcode(code);
+}
+
+async function _lookupBarcode(barcode){
+  const st=$('scanner-status');if(st)st.textContent='загружаю данные…';
   try{
-    const resp=await fetch(`https://world.openfoodfacts.org/api/v2/product/${barcode}.json?fields=product_name,brands,nutriments`);
+    // Try Open Food Facts v2 API with more fields
+    const resp=await fetch(`https://world.openfoodfacts.org/api/v2/product/${barcode}.json?fields=product_name,product_name_ru,brands,nutriments,nutriments_estimated`);
     const data=await resp.json();
     if(data.status===1&&data.product){
       const p=data.product;
       const n=p.nutriments||{};
+      // Parse energy: prefer energy-kcal_100g, fallback energy_100g (kJ → /4.184), then 0
+      let kcal=0;
+      if(n['energy-kcal_100g']!=null&&n['energy-kcal_100g']!==''){kcal=parseFloat(n['energy-kcal_100g']);}
+      else if(n['energy-kcal']!=null&&n['energy-kcal']!==''){kcal=parseFloat(n['energy-kcal']);}
+      else if(n['energy_100g']!=null&&n['energy_100g']!==''){
+        // OpenFoodFacts stores energy in kJ by default when energy-kcal is absent
+        kcal=Math.round(parseFloat(n['energy_100g'])/4.184);
+      }
+      else if(n['energy']!=null&&n['energy']!==''){
+        kcal=Math.round(parseFloat(n['energy'])/4.184);
+      }
+      // Parse macros with multiple fallback field names
+      const parseMacro=(...keys)=>{for(const k of keys){if(n[k]!=null&&n[k]!=='')return+(parseFloat(n[k])||0).toFixed(1);}return 0;};
+      const prot=parseMacro('proteins_100g','proteins','protein_100g','protein');
+      const fat=parseMacro('fat_100g','fat','lipids_100g','total-fat_100g');
+      const carb=parseMacro('carbohydrates_100g','carbohydrates','carbs_100g','sugars_100g');
+      const name=p.product_name_ru||p.product_name||'Неизвестный продукт';
       _scFoundProduct={
-        name:p.product_name||'Неизвестный продукт',
+        name,
         brand:p.brands||'',
-        kcal:Math.round(n['energy-kcal_100g']||n['energy_100g']||0),
-        prot:+(n.proteins_100g||0).toFixed(1),
-        fat:+(n.fat_100g||0).toFixed(1),
-        carb:+(n.carbohydrates_100g||0).toFixed(1),
+        kcal:Math.round(isNaN(kcal)?0:kcal),
+        prot:isNaN(prot)?0:prot,
+        fat:isNaN(fat)?0:fat,
+        carb:isNaN(carb)?0:carb,
       };
-      _showScannerResult();
+      _showScanProductStep();
     }else{
       _showScannerNotFound(barcode);
     }
-  }catch{_showScannerNotFound(barcode);}
+  }catch(e){_showScannerNotFound(barcode);}
 }
 
-function _showScannerResult(){
+function _showScanProductStep(){
   const p=_scFoundProduct;if(!p)return;
-  const vp=$('scanner-viewport');if(vp)vp.classList.add('found');
   T('sc-name',p.name);T('sc-brand',p.brand);
   T('sc-kcal',p.kcal);T('sc-prot',p.prot);T('sc-fat',p.fat);T('sc-carb',p.carb);
-  _scGrams=100;T('sc-grams-disp',_scGrams+'г');
-  document.querySelectorAll('#seg-sc-meal .m3-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.m==='breakfast'));
-  _scMealType='breakfast';
-  const r=$('scanner-result');if(r)r.style.display='';
-  const nf=$('scanner-not-found');if(nf)nf.style.display='none';
+  _scGrams=100;
+  _updateScCalc();
+  stopScanner();
+  _setScanStep(2);
+}
+
+function _updateScCalc(){
+  if(!_scFoundProduct)return;
+  const p=_scFoundProduct;
+  const k=Math.round(p.kcal*_scGrams/100);
+  const pr=+(p.prot*_scGrams/100).toFixed(1);
+  const fa=+(p.fat*_scGrams/100).toFixed(1);
+  const ca=+(p.carb*_scGrams/100).toFixed(1);
+  T('sc-calc-kcal',k);T('sc-grams-label',_scGrams);
+  T('sc-grams-disp',_scGrams);
+  // update the grams display stepper value
+  const gd=$('sc-grams-disp');if(gd)gd.innerHTML=_scGrams+'<span class="unit">г</span>';
+  T('sc-calc-prot',pr);T('sc-calc-fat',fa);T('sc-calc-carb',ca);
 }
 
 function _showScannerNotFound(barcode){
   T('sc-barcode-val',barcode);
   const nf=$('scanner-not-found');if(nf)nf.style.display='';
-  const r=$('scanner-result');if(r)r.style.display='none';
+  const st=$('scanner-status');if(st)st.textContent='продукт не найден';
+  const vp=$('scanner-viewport');if(vp)vp.classList.remove('found');
 }
 
 function scannerRetry(){
-  $('scanner-not-found') && ($('scanner-not-found').style.display='none');
+  const nf=$('scanner-not-found');if(nf)nf.style.display='none';
+  const inp=$('inp-barcode-manual');if(inp)inp.value='';
   const vp=$('scanner-viewport');if(vp)vp.classList.remove('found');
   const st=$('scanner-status');if(st)st.textContent='наведи на штрихкод';
-  if(_scanStream){_startBarcodeDetect($('scanner-video'));}
-  else{startScanner();}
+  _setScanStep(1);
+  startScanner();
 }
 
 function stepScGrams(d){
-  _scGrams=Math.max(10,Math.min(1000,_scGrams+d));
-  T('sc-grams-disp',_scGrams+'г');
+  _scGrams=Math.max(5,Math.min(2000,_scGrams+d));
+  _updateScCalc();
   tg?.HapticFeedback?.selectionChanged();
 }
-function setScMeal(m){
-  _scMealType=m;
-  document.querySelectorAll('#seg-sc-meal .m3-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
+
+function scGotoMeal(){
+  if(!_scFoundProduct){toast('нет данных о продукте');return;}
+  const p=_scFoundProduct;
+  const k=Math.round(p.kcal*_scGrams/100);
+  T('sc-confirm-name',p.name+(p.brand?' · '+p.brand:''));
+  T('sc-confirm-kcal',k+' ккал · '+_scGrams+'г');
+  _setScanStep(3);
 }
+
+function setScMeal(m,el){
+  _scMealType=m;
+  ['breakfast','lunch','dinner','snack'].forEach(x=>{document.getElementById('scm-'+x)?.classList.toggle('on',x===m);});
+  tg?.HapticFeedback?.selectionChanged();
+}
+
 async function submitScanned(){
   if(!_scFoundProduct){toast('нет данных о продукте');return;}
   const p=_scFoundProduct;
   const kcal=Math.round(p.kcal*_scGrams/100);
+  const prot=+(p.prot*_scGrams/100).toFixed(1);
+  const fat=+(p.fat*_scGrams/100).toFixed(1);
+  const carb=+(p.carb*_scGrams/100).toFixed(1);
   const desc=p.name+' '+_scGrams+'г';
   stopScanner();popPage();
   if(!C.calories)C.calories={};
   C.calories[_scMealType]=(C.calories[_scMealType]||0)+kcal;
-  if(!UID)lsSet('cd_'+TODAY,C.calories);
+  if(!C.macros)C.macros={prot:0,fat:0,carb:0};
+  C.macros.prot=+(( C.macros.prot||0)+prot).toFixed(1);
+  C.macros.fat=+((C.macros.fat||0)+fat).toFixed(1);
+  C.macros.carb=+((C.macros.carb||0)+carb).toFixed(1);
+  if(!UID){lsSet('cd_'+TODAY,C.calories);lsSet('macros_'+TODAY,C.macros);}
   renderTrack('cal');renderHome();
   toast('+'+kcal+' ккал · '+desc);
   tg?.HapticFeedback?.notificationOccurred('success');
-  await apiPost('/api/calories',{amount:kcal,meal_type:_scMealType,description:desc});
+  navTo('track');setTTab('cal');
+  await apiPost('/api/calories',{amount:kcal,meal_type:_scMealType,description:desc,prot,fat,carb});
   await reload();
 }
 
