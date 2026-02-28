@@ -1700,16 +1700,20 @@ async function deleteActDirectly(id,cardEl){
 
   toast('удалено');
   if(cardEl&&cardEl.parentNode){
-    const h=cardEl.offsetHeight;
-    cardEl.style.height=h+'px';cardEl.style.overflow='hidden';cardEl.style.flexShrink='0';
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
-      cardEl.style.transition='opacity .25s ease,transform .25s ease,height .27s cubic-bezier(.4,0,.2,1),margin-bottom .27s ease';
-      cardEl.style.opacity='0';cardEl.style.transform='translateX(32px) scale(0.95)';
-      cardEl.style.height='0';cardEl.style.marginBottom='0';cardEl.style.paddingTop='0';
+      cardEl.style.transition='opacity .25s ease, transform .25s ease';
+      cardEl.style.opacity='0';
+      cardEl.style.transform='translateX(32px) scale(0.95)';
       setTimeout(()=>{
-        if(cardEl.parentNode)cardEl.remove();
-        _afterDelete();
-      },280);
+        cardEl.style.transition='none';
+        cardEl.style.height='0';cardEl.style.marginBottom='0';
+        cardEl.style.paddingTop='0';cardEl.style.paddingBottom='0';
+        cardEl.style.overflow='hidden';
+        requestAnimationFrame(()=>{
+          if(cardEl.parentNode)cardEl.remove();
+          _afterDelete();
+        });
+      },260);
     }));
   }else{_afterDelete();}
   await apiPost('/api/activity/delete',{act_id:id});
@@ -1767,23 +1771,29 @@ async function completeAct(id){
     cardEl.appendChild(timerBar);
     requestAnimationFrame(()=>requestAnimationFrame(()=>{timerBar.style.width='0%';}));
 
-    // Lock height to prevent layout jump
-    cardEl.style.height=cardEl.offsetHeight+'px';cardEl.style.overflow='hidden';
-
     const hideTimer=setTimeout(()=>{
       _completingMap.delete(id);
       requestAnimationFrame(()=>{
-        cardEl.style.transition='opacity .3s ease,transform .3s cubic-bezier(.4,0,.2,1),height .32s cubic-bezier(.4,0,.2,1),margin-bottom .32s ease';
-        cardEl.style.opacity='0';cardEl.style.transform='translateX(60px)';
-        cardEl.style.height='0';cardEl.style.marginBottom='0';
+        // Fade + slide right ONLY — no height collapse, button never jumps
+        cardEl.style.transition='opacity .35s ease, transform .35s cubic-bezier(.4,0,.2,1)';
+        cardEl.style.opacity='0';
+        cardEl.style.transform='translateX(72px)';
+        // After fade done — collapse silently with no transition so it snaps away
         setTimeout(()=>{
-          if(cardEl.parentNode)cardEl.remove();
-          if(_completingMap.size===0){
-            reload().then(()=>{});
-          }
-        },330);
+          cardEl.style.transition='none';
+          cardEl.style.height='0';
+          cardEl.style.marginBottom='0';
+          cardEl.style.paddingTop='0';
+          cardEl.style.paddingBottom='0';
+          cardEl.style.overflow='hidden';
+          // Remove from DOM next frame so layout settles without animation
+          requestAnimationFrame(()=>{
+            if(cardEl.parentNode)cardEl.remove();
+            if(_completingMap.size===0){reload().then(()=>{});}
+          });
+        },360);
       });
-    },3600); // 3.6s timer (matches 3.55s CSS transition + small buffer)
+    },3600);
 
     _completingMap.set(id,{hideTimer});
     await apiPost('/api/activity/complete',{act_id:id});
@@ -1868,15 +1878,8 @@ async function submitWeight(){
   if(v<30||v>300){toast('некорректный вес');return;}
   popPage();
   C.weight_log=[...(C.weight_log||[]),{weight:v,logged_at:TODAY}];
-  // Set start weight if not set
-  if(!C.user.start_weight||C.user.start_weight===0){
-    C.user.start_weight=v;
-  }
-  // Persist to localStorage for demo mode
-  if(!UID){
-    lsSet('wlog',C.weight_log);
-    lsSet('user',C.user);
-  }
+  // NEVER touch start_weight here — it is only set via pp-start-weight screen
+  if(!UID)lsSet('wlog',C.weight_log);
   renderHome();renderProgress();toast('вес '+v.toFixed(1)+' кг сохранён');tg?.HapticFeedback?.notificationOccurred('success');
   await apiPost('/api/weight',{weight:v});
   await reload();
