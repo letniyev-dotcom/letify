@@ -47,49 +47,183 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
 .page::-webkit-scrollbar{display:none}
 .page.active{opacity:1;pointer-events:all;transform:none}
 
-/* ── SCREEN LAYER (full-screen input screens) ── */
+/* ══ SCREEN OVERLAY ══ */
+#scr-overlay{
+  position:fixed;inset:0;z-index:69;
+  background:rgba(0,0,0,.55);
+  opacity:0;pointer-events:none;
+  transition:opacity .3s ease;
+  backdrop-filter:blur(2px);
+  -webkit-backdrop-filter:blur(2px);
+}
+#scr-overlay.show{opacity:1;pointer-events:all}
+
+/* ══ SCREEN LAYER — снизу вверх (bottom sheet) ══ */
 #slayer{position:fixed;inset:0;z-index:70;pointer-events:none}
 .scr{
-  position:absolute;inset:0;background:var(--bg);
-  overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
-  touch-action:pan-y;scrollbar-width:none;
+  position:absolute;
+  bottom:0;left:0;right:0;
+  max-height:92dvh;
+  background:var(--bg);
   pointer-events:none;
-  transform:translateY(100%);
-  transition:transform .3s cubic-bezier(.4,0,.2,1);
-  contain:layout style;
+  transform:translateY(110%);
+  transition:transform .35s cubic-bezier(.4,0,.2,1);
   display:flex;flex-direction:column;
+  border-radius:26px 26px 0 0;
+  overflow:hidden;
 }
-.scr::-webkit-scrollbar{display:none}
-.scr.open{transform:none;pointer-events:all}
-/* Заголовок экрана */
+.scr.open{transform:translateY(0);pointer-events:all}
+
+/* ── Handle ── */
+.scr-handle{
+  width:40px;height:4px;border-radius:99px;
+  background:rgba(0,0,0,.12);
+  margin:10px auto 2px;
+  flex-shrink:0;
+}
+.tg-dark .scr-handle{background:rgba(255,255,255,.18)}
+
+/* ── Хедер экрана ── */
 .scr-hdr{
   flex-shrink:0;
   background:var(--bg);
-  padding:calc(var(--st)+16px) 20px 14px;
-  border-bottom:1px solid var(--brd);
+  padding:4px 16px 12px;
+  display:flex;align-items:center;gap:10px;
 }
-.scr-title{font-size:22px;font-weight:900;letter-spacing:-.02em}
-.scr-subtitle{font-size:13px;font-weight:600;color:var(--hint);margin-top:3px}
-/* Скроллируемое тело с кнопкой внутри */
+.scr-back{
+  width:38px;height:38px;border-radius:12px;
+  background:var(--bg3);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;
+  border:none;color:var(--text);
+  transition:transform .14s,background .14s;
+  -webkit-tap-highlight-color:transparent;
+}
+.scr-back:active{transform:scale(.92);background:rgba(0,0,0,.1)}
+.scr-hdr-text{flex:1;min-width:0}
+.scr-title{font-size:20px;font-weight:900;letter-spacing:-.02em;line-height:1.15}
+.scr-subtitle{font-size:12px;font-weight:600;color:var(--hint);margin-top:1px}
+
+/* ── Тело экрана ── */
 .scr-body{
-  flex:1;
-  overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
+  overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
   scrollbar-width:none;
-  padding:20px 16px calc(var(--sb)+28px);
-  display:flex;flex-direction:column;
+  padding:4px 16px 8px;
 }
 .scr-body::-webkit-scrollbar{display:none}
-/* Кнопка сохранения — прямо в теле, не фиксированная снизу */
+
+/* ── Футер с кнопкой прибит к низу ── */
 .scr-foot{
   flex-shrink:0;
-  padding:0 16px calc(var(--sb)+20px);
+  padding:10px 16px calc(var(--sb)+20px);
   background:var(--bg);
 }
-/* spacer чтобы кнопка не прилипала к контенту */
-.scr-foot-gap{height:20px;flex-shrink:0}
-/* Альтернатива: кнопка сразу под контентом */
-.scr-btn-wrap{
-  margin-top:24px;
+.scr-btn-wrap{display:none}
+
+/* ══ MD3 ПОЛЯ ВВОДА ══ */
+.md-field{
+  position:relative;
+  margin-bottom:8px;
+}
+.md-field:last-child{margin-bottom:0}
+.md-input{
+  width:100%;
+  min-height:56px;
+  padding:18px 16px 6px;
+  font-family:inherit;font-size:16px;font-weight:700;
+  color:var(--text);
+  background:var(--bg3);
+  border:none;outline:none;
+  border-radius:14px;
+  -webkit-appearance:none;
+  transition:background .15s,box-shadow .15s;
+  display:block;
+}
+.md-input:focus{
+  background:rgba(255,107,53,.07);
+  box-shadow:0 0 0 2px rgba(255,107,53,.25);
+}
+.tg-dark .md-input:focus{background:rgba(255,107,53,.12)}
+.md-label{
+  position:absolute;top:8px;left:16px;
+  font-size:11px;font-weight:800;color:var(--hint);
+  letter-spacing:.04em;text-transform:uppercase;
+  pointer-events:none;
+}
+.md-input::placeholder{color:var(--hint);font-size:15px;font-weight:600}
+/* Числовые поля — текст справа */
+.md-input.num{text-align:right;padding:18px 16px 6px}
+
+/* ══ MD3 КАРТОЧКА ПОЛЕЙ ══ */
+.md-card{
+  background:var(--bg2);
+  border-radius:20px;
+  padding:12px;
+  box-shadow:var(--sh);
+  margin-bottom:12px;
+}
+.tg-dark .md-card{
+  background:rgba(255,255,255,.06) !important;
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:none;
+}
+
+/* ══ MD3 СЕГМЕНТ ══ */
+.md-seg{
+  display:flex;gap:6px;
+  background:var(--bg3);
+  border-radius:14px;
+  padding:4px;
+}
+.md-seg-btn{
+  flex:1;padding:10px 8px;
+  font-size:13px;font-weight:800;
+  border:none;border-radius:10px;
+  cursor:pointer;font-family:inherit;
+  background:transparent;color:var(--hint);
+  transition:background .16s,color .16s,box-shadow .16s;
+  line-height:1.3;white-space:nowrap;
+  -webkit-tap-highlight-color:transparent;
+}
+.md-seg-btn:active{transform:scale(.97)}
+.md-seg-btn.on{
+  background:var(--bg2);color:var(--text);
+  box-shadow:0 2px 8px rgba(0,0,0,.1);
+}
+.tg-dark .md-seg-btn.on{background:rgba(255,255,255,.18)}
+
+/* ══ MD3 EMOJI СЕГМЕНТ (качество сна) ══ */
+.md-seg-emoji .md-seg-btn{font-size:22px;padding:7px 4px}
+
+/* ══ СЕКЦИЯ ЗАГОЛОВОК ══ */
+.md-sec{
+  font-size:11px;font-weight:800;
+  letter-spacing:.08em;text-transform:uppercase;
+  color:var(--hint);
+  padding:16px 4px 6px;
+}
+
+/* ══ TOGGLE ROW MD3 ══ */
+.md-tog-row{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;
+  background:var(--bg2);
+  border-radius:14px;
+  margin-bottom:6px;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  transition:opacity .12s;
+}
+.md-tog-row:active{opacity:.7}
+.md-tog-ic{font-size:20px;flex-shrink:0;width:28px;text-align:center}
+.md-tog-lbl{flex:1;font-size:14px;font-weight:700}
+.tg-dark .md-tog-row{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.07)}
+
+/* ══ PICKER ЭКРАНЫ ══ */
+.scr-picker-body{
+  overflow-y:auto;overflow-x:hidden;
+  padding:8px 16px;
 }
 
 /* ── ISLAND NAV ── */
@@ -121,7 +255,7 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
   -webkit-tap-highlight-color:transparent;
 }
 .nt.on{color:var(--sun);background:rgba(255,107,53,.11)}
-.nt:active{transform:scale(.8)!important}
+.nt:active{transform:scale(.88)!important}
 .nt svg{width:22px;height:22px;flex-shrink:0}
 .nt-dot{width:4px;height:4px;border-radius:50%;background:var(--sun);opacity:0;transition:opacity .18s;margin-top:-1px}
 .nt.on .nt-dot{opacity:1}
@@ -226,8 +360,8 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
 .pr-kcal{font-size:15px;font-weight:900;color:var(--cal)}
 
 /* ── BTNS ── */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;cursor:pointer;font-family:inherit;font-weight:800;transition:transform .14s cubic-bezier(.34,1.56,.64,1),opacity .14s}
-.btn:active{transform:scale(.87);opacity:.8}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;cursor:pointer;font-family:inherit;font-weight:800;transition:transform .1s ease,opacity .12s}
+.btn:active{transform:scale(.96);opacity:.85}
 .btn-p{background:linear-gradient(135deg,var(--sun),var(--sun2));color:#fff;padding:16px 24px;font-size:15px;font-weight:900;border-radius:18px;box-shadow:0 6px 24px rgba(255,107,53,.32),0 2px 8px rgba(255,107,53,.18);width:100%;letter-spacing:.01em}
 .btn-g{background:var(--bg3);color:var(--text);padding:11px 16px;font-size:13px;border-radius:11px}
 .btn-water{background:rgba(78,174,229,.11);color:var(--water);padding:13px 8px;font-size:13px;border-radius:11px;flex:1}
@@ -282,7 +416,7 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
 .seg-btn{flex:1;padding:8px 6px;font-size:13px;font-weight:800;border:none;border-radius:7px;cursor:pointer;font-family:inherit;background:transparent;color:var(--hint);transition:background .14s,color .14s;line-height:1.4;white-space:nowrap}
 .seg-btn.on{background:var(--bg2);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.09)}
 /* Эмодзи-версия сегмента */
-#seg-sleepq .seg-btn{font-size:20px;padding:6px 4px}
+/* emoji seg handled by .md-seg-emoji */
 
 /* ── EMPTY ── */
 .empty{text-align:center;padding:44px 24px}
@@ -346,7 +480,6 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
 .tg-dark .scr{background:var(--bg)}
 .tg-dark .scr-hdr{background:var(--bg);border-bottom-color:rgba(255,255,255,.08)}
 .tg-dark .scr-foot{background:var(--bg);border-top-color:rgba(255,255,255,.08)}
-/* Dark: banner остаётся оранжевым */
 /* Dark: nav */
 .tg-dark #nav{background:rgba(20,16,10,.94);border-color:rgba(255,255,255,.1)}
 /* Dark: history rows */
@@ -384,7 +517,7 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
   background:var(--bg3);cursor:pointer;text-align:center;
   transition:all .16s cubic-bezier(.34,1.3,.64,1);
 }
-.type-card:active{transform:scale(.93)}
+.type-card:active{transform:scale(.97)}
 .type-card.on{background:rgba(255,107,53,.08);border-color:var(--sun)}
 .type-card-ico{font-size:28px;margin-bottom:4px;line-height:1}
 .type-card-lbl{font-size:13px;font-weight:800;color:var(--text)}
@@ -512,7 +645,6 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
   <div class="ttabs">
     <button class="ttab on" id="tt-water" onclick="setTTab('water')">Вода</button>
     <button class="ttab" id="tt-cal" onclick="setTTab('cal')">Калории</button>
-    <button class="ttab" id="tt-prod" onclick="setTTab('prod')">КБЖУ</button>
   </div>
 </div>
 
@@ -552,11 +684,6 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
 </div>
 </div>
 
-<div id="tt-prod-body" style="display:none">
-<div class="pad reveal">
-<div class="card" style="margin-top:6px;padding:10px 12px"><div id="prod-list"></div></div>
-<button class="btn btn-p gap" onclick="openScr('scr-cal')">Добавить продукт</button>
-</div>
 </div>
 </div>
 
@@ -595,7 +722,7 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
 <div class="pad" id="pl-list" style="margin-top:4px"></div>
 
 <div class="pad gap">
-  <button class="btn btn-p" onclick="openScr('scr-act')">Добавить задачу</button>
+  <button class="btn btn-p" onclick="openScr('scr-act')">Добавить активность</button>
 </div>
 <div style="height:8px"></div>
 </div>
@@ -718,15 +845,10 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
     <span class="lt-val" id="pf-pname">—</span>
     <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
   </div>
-  <div class="lt" onclick="openScr('scr-goals')">
+  <div class="lt" style="padding-bottom:0;border:none" onclick="openScr('scr-goals')">
     <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg></div>
     <span class="lt-lbl">Мои цели</span>
     <span class="lt-val"><span id="pf-gw">—</span></span>
-    <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-  </div>
-  <div class="lt" style="padding-bottom:0;border:none" onclick="openScr('scr-appsett')">
-    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
-    <span class="lt-lbl">Настройки приложения</span>
     <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
   </div>
 </div>
@@ -759,128 +881,150 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
 
 </div><!-- /pages -->
 
+<div id="scr-overlay" onclick="closeScr()"></div>
+
 <!-- ══════════ SCREEN LAYER ══════════ -->
 <div id="slayer">
 
 <!-- Scr: Вес -->
 <div class="scr" id="scr-weight">
+  <div class="scr-handle"></div>
   <div class="scr-hdr">
-    <div class="scr-title">Записать вес</div>
-    <div class="scr-subtitle">потяни барабан чтобы выбрать</div>
+    <button class="scr-back" onclick="closeScr()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+    </button>
+    <div class="scr-hdr-text">
+      <div class="scr-title">Записать вес</div>
+      <div class="scr-subtitle">потяни барабан чтобы выбрать</div>
+    </div>
   </div>
-  <div class="scr-body">
-    <div class="card" style="padding:20px 16px;margin-bottom:0">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 4px">
-        <span style="font-size:12px;font-weight:800;color:var(--hint);text-transform:uppercase;letter-spacing:.06em">КГ</span>
-        <span style="font-size:12px;font-weight:800;color:var(--hint);text-transform:uppercase;letter-spacing:.06em">.X</span>
+  <div class="scr-picker-body">
+    <div class="md-card" style="padding:20px 16px">
+      <div style="display:flex;justify-content:space-between;padding:0 8px;margin-bottom:8px">
+        <span style="font-size:11px;font-weight:800;color:var(--hint);text-transform:uppercase;letter-spacing:.08em">КГ</span>
+        <span style="font-size:11px;font-weight:800;color:var(--hint);text-transform:uppercase;letter-spacing:.08em">.X</span>
       </div>
       <div class="wp-row" id="wp-weight-wrap"></div>
     </div>
-    <div class="scr-btn-wrap">
-      <button class="btn btn-p" onclick="submitWeight()">Сохранить вес</button>
-    </div>
-    <div style="margin-top:12px">
-      <button class="btn btn-g" style="width:100%;padding:14px;border-radius:18px;font-size:14px;font-weight:800" onclick="openScr('scr-whist')">📊 История веса</button>
-    </div>
+  </div>
+  <div class="scr-foot">
+    <button class="btn btn-p" onclick="submitWeight()">Сохранить вес</button>
   </div>
 </div>
 
 <!-- Scr: Сон -->
 <div class="scr" id="scr-sleep">
+  <div class="scr-handle"></div>
   <div class="scr-hdr">
-    <div class="scr-title">Записать сон</div>
-    <div class="scr-subtitle">сколько спал прошлой ночью?</div>
+    <button class="scr-back" onclick="closeScr()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+    </button>
+    <div class="scr-hdr-text">
+      <div class="scr-title">Записать сон</div>
+      <div class="scr-subtitle">сколько спал прошлой ночью?</div>
+    </div>
   </div>
-  <div class="scr-body">
-    <div class="card" style="padding:20px 16px;margin-bottom:12px">
+  <div class="scr-picker-body">
+    <div class="md-card" style="padding:20px 16px">
       <div class="wp-row" id="wp-sleep-wrap"></div>
     </div>
-    <div class="card" style="padding:16px">
-      <div class="f-lbl" style="margin-bottom:12px;font-size:15px">Качество сна</div>
-      <div class="seg" id="seg-sleepq">
-        <button class="seg-btn" onclick="setSleepQ(1)" data-q="1">😫</button>
-        <button class="seg-btn" onclick="setSleepQ(2)" data-q="2">😴</button>
-        <button class="seg-btn on" onclick="setSleepQ(3)" data-q="3">😑</button>
-        <button class="seg-btn" onclick="setSleepQ(4)" data-q="4">🙂</button>
-        <button class="seg-btn" onclick="setSleepQ(5)" data-q="5">🌟</button>
+    <div class="md-card" style="padding:16px">
+      <div style="font-size:14px;font-weight:800;margin-bottom:12px">Качество сна</div>
+      <div class="md-seg md-seg-emoji" id="seg-sleepq">
+        <button class="md-seg-btn" onclick="setSleepQ(1)" data-q="1">😫</button>
+        <button class="md-seg-btn" onclick="setSleepQ(2)" data-q="2">😴</button>
+        <button class="md-seg-btn on" onclick="setSleepQ(3)" data-q="3">😑</button>
+        <button class="md-seg-btn" onclick="setSleepQ(4)" data-q="4">🙂</button>
+        <button class="md-seg-btn" onclick="setSleepQ(5)" data-q="5">🌟</button>
       </div>
     </div>
-    <div class="scr-btn-wrap">
-      <button class="btn btn-p" onclick="submitSleep()">Сохранить сон</button>
-    </div>
+  </div>
+  <div class="scr-foot">
+    <button class="btn btn-p" onclick="submitSleep()">Сохранить сон</button>
   </div>
 </div>
 
 <!-- Scr: Калории -->
 <div class="scr" id="scr-cal">
+  <div class="scr-handle"></div>
   <div class="scr-hdr">
-    <div class="scr-title">Добавить еду</div>
-    <div class="scr-subtitle">запиши что съел</div>
+    <button class="scr-back" onclick="closeScr()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+    </button>
+    <div class="scr-hdr-text">
+      <div class="scr-title">Добавить еду</div>
+      <div class="scr-subtitle">запиши что съел</div>
+    </div>
   </div>
   <div class="scr-body">
-    <div class="card" style="padding:16px;margin-bottom:12px">
-      <div class="f-lbl" style="margin-bottom:10px">Приём пищи</div>
-      <div class="seg" id="seg-meal">
-        <button class="seg-btn on" onclick="setMeal('breakfast')" data-m="breakfast">Завтрак</button>
-        <button class="seg-btn" onclick="setMeal('lunch')" data-m="lunch">Обед</button>
-        <button class="seg-btn" onclick="setMeal('dinner')" data-m="dinner">Ужин</button>
-        <button class="seg-btn" onclick="setMeal('snack')" data-m="snack">Перекус</button>
+    <div class="md-sec">Приём пищи</div>
+    <div class="md-seg" id="seg-meal" style="margin-bottom:12px">
+      <button class="md-seg-btn on" onclick="setMeal('breakfast')" data-m="breakfast">Завтрак</button>
+      <button class="md-seg-btn" onclick="setMeal('lunch')" data-m="lunch">Обед</button>
+      <button class="md-seg-btn" onclick="setMeal('dinner')" data-m="dinner">Ужин</button>
+      <button class="md-seg-btn" onclick="setMeal('snack')" data-m="snack">Перекус</button>
+    </div>
+    <div class="md-sec">Данные</div>
+    <div class="md-card">
+      <div class="md-field">
+        <div class="md-label">Калорий, ккал</div>
+        <input class="md-input num" id="inp-cal" type="number" inputmode="numeric" step="10" min="0" max="3000" placeholder="500">
+      </div>
+      <div class="md-field">
+        <div class="md-label">Название блюда</div>
+        <input class="md-input" id="inp-cal-desc" type="text" placeholder="гречка, курица…">
       </div>
     </div>
-    <div class="card" style="padding:16px">
-      <div class="f-row">
-        <span class="f-lbl">Калорий, ккал</span>
-        <input class="f-inp" id="inp-cal" type="number" inputmode="numeric" step="10" min="0" max="3000" placeholder="500">
-      </div>
-      <div>
-        <span class="f-lbl">Название блюда</span>
-        <input class="f-inp f-inp-wide" id="inp-cal-desc" type="text" placeholder="гречка, курица…">
-      </div>
-    </div>
-    <div class="scr-btn-wrap">
-      <button class="btn btn-p" onclick="submitCal()">Добавить</button>
-    </div>
+  </div>
+  <div class="scr-foot">
+    <button class="btn btn-p" onclick="submitCal()">Добавить</button>
   </div>
 </div>
 
 <!-- Scr: Активность — MULTI-STEP -->
 <div class="scr" id="scr-act">
+  <div class="scr-handle"></div>
   <div class="scr-hdr">
-    <div class="step-ind">
-      <div class="step-pip on" id="sp1"></div>
-      <div class="step-pip" id="sp2"></div>
-      <div class="step-pip" id="sp3"></div>
+    <button class="scr-back" onclick="closeScr()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+    </button>
+    <div class="scr-hdr-text">
+      <div class="step-ind" style="justify-content:flex-start;padding:0 0 4px">
+        <div class="step-pip on" id="sp1"></div>
+        <div class="step-pip" id="sp2"></div>
+        <div class="step-pip" id="sp3"></div>
+      </div>
+      <div class="scr-title" id="act-step-title">Название</div>
+      <div class="scr-subtitle" id="act-step-sub">как называется активность?</div>
     </div>
-    <div class="scr-title" id="act-step-title">Название</div>
-    <div class="scr-subtitle" id="act-step-sub">как называется тренировка?</div>
   </div>
   <div class="scr-body">
 
     <!-- Шаг 1: Название -->
     <div class="act-step active" id="act-s1">
-      <input class="f-inp f-inp-wide" id="inp-aname" type="text" placeholder="Пробежка, йога, зал…"
-        style="font-size:18px;padding:16px;margin-top:4px" autocomplete="off">
-      <div style="margin-top:16px">
-        <div class="t5" style="margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">или выбери</div>
-        <div class="type-grid" id="act-quick">
-          <div class="type-card on" onclick="actQuick('Пробежка','run')"><div class="type-card-ico">🏃</div><div class="type-card-lbl">Пробежка</div></div>
-          <div class="type-card" onclick="actQuick('Зал','gym')"><div class="type-card-ico">💪</div><div class="type-card-lbl">Зал</div></div>
-          <div class="type-card" onclick="actQuick('Йога','yoga')"><div class="type-card-ico">🧘</div><div class="type-card-lbl">Йога</div></div>
-          <div class="type-card" onclick="actQuick('Ходьба','walk')"><div class="type-card-ico">🚶</div><div class="type-card-lbl">Ходьба</div></div>
-          <div class="type-card" onclick="actQuick('Велосипед','bike')"><div class="type-card-ico">🚴</div><div class="type-card-lbl">Велосипед</div></div>
-          <div class="type-card" onclick="actQuick('Плавание','swim')"><div class="type-card-ico">🏊</div><div class="type-card-lbl">Плавание</div></div>
-        </div>
+      <div class="md-field" style="margin-bottom:16px">
+        <div class="md-label">Название активности</div>
+        <input class="md-input" id="inp-aname" type="text" placeholder="Пробежка, йога, зал…" autocomplete="off">
+      </div>
+      <div class="md-sec" style="padding-top:4px">Или выбери</div>
+      <div class="type-grid" id="act-quick">
+        <div class="type-card on" onclick="actQuick('Пробежка','run')"><div class="type-card-ico">🏃</div><div class="type-card-lbl">Пробежка</div></div>
+        <div class="type-card" onclick="actQuick('Зал','gym')"><div class="type-card-ico">💪</div><div class="type-card-lbl">Зал</div></div>
+        <div class="type-card" onclick="actQuick('Йога','yoga')"><div class="type-card-ico">🧘</div><div class="type-card-lbl">Йога</div></div>
+        <div class="type-card" onclick="actQuick('Ходьба','walk')"><div class="type-card-ico">🚶</div><div class="type-card-lbl">Ходьба</div></div>
+        <div class="type-card" onclick="actQuick('Велосипед','bike')"><div class="type-card-ico">🚴</div><div class="type-card-lbl">Велосипед</div></div>
+        <div class="type-card" onclick="actQuick('Другое','other')"><div class="type-card-ico">✨</div><div class="type-card-lbl">Другое</div></div>
       </div>
     </div>
 
     <!-- Шаг 2: Время и длительность -->
     <div class="act-step" id="act-s2">
-      <div class="t5" style="text-align:center;margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em">Время начала</div>
-      <div class="card" style="padding:16px;margin-bottom:12px">
+      <div class="md-sec" style="padding-top:4px">Время начала</div>
+      <div class="md-card" style="padding:16px;margin-bottom:0">
         <div class="wp-row" id="wp-time-wrap"></div>
       </div>
-      <div class="t5" style="text-align:center;margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em">Длительность</div>
-      <div class="card" style="padding:16px">
+      <div class="md-sec">Длительность</div>
+      <div class="md-card" style="padding:16px">
         <div class="wp-row" id="wp-dur-wrap"></div>
       </div>
     </div>
@@ -892,80 +1036,128 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
         <div id="act-confirm-name" style="font-size:24px;font-weight:900;letter-spacing:-.02em;margin-bottom:6px">—</div>
         <div id="act-confirm-time" style="font-size:15px;color:var(--hint);font-weight:700">—</div>
       </div>
-      <div class="card" style="padding:16px;margin-top:8px">
-        <div class="f-row" style="padding-bottom:0">
-          <span class="f-lbl">Напоминание</span>
+      <div class="md-card" style="padding:16px;margin-top:8px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:14px;font-weight:800">Напоминание</span>
           <div class="tog on" id="tog-act-rem" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div>
         </div>
       </div>
     </div>
 
   </div>
-  <div class="scr-foot" id="act-foot" style="padding:0 16px calc(var(--sb)+20px)">
+  <div class="scr-foot" id="act-foot">
     <button class="btn btn-p" id="act-next-btn" onclick="actStepNext()">Далее →</button>
   </div>
 </div>
 
 <!-- Scr: Данные профиля -->
 <div class="scr" id="scr-pdata">
+  <div class="scr-handle"></div>
   <div class="scr-hdr">
-    <div class="scr-title">Данные профиля</div>
+    <button class="scr-back" onclick="closeScr()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+    </button>
+    <div class="scr-hdr-text">
+      <div class="scr-title">Данные профиля</div>
+    </div>
   </div>
   <div class="scr-body">
-    <div class="card" style="padding:16px;margin-bottom:12px">
-      <div class="f-row"><span class="f-lbl">Имя</span><input class="f-inp" id="inp-pname" type="text" placeholder="Алексей" style="text-align:left"></div>
-      <div class="f-row"><span class="f-lbl">Рост, см</span><input class="f-inp" id="inp-height" type="number" inputmode="numeric" min="100" max="250" placeholder="175"></div>
-      <div class="f-row" style="padding-bottom:0"><span class="f-lbl">Возраст</span><input class="f-inp" id="inp-age" type="number" inputmode="numeric" min="10" max="100" placeholder="25"></div>
-    </div>
-    <div class="card" style="padding:16px">
-      <div class="f-lbl" style="margin-bottom:10px">Пол</div>
-      <div class="seg" id="seg-gender">
-        <button class="seg-btn on" onclick="setGender('male')" data-g="male">Мужской</button>
-        <button class="seg-btn" onclick="setGender('female')" data-g="female">Женский</button>
+    <div class="md-sec">Личные данные</div>
+    <div class="md-card">
+      <div class="md-field">
+        <div class="md-label">Имя</div>
+        <input class="md-input" id="inp-pname" type="text" placeholder="Алексей">
+      </div>
+      <div class="md-field">
+        <div class="md-label">Рост, см</div>
+        <input class="md-input num" id="inp-height" type="number" inputmode="numeric" min="100" max="250" placeholder="175">
+      </div>
+      <div class="md-field">
+        <div class="md-label">Возраст</div>
+        <input class="md-input num" id="inp-age" type="number" inputmode="numeric" min="10" max="100" placeholder="25">
       </div>
     </div>
-    <div class="scr-btn-wrap">
-      <button class="btn btn-p" onclick="submitProfile()">Сохранить</button>
+    <div class="md-sec">Пол</div>
+    <div class="md-seg" id="seg-gender">
+      <button class="md-seg-btn on" onclick="setGender('male')" data-g="male">♂ Мужской</button>
+      <button class="md-seg-btn" onclick="setGender('female')" data-g="female">♀ Женский</button>
     </div>
+  </div>
+  <div class="scr-foot">
+    <button class="btn btn-p" onclick="submitProfile()">Сохранить</button>
   </div>
 </div>
 
 <!-- Scr: Цели -->
 <div class="scr" id="scr-goals">
+  <div class="scr-handle"></div>
   <div class="scr-hdr">
-    <div class="scr-title">Мои цели</div>
+    <button class="scr-back" onclick="closeScr()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+    </button>
+    <div class="scr-hdr-text">
+      <div class="scr-title">Мои цели</div>
+    </div>
   </div>
   <div class="scr-body">
-    <div class="card" style="padding:16px">
-      <div class="f-row"><span class="f-lbl">Целевой вес, кг</span><input class="f-inp" id="inp-gw" type="number" inputmode="decimal" step="0.5" placeholder="70"></div>
-      <div class="f-row"><span class="f-lbl">Норма воды, мл</span><input class="f-inp" id="inp-gwat" type="number" inputmode="numeric" step="100" placeholder="2000"></div>
-      <div class="f-row" style="padding-bottom:0"><span class="f-lbl">Норма калорий</span><input class="f-inp" id="inp-gcal" type="number" inputmode="numeric" step="50" placeholder="2000"></div>
+    <div class="md-sec">Параметры</div>
+    <div class="md-card">
+      <div class="md-field">
+        <div class="md-label">Целевой вес, кг</div>
+        <input class="md-input num" id="inp-gw" type="number" inputmode="decimal" step="0.5" placeholder="70">
+      </div>
+      <div class="md-field">
+        <div class="md-label">Норма воды, мл</div>
+        <input class="md-input num" id="inp-gwat" type="number" inputmode="numeric" step="100" placeholder="2000">
+      </div>
+      <div class="md-field">
+        <div class="md-label">Норма калорий</div>
+        <input class="md-input num" id="inp-gcal" type="number" inputmode="numeric" step="50" placeholder="2000">
+      </div>
     </div>
-    <div class="scr-btn-wrap">
-      <button class="btn btn-p" onclick="submitGoals()">Сохранить цели</button>
-    </div>
+  </div>
+  <div class="scr-foot">
+    <button class="btn btn-p" onclick="submitGoals()">Сохранить цели</button>
   </div>
 </div>
 
-<!-- Scr: Настройки приложения -->
+<!-- Scr: Настройки (тогглы отображения) -->
 <div class="scr" id="scr-appsett">
+  <div class="scr-handle"></div>
   <div class="scr-hdr">
-    <div class="scr-title">Настройки</div>
+    <button class="scr-back" onclick="closeScr()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+    </button>
+    <div class="scr-hdr-text">
+      <div class="scr-title">Настройки</div>
+    </div>
   </div>
   <div class="scr-body">
-    <div class="sec" style="padding-left:0;padding-top:4px">Отображение</div>
-    <div class="card" style="margin-bottom:12px">
-      <div class="lt"><div class="lt-ic">⚖️</div><span class="lt-lbl">Показывать вес</span><div class="tog on" id="tog-w" onclick="toggleSett('w')"></div></div>
-      <div class="lt"><div class="lt-ic">💧</div><span class="lt-lbl">Показывать воду</span><div class="tog on" id="tog-water" onclick="toggleSett('water')"></div></div>
-      <div class="lt"><div class="lt-ic">🔥</div><span class="lt-lbl">Показывать калории</span><div class="tog on" id="tog-cal" onclick="toggleSett('cal')"></div></div>
-      <div class="lt" style="padding-bottom:0;border:none"><div class="lt-ic">🌙</div><span class="lt-lbl">Показывать сон</span><div class="tog on" id="tog-sleep" onclick="toggleSett('sleep')"></div></div>
+    <div class="md-sec">Отображение</div>
+    <div class="md-tog-row" onclick="toggleSett('w')">
+      <div class="md-tog-ic">⚖️</div>
+      <div class="md-tog-lbl">Показывать вес</div>
+      <div class="tog on" id="tog-w"></div>
     </div>
-    <div class="sec" style="padding-left:0">Данные</div>
-    <div class="card">
-      <div class="lt" style="padding-bottom:0;border:none;color:var(--red);cursor:pointer" onclick="confirmReset()">
-        <div class="lt-ic" style="background:rgba(244,92,92,.1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></div>
-        <span class="lt-lbl" style="color:var(--red)">Сбросить все данные</span>
-      </div>
+    <div class="md-tog-row" onclick="toggleSett('water')">
+      <div class="md-tog-ic">💧</div>
+      <div class="md-tog-lbl">Показывать воду</div>
+      <div class="tog on" id="tog-water"></div>
+    </div>
+    <div class="md-tog-row" onclick="toggleSett('cal')">
+      <div class="md-tog-ic">🔥</div>
+      <div class="md-tog-lbl">Показывать калории</div>
+      <div class="tog on" id="tog-cal"></div>
+    </div>
+    <div class="md-tog-row" onclick="toggleSett('sleep')">
+      <div class="md-tog-ic">🌙</div>
+      <div class="md-tog-lbl">Показывать сон</div>
+      <div class="tog on" id="tog-sleep"></div>
+    </div>
+    <div class="md-sec">Данные</div>
+    <div class="md-tog-row" style="color:var(--red)" onclick="confirmReset()">
+      <div class="md-tog-ic">🗑️</div>
+      <div class="md-tog-lbl" style="color:var(--red)">Сбросить все данные</div>
     </div>
     <div style="text-align:center;padding:24px 0 8px">
       <div class="t5">letify · ver 3.0</div>
@@ -974,12 +1166,18 @@ html,body{height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;
 </div>
 <!-- Scr: История веса -->
 <div class="scr" id="scr-whist">
+  <div class="scr-handle"></div>
   <div class="scr-hdr">
-    <div class="scr-title">История веса</div>
-    <div class="scr-subtitle">все записанные измерения</div>
+    <button class="scr-back" onclick="closeScr()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+    </button>
+    <div class="scr-hdr-text">
+      <div class="scr-title">История веса</div>
+      <div class="scr-subtitle">все записанные измерения</div>
+    </div>
   </div>
   <div class="scr-body">
-    <div class="card" style="padding:10px 14px" id="scr-whist-list">
+    <div class="md-card" style="padding:10px 14px" id="scr-whist-list">
       <div style="text-align:center;padding:20px;color:var(--hint);font-size:13px;font-weight:600">Нет записей</div>
     </div>
   </div>
@@ -1160,7 +1358,7 @@ function navTo(tab){
 
 function setTTab(t){
   trackTab=t;
-  ['water','cal','prod'].forEach(k=>{
+  ['water','cal'].forEach(k=>{
     document.getElementById('tt-'+k)?.classList.toggle('on',k===t);
     const b=document.getElementById('tt-'+k+'-body');if(b)b.style.display=k===t?'':'none';
   });
@@ -1174,6 +1372,8 @@ function openScr(id){
   nav?.classList.add('gone');
   const navEl=document.getElementById('nav');
   if(navEl)navEl.style.bottom='-120px';
+  const overlay=document.getElementById('scr-overlay');
+  if(overlay)overlay.classList.add('show');
   _populateScr(id);
   const scr=document.getElementById(id);
   if(scr)scr.classList.add('open');
@@ -1187,6 +1387,8 @@ function closeScr(doNav=true){
   const scr=document.getElementById(curScr);
   if(scr)scr.classList.remove('open');
   curScr=null;
+  const overlay=document.getElementById('scr-overlay');
+  if(overlay)overlay.classList.remove('show');
   const navEl=document.getElementById('nav');
   navEl?.classList.remove('gone');
   const sb=Math.min(Math.max(tg?.safeAreaInset?.bottom??0,0),80);
@@ -1200,7 +1402,7 @@ function _populateScr(id){
     const hi=document.getElementById('inp-height');if(hi)hi.value=u.height||'';
     const ai=document.getElementById('inp-age');if(ai)ai.value=u.age||'';
     _gender=u.gender||'male';
-    document.querySelectorAll('#seg-gender .seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.g===_gender));
+    document.querySelectorAll('#seg-gender .md-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.g===_gender));
   }
   if(id==='scr-goals'){
     const gi=document.getElementById('inp-gw');if(gi)gi.value=u.goal_weight||'';
@@ -1365,21 +1567,24 @@ const ACT_ICO={run:'🏃',walk:'🚶',bike:'🚴',gym:'💪',yoga:'🧘',swim:'�
 const ACT_COL={run:'#FF6B35',walk:'#52C177',bike:'#4EAEE5',gym:'#E91E63',yoga:'#8B7FD4',swim:'#00BCD4',other:'#FFAB40'};
 
 /* ════ ACTIONS ════ */
+let _addWBusy=false;
 async function addW(ml){
+  if(_addWBusy)return;
+  _addWBusy=true;
   C.water.total=(C.water.total||0)+ml;
   C.water.entries=[...(C.water.entries||[]),ml];
   renderTrack('water');renderHome();
   toast('+'+ml+' мл');
   tg?.HapticFeedback?.impactOccurred('light');
-  await apiPost('/api/water',{amount:ml});
-  await reload();
+  apiPost('/api/water',{amount:ml});
+  setTimeout(()=>{_addWBusy=false;},300);
 }
 async function undoW(){
   if(!C.water.entries?.length){toast('Нечего отменять');return;}
   const last=C.water.entries.pop();
   C.water.total=Math.max(0,(C.water.total||0)-last);
   renderTrack('water');renderHome();toast('Отменено −'+last+' мл');
-  await apiPost('/api/water/undo',{});await reload();
+  apiPost('/api/water/undo',{});
 }
 async function completeAct(id){
   const a=gActs().find(x=>x.id===id);if(!a)return;
@@ -1403,7 +1608,7 @@ function toggleSett(key){
 let _sleepQ=3,_mealType='breakfast',_actType='run',_gender='male';
 let actStep=1;
 const ACT_STEPS_TITLE=['Название','Когда?','Готово!'];
-const ACT_STEPS_SUB=['как называется тренировка?','выбери время и длительность','проверь и добавь в план'];
+const ACT_STEPS_SUB=['как называется активность?','выбери время и длительность','проверь и добавь в план'];
 
 function _renderActStep(){
   [1,2,3].forEach(i=>{
@@ -1448,9 +1653,9 @@ function actQuick(name,type){
   event?.target?.closest('.type-card')?.classList.add('on');
   const inp=document.getElementById('inp-aname');if(inp)inp.value=name;
 }
-function setSleepQ(q){_sleepQ=q;document.querySelectorAll('#seg-sleepq .seg-btn').forEach(b=>b.classList.toggle('on',+b.dataset.q===q));}
-function setMeal(m){_mealType=m;document.querySelectorAll('#seg-meal .seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.m===m));}
-function setGender(g){_gender=g;document.querySelectorAll('#seg-gender .seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.g===g));}
+function setSleepQ(q){_sleepQ=q;document.querySelectorAll('#seg-sleepq .md-seg-btn').forEach(b=>b.classList.toggle('on',+b.dataset.q===q));}
+function setMeal(m){_mealType=m;document.querySelectorAll('#seg-meal .md-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.m===m));}
+function setGender(g){_gender=g;document.querySelectorAll('#seg-gender .md-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.g===g));}
 function setActType(at){_actType=at;document.querySelectorAll('#seg-atype .seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.t===at));}
 
 async function submitWeight(){
@@ -1671,7 +1876,6 @@ function renderHome(){
 function renderTrack(tab){
   if(tab==='water')renderWater();
   else if(tab==='cal')renderCal();
-  else renderProds();
 }
 function renderWater(){
   const u=gU(),wd=gWD();
