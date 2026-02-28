@@ -541,24 +541,16 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .scanner-overlay{
   position:absolute;inset:0;pointer-events:none;
 }
-.scanner-line{
-  position:absolute;left:20px;right:20px;height:2px;
-  background:linear-gradient(90deg,transparent,var(--sun),var(--sun2),var(--sun),transparent);
-  border-radius:99px;top:50%;transform:translateY(-50%);
-  animation:sc-scan 2.4s ease-in-out infinite;
-  box-shadow:0 0 12px rgba(255,107,53,.6);
-}
-@keyframes sc-scan{0%,100%{top:20%}50%{top:80%}}
 .scanner-corner{
-  position:absolute;width:28px;height:28px;
-  border-color:var(--scan-border,rgba(255,255,255,.7));border-style:solid;border-width:0;
+  position:absolute;width:36px;height:36px;
+  border-color:var(--scan-border,rgba(255,255,255,.8));border-style:solid;border-width:0;
+  transition:border-color .4s ease;
 }
-.scanner-corner.tl{top:16px;left:16px;border-top-width:3px;border-left-width:3px;border-radius:6px 0 0 0}
-.scanner-corner.tr{top:16px;right:16px;border-top-width:3px;border-right-width:3px;border-radius:0 6px 0 0}
-.scanner-corner.bl{bottom:16px;left:16px;border-bottom-width:3px;border-left-width:3px;border-radius:0 0 0 6px}
-.scanner-corner.br{bottom:16px;right:16px;border-bottom-width:3px;border-right-width:3px;border-radius:0 0 6px 0}
+.scanner-corner.tl{top:16px;left:16px;border-top-width:3px;border-left-width:3px;border-radius:8px 0 0 0}
+.scanner-corner.tr{top:16px;right:16px;border-top-width:3px;border-right-width:3px;border-radius:0 8px 0 0}
+.scanner-corner.bl{bottom:16px;left:16px;border-bottom-width:3px;border-left-width:3px;border-radius:0 0 0 8px}
+.scanner-corner.br{bottom:16px;right:16px;border-bottom-width:3px;border-right-width:3px;border-radius:0 0 8px 0}
 .scanner-viewport.found .scanner-corner{--scan-border:var(--green) !important;}
-.scanner-viewport.found .scanner-line{background:linear-gradient(90deg,transparent,var(--green),var(--green),transparent);box-shadow:0 0 12px rgba(82,193,119,.7);animation:none;top:50%}
 .scanner-found-card{
   background:var(--bg2);border-radius:18px;padding:16px;
   box-shadow:var(--sh);margin-bottom:16px;
@@ -578,6 +570,14 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   transition:background .12s,transform .12s;
 }
 .scan-ico-btn:active{transform:scale(.93);background:rgba(255,107,53,.18)}
+.scm-btn{
+  padding:12px 8px;border:2px solid var(--brd);border-radius:12px;
+  background:var(--bg3);color:var(--hint);
+  font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;
+  transition:all .14s ease;
+}
+.scm-btn.on{border-color:var(--sun);background:rgba(255,107,53,.1);color:var(--text);}
+.scm-btn:active{transform:scale(.96);}
 /* Scanner step pages */
 .sc-step{display:none}
 .sc-step.active{display:block}
@@ -1043,7 +1043,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   <div class="pp-hdr">
     <button class="pp-back" onclick="calBackOrPop()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
     <div style="flex:1">
-      <div class="step-ind"><div class="step-pip on" id="cp1"></div><div class="step-pip" id="cp2"></div></div>
+      <div class="step-ind"><div class="step-pip on" id="cp1"></div><div class="step-pip" id="cp2"></div><div class="step-pip" id="cp3"></div></div>
       <div class="pp-title" id="cal-step-title">название блюда</div>
     </div>
     <button class="scan-ico-btn" onclick="pushPage('pp-scanner')" title="сканировать штрихкод">
@@ -1051,6 +1051,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     </button>
   </div>
   <div class="pp-body">
+    <!-- Step 1: Name -->
     <div class="act-step active" id="cal-s1">
       <div class="act-hint">как называется блюдо?</div>
       <div class="m3-card" style="padding:16px 14px;margin-bottom:0">
@@ -1059,55 +1060,71 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
           <input class="m3-input" id="inp-cal-desc" type="text" placeholder="гречка, курица, суп…" autocomplete="off" style="font-size:17px">
         </div>
       </div>
-      <button class="btn btn-p" style="margin-top:20px" onclick="calStepNext()">далее →</button>
+      <button class="btn btn-p" style="margin-top:20px" onclick="calStep2()">далее →</button>
     </div>
+    <!-- Step 2: Macros + weight -->
     <div class="act-step" id="cal-s2">
+      <div class="act-hint">питательная ценность</div>
       <div class="big-val-card" style="background:linear-gradient(135deg,rgba(244,129,74,.08),rgba(244,129,74,.03))">
-        <div class="big-val" style="color:var(--cal)" id="cal-preview">500</div>
-        <div class="big-val-unit">ккал</div>
+        <div class="big-val" style="color:var(--cal)" id="cal-preview">0</div>
+        <div class="big-val-unit">ккал · <span id="cal-portion-lbl">100</span> г</div>
       </div>
-      <div class="m3-sec">калорий</div>
-      <div class="m3-card" style="padding:8px">
-        <div class="stepper-wrap">
-          <button class="stepper-btn" style="color:var(--cal)" onclick="stepCal(-50)">−</button>
-          <div class="stepper-val" style="color:var(--cal)" id="cal-step-disp">500</div>
-          <button class="stepper-btn" style="color:var(--cal)" onclick="stepCal(50)">+</button>
+      <div class="m3-card" style="padding:14px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="m3-field" style="margin-bottom:0">
+            <div class="m3-label">ккал / 100г</div>
+            <input class="m3-input num" id="inp-kcal100" type="number" inputmode="decimal" placeholder="200" oninput="calRecalc()">
+          </div>
+          <div class="m3-field" style="margin-bottom:0">
+            <div class="m3-label">белки / 100г</div>
+            <input class="m3-input num" id="inp-prot100" type="number" inputmode="decimal" step="0.1" placeholder="0" oninput="calRecalc()">
+          </div>
+          <div class="m3-field" style="margin-bottom:0">
+            <div class="m3-label">жиры / 100г</div>
+            <input class="m3-input num" id="inp-fat100" type="number" inputmode="decimal" step="0.1" placeholder="0" oninput="calRecalc()">
+          </div>
+          <div class="m3-field" style="margin-bottom:0">
+            <div class="m3-label">углеводы / 100г</div>
+            <input class="m3-input num" id="inp-carb100" type="number" inputmode="decimal" step="0.1" placeholder="0" oninput="calRecalc()">
+          </div>
         </div>
-      </div>
-      <div class="dur-grid" style="margin-bottom:10px">
-        <button class="dur-btn" onclick="setCalVal(100)">100</button>
-        <button class="dur-btn" onclick="setCalVal(200)">200</button>
-        <button class="dur-btn" onclick="setCalVal(350)">350</button>
-        <button class="dur-btn" onclick="setCalVal(500)">500</button>
-        <button class="dur-btn" onclick="setCalVal(650)">650</button>
-        <button class="dur-btn" onclick="setCalVal(800)">800</button>
-        <button class="dur-btn" onclick="setCalVal(1000)">1000</button>
-        <button class="dur-btn" onclick="setCalVal(1200)">1200</button>
-      </div>
-      <div class="m3-sec">приём пищи</div>
-      <div class="m3-seg" id="seg-meal" style="margin-bottom:0">
-        <button class="m3-seg-btn on" onclick="setMeal('breakfast')" data-m="breakfast">завтрак</button>
-        <button class="m3-seg-btn" onclick="setMeal('lunch')" data-m="lunch">обед</button>
-        <button class="m3-seg-btn" onclick="setMeal('dinner')" data-m="dinner">ужин</button>
-        <button class="m3-seg-btn" onclick="setMeal('snack')" data-m="snack">перекус</button>
-      </div>
-      <div style="margin-top:14px">
-        <div onclick="toggleCalMacros()" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg3);border-radius:12px;cursor:pointer">
-          <span style="font-size:13px;font-weight:700;color:var(--hint)">+ указать КБЖУ (необязательно)</span>
-          <span id="cal-macros-arrow" style="color:var(--hint);font-size:16px;transition:transform .2s">▼</span>
+        <div class="m3-field" style="margin-top:10px;margin-bottom:0">
+          <div class="m3-label">вес порции, г</div>
+          <input class="m3-input num" id="inp-weight" type="number" inputmode="decimal" placeholder="100" value="100" oninput="calRecalc()">
         </div>
-        <div id="cal-macros-wrap" style="display:none;margin-top:8px">
-          <div class="m3-card">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-              <div class="m3-field" style="margin-bottom:0"><div class="m3-label">белки, г</div><input class="m3-input num" id="inp-prot" type="number" inputmode="decimal" step="0.1" placeholder="0"></div>
-              <div class="m3-field" style="margin-bottom:0"><div class="m3-label">жиры, г</div><input class="m3-input num" id="inp-fat" type="number" inputmode="decimal" step="0.1" placeholder="0"></div>
-              <div class="m3-field" style="margin-bottom:0"><div class="m3-label">углеводы, г</div><input class="m3-input num" id="inp-carb" type="number" inputmode="decimal" step="0.1" placeholder="0"></div>
-              <div style="display:flex;align-items:center;padding:8px;background:var(--bg3);border-radius:12px;font-size:11px;font-weight:600;color:var(--hint)">необязательно, но полезно</div>
-            </div>
+        <div id="cal-macro-preview" style="display:flex;gap:6px;margin-top:10px">
+          <div style="flex:1;background:var(--bg3);border-radius:10px;padding:8px;text-align:center">
+            <div style="font-size:14px;font-weight:800;color:var(--green)" id="cal-prev-prot">0</div>
+            <div style="font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase">белки г</div>
+          </div>
+          <div style="flex:1;background:var(--bg3);border-radius:10px;padding:8px;text-align:center">
+            <div style="font-size:14px;font-weight:800;color:var(--sun)" id="cal-prev-fat">0</div>
+            <div style="font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase">жиры г</div>
+          </div>
+          <div style="flex:1;background:var(--bg3);border-radius:10px;padding:8px;text-align:center">
+            <div style="font-size:14px;font-weight:800;color:var(--sleep)" id="cal-prev-carb">0</div>
+            <div style="font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase">углев. г</div>
           </div>
         </div>
       </div>
-      <button class="btn btn-p" style="margin-top:20px" onclick="submitCal()">добавить</button>
+      <button class="btn btn-p" style="margin-top:20px" onclick="calStep3()">далее →</button>
+    </div>
+    <!-- Step 3: Meal type -->
+    <div class="act-step" id="cal-s3">
+      <div class="act-hint">когда ты это ел?</div>
+      <div class="m3-card" style="padding:14px;margin-bottom:12px">
+        <div id="cal-confirm-info" style="text-align:center;padding:8px 0 12px">
+          <div style="font-size:22px;font-weight:900;color:var(--cal)" id="cal-confirm-kcal">0 ккал</div>
+          <div style="font-size:13px;color:var(--hint);font-weight:600;margin-top:2px" id="cal-confirm-desc">—</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button class="scm-btn on" id="scm2-breakfast" onclick="setMeal2('breakfast',this)">🌅 завтрак</button>
+          <button class="scm-btn" id="scm2-lunch" onclick="setMeal2('lunch',this)">☀️ обед</button>
+          <button class="scm-btn" id="scm2-dinner" onclick="setMeal2('dinner',this)">🌙 ужин</button>
+          <button class="scm-btn" id="scm2-snack" onclick="setMeal2('snack',this)">🍑 перекус</button>
+        </div>
+      </div>
+      <button class="btn btn-p" onclick="submitCal()">добавить</button>
     </div>
   </div>
 </div>
@@ -1387,17 +1404,10 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
           <div class="scanner-corner tr"></div>
           <div class="scanner-corner bl"></div>
           <div class="scanner-corner br"></div>
-          <div class="scanner-line"></div>
         </div>
         <div id="scanner-status" style="position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:12px;font-weight:700;color:rgba(255,255,255,.85);text-shadow:0 1px 4px rgba(0,0,0,.7);letter-spacing:.02em">наведи на штрихкод</div>
       </div>
-      <div style="text-align:center;padding:8px 0 4px">
-        <div style="font-size:13px;font-weight:600;color:var(--hint)">или введи штрихкод вручную</div>
-        <div style="display:flex;gap:8px;margin-top:10px">
-          <input class="m3-input" id="inp-barcode-manual" type="text" inputmode="numeric" placeholder="4600000000000" style="flex:1;padding:14px 14px 14px" autocomplete="off">
-          <button class="btn btn-p" style="padding:14px 18px;flex-shrink:0;font-size:14px" onclick="manualBarcode()">→</button>
-        </div>
-      </div>
+      <button class="btn btn-p" id="scanner-continue-btn" style="display:none;margin-top:8px" onclick="scannerContinue()">продолжить →</button>
       <div id="scanner-not-found" style="display:none;text-align:center;padding:16px 0">
         <div style="font-size:32px;margin-bottom:8px">🔍</div>
         <div style="font-size:15px;font-weight:800;margin-bottom:4px">продукт не найден</div>
@@ -1611,7 +1621,16 @@ const gWL=()=>C.weight_log.map(r=>({weight:r.weight,logged_at:(r.logged_at||'').
 const gSL=()=>C.sleep_log.map(r=>({hours:r.hours,quality:r.quality,logged_at:(r.logged_at||'').slice(0,10)}));
 const gWD=()=>C.water;
 const gCD=()=>C.calories;
-const gActs=()=>C.acts_today.map(a=>({...a,time:(a.scheduled_at||'').slice(11,16)||'00:00',completed:!!a.completed}));
+const gActs=()=>{
+  const todayDow=new Date().getDay(); // 0=Sun,1=Mon,...,6=Sat (matches HTML day buttons)
+  return C.acts_today
+    .filter(a=>{
+      const rd=a.repeat_days;
+      if(!rd||rd.length===0)return true; // daily
+      return rd.includes(todayDow);
+    })
+    .map(a=>({...a,time:(a.scheduled_at||'').slice(11,16)||'00:00',completed:!!a.completed}));
+};
 const gStreak=()=>C.water.streak||0;
 const totalCal=()=>Object.values(gCD()).reduce((a,b)=>a+b,0);
 
@@ -1662,8 +1681,9 @@ function popPage(doRender=true){
   }
   const pp=document.getElementById(curPushPage);
   if(pp){
+    pp.style.pointerEvents='none';
     pp.style.opacity='0';pp.style.transform='translateY(10px) translateZ(0)';
-    setTimeout(()=>{pp.style.transition='none';pp.classList.remove('open');pp.style.opacity='';pp.style.transform='';setTimeout(()=>{pp.style.transition='';},10);},200);
+    setTimeout(()=>{pp.style.transition='none';pp.classList.remove('open');pp.style.opacity='';pp.style.transform='';pp.style.pointerEvents='';setTimeout(()=>{pp.style.transition='';},10);},200);
   }
   curPushPage=null;navHidden=false;
   document.getElementById('nav')?.classList.remove('gone');
@@ -1696,17 +1716,16 @@ function _populatePP(id){
     document.querySelectorAll('#seg-sleepq .m3-seg-btn').forEach(b=>b.classList.toggle('on',+b.dataset.q===3));
   }
   if(id==='pp-cal'){
-    _calVal=500;_mealType='breakfast';_calStep=1;
+    _calStep=1;_mealType2='breakfast';
     document.getElementById('inp-cal-desc').value='';
-    document.getElementById('cal-s1')?.classList.add('active');
-    document.getElementById('cal-s2')?.classList.remove('active');
-    const t=document.getElementById('cal-step-title');if(t)t.textContent='название блюда';
-    const p1=document.getElementById('cp1'),p2=document.getElementById('cp2');
-    if(p1){p1.classList.add('on');p1.classList.remove('done');}
-    if(p2)p2.classList.remove('on');
-    _updateCalDisplay();
-    document.querySelectorAll('#seg-meal .m3-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.m==='breakfast'));
-    document.querySelectorAll('#cal-s2 .dur-grid .dur-btn').forEach(b=>b.classList.remove('on'));
+    document.getElementById('inp-kcal100').value='';
+    document.getElementById('inp-prot100').value='';
+    document.getElementById('inp-fat100').value='';
+    document.getElementById('inp-carb100').value='';
+    document.getElementById('inp-weight').value='100';
+    _setCalStep(1);
+    ['breakfast','lunch','dinner','snack'].forEach(x=>{document.getElementById('scm2-'+x)?.classList.toggle('on',x==='breakfast');});
+    calRecalc();
   }
   if(id==='pp-pdata'){
     const ni=document.getElementById('inp-pname');if(ni)ni.value=u.name||'';
@@ -1795,6 +1814,7 @@ function _populatePP(id){
     });
     T('sc-step-title','сканирование');
     const nf=$('scanner-not-found');if(nf)nf.style.display='none';
+    const cb=$('scanner-continue-btn');if(cb){cb.style.display='none';cb._barcode=null;}
     const vp=$('scanner-viewport');if(vp)vp.classList.remove('found');
     const st=$('scanner-status');if(st)st.textContent='наведи на штрихкод';
     // Reset meal type selection
@@ -1868,37 +1888,56 @@ function setSleepMin(m){_slMin=m;_updateSleepDisplay();}
 function setSleepQ(q){_sleepQ=q;document.querySelectorAll('#seg-sleepq .m3-seg-btn').forEach(b=>b.classList.toggle('on',+b.dataset.q===q));}
 
 /* ══ CAL STEPPER ══ */
-let _calVal=500,_calStep=1;
-function _updateCalDisplay(){
-  const e=document.getElementById('cal-preview');if(e)e.textContent=_calVal;
-  const d=document.getElementById('cal-step-disp');if(d)d.textContent=_calVal;
+let _calStep=1,_mealType2='breakfast';
+function _setCalStep(n){
+  _calStep=n;
+  [1,2,3].forEach(i=>{
+    document.getElementById('cal-s'+i)?.classList.toggle('active',i===n);
+    const pip=document.getElementById('cp'+i);
+    if(pip){pip.classList.toggle('on',i===n);pip.classList.toggle('done',i<n);if(i<n)pip.classList.remove('on');}
+  });
+  const titles=['название блюда','питательная ценность','приём пищи'];
+  const t=document.getElementById('cal-step-title');if(t)t.textContent=titles[n-1];
 }
-function stepCal(delta){_calVal=Math.max(50,Math.min(3000,_calVal+delta));_updateCalDisplay();tg?.HapticFeedback?.selectionChanged();}
-function setCalVal(v){
-  _calVal=v;_updateCalDisplay();
-  document.querySelectorAll('#cal-s2 .dur-grid .dur-btn').forEach(b=>b.classList.toggle('on',parseInt(b.textContent)===v));
+function calRecalc(){
+  const kcal100=parseFloat(document.getElementById('inp-kcal100')?.value)||0;
+  const prot100=parseFloat(document.getElementById('inp-prot100')?.value)||0;
+  const fat100=parseFloat(document.getElementById('inp-fat100')?.value)||0;
+  const carb100=parseFloat(document.getElementById('inp-carb100')?.value)||0;
+  const w=parseFloat(document.getElementById('inp-weight')?.value)||100;
+  const k=Math.round(kcal100*w/100);
+  const pr=+(prot100*w/100).toFixed(1);
+  const fa=+(fat100*w/100).toFixed(1);
+  const ca=+(carb100*w/100).toFixed(1);
+  const p=$('cal-preview');if(p)p.textContent=k;
+  const pl=$('cal-portion-lbl');if(pl)pl.textContent=Math.round(w);
+  const pp=$('cal-prev-prot');if(pp)pp.textContent=pr;
+  const pf=$('cal-prev-fat');if(pf)pf.textContent=fa;
+  const pc=$('cal-prev-carb');if(pc)pc.textContent=ca;
+}
+function calStep2(){
+  _setCalStep(2);
   tg?.HapticFeedback?.selectionChanged();
 }
-function calStepNext(){
-  _calStep=2;
-  document.getElementById('cal-s1')?.classList.remove('active');
-  document.getElementById('cal-s2')?.classList.add('active');
-  const t=document.getElementById('cal-step-title');if(t)t.textContent='сколько калорий?';
-  const p1=document.getElementById('cp1'),p2=document.getElementById('cp2');
-  if(p1){p1.classList.remove('on');p1.classList.add('done');}
-  if(p2)p2.classList.add('on');
+function calStep3(){
+  const kcal100=parseFloat(document.getElementById('inp-kcal100')?.value)||0;
+  if(!kcal100){toast('введи калории');return;}
+  const w=parseFloat(document.getElementById('inp-weight')?.value)||100;
+  const k=Math.round(kcal100*w/100);
+  const desc=document.getElementById('inp-cal-desc')?.value||'';
+  T('cal-confirm-kcal',k+' ккал · '+Math.round(w)+'г');
+  T('cal-confirm-desc',desc||'ручной ввод');
+  _setCalStep(3);
   tg?.HapticFeedback?.selectionChanged();
 }
 function calBackOrPop(){
-  if(_calStep===2){
-    _calStep=1;
-    document.getElementById('cal-s2')?.classList.remove('active');
-    document.getElementById('cal-s1')?.classList.add('active');
-    const t=document.getElementById('cal-step-title');if(t)t.textContent='название блюда';
-    const p1=document.getElementById('cp1'),p2=document.getElementById('cp2');
-    if(p1){p1.classList.add('on');p1.classList.remove('done');}
-    if(p2)p2.classList.remove('on');
-  }else popPage();
+  if(_calStep>1){_setCalStep(_calStep-1);}
+  else popPage();
+}
+function setMeal2(m,el){
+  _mealType2=m;
+  ['breakfast','lunch','dinner','snack'].forEach(x=>{document.getElementById('scm2-'+x)?.classList.toggle('on',x===m);});
+  tg?.HapticFeedback?.selectionChanged();
 }
 
 /* ══ TIME PICKER ══ */
@@ -2216,19 +2255,25 @@ async function submitSleep(){
 }
 async function submitCal(){
   const desc=document.getElementById('inp-cal-desc')?.value||'';
-  if(!_calVal||_calVal<10){toast('выбери калории');return;}
-  const prot=parseFloat(document.getElementById('inp-prot')?.value)||0;
-  const fat=parseFloat(document.getElementById('inp-fat')?.value)||0;
-  const carb=parseFloat(document.getElementById('inp-carb')?.value)||0;
+  const kcal100=parseFloat(document.getElementById('inp-kcal100')?.value)||0;
+  const prot100=parseFloat(document.getElementById('inp-prot100')?.value)||0;
+  const fat100=parseFloat(document.getElementById('inp-fat100')?.value)||0;
+  const carb100=parseFloat(document.getElementById('inp-carb100')?.value)||0;
+  const w=parseFloat(document.getElementById('inp-weight')?.value)||100;
+  if(!kcal100||kcal100<1){toast('введи калории');return;}
+  const _calVal=Math.round(kcal100*w/100);
+  const prot=+(prot100*w/100).toFixed(1);
+  const fat=+(fat100*w/100).toFixed(1);
+  const carb=+(carb100*w/100).toFixed(1);
   popPage();
-  if(!C.calories)C.calories={};C.calories[_mealType]=(C.calories[_mealType]||0)+_calVal;
+  if(!C.calories)C.calories={};C.calories[_mealType2]=(C.calories[_mealType2]||0)+_calVal;
   if(!C.macros)C.macros={prot:0,fat:0,carb:0};
   C.macros.prot=+(( C.macros.prot||0)+prot).toFixed(1);
   C.macros.fat=+((C.macros.fat||0)+fat).toFixed(1);
   C.macros.carb=+((C.macros.carb||0)+carb).toFixed(1);
   if(!UID){lsSet('cd_'+TODAY,C.calories);lsSet('macros_'+TODAY,C.macros);}
   renderTrack('cal');renderHome();toast('+'+_calVal+' ккал');tg?.HapticFeedback?.notificationOccurred('success');
-  await apiPost('/api/calories',{amount:_calVal,meal_type:_mealType,description:desc,prot,fat,carb});await reload();
+  await apiPost('/api/calories',{amount:_calVal,meal_type:_mealType2,description:desc,prot,fat,carb});await reload();
 }
 function _saveProfileSilent(){
   const name=document.getElementById('inp-pname')?.value?.trim();
@@ -2493,7 +2538,7 @@ function renderCal(){
   requestAnimationFrame(()=>{const b=$('c-bar');if(b)b.style.width=cp+'%';});
   const m=C.macros||{prot:0,fat:0,carb:0};
   T('c-prot',m.prot||0);T('c-fat',m.fat||0);T('c-carb',m.carb||0);
-  const MEALS=[{k:'breakfast',i:'🌅',n:'завтрак',col:'#FF9800'},{k:'lunch',i:'☀️',n:'обед',col:'#FF6B35'},{k:'dinner',i:'🌙',n:'ужин',col:'#8B7FD4'},{k:'snack',i:'🍑',n:'перекус',col:'#52C177'},{k:'other',i:'🌿',n:'другое',col:'#607D8B'}];
+  const MEALS=[{k:'breakfast',i:'🌅',n:'завтрак',col:'#FF9800'},{k:'lunch',i:'☀️',n:'обед',col:'#FF6B35'},{k:'dinner',i:'🌙',n:'ужин',col:'#8B7FD4'},{k:'snack',i:'🍑',n:'перекус',col:'#52C177'}];
   H('c-meals',MEALS.map(m=>`<div class="mr"><div class="mr-ico" style="background:${m.col}18;color:${m.col}">${m.i}</div><div style="flex:1"><div class="mr-name">${m.n}</div>${!cd[m.k]?`<div class="t5" style="font-size:10px">не записано</div>`:''}</div><div class="mr-kcal" style="${cd[m.k]?'color:var(--cal)':'color:var(--hint)'}">${cd[m.k]||'—'} ${cd[m.k]?'ккал':''}</div></div>`).join(''));
 }
 
@@ -2722,6 +2767,7 @@ async function startScanner(){
   const vid=$('scanner-video');
   const status=$('scanner-status');
   const nf=$('scanner-not-found');if(nf)nf.style.display='none';
+  const cb=$('scanner-continue-btn');if(cb){cb.style.display='none';cb._barcode=null;}
   if(vp)vp.classList.remove('found');
   if(status)status.textContent='наведи на штрихкод';
   try{
@@ -2758,12 +2804,19 @@ function _startBarcodeDetect(vid){
         const barcode=codes[0].rawValue;
         tg?.HapticFeedback?.notificationOccurred('success');
         navigator.vibrate?.([60]);
-        const st=$('scanner-status');if(st)st.textContent='✓ найден: '+barcode;
+        const st=$('scanner-status');if(st)st.textContent='✓ штрихкод найден';
         const vp=$('scanner-viewport');if(vp)vp.classList.add('found');
-        await _lookupBarcode(barcode);
+        const cb=$('scanner-continue-btn');if(cb){cb._barcode=barcode;cb.style.display='';}
       }
     }catch{}
   },350);
+}
+
+function scannerContinue(){
+  const cb=$('scanner-continue-btn');
+  if(!cb||!cb._barcode)return;
+  cb.style.display='none';
+  _lookupBarcode(cb._barcode);
 }
 
 function manualBarcode(){
@@ -2773,6 +2826,7 @@ function manualBarcode(){
   stopScanner();
   _lookupBarcode(code);
 }
+
 
 async function _lookupBarcode(barcode){
   const st=$('scanner-status');if(st)st.textContent='загружаю данные…';
@@ -2848,7 +2902,7 @@ function _showScannerNotFound(barcode){
 
 function scannerRetry(){
   const nf=$('scanner-not-found');if(nf)nf.style.display='none';
-  const inp=$('inp-barcode-manual');if(inp)inp.value='';
+  const cb=$('scanner-continue-btn');if(cb){cb.style.display='none';cb._barcode=null;}
   const vp=$('scanner-viewport');if(vp)vp.classList.remove('found');
   const st=$('scanner-status');if(st)st.textContent='наведи на штрихкод';
   _setScanStep(1);
