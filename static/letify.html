@@ -47,10 +47,13 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;touch-action:pan-y;
   scrollbar-width:none;
-  transform:translateX(100%);
-  transition:transform .28s cubic-bezier(.4,0,.2,1);
+  transform:translateX(100%) translateZ(0);
+  transition:transform .3s cubic-bezier(.25,.46,.45,.94);
   pointer-events:none;
   display:flex;flex-direction:column;
+  will-change:transform;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
 }
 .push-page::-webkit-scrollbar{display:none}
 .push-page.open{transform:translateX(0);pointer-events:all}
@@ -65,13 +68,14 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   border-bottom:1px solid var(--brd);
   background:var(--bg);
 }
+.tg-env .pp-back{display:none !important}
 .pp-back{
   width:36px;height:36px;border-radius:12px;
   background:var(--bg3);display:flex;align-items:center;justify-content:center;
   cursor:pointer;border:none;color:var(--text);flex-shrink:0;
   transition:transform .1s,background .1s;
 }
-.pp-back:active{transform:scale(.9);background:rgba(0,0,0,.1)}
+.pp-back:active{transform:scale(.93);background:rgba(0,0,0,.08)}
 .tg-dark .pp-back:active{background:rgba(255,255,255,.18)}
 .pp-title{font-size:18px;font-weight:900;letter-spacing:-.02em}
 .pp-subtitle{font-size:11px;font-weight:500;color:var(--hint);margin-top:1px}
@@ -123,7 +127,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   background:transparent;color:var(--hint);
   transition:background .12s,color .12s,box-shadow .12s;white-space:nowrap;
 }
-.m3-seg-btn:active{transform:scale(.97)}
+.m3-seg-btn:active{transform:scale(.97);transition:transform .08s ease}
 .m3-seg-btn.on{background:var(--bg2);color:var(--text);box-shadow:0 1px 5px rgba(0,0,0,.09)}
 .tg-dark .m3-seg-btn.on{background:rgba(255,255,255,.16)}
 .m3-seg-emoji .m3-seg-btn{font-size:22px;padding:7px 4px}
@@ -143,12 +147,13 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   transition:background .1s;
   -webkit-tap-highlight-color:transparent;
 }
-.stepper-btn:active{background:rgba(255,107,53,.12)}
+.stepper-btn:active{transform:scale(.91);transition:transform .08s ease}
 .stepper-val{
   flex:1;text-align:center;
-  font-size:40px;font-weight:900;letter-spacing:-.03em;
+  font-size:38px;font-weight:700;letter-spacing:-.02em;
   color:var(--text);padding:0 4px;
   user-select:none;
+  transition:opacity .06s ease;
 }
 .stepper-val .unit{font-size:14px;font-weight:700;color:var(--hint);margin-left:4px}
 
@@ -162,7 +167,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   border-radius:20px;padding:24px 20px;
   text-align:center;margin-bottom:16px;
 }
-.big-val{font-size:64px;font-weight:900;letter-spacing:-.04em;line-height:1;color:var(--text)}
+.big-val{font-size:64px;font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--text)}
 .big-val-unit{font-size:16px;font-weight:700;color:var(--hint);margin-top:4px}
 .big-val-range{font-size:12px;font-weight:600;color:var(--hint);margin-top:6px}
 
@@ -209,7 +214,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .lt{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--brd);cursor:pointer;transition:opacity .12s}
 .lt:last-child{border-bottom:none;padding-bottom:0}
 .lt:first-child{padding-top:0}
-.lt:active{opacity:.55}
+.lt:active{opacity:.65;transition:opacity .08s}
 .lt-ic{width:32px;height:32px;border-radius:10px;background:var(--bg3);display:flex;align-items:center;justify-content:center;color:var(--hint);flex-shrink:0}
 .tg-dark .lt-ic{background:rgba(255,255,255,.08)}
 .lt-lbl{flex:1;font-size:14px;font-weight:700}
@@ -286,7 +291,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 /* ── BTNS ── */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;cursor:pointer;font-family:inherit;font-weight:800;transition:transform .1s ease,opacity .12s}
-.btn:active{transform:scale(.96);opacity:.85}
+.btn:active{transform:scale(.97);opacity:.9;transition:transform .08s ease}
 .btn-p{background:linear-gradient(135deg,var(--sun),var(--sun2));color:#fff;padding:15px 20px;font-size:15px;border-radius:14px;box-shadow:0 4px 16px rgba(255,107,53,.28);width:100%;letter-spacing:.01em}
 .btn-g{background:var(--bg3);color:var(--text);padding:11px 16px;font-size:13px;border-radius:11px}
 .btn-water{background:rgba(78,174,229,.1);color:var(--water);padding:13px 8px;font-size:13px;border-radius:12px;flex:1;font-weight:800}
@@ -329,7 +334,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   background:var(--bg3);cursor:pointer;text-align:center;
   transition:all .14s ease;
 }
-.type-card:active{transform:scale(.97)}
+.type-card:active{transform:scale(.97);transition:transform .08s ease}
 .type-card.on{background:rgba(255,107,53,.08);border-color:var(--sun)}
 .type-card-ico{font-size:28px;margin-bottom:4px;line-height:1}
 .type-card-lbl{font-size:12px;font-weight:700;color:var(--text)}
@@ -344,7 +349,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   font-size:12px;font-weight:800;color:var(--hint);
   font-family:inherit;transition:all .12s ease;
 }
-.dur-btn:active{transform:scale(.95)}
+.dur-btn:active{transform:scale(.97);transition:transform .08s ease}
 .dur-btn.on{background:rgba(255,107,53,.08);border-color:var(--sun);color:var(--sun)}
 .tg-dark .dur-btn{background:rgba(255,255,255,.07)}
 .tg-dark .dur-btn.on{background:rgba(255,107,53,.18)}
@@ -371,7 +376,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tg-dark .m3-tog-row{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08)}
 
 /* ── CHART SCROLL ── */
-.chart-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin:0 -4px;padding:0 4px}
+.chart-scroll{overflow-x:hidden;width:100%;}
 .chart-scroll::-webkit-scrollbar{display:none}
 
 /* ── EMPTY ── */
@@ -391,6 +396,15 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tg-dark #nav{background:rgba(20,14,8,.96);border-color:rgba(255,255,255,.1)}
 .tg-dark .empty svg{opacity:.15}
 .tg-dark .banner::after{opacity:.5}
+
+/* smooth stepper-val transitions */
+.stepper-val{transition:opacity .08s ease}
+/* кастомный time picker */
+#time-h-disp,#time-m-disp{font-size:34px !important;font-weight:700 !important;letter-spacing:-.02em}
+/* Скрываем + кнопку в stepper (оранжевый не нужен, только scale) */
+.stepper-btn{transition:transform .1s ease, background .1s ease}
+/* Убрать оранжевый border у кнопок воды при нажатии */
+.btn-water:active{background:rgba(78,174,229,.16) !important}
 </style>
 </head>
 <body>
@@ -621,7 +635,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 <div class="card" style="padding:14px">
   <div class="t5" style="margin-bottom:8px">динамика веса</div>
   <div class="chart-scroll">
-    <canvas id="wchart" height="90" style="display:block"></canvas>
+    <canvas id="wchart" height="90" style="display:block;max-width:100%"></canvas>
   </div>
 </div>
 </div>
@@ -676,31 +690,11 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
 </div>
 </div>
-<div class="sec">физические данные</div>
-<div class="pad">
+<!-- физические данные скрыты -->
+<!-- приложение секция скрыта -->
+<div style="display:none">
 <div class="card">
-  <div class="lt">
-    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-    <span class="lt-lbl">рост</span><span class="lt-val" id="pf-height">—</span>
-  </div>
-  <div class="lt">
-    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
-    <span class="lt-lbl">возраст</span><span class="lt-val" id="pf-age">—</span>
-  </div>
-  <div class="lt" style="padding-bottom:0;border:none">
-    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M12 6v6l4 2"/></svg></div>
-    <span class="lt-lbl">норма воды</span><span class="lt-val" id="pf-gwater">—</span>
-  </div>
-</div>
-</div>
-<div class="sec">приложение</div>
-<div class="pad">
-<div class="card">
-  <div class="lt" onclick="pushPage('pp-sett')">
-    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
-    <span class="lt-lbl">настройки</span>
-    <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-  </div>
+  <!-- настройки скрыты -->
   <div class="lt" style="padding-bottom:0;border:none" onclick="pushPage('pp-weight')">
     <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zm-8 5h.01"/></svg></div>
     <span class="lt-lbl">записать вес</span>
@@ -799,55 +793,70 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
 </div>
 
-<!-- PP: Добавить еду -->
+<!-- PP: Добавить еду (2 шага) -->
 <div class="push-page" id="pp-cal">
   <div class="pp-hdr">
-    <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
-    <div>
-      <div class="pp-title">добавить еду</div>
-      <div class="pp-subtitle" style="margin-top:1px">запиши что съел</div>
+    <button class="pp-back" onclick="calBackOrPop()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <div style="flex:1">
+      <div class="step-ind">
+        <div class="step-pip on" id="cp1"></div>
+        <div class="step-pip" id="cp2"></div>
+      </div>
+      <div class="pp-title" id="cal-step-title">название блюда</div>
     </div>
   </div>
   <div class="pp-body">
-    <!-- Current total -->
-    <div class="big-val-card" style="background:linear-gradient(135deg,rgba(244,129,74,.08),rgba(244,129,74,.03))">
-      <div class="big-val" style="color:var(--cal)" id="cal-preview">500</div>
-      <div class="big-val-unit">ккал</div>
-    </div>
-    <!-- Cal stepper -->
-    <div class="m3-sec">калорий</div>
-    <div class="m3-card" style="padding:8px">
-      <div class="stepper-wrap">
-        <button class="stepper-btn" style="color:var(--cal)" onclick="stepCal(-50)">−</button>
-        <div class="stepper-val" style="color:var(--cal)" id="cal-step-disp">500</div>
-        <button class="stepper-btn" style="color:var(--cal)" onclick="stepCal(50)">+</button>
+    <!-- Шаг 1: название -->
+    <div class="act-step active" id="cal-s1">
+      <div class="act-hint">как называется блюдо?</div>
+      <div class="m3-card" style="padding:10px 12px;margin-bottom:0">
+        <div class="m3-field" style="margin-bottom:0">
+          <div class="m3-label">блюдо (необязательно)</div>
+          <input class="m3-input" id="inp-cal-desc" type="text" placeholder="гречка, курица, суп…" autocomplete="off">
+        </div>
       </div>
+      <div style="margin:14px 0 8px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--hint)">быстрый выбор</div>
+      <div class="dur-grid" style="grid-template-columns:1fr 1fr;gap:8px">
+        <button class="dur-btn" style="padding:14px 8px;font-size:13px" onclick="calQuickDish('завтрак','breakfast')">🌅 завтрак</button>
+        <button class="dur-btn" style="padding:14px 8px;font-size:13px" onclick="calQuickDish('обед','lunch')">☀️ обед</button>
+        <button class="dur-btn" style="padding:14px 8px;font-size:13px" onclick="calQuickDish('ужин','dinner')">🌙 ужин</button>
+        <button class="dur-btn" style="padding:14px 8px;font-size:13px" onclick="calQuickDish('перекус','snack')">🍑 перекус</button>
+      </div>
+      <button class="btn btn-p" style="margin-top:20px" onclick="calStepNext()">далее →</button>
     </div>
-    <!-- Quick amounts -->
-    <div class="dur-grid" style="margin-bottom:10px">
-      <button class="dur-btn" onclick="setCalVal(100)">100</button>
-      <button class="dur-btn" onclick="setCalVal(200)">200</button>
-      <button class="dur-btn" onclick="setCalVal(350)">350</button>
-      <button class="dur-btn" onclick="setCalVal(500)">500</button>
-      <button class="dur-btn" onclick="setCalVal(650)">650</button>
-      <button class="dur-btn" onclick="setCalVal(800)">800</button>
-      <button class="dur-btn" onclick="setCalVal(1000)">1000</button>
-      <button class="dur-btn" onclick="setCalVal(1200)">1200</button>
+    <!-- Шаг 2: калории + приём пищи -->
+    <div class="act-step" id="cal-s2">
+      <div class="big-val-card" style="background:linear-gradient(135deg,rgba(244,129,74,.08),rgba(244,129,74,.03))">
+        <div class="big-val" style="color:var(--cal)" id="cal-preview">500</div>
+        <div class="big-val-unit">ккал</div>
+      </div>
+      <div class="m3-sec">калорий</div>
+      <div class="m3-card" style="padding:8px">
+        <div class="stepper-wrap">
+          <button class="stepper-btn" style="color:var(--cal)" onclick="stepCal(-50)">−</button>
+          <div class="stepper-val" style="color:var(--cal)" id="cal-step-disp">500</div>
+          <button class="stepper-btn" style="color:var(--cal)" onclick="stepCal(50)">+</button>
+        </div>
+      </div>
+      <div class="dur-grid" style="margin-bottom:10px">
+        <button class="dur-btn" onclick="setCalVal(100)">100</button>
+        <button class="dur-btn" onclick="setCalVal(200)">200</button>
+        <button class="dur-btn" onclick="setCalVal(350)">350</button>
+        <button class="dur-btn" onclick="setCalVal(500)">500</button>
+        <button class="dur-btn" onclick="setCalVal(650)">650</button>
+        <button class="dur-btn" onclick="setCalVal(800)">800</button>
+        <button class="dur-btn" onclick="setCalVal(1000)">1000</button>
+        <button class="dur-btn" onclick="setCalVal(1200)">1200</button>
+      </div>
+      <div class="m3-sec">приём пищи</div>
+      <div class="m3-seg" id="seg-meal" style="margin-bottom:0">
+        <button class="m3-seg-btn on" onclick="setMeal('breakfast')" data-m="breakfast">завтрак</button>
+        <button class="m3-seg-btn" onclick="setMeal('lunch')" data-m="lunch">обед</button>
+        <button class="m3-seg-btn" onclick="setMeal('dinner')" data-m="dinner">ужин</button>
+        <button class="m3-seg-btn" onclick="setMeal('snack')" data-m="snack">перекус</button>
+      </div>
+      <button class="btn btn-p" style="margin-top:20px" onclick="submitCal()">добавить</button>
     </div>
-    <!-- Name input -->
-    <div class="m3-sec">блюдо (необязательно)</div>
-    <div class="m3-card" style="padding:8px 12px">
-      <input class="m3-input" id="inp-cal-desc" type="text" placeholder="гречка, курица, суп…" style="padding:12px 2px;background:transparent;border-radius:0;min-height:44px">
-    </div>
-    <!-- Meal type -->
-    <div class="m3-sec">приём пищи</div>
-    <div class="m3-seg" id="seg-meal" style="margin-bottom:0">
-      <button class="m3-seg-btn on" onclick="setMeal('breakfast')" data-m="breakfast">завтрак</button>
-      <button class="m3-seg-btn" onclick="setMeal('lunch')" data-m="lunch">обед</button>
-      <button class="m3-seg-btn" onclick="setMeal('dinner')" data-m="dinner">ужин</button>
-      <button class="m3-seg-btn" onclick="setMeal('snack')" data-m="snack">перекус</button>
-    </div>
-    <button class="btn btn-p" style="margin-top:20px" onclick="submitCal()">добавить</button>
   </div>
 </div>
 
@@ -877,7 +886,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       <button class="m3-seg-btn on" onclick="setGender('male')" data-g="male">♂ мужской</button>
       <button class="m3-seg-btn" onclick="setGender('female')" data-g="female">♀ женский</button>
     </div>
-    <button class="btn btn-p" style="margin-top:8px" onclick="submitProfile()">сохранить</button>
+    <!-- автосохранение при закрытии -->
   </div>
 </div>
 
@@ -980,9 +989,22 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     <div class="act-step" id="act-s2">
       <div class="act-hint">выбери время и длительность</div>
       <div style="margin-bottom:8px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--hint)">время начала</div>
-      <div class="m3-card" style="padding:12px">
-        <input type="time" id="inp-atime" value="08:00" style="font-family:'Onest',sans-serif;font-size:32px;font-weight:900;letter-spacing:-.02em;color:var(--text);background:transparent;border:none;outline:none;width:100%;text-align:center;-webkit-appearance:none;cursor:pointer">
+      <div class="m3-card" style="padding:8px">
+        <div style="display:flex;align-items:center;justify-content:center;gap:0">
+          <div class="stepper-wrap" style="flex:1;border-radius:12px 0 0 12px">
+            <button class="stepper-btn" onclick="stepTime('h',-1)">−</button>
+            <div class="stepper-val" id="time-h-disp" style="font-size:34px">08</div>
+            <button class="stepper-btn" onclick="stepTime('h',1)">+</button>
+          </div>
+          <div style="font-size:34px;font-weight:700;padding:0 4px;color:var(--hint)">:</div>
+          <div class="stepper-wrap" style="flex:1;border-radius:0 12px 12px 0">
+            <button class="stepper-btn" onclick="stepTime('m',-1)">−</button>
+            <div class="stepper-val" id="time-m-disp" style="font-size:34px">00</div>
+            <button class="stepper-btn" onclick="stepTime('m',1)">+</button>
+          </div>
+        </div>
       </div>
+      <input type="hidden" id="inp-atime" value="08:00">
       <div style="margin:14px 0 8px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--hint)">длительность</div>
       <div class="dur-grid" id="dur-grid">
         <button class="dur-btn" onclick="setDur(15,this)">15 мин</button>
@@ -1050,6 +1072,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 /* ══ TG INIT ══ */
 const tg=window.Telegram?.WebApp;
 if(tg){
+  document.body.classList.add('tg-env');
   tg.ready();tg.expand();
   if(typeof tg.requestFullscreen==='function')tg.requestFullscreen();
   if(typeof tg.disableVerticalSwipes==='function')tg.disableVerticalSwipes();
@@ -1192,6 +1215,8 @@ function pushPage(id){
 }
 function popPage(doRender=true){
   if(!curPushPage)return;
+  // Автосохранение профиля при закрытии
+  if(curPushPage==='pp-pdata'){_saveProfileSilent();}
   document.getElementById(curPushPage)?.classList.remove('open');
   curPushPage=null;navHidden=false;
   document.getElementById('nav')?.classList.remove('gone');
@@ -1214,10 +1239,17 @@ function _populatePP(id){
     document.querySelectorAll('#seg-sleepq .m3-seg-btn').forEach(b=>b.classList.toggle('on',+b.dataset.q===3));
   }
   if(id==='pp-cal'){
-    _calVal=500;_mealType='breakfast';
+    _calVal=500;_mealType='breakfast';_calStep=1;
     document.getElementById('inp-cal-desc').value='';
+    document.getElementById('cal-s1')?.classList.add('active');
+    document.getElementById('cal-s2')?.classList.remove('active');
+    const t=document.getElementById('cal-step-title');if(t)t.textContent='название блюда';
+    const p1=document.getElementById('cp1'),p2=document.getElementById('cp2');
+    if(p1){p1.classList.add('on');p1.classList.remove('done');}
+    if(p2){p2.classList.remove('on');}
     _updateCalDisplay();
     document.querySelectorAll('#seg-meal .m3-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.m==='breakfast'));
+    document.querySelectorAll('#cal-s2 .dur-grid .dur-btn').forEach(b=>b.classList.remove('on'));
   }
   if(id==='pp-pdata'){
     const ni=document.getElementById('inp-pname');if(ni)ni.value=u.name||'';
@@ -1238,10 +1270,11 @@ function _populatePP(id){
     });
   }
   if(id==='pp-act'){
-    actStep=1;_actType='run';_actDur=45;
+    actStep=1;_actType='run';_actDur=45;_timeH=8;_timeM=0;
     const ni=document.getElementById('inp-aname');if(ni)ni.value='пробежка';
     document.querySelectorAll('#act-quick .type-card').forEach((c,i)=>c.classList.toggle('on',i===0));
     document.querySelectorAll('#dur-grid .dur-btn').forEach(b=>b.classList.toggle('on',b.textContent==='45 мин'));
+    _updateTimeDisplay();
     _renderActStep();
   }
 }
@@ -1249,9 +1282,9 @@ function _populatePP(id){
 /* ══ WEIGHT STEPPER ══ */
 let _wtInt=70,_wtDec=0;
 function _updateWeightDisplay(){
-  const T=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
-  T('wt-int',_wtInt);T('wt-dec',_wtDec);
-  T('wt-int-disp',_wtInt);T('wt-dec-disp','.'+_wtDec);
+  const A=(id,v)=>{const e=document.getElementById(id);if(e)_animNum(e,v);};
+  A('wt-int',_wtInt);A('wt-dec',_wtDec);
+  A('wt-int-disp',_wtInt);A('wt-dec-disp','.'+_wtDec);
 }
 function stepW(part,dir){
   if(part==='int'){_wtInt=Math.max(30,Math.min(250,_wtInt+dir));}
@@ -1263,8 +1296,8 @@ function stepW(part,dir){
 /* ══ SLEEP STEPPER ══ */
 let _slH=8,_slMin=0,_sleepQ=3;
 function _updateSleepDisplay(){
-  const e=document.getElementById('sl-val-disp');if(e)e.textContent=_slH;
-  const hd=document.getElementById('sl-h-disp');if(hd)hd.textContent=_slH;
+  const e=document.getElementById('sl-val-disp');if(e)_animNum(e,_slH);
+  const hd=document.getElementById('sl-h-disp');if(hd)_animNum(hd,_slH);
   const m0=document.getElementById('sl-m0'),m30=document.getElementById('sl-m30');
   if(m0){m0.classList.toggle('on',_slMin===0);m0.classList.toggle('off',_slMin!==0);}
   if(m30){m30.classList.toggle('on',_slMin===30);m30.classList.toggle('off',_slMin!==30);}
@@ -1278,16 +1311,57 @@ function setSleepMin(m){_slMin=m;_updateSleepDisplay();}
 function setSleepQ(q){_sleepQ=q;document.querySelectorAll('#seg-sleepq .m3-seg-btn').forEach(b=>b.classList.toggle('on',+b.dataset.q===q));}
 
 /* ══ CAL STEPPER ══ */
-let _calVal=500;
+let _calVal=500,_calStep=1;
+const CAL_STEP_TITLES=['название блюда','сколько калорий?'];
 function _updateCalDisplay(){
-  const e=document.getElementById('cal-preview');if(e)e.textContent=_calVal;
-  const d=document.getElementById('cal-step-disp');if(d)d.textContent=_calVal;
+  const e=document.getElementById('cal-preview');if(e)_animNum(e,_calVal);
+  const d=document.getElementById('cal-step-disp');if(d)_animNum(d,_calVal);
 }
 function stepCal(delta){_calVal=Math.max(50,Math.min(3000,_calVal+delta));_updateCalDisplay();tg?.HapticFeedback?.selectionChanged();}
 function setCalVal(v){
   _calVal=v;_updateCalDisplay();
-  document.querySelectorAll('.dur-grid .dur-btn').forEach(b=>b.classList.toggle('on',parseInt(b.textContent)===v));
+  document.querySelectorAll('#cal-s2 .dur-grid .dur-btn').forEach(b=>b.classList.toggle('on',parseInt(b.textContent)===v));
   tg?.HapticFeedback?.selectionChanged();
+}
+function calQuickDish(name,meal){
+  const inp=document.getElementById('inp-cal-desc');if(inp)inp.value=name;
+  setMeal(meal);calStepNext();
+}
+function calStepNext(){
+  _calStep=2;
+  document.getElementById('cal-s1')?.classList.remove('active');
+  document.getElementById('cal-s2')?.classList.add('active');
+  const t=document.getElementById('cal-step-title');if(t)t.textContent='сколько калорий?';
+  const p1=document.getElementById('cp1'),p2=document.getElementById('cp2');
+  if(p1){p1.classList.remove('on');p1.classList.add('done');}
+  if(p2){p2.classList.add('on');}
+  tg?.HapticFeedback?.selectionChanged();
+}
+function calBackOrPop(){
+  if(_calStep===2){
+    _calStep=1;
+    document.getElementById('cal-s2')?.classList.remove('active');
+    document.getElementById('cal-s1')?.classList.add('active');
+    const t=document.getElementById('cal-step-title');if(t)t.textContent='название блюда';
+    const p1=document.getElementById('cp1'),p2=document.getElementById('cp2');
+    if(p1){p1.classList.add('on');p1.classList.remove('done');}
+    if(p2){p2.classList.remove('on');}
+  }else popPage();
+}
+
+/* ══ TIME PICKER ══ */
+let _timeH=8,_timeM=0;
+function _updateTimeDisplay(){
+  const h=document.getElementById('time-h-disp'),m=document.getElementById('time-m-disp');
+  if(h)_animNum(h,String(_timeH).padStart(2,'0'));
+  if(m)_animNum(m,String(_timeM).padStart(2,'0'));
+  const inp=document.getElementById('inp-atime');
+  if(inp)inp.value=String(_timeH).padStart(2,'0')+':'+String(_timeM).padStart(2,'0');
+}
+function stepTime(part,dir){
+  if(part==='h'){_timeH=(_timeH+dir+24)%24;}
+  else{_timeM=(_timeM+dir*5+60)%60;}
+  _updateTimeDisplay();tg?.HapticFeedback?.selectionChanged();
 }
 
 /* ══ OTHER SETTERS ══ */
@@ -1386,6 +1460,15 @@ async function submitCal(){
   renderTrack('cal');renderHome();toast('+'+_calVal+' ккал');tg?.HapticFeedback?.notificationOccurred('success');
   await apiPost('/api/calories',{amount:_calVal,meal_type:_mealType,description:desc});await reload();
 }
+function _saveProfileSilent(){
+  const name=document.getElementById('inp-pname')?.value?.trim();
+  const height=parseInt(document.getElementById('inp-height')?.value);
+  const age=parseInt(document.getElementById('inp-age')?.value);
+  if(!name)return;
+  C.user={...C.user,name,height:height||0,age:age||0,gender:_gender};
+  renderProfile();renderHome();toast('профиль сохранён');
+  apiPost('/api/profile',{name,height:height||0,age:age||0,gender:_gender});
+}
 async function submitProfile(){
   const name=document.getElementById('inp-pname')?.value?.trim();
   const height=parseInt(document.getElementById('inp-height')?.value);
@@ -1443,6 +1526,14 @@ function fmtRange(a){
   const eh=hh+Math.floor((mm+(a.duration||30))/60),em=(mm+(a.duration||30))%60;
   return`${a.time}–${String(eh%24).padStart(2,'0')}:${String(em).padStart(2,'0')}`;
 }
+/* ══ ANIMATED NUMBER UPDATE ══ */
+function _animNum(el,val){
+  el.style.opacity='0.3';
+  requestAnimationFrame(()=>{
+    setTimeout(()=>{el.textContent=val;el.style.opacity='1';},60);
+  });
+}
+
 let _tt;
 function toast(msg){const el=$('toast');if(!el)return;el.textContent=msg;el.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),1800);}
 
@@ -1454,7 +1545,9 @@ function drawChart(data){
   _chartRaf=requestAnimationFrame(()=>{
     const dpr=Math.min(window.devicePixelRatio||1,2);
     const containerW=canvas.parentElement.clientWidth||280;
-    const W=Math.max(containerW,data&&data.length>5?data.length*54:containerW);
+    // Sort by date (oldest first = left side)
+    if(data&&data.length>1){data=[...data].sort((a,b)=>(a.logged_at||'').localeCompare(b.logged_at||''));}
+    const W=containerW;
     const H=90;
     canvas.width=W*dpr;canvas.height=H*dpr;canvas.style.width=W+'px';canvas.style.height=H+'px';
     const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
