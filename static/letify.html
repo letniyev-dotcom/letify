@@ -474,6 +474,14 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 /* ══ CLEAR BTN HINT ══ */
 .clear-hint{font-size:10px;font-weight:600;color:var(--hint);text-align:center;margin-top:6px;padding:0 4px}
 
+/* ══ HISTORY SCROLL CONTAINER ══ */
+.hist-scroll{
+  max-height:45vh;
+  overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;
+}
+.hist-scroll::-webkit-scrollbar{display:none}
+
 /* ══ PLAN ADD BTN — no longer used, kept for compat ══ */
 #pl-add-btn-wrap{display:none}
 
@@ -602,49 +610,8 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .kbzhu-track-row{display:flex;gap:6px;margin-top:10px}
 .kbzhu-track-box{flex:1;background:var(--bg2);border-radius:12px;padding:10px 8px;text-align:center;box-shadow:var(--sh)}
 .tg-dark .kbzhu-track-box{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);box-shadow:none}
-/* ══ CAL STEPPER (step 2) ══ */
-.cal-preview-row{
-  display:flex;align-items:center;justify-content:space-between;
-  background:linear-gradient(135deg,rgba(244,129,74,.09),rgba(244,129,74,.03));
-  border:1px solid rgba(244,129,74,.15);
-  border-radius:16px;padding:12px 14px;margin-bottom:10px;
-}
-.cal-prev-kcal-wrap{display:flex;align-items:baseline;gap:4px}
-.cal-prev-kcal-num{font-size:38px;font-weight:900;color:var(--cal);line-height:1;letter-spacing:-.02em}
-.cal-prev-kcal-unit{font-size:13px;font-weight:700;color:var(--hint)}
-.cal-prev-macros{display:flex;gap:10px;align-items:center}
-.cal-prev-mac{display:flex;align-items:baseline;gap:2px;font-size:14px;font-weight:800}
-.cal-prev-mac-l{font-size:10px;font-weight:700;color:var(--hint)}
-.cst-list{display:flex;flex-direction:column;gap:6px}
-.cst-row{
-  display:flex;align-items:center;justify-content:space-between;
-  background:var(--bg2);border-radius:13px;
-  border:1px solid var(--brd);
-  padding:9px 12px;
-}
-.cst-row-por{
-  background:rgba(255,107,53,.05);
-  border-color:rgba(255,107,53,.2);
-}
-.cst-label{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:700;color:var(--hint)}
-.cst-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.cst-ctrl{display:flex;align-items:center;gap:0}
-.cst-btn{
-  width:36px;height:36px;border-radius:10px;border:none;
-  background:var(--bg3);color:var(--text);
-  font-size:20px;font-weight:600;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:background .1s,transform .1s;
-  -webkit-user-select:none;user-select:none;
-}
-.cst-btn:active{background:rgba(255,107,53,.18);transform:scale(.91)}
-.cst-val{
-  min-width:52px;text-align:center;
-  font-size:16px;font-weight:900;
-  color:var(--text);
-  padding:0 2px;
-}
-.cst-row-por .cst-val{color:var(--sun)}
+.kbzhu-track-v{font-size:17px;font-weight:900}
+.kbzhu-track-l{font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
 </style>
 </head>
 <body>
@@ -1103,74 +1070,65 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       </div>
       <button class="btn btn-p" style="margin-top:20px" onclick="calStep2()">далее →</button>
     </div>
-    <!-- Step 2: Macros + weight — stepper, no keyboard -->
+    <!-- Step 2: Macros only (per 100g) -->
     <div class="act-step" id="cal-s2">
-      <!-- Compact preview row -->
-      <div class="cal-preview-row">
-        <div class="cal-prev-kcal-wrap">
-          <span class="cal-prev-kcal-num" id="cal-preview">0</span>
-          <span class="cal-prev-kcal-unit">ккал</span>
-        </div>
-        <div class="cal-prev-macros">
-          <div class="cal-prev-mac"><span id="cal-prev-prot" style="color:var(--green)">0</span><span class="cal-prev-mac-l">б</span></div>
-          <div class="cal-prev-mac"><span id="cal-prev-fat" style="color:var(--sun)">0</span><span class="cal-prev-mac-l">ж</span></div>
-          <div class="cal-prev-mac"><span id="cal-prev-carb" style="color:var(--sleep)">0</span><span class="cal-prev-mac-l">у</span></div>
-          <div class="cal-prev-mac" style="opacity:.6"><span id="cal-portion-lbl">100</span><span class="cal-prev-mac-l">г</span></div>
-        </div>
+      <div class="act-hint">питательная ценность на 100 г</div>
+      <div class="big-val-card" style="background:linear-gradient(135deg,rgba(244,129,74,.08),rgba(244,129,74,.03))">
+        <div class="big-val" style="color:var(--cal)" id="cal-preview">0</div>
+        <div class="big-val-unit">ккал / 100 г</div>
       </div>
-      <!-- Stepper rows -->
-      <div class="cst-list">
-        <div class="cst-row">
-          <div class="cst-label"><span class="cst-dot" style="background:var(--cal)"></span>ккал / 100г</div>
-          <div class="cst-ctrl">
-            <button class="cst-btn" ontouchstart="csStart('k',-10,this)" ontouchend="csStop()" ontouchcancel="csStop()" onmousedown="csStart('k',-10,this)" onmouseup="csStop()" onmouseleave="csStop()">−</button>
-            <div class="cst-val" id="cst-k">0</div>
-            <button class="cst-btn" ontouchstart="csStart('k',10,this)" ontouchend="csStop()" ontouchcancel="csStop()" onmousedown="csStart('k',10,this)" onmouseup="csStop()" onmouseleave="csStop()">+</button>
+      <div class="m3-card" style="padding:14px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="m3-field" style="margin-bottom:0">
+            <div class="m3-label">ккал / 100г</div>
+            <input class="m3-input num" id="inp-kcal100" type="number" inputmode="decimal" placeholder="200" oninput="calRecalc()">
           </div>
-        </div>
-        <div class="cst-row">
-          <div class="cst-label"><span class="cst-dot" style="background:var(--green)"></span>белки / 100г</div>
-          <div class="cst-ctrl">
-            <button class="cst-btn" ontouchstart="csStart('p',-1,this)" ontouchend="csStop()" ontouchcancel="csStop()" onmousedown="csStart('p',-1,this)" onmouseup="csStop()" onmouseleave="csStop()">−</button>
-            <div class="cst-val" id="cst-p">0</div>
-            <button class="cst-btn" ontouchstart="csStart('p',1,this)" ontouchend="csStop()" ontouchcancel="csStop()" onmousedown="csStart('p',1,this)" onmouseup="csStop()" onmouseleave="csStop()">+</button>
+          <div class="m3-field" style="margin-bottom:0">
+            <div class="m3-label">белки / 100г</div>
+            <input class="m3-input num" id="inp-prot100" type="number" inputmode="decimal" step="0.1" placeholder="0" oninput="calRecalc()">
           </div>
-        </div>
-        <div class="cst-row">
-          <div class="cst-label"><span class="cst-dot" style="background:var(--sun)"></span>жиры / 100г</div>
-          <div class="cst-ctrl">
-            <button class="cst-btn" ontouchstart="csStart('f',-1,this)" ontouchend="csStop()" ontouchcancel="csStop()" onmousedown="csStart('f',-1,this)" onmouseup="csStop()" onmouseleave="csStop()">−</button>
-            <div class="cst-val" id="cst-f">0</div>
-            <button class="cst-btn" ontouchstart="csStart('f',1,this)" ontouchend="csStop()" ontouchcancel="csStop()" onmousedown="csStart('f',1,this)" onmouseup="csStop()" onmouseleave="csStop()">+</button>
+          <div class="m3-field" style="margin-bottom:0">
+            <div class="m3-label">жиры / 100г</div>
+            <input class="m3-input num" id="inp-fat100" type="number" inputmode="decimal" step="0.1" placeholder="0" oninput="calRecalc()">
           </div>
-        </div>
-        <div class="cst-row">
-          <div class="cst-label"><span class="cst-dot" style="background:var(--sleep)"></span>углев. / 100г</div>
-          <div class="cst-ctrl">
-            <button class="cst-btn" ontouchstart="csStart('c',-1,this)" ontouchend="csStop()" ontouchcancel="csStop()" onmousedown="csStart('c',-1,this)" onmouseup="csStop()" onmouseleave="csStop()">−</button>
-            <div class="cst-val" id="cst-c">0</div>
-            <button class="cst-btn" ontouchstart="csStart('c',1,this)" ontouchend="csStop()" ontouchcancel="csStop()" onmousedown="csStart('c',1,this)" onmouseup="csStop()" onmouseleave="csStop()">+</button>
-          </div>
-        </div>
-        <div class="cst-row cst-row-por">
-          <div class="cst-label" style="font-weight:800">вес порции</div>
-          <div class="cst-ctrl">
-            <button class="cst-btn" ontouchstart="csStart('w',-10,this)" ontouchend="csStop()" ontouchcancel="csStop()" onmousedown="csStart('w',-10,this)" onmouseup="csStop()" onmouseleave="csStop()">−</button>
-            <div class="cst-val" id="cst-w">100 г</div>
-            <button class="cst-btn" ontouchstart="csStart('w',10,this)" ontouchend="csStop()" ontouchcancel="csStop()" onmousedown="csStart('w',10,this)" onmouseup="csStop()" onmouseleave="csStop()">+</button>
+          <div class="m3-field" style="margin-bottom:0">
+            <div class="m3-label">углеводы / 100г</div>
+            <input class="m3-input num" id="inp-carb100" type="number" inputmode="decimal" step="0.1" placeholder="0" oninput="calRecalc()">
           </div>
         </div>
       </div>
-      <button class="btn btn-p" style="margin-top:14px" onclick="calStep3()">далее →</button>
+      <button class="btn btn-p" style="margin-top:20px" onclick="calStep3()">далее →</button>
     </div>
-    <!-- Step 3: Meal type -->
+    <!-- Step 3: Weight + Meal type -->
     <div class="act-step" id="cal-s3">
-      <div class="act-hint">когда ты это ел?</div>
+      <div class="act-hint">порция и приём пищи</div>
+      <div class="big-val-card" style="background:linear-gradient(135deg,rgba(244,129,74,.08),rgba(244,129,74,.03));margin-bottom:12px">
+        <div class="big-val" style="color:var(--cal)" id="cal-confirm-kcal">0</div>
+        <div class="big-val-unit">ккал · <span id="cal-portion-lbl">100</span> г</div>
+      </div>
       <div class="m3-card" style="padding:14px;margin-bottom:12px">
-        <div id="cal-confirm-info" style="text-align:center;padding:8px 0 12px">
-          <div style="font-size:22px;font-weight:900;color:var(--cal)" id="cal-confirm-kcal">0 ккал</div>
-          <div style="font-size:13px;color:var(--hint);font-weight:600;margin-top:2px" id="cal-confirm-desc">—</div>
+        <div style="font-size:13px;font-weight:700;color:var(--hint);margin-bottom:6px" id="cal-confirm-desc">—</div>
+        <div class="m3-field" style="margin-bottom:10px">
+          <div class="m3-label">вес порции, г</div>
+          <input class="m3-input num" id="inp-weight" type="number" inputmode="decimal" placeholder="100" value="100" oninput="calRecalc()">
         </div>
+        <div id="cal-macro-preview" style="display:flex;gap:6px">
+          <div style="flex:1;background:var(--bg3);border-radius:10px;padding:8px;text-align:center">
+            <div style="font-size:14px;font-weight:800;color:var(--green)" id="cal-prev-prot">0</div>
+            <div style="font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase">белки г</div>
+          </div>
+          <div style="flex:1;background:var(--bg3);border-radius:10px;padding:8px;text-align:center">
+            <div style="font-size:14px;font-weight:800;color:var(--sun)" id="cal-prev-fat">0</div>
+            <div style="font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase">жиры г</div>
+          </div>
+          <div style="flex:1;background:var(--bg3);border-radius:10px;padding:8px;text-align:center">
+            <div style="font-size:14px;font-weight:800;color:var(--sleep)" id="cal-prev-carb">0</div>
+            <div style="font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase">углев. г</div>
+          </div>
+        </div>
+      </div>
+      <div class="m3-card" style="padding:14px;margin-bottom:12px">
+        <div style="font-size:11px;font-weight:700;color:var(--hint);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">когда ты это ел?</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
           <button class="scm-btn on" id="scm2-breakfast" onclick="setMeal2('breakfast',this)">🌅 завтрак</button>
           <button class="scm-btn" id="scm2-lunch" onclick="setMeal2('lunch',this)">☀️ обед</button>
@@ -1178,7 +1136,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
           <button class="scm-btn" id="scm2-snack" onclick="setMeal2('snack',this)">🍑 перекус</button>
         </div>
       </div>
-      <button class="btn btn-p" onclick="submitCal()">добавить</button>
+      <button class="btn btn-p" onclick="submitCal()">добавить ✓</button>
     </div>
   </div>
 </div>
@@ -1328,7 +1286,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
   <div class="pp-body">
     <div class="m3-sec">история веса</div>
-    <div class="m3-card"><div id="pp-whist" style="padding:2px 0"></div></div>
+    <div class="m3-card" style="padding:0;overflow:hidden"><div class="hist-scroll" style="padding:10px 12px"><div id="pp-whist" style="padding:2px 0"></div></div></div>
     <button class="btn btn-danger" style="margin-top:4px" onclick="clearWeightHistory()">🗑 очистить историю веса</button>
     <div class="clear-hint">данные будут удалены навсегда</div>
     <div class="m3-sec" style="margin-top:8px">за всё время</div>
@@ -1349,9 +1307,11 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     <div><div class="pp-title">история воды</div><div class="pp-subtitle">сегодня</div></div>
   </div>
   <div class="pp-body">
-    <div class="m3-card" style="padding:10px 12px">
+    <div class="m3-card" style="padding:0;overflow:hidden">
+      <div class="hist-scroll" style="padding:10px 12px">
       <div id="wh-entries">
         <div style="text-align:center;padding:20px;color:var(--hint);font-size:13px;font-weight:600">пока ничего не записано</div>
+      </div>
       </div>
     </div>
     <button class="btn btn-danger" style="margin-top:10px" onclick="clearWaterHistory()">🗑 очистить историю воды</button>
@@ -1366,9 +1326,11 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     <div><div class="pp-title">история сна</div><div class="pp-subtitle">последние 7 ночей</div></div>
   </div>
   <div class="pp-body">
-    <div class="m3-card" style="padding:10px 12px">
+    <div class="m3-card" style="padding:0;overflow:hidden">
+      <div class="hist-scroll" style="padding:10px 12px">
       <div id="slh-entries">
         <div style="text-align:center;padding:20px;color:var(--hint);font-size:13px;font-weight:600">нет записей</div>
+      </div>
       </div>
     </div>
     <button class="btn btn-danger" style="margin-top:10px" onclick="clearSleepHistory()">🗑 очистить историю сна</button>
@@ -1389,7 +1351,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
   <div class="pp-body">
     <div class="m3-card" style="padding:0;overflow:hidden">
-      <div id="done-acts-list" style="padding:10px 12px">
+      <div class="hist-scroll" id="done-acts-list" style="padding:10px 12px">
         <div style="text-align:center;padding:20px;color:var(--hint);font-size:13px;font-weight:600">нет выполненных задач</div>
       </div>
     </div>
@@ -1618,12 +1580,19 @@ async function loadData(){
     C.macros=d.macros||lsGet('macros_'+TODAY)||{prot:0,fat:0,carb:0};
     C.weight_log=d.weight_log||[];C.sleep_log=d.sleep_log||[];
     C.acts_today=d.acts_today||[];C.products=d.products||[];
-    // Always restore start_weight/goal_type from localStorage — server may not store them
+    // ALWAYS restore start_weight/goal_type from localStorage — it is the authoritative source
     const localUser=lsGet('user_sw');
-    if(localUser?.start_weight>0&&(!C.user.start_weight||C.user.start_weight===0)){
+    if(localUser?.start_weight>0){
       C.user.start_weight=localUser.start_weight;
     }
     if(localUser?.goal_type)C.user.goal_type=localUser.goal_type||'lose';
+    // Restore goal_weight/water_goal/cal_goal from localStorage when server doesn't persist them
+    const localGw=lsGet('user_gw');
+    if(localGw?.goal_weight>0&&(!C.user.goal_weight||C.user.goal_weight===0)){
+      C.user.goal_weight=localGw.goal_weight;
+    }
+    if(localGw?.water_goal>0&&(!C.user.water_goal||C.user.water_goal===0))C.user.water_goal=localGw.water_goal;
+    if(localGw?.cal_goal>0&&(!C.user.cal_goal||C.user.cal_goal===0))C.user.cal_goal=localGw.cal_goal;
   }catch{_demo();}
 }
 
@@ -1730,7 +1699,7 @@ function popPage(doRender=true){
   if(!curPushPage)return;
   if(curPushPage==='pp-pdata')_saveProfileSilent();
   if(curPushPage==='pp-goals')_saveGoalsSilent();
-  if(curPushPage==='pp-scanner')stopScanner();
+  if(curPushPage==='pp-scanner')stopScanner(true);
   if(curPushPage==='pp-weight-chart'){
     const wrap=document.getElementById('wchart-svg-wrap');
     if(wrap)wrap.innerHTML='';
@@ -1949,70 +1918,6 @@ function setSleepQ(q){_sleepQ=q;document.querySelectorAll('#seg-sleepq .m3-seg-b
 
 /* ══ CAL STEPPER ══ */
 let _calStep=1,_mealType2='breakfast';
-// Stepper state — replaces input fields entirely
-let _csK=0,_csP=0,_csF=0,_csC=0,_csW=100;
-// Long-press acceleration state
-let _csTimer=null,_csInterval=null,_csTick=0;
-
-function _csUpdate(){
-  const k=Math.round(_csK*_csW/100);
-  const p=+(_csP*_csW/100).toFixed(1);
-  const f=+(_csF*_csW/100).toFixed(1);
-  const c=+(_csC*_csW/100).toFixed(1);
-  T('cst-k',_csK);T('cst-p',_csP);T('cst-f',_csF);T('cst-c',_csC);
-  T('cst-w',_csW+' г');
-  T('cal-preview',k);
-  T('cal-portion-lbl',_csW);
-  T('cal-prev-prot',p);T('cal-prev-fat',f);T('cal-prev-carb',c);
-}
-
-function _csApply(field,delta){
-  const limits={k:[0,1500],p:[0,100],f:[0,100],c:[0,100],w:[10,2000]};
-  const [mn,mx]=limits[field];
-  if(field==='k')_csK=Math.min(mx,Math.max(mn,_csK+delta));
-  else if(field==='p')_csP=Math.min(mx,Math.max(mn,Math.round((_csP+delta)*10)/10));
-  else if(field==='f')_csF=Math.min(mx,Math.max(mn,Math.round((_csF+delta)*10)/10));
-  else if(field==='c')_csC=Math.min(mx,Math.max(mn,Math.round((_csC+delta)*10)/10));
-  else if(field==='w')_csW=Math.min(mx,Math.max(mn,_csW+delta));
-  _csUpdate();
-  tg?.HapticFeedback?.selectionChanged();
-}
-
-function csStart(field,delta,el){
-  // immediate first tick
-  _csApply(field,delta);
-  _csTick=0;
-  // long-press: start after 400ms, accelerate every step
-  _csTimer=setTimeout(()=>{
-    _csInterval=setInterval(()=>{
-      _csTick++;
-      // speed: starts at 150ms effective, accelerates every 5 ticks
-      // we change interval dynamically by stopping and restarting
-      const speed=Math.max(60,150-Math.floor(_csTick/5)*15);
-      // apply accelerated delta: after 20 ticks double the step
-      const accel=_csTick>20?delta*2:delta;
-      _csApply(field,accel);
-      if(_csTick%5===0){
-        clearInterval(_csInterval);
-        const newSpeed=Math.max(60,150-Math.floor(_csTick/5)*15);
-        _csInterval=setInterval(()=>{
-          _csTick++;
-          const acc=_csTick>20?delta*2:delta;
-          _csApply(field,acc);
-        },newSpeed);
-      }
-    },150);
-  },380);
-}
-
-function csStop(){
-  if(_csTimer){clearTimeout(_csTimer);_csTimer=null;}
-  if(_csInterval){clearInterval(_csInterval);_csInterval=null;}
-  _csTick=0;
-}
-
-function calRecalc(){/* no-op — now driven by steppers */}
-
 function _setCalStep(n){
   _calStep=n;
   [1,2,3].forEach(i=>{
@@ -2023,18 +1928,35 @@ function _setCalStep(n){
   const titles=['название блюда','питательная ценность','приём пищи'];
   const t=document.getElementById('cal-step-title');if(t)t.textContent=titles[n-1];
 }
+function calRecalc(){
+  const kcal100=parseFloat(document.getElementById('inp-kcal100')?.value)||0;
+  const prot100=parseFloat(document.getElementById('inp-prot100')?.value)||0;
+  const fat100=parseFloat(document.getElementById('inp-fat100')?.value)||0;
+  const carb100=parseFloat(document.getElementById('inp-carb100')?.value)||0;
+  const w=parseFloat(document.getElementById('inp-weight')?.value)||100;
+  const k=Math.round(kcal100*w/100);
+  const pr=+(prot100*w/100).toFixed(1);
+  const fa=+(fat100*w/100).toFixed(1);
+  const ca=+(carb100*w/100).toFixed(1);
+  // Step 2 big-val: show kcal per 100g
+  const p2=$('cal-preview');if(p2)p2.textContent=Math.round(kcal100)||0;
+  // Step 3 big-val: show portion total
+  const p3=$('cal-confirm-kcal');if(p3)p3.textContent=k;
+  const pl=$('cal-portion-lbl');if(pl)pl.textContent=Math.round(w);
+  const pp=$('cal-prev-prot');if(pp)pp.textContent=pr;
+  const pf=$('cal-prev-fat');if(pf)pf.textContent=fa;
+  const pc=$('cal-prev-carb');if(pc)pc.textContent=ca;
+}
 function calStep2(){
-  _csK=0;_csP=0;_csF=0;_csC=0;_csW=100;
-  _csUpdate();
   _setCalStep(2);
   tg?.HapticFeedback?.selectionChanged();
 }
 function calStep3(){
-  if(!_csK||_csK<1){toast('введи калории');return;}
-  const k=Math.round(_csK*_csW/100);
+  const kcal100=parseFloat(document.getElementById('inp-kcal100')?.value)||0;
+  if(!kcal100){toast('введи калории');return;}
   const desc=document.getElementById('inp-cal-desc')?.value||'';
-  T('cal-confirm-kcal',k+' ккал · '+_csW+'г');
   T('cal-confirm-desc',desc||'ручной ввод');
+  calRecalc();
   _setCalStep(3);
   tg?.HapticFeedback?.selectionChanged();
 }
@@ -2346,7 +2268,8 @@ async function submitWeight(){
   const v=_wtInt+_wtDec/10;
   if(v<30||v>300){toast('некорректный вес');return;}
   popPage();
-  C.weight_log=[...(C.weight_log||[]),{weight:v,logged_at:TODAY}];
+  const ts=new Date().toISOString();
+  C.weight_log=[...(C.weight_log||[]),{weight:v,logged_at:ts}];
   // NEVER touch start_weight here — it is only set via pp-start-weight screen
   if(!UID)lsSet('wlog',C.weight_log);
   renderHome();renderProgress();toast('вес '+v.toFixed(1)+' кг сохранён');tg?.HapticFeedback?.notificationOccurred('success');
@@ -2363,7 +2286,11 @@ async function submitSleep(){
 }
 async function submitCal(){
   const desc=document.getElementById('inp-cal-desc')?.value||'';
-  const kcal100=_csK,prot100=_csP,fat100=_csF,carb100=_csC,w=_csW;
+  const kcal100=parseFloat(document.getElementById('inp-kcal100')?.value)||0;
+  const prot100=parseFloat(document.getElementById('inp-prot100')?.value)||0;
+  const fat100=parseFloat(document.getElementById('inp-fat100')?.value)||0;
+  const carb100=parseFloat(document.getElementById('inp-carb100')?.value)||0;
+  const w=parseFloat(document.getElementById('inp-weight')?.value)||100;
   if(!kcal100||kcal100<1){toast('введи калории');return;}
   const _calVal=Math.round(kcal100*w/100);
   const prot=+(prot100*w/100).toFixed(1);
@@ -2394,6 +2321,8 @@ function _saveGoalsSilent(){
   const gwat=parseInt(document.getElementById('inp-gwat')?.value)||2000;
   const gcal=parseInt(document.getElementById('inp-gcal')?.value)||2000;
   C.user={...C.user,goal_weight:gw,water_goal:gwat,cal_goal:gcal};
+  // Always persist goals to localStorage as authoritative fallback
+  lsSet('user_gw',{goal_weight:gw,water_goal:gwat,cal_goal:gcal});
   if(!UID)lsSet('user',C.user);
   renderProfile();renderHome();renderProgress();toast('цели сохранены');
   apiPost('/api/goals',{goal_weight:gw,water_goal:gwat,cal_goal:gcal});
@@ -2891,9 +2820,9 @@ async function startScanner(){
   }
 }
 
-function stopScanner(){
+function stopScanner(releaseCamera=false){
   if(_scanInterval){clearInterval(_scanInterval);_scanInterval=null;}
-  if(_scanStream){_scanStream.getTracks().forEach(t=>t.stop());_scanStream=null;}
+  if(releaseCamera&&_scanStream){_scanStream.getTracks().forEach(t=>t.stop());_scanStream=null;const vid=$('scanner-video');if(vid){vid.srcObject=null;}}
 }
 
 function _startBarcodeDetect(vid){
@@ -2931,7 +2860,7 @@ function manualBarcode(){
   const inp=$('inp-barcode-manual');
   const code=(inp?.value||'').trim();
   if(!code){toast('введи штрихкод');return;}
-  stopScanner();
+  stopScanner(false); // stop detection but keep stream
   _lookupBarcode(code);
 }
 
@@ -2983,7 +2912,7 @@ function _showScanProductStep(){
   T('sc-kcal',p.kcal);T('sc-prot',p.prot);T('sc-fat',p.fat);T('sc-carb',p.carb);
   _scGrams=100;
   _updateScCalc();
-  stopScanner();
+  stopScanner(false); // stop detection loop but keep camera stream alive
   _setScanStep(2);
 }
 
@@ -3046,7 +2975,7 @@ async function submitScanned(){
   const fat=+(p.fat*_scGrams/100).toFixed(1);
   const carb=+(p.carb*_scGrams/100).toFixed(1);
   const desc=p.name+' '+_scGrams+'г';
-  stopScanner();popPage();
+  stopScanner(true);popPage();
   if(!C.calories)C.calories={};
   C.calories[_scMealType]=(C.calories[_scMealType]||0)+kcal;
   if(!C.macros)C.macros={prot:0,fat:0,carb:0};
