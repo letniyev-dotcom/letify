@@ -643,6 +643,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 /* ══ WEIGHT CHART push page v2 ══ */
 #pp-weight-chart{display:flex;flex-direction:column;overflow:hidden}
 #pp-weight-chart .pp-body{display:none}
+#pp-weight-chart .pp-hdr{background:var(--bg);border-bottom:none;padding-top:calc(var(--st) + 6px);padding-bottom:6px}
 #wc-stat-list{flex-shrink:0;padding:10px 16px 0;display:flex;gap:8px}
 #wc-stat-list .sbox{flex:1;background:var(--bg2);border-radius:14px;padding:10px 8px;box-shadow:var(--sh);text-align:center}
 .tg-dark #wc-stat-list .sbox{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);box-shadow:none}
@@ -650,33 +651,37 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 #wc-stat-list .sl{font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.05em}
 
 /* chart stage */
-#wc-stage{flex:1;position:relative;min-height:0;overflow:hidden;background:#0E0B08}
+#wc-stage{flex:1;position:relative;min-height:0;overflow:hidden;background:var(--bg)}
 
 /* dot grid */
 .wc-dot-grid{
   position:absolute;inset:0;pointer-events:none;
-  background-image:radial-gradient(circle,rgba(255,255,255,.04) 1px,transparent 1px);
+  background-image:radial-gradient(circle,rgba(0,0,0,.06) 1px,transparent 1px);
   background-size:22px 22px;
+}
+.tg-dark .wc-dot-grid{
+  background-image:radial-gradient(circle,rgba(255,255,255,.04) 1px,transparent 1px);
 }
 
 /* y-axis */
 .wc-yaxis{
-  position:absolute;left:0;top:0;bottom:0;width:48px;z-index:10;pointer-events:none;
-  background:linear-gradient(90deg,rgba(14,11,8,.96) 55%,transparent 100%);
+  position:absolute;left:0;top:0;bottom:0;width:52px;z-index:10;pointer-events:none;
+  background:linear-gradient(90deg,var(--bg) 55%,transparent 100%);
 }
-.wc-ylabels{position:absolute;inset:0;transition:opacity .2s ease}
-.wc-ylabels.fading{opacity:0}
+.wc-ylabels{position:absolute;inset:0;}
 .wc-ylbl{
   position:absolute;right:0;width:100%;
-  font-size:11px;font-weight:700;color:rgba(255,160,50,.32);
+  font-size:11px;font-weight:700;color:rgba(180,120,40,.4);
   text-align:right;padding-right:9px;line-height:1;transform:translateY(-50%);
+  transition:top .12s ease;
 }
+.tg-dark .wc-ylbl{color:rgba(255,160,50,.32)}
 
 /* scroll */
 .wc-scroll{
   position:absolute;inset:0;overflow-x:auto;overflow-y:hidden;
   scrollbar-width:none;-webkit-overflow-scrolling:touch;
-  padding-left:48px;touch-action:pan-x;
+  padding-left:52px;touch-action:pan-x;
 }
 .wc-scroll::-webkit-scrollbar{display:none}
 
@@ -693,16 +698,18 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .wc-tt.on{opacity:1;transform:translateY(0) scale(1)}
 .wc-tt-body{
   display:flex;align-items:center;gap:8px;
-  background:rgba(18,13,8,.97);
-  border:1px solid rgba(255,165,55,.2);border-radius:13px;
+  background:var(--bg2);
+  border:1px solid var(--brd);border-radius:13px;
   padding:9px 13px;
   backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-  box-shadow:0 10px 32px rgba(0,0,0,.6);white-space:nowrap;
+  box-shadow:0 6px 24px rgba(0,0,0,.12);white-space:nowrap;
 }
-.wc-tt-date{font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,171,64,.5);flex-shrink:0}
-.wc-tt-sep{width:1px;height:18px;background:rgba(255,255,255,.1);flex-shrink:0}
-.wc-tt-val{font-size:18px;font-weight:900;letter-spacing:-.04em;color:#fff;line-height:1}
-.wc-tt-unit{font-size:11px;font-weight:700;color:rgba(255,255,255,.3);margin-left:2px}
+.tg-dark .wc-tt-body{background:rgba(20,15,10,.97);border-color:rgba(255,165,55,.2);box-shadow:0 10px 32px rgba(0,0,0,.6);}
+.wc-tt-date{font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--hint);flex-shrink:0}
+.tg-dark .wc-tt-date{color:rgba(255,171,64,.5)}
+.wc-tt-sep{width:1px;height:18px;background:var(--brd);flex-shrink:0}
+.wc-tt-val{font-size:18px;font-weight:900;letter-spacing:-.04em;color:var(--text);line-height:1}
+.wc-tt-unit{font-size:11px;font-weight:700;color:var(--hint);margin-left:2px}
 .wc-tt-delta{
   display:inline-flex;align-items:center;gap:3px;
   padding:3px 8px;border-radius:99px;font-size:10px;font-weight:800;flex-shrink:0;
@@ -715,8 +722,8 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .wc-zoom-hint{
   position:absolute;bottom:12px;right:12px;z-index:20;
   padding:4px 10px;border-radius:99px;
-  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);
-  font-size:9px;font-weight:700;color:rgba(255,255,255,.28);
+  background:var(--bg3);border:1px solid var(--brd);
+  font-size:9px;font-weight:700;color:var(--hint);
   opacity:0;transition:opacity .3s;pointer-events:none;
 }
 .wc-zoom-hint.show{opacity:1}
@@ -2242,9 +2249,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 <div class="push-page" id="pp-weight-chart">
   <div class="pp-hdr">
     <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
-    <div><div class="pp-title">динамика веса</div><div class="pp-subtitle" id="wc-sub">история</div></div>
   </div>
-  <div id="wc-stat-list"></div>
   <div id="wc-stage">
     <div class="wc-dot-grid"></div>
     <div class="wc-yaxis"><div class="wc-ylabels" id="wc-ylabels"></div></div>
@@ -3541,8 +3546,8 @@ function toast(msg){/* toasts disabled */}
    WEIGHT CHART — full-height, no tabs
 ══════════════════════════════════════ */
 (function(){
-  const Y_W=48, PT_MIN=52, PT_MAX=180, N_GRID=5;
-  const PAD={l:16,r:28,t:40,b:36};
+  const Y_W=52, PT_MIN=52, PT_MAX=200, N_GRID=5;
+  const PAD={l:16,r:28,t:40,b:42};
   let _data=[], _pts=[], _svgW=1, _svgH=1;
   let _activeI=-1;
   let _ptSp=80;
@@ -3550,18 +3555,42 @@ function toast(msg){/* toasts disabled */}
   let _pinching=false, _ptSp0=80, _dist0=0;
   let _anchorSvgX=0, _anchorViewX=0, _pendingOldW=1, _pendingPtSp=null;
   let _rafId=null, _zoomTimer=null;
-  let _yDec=-1, _yFadeTimer=null;
   let _scrollEl=null;
 
-  function _fmt(s){const d=new Date(s);const MNS=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];return d.getDate()+'\u00a0'+MNS[d.getMonth()];}
+  // Show date; when zoomed in and entries on same day visible, show time too
+  function _fmt(s,showTime){
+    const d=new Date(s);
+    const MNS=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+    const base=d.getDate()+'\u00a0'+MNS[d.getMonth()];
+    if(showTime){
+      const h=d.getHours().toString().padStart(2,'0');
+      const m=d.getMinutes().toString().padStart(2,'0');
+      return h+':'+m;
+    }
+    return base;
+  }
+  // Full date+time for tooltip
+  function _fmtFull(s){
+    const d=new Date(s);
+    const MNS=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+    const h=d.getHours().toString().padStart(2,'0');
+    const m=d.getMinutes().toString().padStart(2,'0');
+    return d.getDate()+'\u00a0'+MNS[d.getMonth()]+' '+h+':'+m;
+  }
 
   function _getRange(d){
     const ws=d.map(v=>v.weight);
-    const rMn=Math.min(...ws),rMx=Math.max(...ws);
-    const sp=rMx-rMn||0.5;
-    const z=(_ptSp-PT_MIN)/(PT_MAX-PT_MIN);
-    const pad=0.22-z*0.18;
-    return{mn:rMn-sp*pad,mx:rMx+sp*pad};
+    const u=gU();
+    const sw=u.start_weight>0?u.start_weight:null;
+    const gw=u.goal_weight>0?u.goal_weight:null;
+    // Include start and goal in range so chart always shows the full journey
+    const candidates=[...ws];
+    if(sw)candidates.push(sw);
+    if(gw)candidates.push(gw);
+    const rMn=Math.min(...candidates),rMx=Math.max(...candidates);
+    const sp=rMx-rMn||1;
+    // Add small padding so points aren't at exact edges
+    return{mn:rMn-sp*0.08,mx:rMx+sp*0.08};
   }
 
   function _smooth(arr){
@@ -3580,25 +3609,20 @@ function toast(msg){/* toasts disabled */}
     if(!el)return;
     const cH=H-PAD.t-PAD.b;
     const range=mx-mn;
-    const roughStep=range/N_GRID;
-    const mag=Math.pow(10,Math.floor(Math.log10(roughStep||1)));
-    const step=mag*([1,2,5,10].find(m=>mag*m>=roughStep)||10);
+    // Always use 1kg steps; if range > ~15kg, use 2kg, etc.
+    const rawRange=range;
+    let step=1;
+    if(rawRange>30)step=5;
+    else if(rawRange>15)step=2;
     const dec=step<1?1:0;
-    function rebuild(){
-      const labelMx=Math.floor(mx/step)*step;
-      const labelMn=Math.ceil(mn/step)*step;
-      let html='';
-      for(let v=labelMx;v>=labelMn-step*0.01;v-=step){
-        const y=(PAD.t+cH*(1-(v-mn)/range)).toFixed(1);
-        html+=`<div class="wc-ylbl" style="top:${y}px">${v.toFixed(dec)}</div>`;
-      }
-      el.innerHTML=html;
+    const labelMx=Math.floor(mx/step)*step;
+    const labelMn=Math.ceil(mn/step)*step;
+    let html='';
+    for(let v=labelMx;v>=labelMn-step*0.01;v-=step){
+      const y=(PAD.t+cH*(1-(v-mn)/range)).toFixed(1);
+      html+=`<div class="wc-ylbl" style="top:${y}px">${v.toFixed(dec)}</div>`;
     }
-    if(dec!==_yDec&&_yDec!==-1){
-      if(_yFadeTimer){clearTimeout(_yFadeTimer);_yFadeTimer=null;}
-      el.classList.add('fading');
-      _yFadeTimer=setTimeout(()=>{rebuild();el.classList.remove('fading');_yDec=dec;_yFadeTimer=null;},180);
-    } else {rebuild();_yDec=dec;}
+    el.innerHTML=html;
   }
 
   function _draw(animate){
@@ -3622,26 +3646,40 @@ function toast(msg){/* toasts disabled */}
     _buildYLabels(mn,mx,H);
     const uid='wc'+Math.random().toString(36).slice(2,6);
     const line=_smooth(_pts);
+    const dark=document.body.classList.contains('tg-dark');
+    const gridClr=dark?'rgba(255,200,80,.05)':'rgba(100,80,0,.06)';
+    const goalClr=dark?'rgba(78,174,229,.3)':'rgba(78,174,229,.45)';
+    const goalTxtClr=dark?'rgba(78,174,229,.4)':'rgba(78,174,229,.6)';
+    const xlabClr=dark?'rgba(255,175,60,.22)':'rgba(120,80,0,.25)';
+    // Get CSS bg color for dot holes (avoid transparent holes on light theme)
+    const bgColor=dark?'#111111':'#FAF7F2';
     // grid
     let grid='';
     for(let i=0;i<=N_GRID;i++){
       const gy=(PAD.t+cH*(i/N_GRID)).toFixed(1);
-      grid+=`<line x1="${PAD.l}" y1="${gy}" x2="${(W-PAD.r).toFixed(0)}" y2="${gy}" stroke="rgba(255,200,80,.04)" stroke-width="1"/>`;
+      grid+=`<line x1="${PAD.l}" y1="${gy}" x2="${(W-PAD.r).toFixed(0)}" y2="${gy}" stroke="${gridClr}" stroke-width="1"/>`;
     }
     // goal marker
     const gw=gU().goal_weight;
     let goalM='';
     if(gw&&gw>mn&&gw<mx){
       const gy=(PAD.t+cH*(1-(gw-mn)/rng)).toFixed(1);
-      goalM=`<line x1="${PAD.l}" y1="${gy}" x2="${(W-PAD.r).toFixed(0)}" y2="${gy}" stroke="rgba(78,174,229,.3)" stroke-width="1.5" stroke-dasharray="4,7"/>
-      <text x="${(W-PAD.r-3).toFixed(0)}" y="${(parseFloat(gy)-6).toFixed(0)}" text-anchor="end" font-family="Onest,sans-serif" font-size="10" font-weight="800" fill="rgba(78,174,229,.4)">цель ${gw}</text>`;
+      goalM=`<line x1="${PAD.l}" y1="${gy}" x2="${(W-PAD.r).toFixed(0)}" y2="${gy}" stroke="${goalClr}" stroke-width="1.5" stroke-dasharray="4,7"/>
+      <text x="${(W-PAD.r-3).toFixed(0)}" y="${(parseFloat(gy)-6).toFixed(0)}" text-anchor="end" font-family="Onest,sans-serif" font-size="10" font-weight="800" fill="${goalTxtClr}">цель ${gw}</text>`;
     }
-    // x date labels
+    // x date labels — show time when pts per day density is high (zoomed in)
     let xlabs='';
     const step=Math.max(1,Math.ceil(n/6));
+    // Detect if any entries share the same day (so we need to show times)
+    const daySet=new Set(_data.map(e=>new Date(e.logged_at).toDateString()));
+    const hasSameDayEntries=daySet.size<n;
+    // Show time instead of date when zoomed in enough (pt spacing > 100px) and same-day entries exist
+    const showTime=hasSameDayEntries&&_ptSp>100;
     _pts.forEach((p,i)=>{
-      if(i%step===0||i===n-1)
-        xlabs+=`<text x="${p.x.toFixed(1)}" y="${(H-PAD.b+20).toFixed(0)}" text-anchor="middle" font-family="Onest,sans-serif" font-size="10" font-weight="700" fill="rgba(255,175,60,.22)">${_fmt(p.d)}</text>`;
+      if(i%step===0||i===n-1){
+        const lbl=_fmt(p.d,showTime&&hasSameDayEntries&&_ptSp>80);
+        xlabs+=`<text x="${p.x.toFixed(1)}" y="${(H-6).toFixed(0)}" text-anchor="middle" font-family="Onest,sans-serif" font-size="10" font-weight="700" fill="${xlabClr}">${lbl}</text>`;
+      }
     });
     // dots
     const lastIdx=n-1;
@@ -3652,7 +3690,7 @@ function toast(msg){/* toasts disabled */}
         <circle cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="22" fill="transparent" class="wcdhit"/>
         <circle class="wcdring" cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="0" fill="none" stroke="rgba(255,171,64,.38)" stroke-width="1.5" opacity="0" style="transition:r .2s cubic-bezier(.34,1.3,.64,1),opacity .18s"/>
         <circle class="wcdcore" cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="${r}" fill="${isL?'#FFAB40':'rgba(255,171,64,.72)'}" style="transition:r .16s cubic-bezier(.34,1.2,.64,1),fill .14s"/>
-        <circle class="wcdhle" cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="${isL?4:2.8}" fill="#0E0B08" pointer-events="none" style="transition:r .16s cubic-bezier(.34,1.2,.64,1)"/>
+        <circle class="wcdhle" cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="${isL?4:2.8}" fill="${bgColor}" pointer-events="none" style="transition:r .16s cubic-bezier(.34,1.2,.64,1)"/>
       </g>`;
     });
     // pulse on last dot
@@ -3679,7 +3717,7 @@ function toast(msg){/* toasts disabled */}
     </defs>
     ${grid}${goalM}
     <g clip-path="url(#wccp${uid})">
-      <path class="${animate?'wcla-'+uid:''}" d="${line}" fill="none" stroke="#FF6820" stroke-width="10" stroke-linecap="round" filter="url(#wcgf${uid})" opacity=".2"/>
+      <path class="${animate?'wcla-'+uid:''}" d="${line}" fill="none" stroke="#FF6820" stroke-width="10" stroke-linecap="round" filter="url(#wcgf${uid})" opacity="${dark?.2:.1}"/>
       <path class="${animate?'wcla-'+uid:''}" d="${line}" fill="none" stroke="url(#wclg${uid})" stroke-width="2.5" stroke-linecap="round"/>
       ${pulse}
     </g>
@@ -3721,7 +3759,7 @@ function toast(msg){/* toasts disabled */}
     const dotY=pt.y;
     // fill tooltip
     const td=document.getElementById('wc-tt-date');
-    if(td)td.textContent=_fmt(e.logged_at);
+    if(td)td.textContent=_fmtFull(e.logged_at);
     const tv=document.getElementById('wc-tt-val');
     if(tv)tv.textContent=e.weight.toFixed(1);
     const dEl=document.getElementById('wc-tt-delta');
@@ -3827,9 +3865,8 @@ function toast(msg){/* toasts disabled */}
   };
 
   window._wcCleanup=function(){
-    _activeI=-1;_yDec=-1;_pinching=false;
+    _activeI=-1;_pinching=false;
     if(_rafId){cancelAnimationFrame(_rafId);_rafId=null;}
-    if(_yFadeTimer){clearTimeout(_yFadeTimer);_yFadeTimer=null;}
     const svg=document.getElementById('wc-svg');if(svg)svg.innerHTML='';
     const yl=document.getElementById('wc-ylabels');if(yl)yl.innerHTML='';
     const tt=document.getElementById('wc-tt');if(tt)tt.classList.remove('on');
@@ -3838,29 +3875,11 @@ function toast(msg){/* toasts disabled */}
 
   window._populateWeightChart=function(){
     const wl=gWL();
-    // deduplicate by date, sort, take all
-    const byDate=new Map();
-    wl.forEach(e=>byDate.set(e.logged_at,e));
-    _data=[...byDate.values()].sort((a,b)=>a.logged_at.localeCompare(b.logged_at));
-    // subtitle
-    const sub=document.getElementById('wc-sub');
-    if(sub)sub.textContent=_data.length+'\u00a0записей';
-    // stats
-    const statEl=document.getElementById('wc-stat-list');
-    if(statEl&&_data.length){
-      const cw=_data[_data.length-1].weight;
-      const best=Math.min(..._data.map(d=>d.weight));
-      const worst=Math.max(..._data.map(d=>d.weight));
-      const gw=gU().goal_weight;
-      const diff=+(_data[_data.length-1].weight-_data[0].weight).toFixed(1);
-      statEl.innerHTML=`
-        <div class="sbox"><div class="sv" style="color:var(--sun)">${cw.toFixed(1)}</div><div class="sl">сейчас</div></div>
-        <div class="sbox"><div class="sv" style="color:${diff<=0?'var(--green)':'var(--red)'}">${diff<=0?'':'+'}&thinsp;${diff}</div><div class="sl">за период</div></div>
-        <div class="sbox"><div class="sv" style="color:var(--green)">${best.toFixed(1)}</div><div class="sl">мин</div></div>
-        ${gw?`<div class="sbox"><div class="sv" style="color:var(--water)">${gw.toFixed?gw.toFixed(1):gw}</div><div class="sl">цель</div></div>`:''}
-      `;
-    } else if(statEl){statEl.innerHTML='';}
-    _ptSp=80;_yDec=-1;_activeI=-1;_pinching=false;
+    // Sort by timestamp, keep all entries (including same-day at different times)
+    _data=[...wl].sort((a,b)=>a.logged_at.localeCompare(b.logged_at));
+    // Add prev reference
+    _data=_data.map((e,i)=>({...e,prev:i>0?_data[i-1].weight:null}));
+    _ptSp=80;_activeI=-1;_pinching=false;
     requestAnimationFrame(()=>{
       _wcInit();
       _draw(true);
