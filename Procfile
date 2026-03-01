@@ -1,1 +1,1 @@
-web: python letify.py
+web: python main.py
