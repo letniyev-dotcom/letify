@@ -560,6 +560,84 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 }
 .wchart-push-wrap::-webkit-scrollbar{display:none}
 
+/* ══ WATER RING ══ */
+.wtr-ring-wrap{
+  position:relative;display:flex;align-items:center;justify-content:center;
+  padding:8px 0 4px;
+}
+.wtr-ring-svg{overflow:visible;filter:drop-shadow(0 0 12px rgba(78,174,229,.18))}
+.wtr-ring-center{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  text-align:center;pointer-events:none;
+}
+.wtr-ring-num{font-size:42px;font-weight:900;color:var(--water);letter-spacing:-.04em;line-height:1}
+.wtr-ring-unit{font-size:12px;font-weight:700;color:var(--hint);margin-top:2px}
+.wtr-ring-of{font-size:11px;font-weight:600;color:var(--hint);margin-top:2px}
+.wtr-chips{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.wtr-chip{
+  padding:14px 8px;border-radius:14px;font-size:14px;font-weight:800;
+  background:rgba(78,174,229,.1);border:1.5px solid rgba(78,174,229,.18);
+  color:var(--water);cursor:pointer;text-align:center;font-family:inherit;
+  transition:transform .1s,background .1s,opacity .1s;
+}
+.wtr-chip:active{transform:scale(.96);opacity:.75}
+.tg-dark .wtr-chip{background:rgba(78,174,229,.15);border-color:rgba(78,174,229,.25);color:#7ecef5}
+
+/* ══ WEIGHT TERMINAL CHART ══ */
+.wterm-ticker-row{display:flex;align-items:baseline;gap:8px;padding:0}
+.wterm-ticker{font-size:11px;font-weight:700;color:var(--hint);letter-spacing:.08em;text-transform:uppercase}
+.wterm-price{font-size:28px;font-weight:900;letter-spacing:-.04em;color:var(--text)}
+.wterm-change{font-size:13px;font-weight:800;padding:2px 8px;border-radius:6px}
+.wterm-change.up{color:var(--green);background:rgba(82,193,119,.12)}
+.wterm-change.down{color:var(--red);background:rgba(244,92,92,.12)}
+.wterm-change.neutral{color:var(--hint);background:var(--bg3)}
+.wterm-meta-row{
+  font-size:10px;font-weight:700;color:var(--hint);
+  padding:2px 16px 0;letter-spacing:.04em;text-transform:uppercase;
+}
+.wterm-periods{
+  display:flex;gap:0;border-bottom:1px solid var(--brd);
+  padding:0 4px;margin-top:10px;
+}
+.wterm-pbtn{
+  flex:1;padding:8px 0;background:transparent;border:none;border-bottom:2px solid transparent;
+  font-size:11px;font-weight:800;color:var(--hint);font-family:inherit;cursor:pointer;
+  letter-spacing:.04em;transition:color .14s,border-color .14s,background .14s;
+  margin-bottom:-1px;
+}
+.wterm-pbtn.on{color:var(--green);border-bottom-color:var(--green);background:rgba(82,193,119,.05)}
+.wterm-chart-wrap{position:relative;background:transparent;margin:0;overflow:hidden}
+.wterm-tooltip{
+  position:absolute;background:var(--bg2);border:1px solid var(--brd);
+  border-radius:10px;padding:7px 12px;pointer-events:none;font-size:12px;font-weight:700;
+  white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.25);transform:translateX(-50%);
+  top:8px;z-index:10;
+}
+.tg-dark .wterm-tooltip{background:#1C1C1C;border-color:rgba(255,255,255,.12)}
+.wterm-tt-val{color:var(--text);font-size:14px;font-weight:900}
+.wterm-tt-date{color:var(--hint);font-size:10px;margin-top:1px}
+.wterm-stats{
+  display:flex;gap:0;border-top:1px solid var(--brd);border-bottom:1px solid var(--brd);
+}
+.wterm-stat{flex:1;padding:10px 8px;border-right:1px solid var(--brd);text-align:center}
+.wterm-stat:last-child{border-right:none}
+.wterm-stat-lbl{font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.06em}
+.wterm-stat-val{font-size:15px;font-weight:900;margin-top:2px;letter-spacing:-.02em}
+.wterm-log{padding:12px 16px 0}
+.wterm-log-hdr{font-size:10px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.wterm-log-item{
+  display:flex;align-items:center;padding:8px 0;
+  border-bottom:1px solid var(--brd);font-size:12px;font-weight:700;
+}
+.tg-dark .wterm-log-item{border-bottom-color:rgba(255,255,255,.06)}
+.wterm-log-item:last-child{border-bottom:none}
+.wterm-log-date{color:var(--hint);width:58px;flex-shrink:0;font-size:11px;font-weight:600}
+.wterm-log-val{color:var(--text);margin-right:auto;font-size:13px;font-weight:800}
+.wterm-log-d{font-size:10px;font-weight:800;padding:2px 7px;border-radius:5px;flex-shrink:0}
+.wterm-log-d.neg{color:var(--green);background:rgba(82,193,119,.1)}
+.wterm-log-d.pos{color:var(--red);background:rgba(244,92,92,.1)}
+.wterm-log-d.zero{color:var(--hint);background:var(--bg3)}
+
 /* ══ EMPTY ══ */
 .empty{text-align:center;padding:40px 20px;animation:empty-fadein .35s ease forwards}
 @keyframes empty-fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -1191,27 +1269,54 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
 </div>
 <div id="tt-water-body">
-<div class="pad">
-<div class="card" style="margin-top:4px;text-align:center;padding:20px 16px;background:linear-gradient(160deg,rgba(78,174,229,.06),rgba(78,174,229,.02))">
-  <div class="t5">выпито сегодня</div>
-  <div style="font-size:52px;font-weight:900;color:var(--water);line-height:1.1;margin:6px 0" id="w-total">0</div>
-  <div class="t5">из <span id="w-goal">2000</span> мл</div>
-  <div class="pb" style="margin-top:12px;height:7px"><div class="pbf pb-water" id="w-bar" style="width:0%"></div></div>
-  <div id="w-streak" style="margin-top:9px"></div>
-</div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px">
-  <button class="btn btn-water" onclick="addW(150)">+150 мл</button>
-  <button class="btn btn-water" onclick="addW(200)">+200 мл</button>
-  <button class="btn btn-water" onclick="addW(250)">+250 мл</button>
-  <button class="btn btn-water" onclick="addW(500)">+500 мл</button>
-</div>
-<button class="btn btn-g" style="margin-top:7px;width:100%;padding:12px" onclick="undoW()">отменить последнее</button>
-<div style="margin-top:10px">
-  <button class="btn btn-g" style="width:100%;padding:12px;display:flex;align-items:center;justify-content:space-between" onclick="pushPage('pp-water-hist')">
-    <span style="font-size:13px;font-weight:800">история сегодня</span>
-    <span style="color:var(--hint);font-size:13px">→</span>
-  </button>
-</div>
+<div class="pad" style="padding-top:4px">
+
+  <!-- Arc Ring -->
+  <div class="wtr-ring-wrap">
+    <svg class="wtr-ring-svg" width="210" height="210" viewBox="0 0 210 210">
+      <defs>
+        <linearGradient id="wtr-grad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#4EAEE5"/>
+          <stop offset="100%" stop-color="#6DC8F5"/>
+        </linearGradient>
+      </defs>
+      <!-- track -->
+      <circle cx="105" cy="105" r="86" fill="none" stroke="rgba(78,174,229,.12)" stroke-width="11"/>
+      <!-- progress -->
+      <circle id="wtr-arc" cx="105" cy="105" r="86" fill="none" stroke="url(#wtr-grad)" stroke-width="11"
+        stroke-linecap="round" stroke-dasharray="540.4" stroke-dashoffset="540.4"
+        transform="rotate(-90 105 105)"
+        style="transition:stroke-dashoffset .85s cubic-bezier(.25,.46,.45,.94)"/>
+    </svg>
+    <div class="wtr-ring-center">
+      <div id="w-total" class="wtr-ring-num">0</div>
+      <div class="wtr-ring-unit">мл выпито</div>
+      <div class="wtr-ring-of">из <span id="w-goal">2000</span> мл</div>
+    </div>
+  </div>
+
+  <!-- Streak -->
+  <div id="w-streak" style="text-align:center;margin-bottom:14px;min-height:26px"></div>
+
+  <!-- Chips -->
+  <div class="wtr-chips">
+    <button class="wtr-chip" onclick="addW(150)">+150 мл</button>
+    <button class="wtr-chip" onclick="addW(200)">+200 мл</button>
+    <button class="wtr-chip" onclick="addW(250)">+250 мл</button>
+    <button class="wtr-chip" onclick="addW(500)">+500 мл</button>
+  </div>
+
+  <!-- Undo -->
+  <button class="btn btn-g" style="width:100%;padding:12px;margin-top:4px" onclick="undoW()">отменить последнее</button>
+
+  <!-- History -->
+  <div style="margin-top:8px">
+    <button class="btn btn-g" style="width:100%;padding:12px;display:flex;align-items:center;justify-content:space-between" onclick="pushPage('pp-water-hist')">
+      <span style="font-size:13px;font-weight:800">история сегодня</span>
+      <span style="color:var(--hint);font-size:13px">→</span>
+    </button>
+  </div>
+
 </div>
 </div>
 <div id="tt-cal-body" style="display:none">
@@ -2059,16 +2164,31 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 <!-- PP: График веса -->
 <div class="push-page" id="pp-weight-chart">
-  <div class="pp-hdr">
+  <div class="pp-hdr" style="border-bottom:1px solid var(--brd)">
     <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
-    <div><div class="pp-title">динамика веса</div><div class="pp-subtitle" id="wc-sub">история</div></div>
-  </div>
-  <div class="pp-body" style="padding:12px 12px calc(var(--sb)+24px)">
-    <div class="wchart-push-wrap" id="wchart-container">
-      <div id="wchart-svg-wrap"></div>
+    <div class="wterm-ticker-row" style="flex:1">
+      <span class="wterm-ticker">BW/КГ</span>
+      <span class="wterm-price" id="wterm-price">—</span>
+      <span class="wterm-change neutral" id="wterm-change">—</span>
     </div>
-    <div style="margin-top:16px" id="wc-stat-list"></div>
   </div>
+  <div class="wterm-meta-row" id="wterm-meta">— · —</div>
+  <div class="wterm-periods" id="wterm-periods">
+    <button class="wterm-pbtn" onclick="wtermSetPeriod(this,'7d')">7Д</button>
+    <button class="wterm-pbtn on" onclick="wtermSetPeriod(this,'1m')">1М</button>
+    <button class="wterm-pbtn" onclick="wtermSetPeriod(this,'3m')">3М</button>
+    <button class="wterm-pbtn" onclick="wtermSetPeriod(this,'6m')">6М</button>
+    <button class="wterm-pbtn" onclick="wtermSetPeriod(this,'all')">ВСЁ</button>
+  </div>
+  <div class="wterm-chart-wrap">
+    <canvas id="wterm-canvas" height="200" style="width:100%;display:block"></canvas>
+    <div class="wterm-tooltip" id="wterm-tooltip">
+      <div class="wterm-tt-val" id="wterm-tt-val"></div>
+      <div class="wterm-tt-date" id="wterm-tt-date"></div>
+    </div>
+  </div>
+  <div class="wterm-stats" id="wterm-stats"></div>
+  <div class="wterm-log" id="wterm-log"></div>
 </div>
 
 <!-- PP: Настройки плана по дням -->
@@ -2564,8 +2684,9 @@ function popPage(doRender=true){
   if(curPushPage==='pp-goals')_saveGoalsSilent();
   if(curPushPage==='pp-scanner')stopScanner(false);  // keep stream alive — no permission dialog
   if(curPushPage==='pp-weight-chart'){
-    const wrap=document.getElementById('wchart-svg-wrap');
-    if(wrap)wrap.innerHTML='';
+    const canvas=document.getElementById('wterm-canvas');
+    if(canvas){canvas._wdata=null;canvas._wvals=null;}
+    const tt=document.getElementById('wterm-tooltip');if(tt)tt.style.display='none';
   }
   const pp=document.getElementById(curPushPage);
   if(pp){
@@ -3342,109 +3463,244 @@ function fmtRange(a){
 let _tt;
 function toast(msg){/* toasts disabled */}
 
-/* ══ WEIGHT CHART ══ */
-function drawWeightChart(data){
-  const wrap=document.getElementById('wchart-svg-wrap');
-  const container=document.getElementById('wchart-container');
-  if(!wrap||!container)return;
-  data=[...data].sort((a,b)=>(a.logged_at||'').localeCompare(b.logged_at||''));
-  if(!data||data.length<2){
-    wrap.innerHTML=`<div style="text-align:center;padding:48px 16px;color:var(--hint);font-size:13px;font-weight:700">нет данных для графика<br><span style="font-size:11px;opacity:.6">запиши хотя бы 2 записи веса</span></div>`;
-    return;
-  }
-  const byDate=new Map();
-  data.forEach(d=>byDate.set(d.logged_at,d));
-  data=[...byDate.values()].sort((a,b)=>a.logged_at.localeCompare(b.logged_at));
-  const n=data.length;
-  const containerW=container.clientWidth||320;
-  const minColW=56;
-  const W=Math.max(containerW-4,n*minColW+40);
-  const H=160,PAD={l:36,r:16,t:32,b:28};
-  const chartW=W-PAD.l-PAD.r,chartH=H-PAD.t-PAD.b;
-  const ws=data.map(d=>d.weight);
-  const rawMin=Math.min(...ws),rawMax=Math.max(...ws);
-  const span=rawMax-rawMin||0.5;
-  const mn=rawMin-span*0.2,mx=rawMax+span*0.2,rng=mx-mn;
-  const xStep=n>1?chartW/(n-1):0;
-  const pts=data.map((d,i)=>({x:PAD.l+i*xStep,y:PAD.t+chartH*(1-(d.weight-mn)/rng),w:d.weight,d:d.logged_at}));
+/* ══ WEIGHT TERMINAL CHART ══ */
+let _wtermAllData=[], _wtermGoal=0, _wtermPeriod='1m';
+
+function _wtermFilterData(all, period){
+  if(!all||!all.length)return[];
+  const sorted=[...all].sort((a,b)=>a.logged_at.localeCompare(b.logged_at));
+  const now=new Date();
+  const cutoffs={'7d':7,'1m':31,'3m':92,'6m':183,'all':99999};
+  const days=cutoffs[period]||31;
+  const cut=new Date(now.getTime()-days*86400000);
+  const cutStr=cut.toISOString().slice(0,10);
+  const filtered=period==='all'?sorted:sorted.filter(d=>d.logged_at>=cutStr);
+  return filtered.length>=2?filtered:sorted;
+}
+
+function drawTerminalWeightChart(canvasId, data, goalVal){
+  const canvas=document.getElementById(canvasId);
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const PR=window.devicePixelRatio||1;
+  const W=canvas.parentElement.clientWidth||document.documentElement.clientWidth||360;
+  const H=200;
+  canvas.width=W*PR; canvas.height=H*PR;
+  canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  ctx.scale(PR,PR);
+  ctx.clearRect(0,0,W,H);
+
   const dark=document.body.classList.contains('tg-dark');
-  const accent='#FF6B35';
-  const hintC=dark?'rgba(255,255,255,0.3)':'rgba(0,0,0,0.28)';
-  const labelC=dark?'rgba(255,255,255,0.5)':'rgba(0,0,0,0.45)';
-  const bg2C=dark?'#181818':'#ffffff';
-  const gridC=dark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.06)';
-  function makePath(pts){
-    if(pts.length===1)return`M${pts[0].x},${pts[0].y}`;
-    let d=`M${pts[0].x},${pts[0].y}`;
-    for(let i=0;i<pts.length-1;i++){const cx=(pts[i].x+pts[i+1].x)/2;d+=` C${cx},${pts[i].y} ${cx},${pts[i+1].y} ${pts[i+1].x},${pts[i+1].y}`;}
-    return d;
+  const gridC=dark?'rgba(255,255,255,.05)':'rgba(0,0,0,.05)';
+  const labelC=dark?'rgba(255,255,255,.22)':'rgba(0,0,0,.28)';
+  const bgC=dark?'#111':'#fff';
+  const GREEN='#52C177';
+
+  const pad={top:18,right:44,bottom:26,left:40};
+  const cw=W-pad.left-pad.right, ch=H-pad.top-pad.bottom;
+
+  const vals=data.map(d=>d.weight||d.v||0);
+  let minV=Math.min(...vals,goalVal||999)-0.5;
+  let maxV=Math.max(...vals)+0.5;
+  const range=maxV-minV||1;
+  const px=i=>pad.left+(i/(data.length-1||1))*cw;
+  const py=v=>pad.top+(1-(v-minV)/range)*ch;
+
+  // Grid
+  for(let i=0;i<=4;i++){
+    const gv=minV+(range*i/4);
+    const gy=py(gv);
+    ctx.beginPath(); ctx.strokeStyle=gridC; ctx.lineWidth=1; ctx.setLineDash([]);
+    ctx.moveTo(pad.left,gy); ctx.lineTo(W-pad.right,gy); ctx.stroke();
+    ctx.fillStyle=labelC; ctx.font=`700 9px Onest,sans-serif`; ctx.textAlign='right';
+    ctx.fillText(gv.toFixed(1),pad.left-4,gy+3);
   }
-  const linePath=makePath(pts);
-  const fillPath=linePath+` L${pts[pts.length-1].x},${H-PAD.b+4} L${pts[0].x},${H-PAD.b+4} Z`;
-  const uid=Math.random().toString(36).slice(2,7);
-  const gradId='g'+uid,glowId='gw'+uid,clipId='cl'+uid;
-  const yLabels=[0.15,0.5,0.85].map(f=>{
-    const gy=PAD.t+chartH*f,val=mx-rng*f;
-    return`<text x="${PAD.l-4}" y="${gy+4}" text-anchor="end" font-family="Onest,sans-serif" font-size="8.5" font-weight="700" fill="${hintC}">${val.toFixed(1)}</text>
-    <line x1="${PAD.l}" y1="${gy}" x2="${W-PAD.r}" y2="${gy}" stroke="${gridC}" stroke-width="1" stroke-dasharray="3,3"/>`;
-  }).join('');
-  const lastIdx=pts.length-1;
-  const dotsHTML=pts.map((p,i)=>{
-    const isLast=i===lastIdx,r=isLast?5.5:3.5;
-    const lbX=Math.max(PAD.l+10,Math.min(W-PAD.r-10,p.x));
-    return`<circle cx="${p.x}" cy="${p.y}" r="${r}" fill="${accent}" opacity="${isLast?1:0.75}"/>
-    <circle cx="${p.x}" cy="${p.y}" r="${r-1.8}" fill="${bg2C}"/>
-    <text x="${lbX}" y="${p.y-9}" text-anchor="middle" font-family="Onest,sans-serif" font-size="${isLast?10:8.5}" font-weight="${isLast?900:700}" fill="${isLast?accent:labelC}">${p.w.toFixed(1)}</text>
-    <text x="${lbX}" y="${H-PAD.b+14}" text-anchor="middle" font-family="Onest,sans-serif" font-size="8" font-weight="600" fill="${hintC}">${fmtMD(p.d)}</text>`;
-  }).join('');
-  const lastPt=pts[lastIdx];
-  wrap.style.width=W+'px';wrap.style.minWidth=W+'px';wrap.style.display='block';
-  wrap.innerHTML=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="display:block;overflow:visible">
-  <defs>
-    <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="${accent}" stop-opacity="0.25"/>
-      <stop offset="100%" stop-color="${accent}" stop-opacity="0.02"/>
-    </linearGradient>
-    <filter id="${glowId}" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-    <clipPath id="${clipId}"><rect x="${PAD.l}" y="0" width="${chartW}" height="${H}"/></clipPath>
-  </defs>
-  ${yLabels}
-  <g clip-path="url(#${clipId})">
-    <path d="${fillPath}" fill="url(#${gradId})"/>
-    <path d="${linePath}" fill="none" stroke="${accent}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#${glowId})" opacity="0.5"/>
-    <path d="${linePath}" fill="none" stroke="${accent}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="${lastPt.x}" cy="${lastPt.y}" r="14" fill="${accent}" opacity="0.1">
-      <animate attributeName="r" values="10;16;10" dur="2.8s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="0.1;0.04;0.1" dur="2.8s" repeatCount="indefinite"/>
-    </circle>
-  </g>
-  ${dotsHTML}
-</svg>`;
-  setTimeout(()=>{container.scrollLeft=container.scrollWidth;},60);
+
+  // Goal dashed line
+  if(goalVal&&goalVal>0&&goalVal>=minV&&goalVal<=maxV){
+    const gy=py(goalVal);
+    ctx.beginPath(); ctx.strokeStyle='rgba(255,107,53,.35)'; ctx.lineWidth=1.5; ctx.setLineDash([5,4]);
+    ctx.moveTo(pad.left,gy); ctx.lineTo(W-pad.right,gy); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle='rgba(255,107,53,.7)'; ctx.font=`700 9px Onest`; ctx.textAlign='left';
+    ctx.fillText('цель',W-pad.right+3,gy+3);
+  }
+
+  if(data.length<2){ctx.setLineDash([]);return;}
+
+  // Area gradient
+  const grad=ctx.createLinearGradient(0,pad.top,0,H-pad.bottom);
+  grad.addColorStop(0,'rgba(82,193,119,.22)'); grad.addColorStop(1,'rgba(82,193,119,.0)');
+  ctx.beginPath();
+  ctx.moveTo(px(0),py(vals[0]));
+  for(let i=1;i<data.length;i++){
+    const x0=px(i-1),y0=py(vals[i-1]),x1=px(i),y1=py(vals[i]),cpx=(x0+x1)/2;
+    ctx.bezierCurveTo(cpx,y0,cpx,y1,x1,y1);
+  }
+  ctx.lineTo(px(data.length-1),H-pad.bottom);
+  ctx.lineTo(pad.left,H-pad.bottom);
+  ctx.closePath(); ctx.fillStyle=grad; ctx.fill();
+
+  // Line
+  ctx.beginPath(); ctx.strokeStyle=GREEN; ctx.lineWidth=2.5; ctx.lineJoin='round'; ctx.lineCap='round'; ctx.setLineDash([]);
+  ctx.moveTo(px(0),py(vals[0]));
+  for(let i=1;i<data.length;i++){
+    const x0=px(i-1),y0=py(vals[i-1]),x1=px(i),y1=py(vals[i]),cpx=(x0+x1)/2;
+    ctx.bezierCurveTo(cpx,y0,cpx,y1,x1,y1);
+  }
+  ctx.stroke();
+
+  // Current value horizontal line
+  const lastX=px(data.length-1),lastY=py(vals[vals.length-1]);
+  ctx.beginPath(); ctx.strokeStyle='rgba(82,193,119,.22)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+  ctx.moveTo(pad.left,lastY); ctx.lineTo(W-pad.right,lastY); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle='rgba(82,193,119,.85)'; ctx.font=`700 9px Onest,sans-serif`; ctx.textAlign='left';
+  ctx.fillText(vals[vals.length-1].toFixed(1),W-pad.right+3,lastY+3);
+
+  // Dots
+  data.forEach((d,i)=>{
+    const isLast=i===data.length-1;
+    const x=px(i),y=py(vals[i]),r=isLast?5:3;
+    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+    ctx.fillStyle=isLast?GREEN:GREEN+'90'; ctx.fill();
+    if(isLast){
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+      ctx.strokeStyle=bgC; ctx.lineWidth=2; ctx.stroke();
+    }
+  });
+
+  // X labels
+  ctx.fillStyle=labelC; ctx.font=`600 9px Onest,sans-serif`; ctx.textAlign='center';
+  const step=Math.max(1,Math.floor(data.length/5));
+  data.forEach((d,i)=>{
+    if(i%step===0||i===data.length-1){
+      ctx.fillText(_wtermFmtDate(d.logged_at||d.d||''),px(i),H-pad.bottom+14);
+    }
+  });
+
+  // Store for crosshair
+  canvas._wdata=data; canvas._wvals=vals; canvas._wpad=pad; canvas._wcw=cw; canvas._wch=ch; canvas._wrange={minV,maxV,range};
+}
+
+function _wtermFmtDate(s){
+  if(!s)return'';
+  if(s.includes('-')){const p=s.split('-');return p[2]+'.'+p[1];}
+  return s;
+}
+
+function _wtermInitCrosshair(){
+  const canvas=document.getElementById('wterm-canvas');
+  const tooltip=document.getElementById('wterm-tooltip');
+  if(!canvas||!tooltip)return;
+
+  function handleMove(cx,cy){
+    const d=canvas._wdata;if(!d||!d.length)return;
+    const rect=canvas.getBoundingClientRect();
+    const x=cx-rect.left;
+    const {_wpad:p,_wcw:cw,_wvals:vals}=canvas;
+    if(!p)return;
+    const idx=Math.round((x-p.left)/cw*(d.length-1));
+    const ci=Math.max(0,Math.min(d.length-1,idx));
+    const item=d[ci];
+    document.getElementById('wterm-tt-val').textContent=(vals[ci]||0).toFixed(1)+' кг';
+    document.getElementById('wterm-tt-date').textContent=_wtermFmtDate(item.logged_at||item.d||'');
+    const dotX=p.left+(ci/(d.length-1||1))*cw;
+    const lim=Math.min(Math.max(dotX,60),(canvas.offsetWidth||300)-60);
+    tooltip.style.left=lim+'px';tooltip.style.display='block';
+  }
+
+  canvas.addEventListener('mousemove',e=>handleMove(e.clientX,e.clientY));
+  canvas.addEventListener('touchmove',e=>{e.preventDefault();handleMove(e.touches[0].clientX,e.touches[0].clientY);},{passive:false});
+  canvas.addEventListener('mouseleave',()=>tooltip.style.display='none');
+  canvas.addEventListener('touchend',()=>setTimeout(()=>tooltip.style.display='none',1500));
+}
+
+function wtermSetPeriod(btn,period){
+  document.querySelectorAll('.wterm-pbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  _wtermPeriod=period;
+  const filtered=_wtermFilterData(_wtermAllData,period);
+  requestAnimationFrame(()=>{
+    drawTerminalWeightChart('wterm-canvas',filtered,_wtermGoal);
+    _wtermRenderLog(_wtermAllData);
+  });
+}
+
+function _wtermRenderLog(all){
+  const logEl=document.getElementById('wterm-log');
+  if(!logEl)return;
+  if(!all||!all.length){logEl.innerHTML='';return;}
+  const sorted=[...all].sort((a,b)=>b.logged_at.localeCompare(a.logged_at)).slice(0,15);
+  let html=`<div class="wterm-log-hdr">ИСТОРИЯ</div>`;
+  sorted.forEach((d,i)=>{
+    const prev=sorted[i+1];
+    const delta=prev?(d.weight-prev.weight):0;
+    const sign=delta<0?'neg':delta>0?'pos':'zero';
+    const dStr=delta===0?'—':(delta>0?'+':'')+delta.toFixed(1);
+    const isToday=d.logged_at===new Date().toISOString().slice(0,10);
+    html+=`<div class="wterm-log-item">
+      <span class="wterm-log-date">${_wtermFmtDate(d.logged_at)}${isToday?' <span style="color:var(--sun);font-size:9px">сег</span>':''}</span>
+      <span class="wterm-log-val">${(d.weight||0).toFixed(1)} кг</span>
+      <span class="wterm-log-d ${sign}">${dStr}</span>
+    </div>`;
+  });
+  logEl.innerHTML=html;
 }
 
 function _populateWeightChart(){
   const wl=gWL();
-  const data=wl.length>30?wl.slice(-30):wl;
-  const sub=document.getElementById('wc-sub');
-  if(sub)sub.textContent=data.length+' записей · последние '+Math.min(30,data.length)+' дней';
-  const statEl=document.getElementById('wc-stat-list');
-  if(statEl&&wl.length){
+  const u=gU();
+  _wtermAllData=[...wl].sort((a,b)=>a.logged_at.localeCompare(b.logged_at));
+  _wtermGoal=u.goal_weight||0;
+
+  // Header: ticker price + change
+  const priceEl=document.getElementById('wterm-price');
+  const changeEl=document.getElementById('wterm-change');
+  const metaEl=document.getElementById('wterm-meta');
+
+  if(wl.length){
     const cw=wl[wl.length-1].weight;
-    const sw=Math.max(...wl.map(d=>d.weight));
-    const best=Math.min(...wl.map(d=>d.weight));
-    const gw=gU().goal_weight;
-    statEl.innerHTML=`<div class="sb-row">
-      <div class="sbox"><div class="sv" style="color:var(--sun)">${cw.toFixed(1)}</div><div class="sl">сейчас кг</div></div>
-      <div class="sbox"><div class="sv" style="color:var(--red)">${sw.toFixed(1)}</div><div class="sl">макс кг</div></div>
-      <div class="sbox"><div class="sv" style="color:var(--green)">${best.toFixed(1)}</div><div class="sl">мин кг</div></div>
-      ${gw?`<div class="sbox"><div class="sv" style="color:var(--water)">${gw.toFixed(1)}</div><div class="sl">цель кг</div></div>`:''}
-    </div>`;
+    const sw=wl[0]?wl[0].weight:cw;
+    const delta=+(cw-sw).toFixed(1);
+    if(priceEl)priceEl.textContent=cw.toFixed(1);
+    if(changeEl){
+      changeEl.textContent=delta===0?'0.0':(delta<0?'▼ ':delta>0?'▲ ':'')+Math.abs(delta).toFixed(1);
+      changeEl.className='wterm-change '+(delta<0?'up':delta>0?'down':'neutral');
+    }
+    if(metaEl){
+      const cnt=wl.length;
+      const recDate=_wtermFmtDate(wl[wl.length-1].logged_at);
+      metaEl.textContent=`СЕГОДНЯ · ${cnt} ${cnt===1?'ЗАПИСЬ':cnt<5?'ЗАПИСИ':'ЗАПИСЕЙ'}`;
+    }
+  } else {
+    if(priceEl)priceEl.textContent='—';
+    if(changeEl){changeEl.textContent='—';changeEl.className='wterm-change neutral';}
+    if(metaEl)metaEl.textContent='НЕТ ДАННЫХ';
   }
-  requestAnimationFrame(()=>requestAnimationFrame(()=>drawWeightChart(data)));
+
+  // Stats bar
+  const statsEl=document.getElementById('wterm-stats');
+  if(statsEl&&wl.length){
+    const cw=wl[wl.length-1].weight;
+    const maxW=Math.max(...wl.map(d=>d.weight));
+    const minW=Math.min(...wl.map(d=>d.weight));
+    const gw=_wtermGoal;
+    statsEl.innerHTML=`
+      <div class="wterm-stat"><div class="wterm-stat-lbl">сейчас</div><div class="wterm-stat-val" style="color:var(--sun)">${cw.toFixed(1)}</div></div>
+      <div class="wterm-stat"><div class="wterm-stat-lbl">макс</div><div class="wterm-stat-val" style="color:var(--red)">${maxW.toFixed(1)}</div></div>
+      <div class="wterm-stat"><div class="wterm-stat-lbl">мин</div><div class="wterm-stat-val" style="color:var(--green)">${minW.toFixed(1)}</div></div>
+      ${gw?`<div class="wterm-stat"><div class="wterm-stat-lbl">цель</div><div class="wterm-stat-val" style="color:var(--water)">${gw.toFixed(1)}</div></div>`:''}
+    `;
+  } else if(statsEl){statsEl.innerHTML='';}
+
+  // Log
+  _wtermRenderLog(_wtermAllData);
+
+  // Draw chart
+  const filtered=_wtermFilterData(_wtermAllData,_wtermPeriod);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    drawTerminalWeightChart('wterm-canvas',filtered,_wtermGoal);
+    _wtermInitCrosshair();
+  }));
 }
 
 /* ══ RENDERS ══ */
@@ -3713,9 +3969,13 @@ function renderHomeBento(){
 function renderTrack(tab){if(tab==='water')renderWater();else renderCal();}
 function renderWater(){
   const u=gU(),wd=gWD();
-  const wt=wd.total||0,wg=u.water_goal||2000,wp=Math.min(100,Math.round(wt/wg*100));
+  const wt=wd.total||0,wg=u.water_goal||2000,wp=Math.min(1,wt/wg);
   T('w-total',wt);T('w-goal',wg);
-  requestAnimationFrame(()=>{const b=$('w-bar');if(b)b.style.width=wp+'%';});
+  const CIRC=540.4; // 2*pi*86
+  requestAnimationFrame(()=>{
+    const arc=document.getElementById('wtr-arc');
+    if(arc)arc.style.strokeDashoffset=(CIRC*(1-wp)).toFixed(2);
+  });
   const st=gStreak();
   H('w-streak',st>=2?`<div style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,107,53,.1);color:var(--sun);padding:4px 12px;border-radius:99px;font-size:11px;font-weight:800">🔥 ${st} дней подряд</div>`:'');
 }
@@ -4304,6 +4564,17 @@ document.addEventListener('DOMContentLoaded',async()=>{
   });
   // Предзагрузка камеры при первом касании кнопки сканера
   document.querySelector('[onclick*="pp-scanner"]')?.addEventListener('touchstart',_prewarmCamera,{once:true,passive:true});
+  // Redraw terminal weight chart on resize
+  let _wtermResizeTO=0;
+  window.addEventListener('resize',()=>{
+    clearTimeout(_wtermResizeTO);
+    _wtermResizeTO=setTimeout(()=>{
+      if(curPushPage==='pp-weight-chart'){
+        const filtered=_wtermFilterData(_wtermAllData,_wtermPeriod);
+        requestAnimationFrame(()=>drawTerminalWeightChart('wterm-canvas',filtered,_wtermGoal));
+      }
+    },120);
+  });
 });
 </script>
 </body>
