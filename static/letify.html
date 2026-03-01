@@ -23,7 +23,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
+* { -webkit-font-smoothing: antialiased; text-rendering: optimizeSpeed; }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+button,a,[onclick]{touch-action:manipulation;}
 :root{
   --bg:#FAF7F2;--bg2:#fff;--bg3:rgba(0,0,0,.05);
   --text:#1C1608;--hint:#A89F90;--brd:rgba(0,0,0,.07);
@@ -77,6 +79,8 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   opacity:0;pointer-events:none;
   transform:translateY(6px);
   transition:opacity .2s ease,transform .2s ease;
+  contain:strict;
+  will-change:opacity,transform;
 }
 .page::-webkit-scrollbar{display:none}
 .page.active{opacity:1;pointer-events:all;transform:none}
@@ -95,6 +99,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   display:flex;flex-direction:column;
   backface-visibility:hidden;-webkit-backface-visibility:hidden;
   will-change:opacity,transform;
+  contain:layout;
 }
 .push-page::-webkit-scrollbar{display:none}
 .push-page.open{opacity:1;transform:translateX(0);pointer-events:all}
@@ -120,6 +125,8 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   flex:1;overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;scrollbar-width:none;
   padding:16px;padding-bottom:calc(var(--sb) + 24px);
+  will-change:scroll-position;
+  transform:translateZ(0);
 }
 .pp-body::-webkit-scrollbar{display:none}
 
@@ -204,7 +211,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   width:50px;height:50px;border-radius:16px;
   display:flex;align-items:center;justify-content:center;
   cursor:pointer;color:var(--hint);
-  transition:color .15s ease-out,background .15s ease-out,transform .2s ease-out;
+  transition:color .12s ease,background .12s ease;
 }
 .nt.on{color:var(--sun);background:rgba(255,107,53,.1)}
 .nt:active{transform:scale(.96);transition:transform .08s ease}
@@ -236,7 +243,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 /* ══ PROGRESS BAR ══ */
 .pb{height:6px;background:rgba(0,0,0,.06);border-radius:99px;overflow:hidden;margin-top:10px}
-.pbf{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.34,1.1,.64,1)}
+.pbf{height:100%;border-radius:99px;transition:width .7s cubic-bezier(.25,.46,.45,.94);will-change:width}
 .pb-sun{background:linear-gradient(90deg,var(--sun),var(--sun2))}
 .pb-water{background:var(--water)}
 .pb-sleep{background:var(--sleep)}
@@ -276,7 +283,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .hl-metric-of{font-size:11px;font-weight:700;color:var(--hint);margin-left:2px}
 .hl-bar{height:6px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden}
 .tg-dark .hl-bar{background:rgba(255,255,255,.1)}
-.hl-bar-fill{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.34,1.1,.64,1)}
+.hl-bar-fill{height:100%;border-radius:99px;transition:width .7s cubic-bezier(.25,.46,.45,.94);will-change:width}
 .hl-metric-footer{display:flex;justify-content:space-between;align-items:center;margin-top:5px;min-height:16px}
 .hl-macros{display:flex;gap:5px}
 .hl-mac{font-size:9px;font-weight:800}
@@ -316,7 +323,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .hb-days-n{font-size:20px;font-weight:900;color:var(--sun);letter-spacing:-.04em;line-height:1}
 .hb-days-l{font-size:8px;font-weight:700;color:rgba(255,107,53,.65);text-transform:uppercase;letter-spacing:.06em}
 .hb-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:7px;min-height:0}
-.hb-card{background:var(--bg2);border-radius:18px;padding:12px;border:1px solid var(--brd);display:flex;flex-direction:column;cursor:pointer;transition:opacity .12s;overflow:hidden}
+.hb-card{background:var(--bg2);border-radius:18px;padding:12px;border:1px solid var(--brd);display:flex;flex-direction:column;cursor:pointer;transition:opacity .12s;overflow:hidden;contain:layout style}
 .hb-card:active{opacity:.7}
 .tg-dark .hb-card{background:rgba(255,255,255,.07)}
 .hb-full{grid-column:1/-1}
@@ -488,15 +495,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .pav{width:64px;height:64px;border-radius:20px;background:linear-gradient(135deg,var(--sun),var(--sun2));display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;color:#fff;box-shadow:0 5px 18px rgba(255,107,53,.25);flex-shrink:0}
 
 /* ══ TOAST ══ */
-#toast{
-  position:fixed;bottom:calc(var(--nav-h) + 12px);left:50%;
-  transform:translateX(-50%) translateY(8px);
-  background:rgba(28,22,14,.9);color:#fff;
-  padding:9px 18px;border-radius:99px;font-size:13px;font-weight:800;
-  white-space:nowrap;z-index:9998;opacity:0;pointer-events:none;
-  transition:opacity .18s,transform .18s cubic-bezier(.34,1.2,.64,1);
-}
-#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* toast removed */
 
 /* ══ TYPE GRID ══ */
 .type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
@@ -1166,7 +1165,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .cal-meal-kcal{font-size:15px;font-weight:900}
 .cal-meal-cnt{font-size:10px;font-weight:700;color:var(--hint)}
 .cal-meal-pbar{height:3px;background:rgba(255,255,255,.09);border-radius:99px;overflow:hidden}
-.cal-meal-pbar-f{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.34,1.1,.64,1)}
+.cal-meal-pbar-f{height:100%;border-radius:99px;transition:width .7s cubic-bezier(.25,.46,.45,.94);will-change:width}
 </style>
 </head>
 <body>
@@ -1237,7 +1236,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
         </div>
         <div class="cal-hero-mac">
           <div class="cal-hero-mac-v" id="c-carb" style="color:var(--sleep)">0г</div>
-          <div class="cal-hero-mac-l">углев.</div>
+          <div class="cal-hero-mac-l">углев</div>
         </div>
       </div>
     </div>
@@ -1274,7 +1273,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       </div>
       <svg width="44" height="44" viewBox="0 0 52 52">
         <circle cx="26" cy="26" r="20" fill="none" stroke="rgba(255,107,53,.12)" stroke-width="4.5"/>
-        <circle cx="26" cy="26" r="20" fill="none" stroke="var(--sun)" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="125.7" id="pl-ring" stroke-dashoffset="125.7" transform="rotate(-90 26 26)" style="transition:stroke-dashoffset .6s cubic-bezier(.34,1.1,.64,1)"/>
+        <circle cx="26" cy="26" r="20" fill="none" stroke="var(--sun)" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="125.7" id="pl-ring" stroke-dashoffset="125.7" transform="rotate(-90 26 26)" style="transition:stroke-dashoffset .6s cubic-bezier(.25,.46,.45,.94)"/>
       </svg>
     </div>
   </div>
@@ -1720,7 +1719,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
           <div class="md-leg-dot" style="background:#8B7FD4;box-shadow:0 0 6px rgba(139,127,212,.5)"></div>
           <div>
             <div class="md-leg-v" style="color:#8B7FD4" id="md-carb">0г</div>
-            <div class="md-leg-l">углев.</div>
+            <div class="md-leg-l">углев</div>
           </div>
         </div>
       </div>
@@ -1931,8 +1930,8 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
             <div class="dp-t-weight"></div>
           </div>
         </div>
-        <div class="dp-name">Классический</div>
-        <div class="dp-desc">Три дуговых кольца с прогрессом</div>
+        <div class="dp-name">классический</div>
+        <div class="dp-desc">три дуговых кольца с прогрессом</div>
       </div>
 
       <!-- Linear -->
@@ -1963,8 +1962,8 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
             <div class="dp-t-weight" style="margin-top:5px"></div>
           </div>
         </div>
-        <div class="dp-name">Линейный</div>
-        <div class="dp-desc">Прогресс-бары в одной карточке</div>
+        <div class="dp-name">линейный</div>
+        <div class="dp-desc">прогресс-бары в одной карточке</div>
       </div>
 
       <!-- Bento — full width -->
@@ -1988,20 +1987,20 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
           </div>
         </div>
         <div>
-          <div class="dp-name">Бенто</div>
-          <div class="dp-desc">Сетка карточек с максимумом данных на экране без прокрутки</div>
+          <div class="dp-name">бенто</div>
+          <div class="dp-desc">сетка карточек с максимумом данных на экране без прокрутки</div>
         </div>
       </div>
 
     </div>
     <div style="background:rgba(255,107,53,.07);border:1px solid rgba(255,107,53,.15);border-radius:14px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start">
       <iconify-icon icon="solar:info-circle-bold" width="18" style="color:var(--sun);flex-shrink:0;margin-top:1px"></iconify-icon>
-      <div style="font-size:12px;font-weight:600;color:rgba(255,107,53,.8);line-height:1.5">Изменение сразу применяется к главному экрану. Все данные остаются на месте.</div>
+      <div style="font-size:12px;font-weight:600;color:rgba(255,107,53,.8);line-height:1.5">изменение сразу применяется к главному экрану — все данные остаются на месте</div>
     </div>
   </div>
 </div>
 
-<div id="toast"></div>
+
 
 <!-- PP: История воды -->
 <div class="push-page" id="pp-water-hist">
@@ -2209,7 +2208,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
           <div class="sc-mac-box">
             <span class="sc-mac-ico">🌾</span>
             <div class="sc-mac-v" id="sc-carb" style="color:var(--sleep)">—</div>
-            <div class="sc-mac-l">углев.</div>
+            <div class="sc-mac-l">углев</div>
           </div>
         </div>
       </div>
@@ -2290,7 +2289,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
             <iconify-icon icon="solar:sun-2-bold" style="font-size:20px;color:var(--sun2)"></iconify-icon>
           </div>
           <div>
-            <div class="sc-meal-name">Завтрак</div>
+            <div class="sc-meal-name">завтрак</div>
             <div class="sc-meal-time">7:00–10:00</div>
           </div>
         </div>
@@ -2299,7 +2298,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
             <iconify-icon icon="solar:sun-bold" style="font-size:20px;color:var(--water)"></iconify-icon>
           </div>
           <div>
-            <div class="sc-meal-name">Обед</div>
+            <div class="sc-meal-name">обед</div>
             <div class="sc-meal-time">12:00–15:00</div>
           </div>
         </div>
@@ -2308,7 +2307,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
             <iconify-icon icon="solar:moon-stars-bold" style="font-size:20px;color:var(--sleep)"></iconify-icon>
           </div>
           <div>
-            <div class="sc-meal-name">Ужин</div>
+            <div class="sc-meal-name">ужин</div>
             <div class="sc-meal-time">18:00–21:00</div>
           </div>
         </div>
@@ -2317,7 +2316,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
             <iconify-icon icon="solar:leaf-bold" style="font-size:20px;color:var(--green)"></iconify-icon>
           </div>
           <div>
-            <div class="sc-meal-name">Перекус</div>
+            <div class="sc-meal-name">перекус</div>
             <div class="sc-meal-time">между едой</div>
           </div>
         </div>
@@ -2932,7 +2931,7 @@ function renderMealDetail(){
 }
 function clearMealEntries(){
   if(!_currentMealKey)return;
-  if(!confirm('Очистить все записи?'))return;
+  if(!confirm('очистить все записи?'))return;
   lsSet('meal_entries_'+TODAY+'_'+_currentMealKey,[]);
   if(C.calories)C.calories[_currentMealKey]=0;
   if(!UID)lsSet('cd_'+TODAY,C.calories||{});
@@ -3203,7 +3202,7 @@ function resetAllData(){
   const keys=Object.keys(localStorage).filter(k=>k.startsWith('lf2_'));
   keys.forEach(k=>{try{localStorage.removeItem(k);}catch{}});
   // Reset in-memory
-  const name=tgUser?.first_name||'Гость';
+  const name=tgUser?.first_name||'гость';
   C={
     user:{name,height:0,age:0,start_weight:0,goal_weight:0,water_goal:2000,cal_goal:2000,gender:'male',goal_type:'lose'},
     settings:{show_weight:1,show_water:1,show_calories:1,show_sleep:1},
@@ -3338,7 +3337,7 @@ function fmtRange(a){
 }
 
 let _tt;
-function toast(msg){const el=$('toast');if(!el)return;el.textContent=msg;el.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),1800);}
+function toast(msg){/* toasts disabled */}
 
 /* ══ WEIGHT CHART ══ */
 function drawWeightChart(data){
@@ -3538,18 +3537,18 @@ function renderHomeClassic(){
 <div class="pad gap"><div class="card" style="padding:16px 6px 12px">
   <div style="display:flex;justify-content:space-around;align-items:center">
     <div style="text-align:center;cursor:pointer" onclick="navTo('track')">
-      <div class="aw"><svg width="68" height="68" viewBox="0 0 68 68"><circle cx="34" cy="34" r="26" fill="none" stroke="rgba(78,174,229,.15)" stroke-width="5"/><circle cx="34" cy="34" r="26" fill="none" stroke="var(--water)" stroke-width="5" stroke-linecap="round" stroke-dasharray="163.4" stroke-dashoffset="${arcW}" transform="rotate(-90 34 34)" style="transition:stroke-dashoffset .9s cubic-bezier(.34,1.1,.64,1)"/></svg>
+      <div class="aw"><svg width="68" height="68" viewBox="0 0 68 68"><circle cx="34" cy="34" r="26" fill="none" stroke="rgba(78,174,229,.15)" stroke-width="5"/><circle cx="34" cy="34" r="26" fill="none" stroke="var(--water)" stroke-width="5" stroke-linecap="round" stroke-dasharray="163.4" stroke-dashoffset="${arcW}" transform="rotate(-90 34 34)" style="transition:stroke-dashoffset .8s cubic-bezier(.25,.46,.45,.94)"/></svg>
       <div class="ai"><div style="font-size:13px;font-weight:900;color:var(--water)">${Math.round(wp*100)}%</div></div></div>
       <div style="font-size:11px;font-weight:900;margin-top:4px">${wt}</div><div class="t5" style="font-size:10px">мл</div>
     </div>
     <div style="text-align:center;cursor:pointer" onclick="navTo('track')">
-      <div class="aw"><svg width="82" height="82" viewBox="0 0 82 82"><circle cx="41" cy="41" r="33" fill="none" stroke="rgba(244,129,74,.15)" stroke-width="6"/><circle cx="41" cy="41" r="33" fill="none" stroke="var(--cal)" stroke-width="6" stroke-linecap="round" stroke-dasharray="207.3" stroke-dashoffset="${arcC}" transform="rotate(-90 41 41)" style="transition:stroke-dashoffset .9s cubic-bezier(.34,1.1,.64,1)"/></svg>
+      <div class="aw"><svg width="82" height="82" viewBox="0 0 82 82"><circle cx="41" cy="41" r="33" fill="none" stroke="rgba(244,129,74,.15)" stroke-width="6"/><circle cx="41" cy="41" r="33" fill="none" stroke="var(--cal)" stroke-width="6" stroke-linecap="round" stroke-dasharray="207.3" stroke-dashoffset="${arcC}" transform="rotate(-90 41 41)" style="transition:stroke-dashoffset .8s cubic-bezier(.25,.46,.45,.94)"/></svg>
       <div class="ai"><div style="font-size:15px;font-weight:900;color:var(--cal)">${Math.round(cp*100)}%</div></div></div>
       <div style="font-size:13px;font-weight:900;margin-top:4px">${ct}</div><div class="t5" style="font-size:10px">ккал</div>
       <div style="margin-top:4px;display:flex;gap:4px;justify-content:center">${macHtml}</div>
     </div>
     <div style="text-align:center;cursor:pointer" onclick="navTo('sleep')">
-      <div class="aw"><svg width="68" height="68" viewBox="0 0 68 68"><circle cx="34" cy="34" r="26" fill="none" stroke="rgba(139,127,212,.15)" stroke-width="5"/><circle cx="34" cy="34" r="26" fill="none" stroke="var(--sleep)" stroke-width="5" stroke-linecap="round" stroke-dasharray="163.4" stroke-dashoffset="${arcS}" transform="rotate(-90 34 34)" style="transition:stroke-dashoffset .9s cubic-bezier(.34,1.1,.64,1)"/></svg>
+      <div class="aw"><svg width="68" height="68" viewBox="0 0 68 68"><circle cx="34" cy="34" r="26" fill="none" stroke="rgba(139,127,212,.15)" stroke-width="5"/><circle cx="34" cy="34" r="26" fill="none" stroke="var(--sleep)" stroke-width="5" stroke-linecap="round" stroke-dasharray="163.4" stroke-dashoffset="${arcS}" transform="rotate(-90 34 34)" style="transition:stroke-dashoffset .8s cubic-bezier(.25,.46,.45,.94)"/></svg>
       <div class="ai"><div style="font-size:13px;font-weight:900;color:var(--sleep)">${sleepH}</div></div></div>
       <div class="sq" style="justify-content:center;margin-top:4px">${sqHtml}</div><div class="t5" style="font-size:10px;margin-top:2px">часов</div>
     </div>
