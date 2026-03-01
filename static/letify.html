@@ -162,12 +162,13 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .m3-seg-emoji .m3-seg-btn{font-size:22px;padding:7px 4px}
 
 /* ══ STEPPER ══ */
-.stepper-wrap{display:flex;align-items:center;gap:0;background:var(--bg3);border-radius:16px;overflow:hidden}
+.stepper-wrap{display:flex;align-items:center;gap:0;background:var(--bg3);border-radius:16px}
 .stepper-btn{
   width:56px;height:64px;background:transparent;border:none;cursor:pointer;
   font-size:26px;font-weight:700;color:var(--hint);font-family:inherit;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
-  transition:background .18s ease,opacity .18s ease,transform .15s ease;-webkit-tap-highlight-color:transparent;
+  transition:transform .12s ease;-webkit-tap-highlight-color:transparent;
+  -webkit-touch-callout:none;outline:none;
 }
 .stepper-val{
   flex:1;text-align:center;font-size:38px;font-weight:700;letter-spacing:-.02em;
@@ -469,9 +470,9 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tg-dark #nav{background:rgba(20,14,8,.96);border-color:rgba(255,255,255,.1)}
 .tg-dark .empty svg{opacity:.15}
 .tg-dark .banner::after{opacity:.5}
-.stepper-btn{transition:opacity .18s ease,transform .15s ease,background .15s ease}
-.stepper-btn:active{background:rgba(0,0,0,.06) !important;transform:scale(.9);opacity:.55;transition:opacity .07s ease,transform .07s ease,background .07s ease}
-.tg-dark .stepper-btn:active{background:rgba(255,255,255,.08) !important}
+.stepper-btn{transition:transform .12s ease}
+.stepper-btn:active{background:transparent !important;transform:scale(.78);transition:transform .06s ease}
+.tg-dark .stepper-btn:active{background:transparent !important}
 .btn-water:active{opacity:.75 !important}
 
 /* ══ CLEAR BTN HINT ══ */
@@ -1850,7 +1851,12 @@ async function loadData(){
     const d=await r.json();
     C.user=d.user||C.user;C.settings=d.settings||C.settings;
     C.water=d.water||C.water;C.calories=d.calories||C.calories;
-    C.macros=d.macros||lsGet('macros_'+TODAY)||{prot:0,fat:0,carb:0};
+    // Macros: server may return zeros — always merge with localStorage
+    const srvMac=d.macros||{prot:0,fat:0,carb:0};
+    const lsMac=lsGet('macros_'+TODAY)||{prot:0,fat:0,carb:0};
+    const sumSrv=(srvMac.prot||0)+(srvMac.fat||0)+(srvMac.carb||0);
+    const sumLs=(lsMac.prot||0)+(lsMac.fat||0)+(lsMac.carb||0);
+    C.macros=sumLs>=sumSrv?lsMac:srvMac;
     C.weight_log=d.weight_log||[];C.sleep_log=d.sleep_log||[];
     C.acts_today=d.acts_today||[];C.products=d.products||[];
     // ALWAYS restore start_weight/goal_type from localStorage — it is the authoritative source
@@ -2267,8 +2273,9 @@ function openMealDetail(mealType){
   T('md-title',m.i+' '+m.n);
   T('md-subtitle','сегодня');
   const el=$('md-ico');if(el)el.textContent=m.i;
-  renderMealDetail();
   pushPage('pp-meal-detail');
+  // Render after page animation starts to avoid jank
+  requestAnimationFrame(()=>requestAnimationFrame(()=>renderMealDetail()));
   tg?.HapticFeedback?.selectionChanged();
 }
 function renderMealDetail(){
@@ -2665,7 +2672,7 @@ async function submitCal(){
   const entry={id:Date.now(),desc:desc||'ручной ввод',kcal:_calVal,prot,fat,carb,grams:w,ts:new Date().toISOString()};
   const key='meal_entries_'+TODAY+'_'+_mealTypeE;
   const existing=lsGet(key)||[];existing.push(entry);lsSet(key,existing);
-  if(!UID){lsSet('cd_'+TODAY,C.calories);lsSet('macros_'+TODAY,C.macros);}
+  if(!UID){lsSet('cd_'+TODAY,C.calories);}lsSet('macros_'+TODAY,C.macros);
   renderTrack('cal');renderHome();toast('+'+_calVal+' ккал');tg?.HapticFeedback?.notificationOccurred('success');
   await apiPost('/api/calories',{amount:_calVal,meal_type:_mealTypeE,description:desc,prot,fat,carb});await reload();
 }
@@ -3368,10 +3375,14 @@ async function submitScanned(){
   C.macros.prot=+(( C.macros.prot||0)+prot).toFixed(1);
   C.macros.fat=+((C.macros.fat||0)+fat).toFixed(1);
   C.macros.carb=+((C.macros.carb||0)+carb).toFixed(1);
-  if(!UID){lsSet('cd_'+TODAY,C.calories);lsSet('macros_'+TODAY,C.macros);}
+  if(!UID){lsSet('cd_'+TODAY,C.calories);}lsSet('macros_'+TODAY,C.macros);
   renderTrack('cal');renderHome();
   toast('+'+kcal+' ккал · '+desc);
   tg?.HapticFeedback?.notificationOccurred('success');
+  // Also save meal entry for detail screen
+  const scEntry={id:Date.now(),desc:desc,kcal,prot,fat,carb,grams:_scGrams,ts:new Date().toISOString()};
+  const scKey='meal_entries_'+TODAY+'_'+_scMealType;
+  const scExisting=lsGet(scKey)||[];scExisting.push(scEntry);lsSet(scKey,scExisting);
   navTo('track');setTTab('cal');
   await apiPost('/api/calories',{amount:kcal,meal_type:_scMealType,description:desc,prot,fat,carb});
   await reload();
