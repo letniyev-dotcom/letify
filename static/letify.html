@@ -640,123 +640,18 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .m3-tog-lbl{flex:1;font-size:14px;font-weight:700}
 .tg-dark .m3-tog-row{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08)}
 
-/* ══ WEIGHT CHART push page v2 ══ */
-#pp-weight-chart{display:flex;flex-direction:column;overflow:hidden}
-#pp-weight-chart .pp-body{display:none}
-#pp-weight-chart .pp-hdr{background:var(--bg);border-bottom:none;padding-top:calc(var(--st) + 6px);padding-bottom:6px}
-/* Floating back button over chart */
-#wc-back-btn{
-  position:absolute;top:calc(var(--st) + 10px);left:12px;z-index:30;
-  width:38px;height:38px;border-radius:13px;
-  background:var(--bg3);border:none;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  color:var(--text);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  transition:transform .1s,opacity .1s;
-}
-.tg-env #wc-back-btn{display:none !important}
-#wc-back-btn:active{transform:scale(.93);opacity:.7}
-/* Download button */
-#wc-dl-btn{
-  position:absolute;top:calc(var(--st) + 10px);right:12px;z-index:30;
-  height:38px;padding:0 14px;border-radius:13px;
-  background:var(--bg3);border:none;cursor:pointer;
-  display:flex;align-items:center;gap:6px;
-  color:var(--text);font-family:inherit;font-size:12px;font-weight:800;
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  transition:transform .1s,opacity .1s;white-space:nowrap;
-}
-#wc-dl-btn:active{transform:scale(.93);opacity:.7}
-#wc-stat-list{flex-shrink:0;padding:10px 16px 0;display:flex;gap:8px}
-#wc-stat-list .sbox{flex:1;background:var(--bg2);border-radius:14px;padding:10px 8px;box-shadow:var(--sh);text-align:center}
-.tg-dark #wc-stat-list .sbox{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);box-shadow:none}
-#wc-stat-list .sv{font-size:17px;font-weight:900;margin-bottom:1px}
-#wc-stat-list .sl{font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.05em}
-
-/* chart stage */
-#wc-stage{flex:1;position:relative;min-height:0;overflow:hidden;background:var(--bg)}
-
-/* dot grid */
-.wc-dot-grid{
-  position:absolute;inset:0;pointer-events:none;
-  background-image:linear-gradient(rgba(0,0,0,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.055) 1px,transparent 1px);
-  background-size:22px 22px;
-}
-.tg-dark .wc-dot-grid{
-  background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
-}
-
-/* y-axis */
-.wc-yaxis{
-  position:absolute;left:0;top:0;bottom:0;width:52px;z-index:10;pointer-events:none;
-  background:linear-gradient(90deg,var(--bg) 55%,transparent 100%);
-}
-.wc-ylabels{position:absolute;inset:0;}
-.wc-ylbl{
-  position:absolute;right:0;width:100%;
-  font-size:11px;font-weight:700;color:rgba(160,100,30,.7);
-  text-align:right;padding-right:9px;line-height:1;transform:translateY(-50%);
-  transition:top .12s ease;
-}
-.tg-dark .wc-ylbl{color:rgba(255,175,80,.55)}
-
-/* scroll */
-.wc-scroll{
-  position:absolute;inset:0;overflow-x:scroll;overflow-y:hidden;
-  scrollbar-width:none;
-  padding-left:52px;
-  touch-action:pan-x;
+/* ══ WEIGHT CHART push page ══ */
+.wchart-push-wrap{
+  width:100%;
+  overflow-x:auto;
   -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  padding-bottom:4px;
+  isolation:isolate;
   transform:translateZ(0);
-  backface-visibility:hidden;
+  -webkit-transform:translateZ(0);
 }
-.wc-scroll::-webkit-scrollbar{display:none}
-
-/* SVG */
-#wc-svg{display:block;transform:translateZ(0);touch-action:pan-x}
-
-/* tooltip */
-.wc-tt{
-  position:absolute;z-index:20;pointer-events:none;
-  opacity:0;transform:translateY(4px) scale(.96);
-  transition:opacity .14s ease,transform .16s cubic-bezier(.34,1.15,.64,1);
-}
-.wc-tt.on{opacity:1;transform:translateY(0) scale(1)}
-.wc-tt-body{
-  display:flex;align-items:center;gap:8px;
-  background:var(--bg2);
-  border:1px solid var(--brd);border-radius:13px;
-  padding:9px 13px;
-  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-  box-shadow:0 6px 24px rgba(0,0,0,.12);white-space:nowrap;
-}
-.tg-dark .wc-tt-body{background:rgba(20,15,10,.97);border-color:rgba(255,165,55,.2);box-shadow:0 10px 32px rgba(0,0,0,.6);}
-.wc-tt-date{font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--hint);flex-shrink:0}
-.tg-dark .wc-tt-date{color:rgba(255,171,64,.5)}
-.wc-tt-sep{width:1px;height:18px;background:var(--brd);flex-shrink:0}
-.wc-tt-val{font-size:18px;font-weight:900;letter-spacing:-.04em;color:var(--text);line-height:1}
-.wc-tt-unit{font-size:11px;font-weight:700;color:var(--hint);margin-left:2px}
-.wc-tt-delta{
-  display:inline-flex;align-items:center;gap:3px;
-  padding:3px 8px;border-radius:99px;font-size:10px;font-weight:800;flex-shrink:0;
-}
-.wc-tt-delta.neg{background:rgba(82,193,119,.14);color:#52C177}
-.wc-tt-delta.pos{background:rgba(244,92,92,.12);color:#F45C5C}
-.wc-tt-delta.zer{background:rgba(255,255,255,.07);color:rgba(255,255,255,.35)}
-
-/* scroll-to-end button */
-#wc-to-end{
-  position:absolute;bottom:20px;right:16px;z-index:25;
-  display:flex;align-items:center;gap:6px;
-  padding:9px 14px;border-radius:99px;border:none;cursor:pointer;
-  background:var(--sun);color:#fff;
-  font-family:inherit;font-size:12px;font-weight:800;
-  box-shadow:0 4px 16px rgba(255,107,53,.38);
-  opacity:0;pointer-events:none;
-  transform:translateY(8px) scale(.94);
-  transition:opacity .22s ease,transform .22s cubic-bezier(.34,1.2,.64,1);
-}
-#wc-to-end.show{opacity:1;pointer-events:all;transform:none}
-#wc-to-end:active{transform:scale(.95);opacity:.85}
+.wchart-push-wrap::-webkit-scrollbar{display:none}
 
 /* ══ EMPTY ══ */
 .empty{text-align:center;padding:40px 20px;animation:empty-fadein .35s ease forwards}
@@ -2277,29 +2172,15 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 <!-- PP: График веса -->
 <div class="push-page" id="pp-weight-chart">
-  <div id="wc-stage">
-    <button id="wc-back-btn" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
-    <button id="wc-dl-btn" onclick="_wcDownloadCard()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 3v13M6 13l6 6 6-6"/><path d="M3 21h18"/></svg>
-      сохранить
-    </button>
-    <div class="wc-dot-grid"></div>
-    <div class="wc-yaxis"><div class="wc-ylabels" id="wc-ylabels"></div></div>
-    <div class="wc-scroll" id="wc-scroll">
-      <svg id="wc-svg" style="display:block"></svg>
+  <div class="pp-hdr">
+    <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <div><div class="pp-title">динамика веса</div><div class="pp-subtitle" id="wc-sub">история</div></div>
+  </div>
+  <div class="pp-body" style="padding:12px 12px calc(var(--sb)+24px)">
+    <div class="wchart-push-wrap" id="wchart-container">
+      <div id="wchart-svg-wrap"></div>
     </div>
-    <div class="wc-tt" id="wc-tt">
-      <div class="wc-tt-body">
-        <div class="wc-tt-date" id="wc-tt-date"></div>
-        <div class="wc-tt-sep"></div>
-        <div><span class="wc-tt-val" id="wc-tt-val">—</span><span class="wc-tt-unit">кг</span></div>
-        <div class="wc-tt-delta zer" id="wc-tt-delta"></div>
-      </div>
-    </div>
-    <button id="wc-to-end" onclick="_wcScrollToEnd()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l8 8h-5v8H9v-8H4z" transform="rotate(90 12 12)"/></svg>
-      в конец
-    </button>
+    <div style="margin-top:16px" id="wc-stat-list"></div>
   </div>
 </div>
 
@@ -2799,7 +2680,8 @@ function popPage(doRender=true){
   if(curPushPage==='pp-goals')_saveGoalsSilent();
   if(curPushPage==='pp-scanner')stopScanner(false);  // keep stream alive — no permission dialog
   if(curPushPage==='pp-weight-chart'){
-    _wcCleanup();
+    const wrap=document.getElementById('wchart-svg-wrap');
+    if(wrap)wrap.innerHTML='';
   }
   const pp=document.getElementById(curPushPage);
   if(pp){
@@ -3577,502 +3459,112 @@ let _tt;
 function toast(msg){/* toasts disabled */}
 
 /* ══ WEIGHT CHART ══ */
-(function(){
-  const Y_W=52, PT_SP=80; // fixed point spacing in px
-  const PAD={l:16,r:28,t:40,b:42};
-  let _data=[], _pts=[], _svgW=1, _svgH=1;
-  let _activeI=-1;
-  let _rafId=null;
-  let _scrollEl=null;
-  let _ttFadeTimer=null;
-  let _endTimer=null;
-
-  function _fmt(s){
-    const d=new Date(s);
-    const MNS=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
-    return d.getDate()+'\u00a0'+MNS[d.getMonth()];
+function drawWeightChart(data){
+  const wrap=document.getElementById('wchart-svg-wrap');
+  const container=document.getElementById('wchart-container');
+  if(!wrap||!container)return;
+  data=[...data].sort((a,b)=>(a.logged_at||'').localeCompare(b.logged_at||''));
+  if(!data||data.length<2){
+    wrap.innerHTML=`<div style="text-align:center;padding:48px 16px;color:var(--hint);font-size:13px;font-weight:700">нет данных для графика<br><span style="font-size:11px;opacity:.6">запиши хотя бы 2 записи веса</span></div>`;
+    return;
   }
-  function _fmtFull(s){
-    const d=new Date(s);
-    const MNS=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
-    const h=d.getHours().toString().padStart(2,'0');
-    const m=d.getMinutes().toString().padStart(2,'0');
-    return d.getDate()+'\u00a0'+MNS[d.getMonth()]+' '+h+':'+m;
+  const byDate=new Map();
+  data.forEach(d=>byDate.set(d.logged_at,d));
+  data=[...byDate.values()].sort((a,b)=>a.logged_at.localeCompare(b.logged_at));
+  const n=data.length;
+  const containerW=container.clientWidth||320;
+  const minColW=56;
+  const W=Math.max(containerW-4,n*minColW+40);
+  const H=160,PAD={l:36,r:16,t:32,b:28};
+  const chartW=W-PAD.l-PAD.r,chartH=H-PAD.t-PAD.b;
+  const ws=data.map(d=>d.weight);
+  const rawMin=Math.min(...ws),rawMax=Math.max(...ws);
+  const span=rawMax-rawMin||0.5;
+  const mn=rawMin-span*0.2,mx=rawMax+span*0.2,rng=mx-mn;
+  const xStep=n>1?chartW/(n-1):0;
+  const pts=data.map((d,i)=>({x:PAD.l+i*xStep,y:PAD.t+chartH*(1-(d.weight-mn)/rng),w:d.weight,d:d.logged_at}));
+  const dark=document.body.classList.contains('tg-dark');
+  const accent='#FF6B35';
+  const hintC=dark?'rgba(255,255,255,0.3)':'rgba(0,0,0,0.28)';
+  const labelC=dark?'rgba(255,255,255,0.5)':'rgba(0,0,0,0.45)';
+  const bg2C=dark?'#181818':'#ffffff';
+  const gridC=dark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.06)';
+  function makePath(pts){
+    if(pts.length===1)return`M${pts[0].x},${pts[0].y}`;
+    let d=`M${pts[0].x},${pts[0].y}`;
+    for(let i=0;i<pts.length-1;i++){const cx=(pts[i].x+pts[i+1].x)/2;d+=` C${cx},${pts[i].y} ${cx},${pts[i+1].y} ${pts[i+1].x},${pts[i+1].y}`;}
+    return d;
   }
+  const linePath=makePath(pts);
+  const fillPath=linePath+` L${pts[pts.length-1].x},${H-PAD.b+4} L${pts[0].x},${H-PAD.b+4} Z`;
+  const uid=Math.random().toString(36).slice(2,7);
+  const gradId='g'+uid,glowId='gw'+uid,clipId='cl'+uid;
+  const yLabels=[0.15,0.5,0.85].map(f=>{
+    const gy=PAD.t+chartH*f,val=mx-rng*f;
+    return`<text x="${PAD.l-4}" y="${gy+4}" text-anchor="end" font-family="Onest,sans-serif" font-size="8.5" font-weight="700" fill="${hintC}">${val.toFixed(1)}</text>
+    <line x1="${PAD.l}" y1="${gy}" x2="${W-PAD.r}" y2="${gy}" stroke="${gridC}" stroke-width="1" stroke-dasharray="3,3"/>`;
+  }).join('');
+  const lastIdx=pts.length-1;
+  const dotsHTML=pts.map((p,i)=>{
+    const isLast=i===lastIdx,r=isLast?5.5:3.5;
+    const lbX=Math.max(PAD.l+10,Math.min(W-PAD.r-10,p.x));
+    return`<circle cx="${p.x}" cy="${p.y}" r="${r}" fill="${accent}" opacity="${isLast?1:0.75}"/>
+    <circle cx="${p.x}" cy="${p.y}" r="${r-1.8}" fill="${bg2C}"/>
+    <text x="${lbX}" y="${p.y-9}" text-anchor="middle" font-family="Onest,sans-serif" font-size="${isLast?10:8.5}" font-weight="${isLast?900:700}" fill="${isLast?accent:labelC}">${p.w.toFixed(1)}</text>
+    <text x="${lbX}" y="${H-PAD.b+14}" text-anchor="middle" font-family="Onest,sans-serif" font-size="8" font-weight="600" fill="${hintC}">${fmtMD(p.d)}</text>`;
+  }).join('');
+  const lastPt=pts[lastIdx];
+  wrap.style.width=W+'px';wrap.style.minWidth=W+'px';wrap.style.display='block';
+  wrap.innerHTML=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="display:block;overflow:visible">
+  <defs>
+    <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${accent}" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="${accent}" stop-opacity="0.02"/>
+    </linearGradient>
+    <filter id="${glowId}" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <clipPath id="${clipId}"><rect x="${PAD.l}" y="0" width="${chartW}" height="${H}"/></clipPath>
+  </defs>
+  ${yLabels}
+  <g clip-path="url(#${clipId})">
+    <path d="${fillPath}" fill="url(#${gradId})"/>
+    <path d="${linePath}" fill="none" stroke="${accent}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#${glowId})" opacity="0.5"/>
+    <path d="${linePath}" fill="none" stroke="${accent}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${lastPt.x}" cy="${lastPt.y}" r="14" fill="${accent}" opacity="0.1">
+      <animate attributeName="r" values="10;16;10" dur="2.8s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.1;0.04;0.1" dur="2.8s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  ${dotsHTML}
+</svg>`;
+  setTimeout(()=>{container.scrollLeft=container.scrollWidth;},60);
+}
 
-  function _getRange(d){
-    const ws=d.map(v=>v.weight);
-    const u=gU();
-    const sw=u.start_weight>0?u.start_weight:null;
-    const gw=u.goal_weight>0?u.goal_weight:null;
-    const candidates=[...ws];
-    if(sw)candidates.push(sw);
-    if(gw)candidates.push(gw);
-    const rMn=Math.min(...candidates),rMx=Math.max(...candidates);
-    const sp=rMx-rMn||1;
-    return{mn:rMn-sp*0.08,mx:rMx+sp*0.08};
-  }
-
-  function _smooth(arr){
-    if(!arr.length)return'';
-    if(arr.length===1)return`M${arr[0].x.toFixed(1)},${arr[0].y.toFixed(1)}`;
-    let p=`M${arr[0].x.toFixed(1)},${arr[0].y.toFixed(1)}`;
-    for(let i=0;i<arr.length-1;i++){
-      const cx=((arr[i].x+arr[i+1].x)/2).toFixed(1);
-      p+=` C${cx},${arr[i].y.toFixed(1)} ${cx},${arr[i+1].y.toFixed(1)} ${arr[i+1].x.toFixed(1)},${arr[i+1].y.toFixed(1)}`;
-    }
-    return p;
-  }
-
-  function _buildYLabels(mn,mx,H){
-    const el=document.getElementById('wc-ylabels');
-    if(!el)return;
-    const cH=H-PAD.t-PAD.b;
-    const range=mx-mn;
-    // Smart step — 0.5kg for ranges up to ~10kg, then 1, 2, 5
-    let step=0.5;
-    if(range>25)step=5;
-    else if(range>12)step=2;
-    else if(range>6)step=1;
-    const dec=step<1?1:0;
-    const labelMx=Math.floor(mx/step)*step;
-    const labelMn=Math.ceil(mn/step)*step;
-    let html='';
-    for(let v=labelMx;v>=labelMn-step*0.01;v-=step){
-      const y=(PAD.t+cH*(1-(v-mn)/range)).toFixed(1);
-      html+=`<div class="wc-ylbl" style="top:${y}px">${v.toFixed(dec)}</div>`;
-    }
-    el.innerHTML=html;
-  }
-
-  function _checkEndBtn(){
-    if(!_scrollEl||!_svgW)return;
-    const maxScroll=_svgW-(_scrollEl.clientWidth-Y_W);
-    if(maxScroll<=0){_hideEndBtn();return;}
-    const distFromEnd=maxScroll-_scrollEl.scrollLeft;
-    const btn=document.getElementById('wc-to-end');
-    if(!btn)return;
-    // Show if scrolled more than half a screen from end OR at very start
-    if(distFromEnd>_scrollEl.clientWidth*0.55||_scrollEl.scrollLeft<10){
-      btn.classList.add('show');
-    } else {
-      _hideEndBtn();
-    }
-  }
-
-  function _hideEndBtn(){
-    const btn=document.getElementById('wc-to-end');
-    if(btn)btn.classList.remove('show');
-  }
-
-  window._wcDownloadCard=function(){
-    const data=_data;if(!data.length){return;}
-    const CW=1600,CH=900,DPR=2;
-    const W=CW*DPR,H=CH*DPR;
-    const cv=document.createElement('canvas');
-    cv.width=W;cv.height=H;
-    const cx=cv.getContext('2d');
-    cx.scale(DPR,DPR);
-    const dark=document.body.classList.contains('tg-dark');
-
-    // ── background ──
-    const bgGrad=cx.createLinearGradient(0,0,CW,CH);
-    if(dark){bgGrad.addColorStop(0,'#0d0a08');bgGrad.addColorStop(1,'#1a1108');}
-    else{bgGrad.addColorStop(0,'#FFF8F2');bgGrad.addColorStop(1,'#FAF0E8');}
-    cx.fillStyle=bgGrad;cx.fillRect(0,0,CW,CH);
-
-    // ── grid ──
-    cx.strokeStyle=dark?'rgba(255,255,255,.04)':'rgba(0,0,0,.05)';
-    cx.lineWidth=1;
-    const gSize=40;
-    for(let x=0;x<CW;x+=gSize){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,CH);cx.stroke();}
-    for(let y=0;y<CH;y+=gSize){cx.beginPath();cx.moveTo(0,y);cx.lineTo(CW,y);cx.stroke();}
-
-    // ── compute range ──
-    const u=gU();
-    const ws=data.map(d=>d.weight);
-    const sw=u.start_weight>0?u.start_weight:null;
-    const gw=u.goal_weight>0?u.goal_weight:null;
-    const cands=[...ws];if(sw)cands.push(sw);if(gw)cands.push(gw);
-    const rawMn=Math.min(...cands),rawMx=Math.max(...cands);
-    const sp=rawMx-rawMn||1;
-    const mn=rawMn-sp*0.08,mx=rawMx+sp*0.08;
-    const rng=mx-mn;
-
-    // ── layout ──
-    const PAD_L=110,PAD_R=60,PAD_T=120,PAD_B=130;
-    const gW=CW-PAD_L-PAD_R,gH=CH-PAD_T-PAD_B;
-    const n=data.length;
-    const xSt=n>1?gW/(n-1):gW/2;
-    const pts=data.map((d,i)=>({
-      x:PAD_L+i*xSt,
-      y:PAD_T+gH*(1-(d.weight-mn)/rng),
-      w:d.weight,
-      ts:d.logged_at
-    }));
-
-    // ── goal line ──
-    if(gw&&gw>mn&&gw<mx){
-      const gy=PAD_T+gH*(1-(gw-mn)/rng);
-      cx.save();
-      cx.setLineDash([8,10]);cx.lineWidth=2;
-      cx.strokeStyle=dark?'rgba(78,174,229,.5)':'rgba(78,174,229,.65)';
-      cx.beginPath();cx.moveTo(PAD_L,gy);cx.lineTo(CW-PAD_R,gy);cx.stroke();
-      cx.setLineDash([]);
-      cx.font='bold 20px Onest,system-ui,sans-serif';
-      cx.fillStyle=dark?'rgba(78,174,229,.7)':'rgba(78,174,229,.9)';
-      cx.textAlign='right';
-      cx.fillText(`цель ${gw} кг`,CW-PAD_R-8,gy-10);
-      cx.restore();
-    }
-
-    // ── Y labels ──
-    let step=0.5;
-    if(rng>25)step=5;else if(rng>12)step=2;else if(rng>6)step=1;
-    const dec=step<1?1:0;
-    const lMx=Math.floor(mx/step)*step,lMn=Math.ceil(mn/step)*step;
-    cx.font='bold 22px Onest,system-ui,sans-serif';
-    cx.fillStyle=dark?'rgba(255,175,80,.55)':'rgba(140,90,20,.6)';
-    cx.textAlign='right';
-    for(let v=lMx;v>=lMn-step*.01;v-=step){
-      const y=PAD_T+gH*(1-(v-mn)/rng);
-      cx.fillText(v.toFixed(dec),PAD_L-14,y+7);
-      cx.save();cx.strokeStyle=dark?'rgba(255,255,255,.04)':'rgba(0,0,0,.05)';
-      cx.lineWidth=1;cx.setLineDash([]);
-      cx.beginPath();cx.moveTo(PAD_L,y);cx.lineTo(CW-PAD_R,y);cx.stroke();
-      cx.restore();
-    }
-
-    // ── glow line ──
-    if(pts.length>1){
-      cx.save();
-      cx.filter='blur(8px)';
-      cx.strokeStyle='rgba(255,104,32,.35)';cx.lineWidth=16;cx.lineCap='round';cx.lineJoin='round';
-      cx.beginPath();
-      pts.forEach((p,i)=>{i===0?cx.moveTo(p.x,p.y):cx.lineTo(p.x,p.y);});
-      cx.stroke();cx.filter='none';cx.restore();
-    }
-
-    // ── gradient line ──
-    if(pts.length>1){
-      const lg=cx.createLinearGradient(PAD_L,0,CW-PAD_R,0);
-      lg.addColorStop(0,'#FF5015');lg.addColorStop(.5,'#FF7828');lg.addColorStop(1,'#FFAB40');
-      cx.strokeStyle=lg;cx.lineWidth=4;cx.lineCap='round';cx.lineJoin='round';
-      cx.beginPath();
-      pts.forEach((p,i)=>{i===0?cx.moveTo(p.x,p.y):cx.lineTo(p.x,p.y);});
-      cx.stroke();
-    }
-
-    // ── dots ──
-    pts.forEach((p,i)=>{
-      const isL=i===n-1,r=isL?10:7;
-      cx.beginPath();cx.arc(p.x,p.y,r,0,Math.PI*2);
-      cx.fillStyle=isL?'#FFAB40':'rgba(255,171,64,.8)';cx.fill();
-      cx.beginPath();cx.arc(p.x,p.y,isL?5.5:3.5,0,Math.PI*2);
-      cx.fillStyle=dark?'#111111':'#FAF7F2';cx.fill();
-    });
-
-    // ── X labels ──
-    const MNS=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
-    cx.font='bold 20px Onest,system-ui,sans-serif';
-    cx.fillStyle=dark?'rgba(255,185,80,.45)':'rgba(140,90,10,.5)';
-    cx.textAlign='center';
-    const xStep=Math.max(1,Math.ceil(n/8));
-    pts.forEach((p,i)=>{
-      if(i%xStep===0||i===n-1){
-        const d2=new Date(p.ts);
-        cx.fillText(d2.getDate()+' '+MNS[d2.getMonth()],p.x,CH-PAD_B+46);
-      }
-    });
-
-    // ── header ──
-    cx.textAlign='left';
-    cx.font='900 48px Onest,system-ui,sans-serif';
-    cx.fillStyle=dark?'rgba(255,255,255,.9)':'rgba(28,22,8,.85)';
-    cx.fillText('динамика веса',PAD_L,68);
-    // current weight big
-    const cur=data[n-1].weight;
-    const diff=+(cur-data[0].weight).toFixed(1);
-    cx.textAlign='right';
-    cx.font='900 52px Onest,system-ui,sans-serif';
-    cx.fillStyle='#FFAB40';
-    cx.fillText(cur.toFixed(1)+' кг',CW-PAD_R,68);
-    cx.font='bold 26px Onest,system-ui,sans-serif';
-    cx.fillStyle=diff<=0?'#52C177':'#F45C5C';
-    cx.fillText((diff>0?'+':'')+diff+' кг',CW-PAD_R,100);
-
-    // ── branding ──
-    cx.textAlign='center';
-    cx.font='700 20px Onest,system-ui,sans-serif';
-    cx.fillStyle=dark?'rgba(255,255,255,.18)':'rgba(0,0,0,.18)';
-    cx.fillText('letify',CW/2,CH-24);
-
-    // ── download ──
-    cv.toBlob(blob=>{
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement('a');
-      a.href=url;a.download='weight_letify.png';
-      document.body.appendChild(a);a.click();
-      setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},2000);
-    },'image/png');
-  };
-
-  window._wcScrollToEnd=function(){
-    if(!_scrollEl)return;
-    _hideEndBtn();
-    _scrollEl.scrollTo({left:_scrollEl.scrollWidth,behavior:'smooth'});
-  };
-
-  function _draw(animate){
-    const stage=document.getElementById('wc-stage');
-    const scroll=document.getElementById('wc-scroll');
-    const svg=document.getElementById('wc-svg');
-    if(!stage||!scroll||!svg)return;
-    const d=_data, n=d.length;
-    if(!n){svg.innerHTML='';return;}
-    const H=stage.clientHeight||440;
-    const viewW=scroll.clientWidth-Y_W;
-    // Width: fit all points with PT_SP spacing, but at least full viewport
-    const W=Math.max(viewW+1, PAD.l+(n>1?(n-1)*PT_SP:PT_SP)+PAD.r);
-    _svgW=W;_svgH=H;
-    svg.setAttribute('width',W);svg.setAttribute('height',H);
-    svg.style.width=W+'px';svg.style.height=H+'px';
-    const cW=W-PAD.l-PAD.r, cH=H-PAD.t-PAD.b;
-    const {mn,mx}=_getRange(d);
-    const rng=mx-mn;
-    const xSt=n>1?cW/(n-1):cW/2;
-    _pts=d.map((e,i)=>({x:PAD.l+i*xSt,y:PAD.t+cH*(1-(e.weight-mn)/rng),w:e.weight,d:e.logged_at,prev:i>0?d[i-1].weight:null}));
-    _buildYLabels(mn,mx,H);
-    const uid='wc'+Math.random().toString(36).slice(2,6);
-    const line=_smooth(_pts);
-    const dark=document.body.classList.contains('tg-dark');
-    const goalClr=dark?'rgba(78,174,229,.55)':'rgba(78,174,229,.6)';
-    const goalTxtClr=dark?'rgba(78,174,229,.8)':'rgba(78,174,229,.9)';
-    const xlabClr=dark?'rgba(255,185,80,.5)':'rgba(140,90,10,.5)';
-    const bgColor=dark?'#111111':'#FAF7F2';
-    // goal marker
+function _populateWeightChart(){
+  const wl=gWL();
+  const data=wl.length>30?wl.slice(-30):wl;
+  const sub=document.getElementById('wc-sub');
+  if(sub)sub.textContent=data.length+' записей · последние '+Math.min(30,data.length)+' дней';
+  const statEl=document.getElementById('wc-stat-list');
+  if(statEl&&wl.length){
+    const cw=wl[wl.length-1].weight;
+    const sw=Math.max(...wl.map(d=>d.weight));
+    const best=Math.min(...wl.map(d=>d.weight));
     const gw=gU().goal_weight;
-    let goalM='';
-    if(gw&&gw>mn&&gw<mx){
-      const gy=(PAD.t+cH*(1-(gw-mn)/rng)).toFixed(1);
-      goalM=`<line x1="${PAD.l}" y1="${gy}" x2="${(W-PAD.r).toFixed(0)}" y2="${gy}" stroke="${goalClr}" stroke-width="1.5" stroke-dasharray="5,6"/>
-      <text x="${(W-PAD.r-3).toFixed(0)}" y="${(parseFloat(gy)-7).toFixed(0)}" text-anchor="end" font-family="Onest,sans-serif" font-size="10" font-weight="800" fill="${goalTxtClr}">цель ${gw}</text>`;
-    }
-    // x labels — smart density
-    let xlabs='';
-    const step=Math.max(1,Math.ceil(n/Math.max(2,Math.floor(viewW/80))));
-    const daySet=new Set(_data.map(e=>new Date(e.logged_at).toDateString()));
-    const hasSameDay=daySet.size<n;
-    _pts.forEach((p,i)=>{
-      if(i%step===0||i===n-1){
-        // If same-day entries exist, show time when spacing allows
-        let lbl=_fmt(p.d);
-        if(hasSameDay&&PT_SP>=80){
-          const d2=new Date(p.d);
-          const h=d2.getHours().toString().padStart(2,'0');
-          const m2=d2.getMinutes().toString().padStart(2,'0');
-          lbl=h+':'+m2;
-        }
-        xlabs+=`<text x="${p.x.toFixed(1)}" y="${(H-6).toFixed(0)}" text-anchor="middle" font-family="Onest,sans-serif" font-size="10" font-weight="700" fill="${xlabClr}">${lbl}</text>`;
-      }
-    });
-    // dots
-    const lastIdx=n-1;
-    let dotsHTML='';
-    _pts.forEach((p,i)=>{
-      const isL=i===lastIdx,r=isL?7:5;
-      dotsHTML+=`<g class="wcdg" data-i="${i}" style="touch-action:pan-x;cursor:pointer">
-        <circle cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="26" fill="transparent" class="wcdhit"/>
-        <circle class="wcdring" cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="0" fill="none" stroke="rgba(255,171,64,.38)" stroke-width="1.5" opacity="0" style="transition:r .2s cubic-bezier(.34,1.3,.64,1),opacity .18s"/>
-        <circle class="wcdcore" cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="${r}" fill="${isL?'#FFAB40':'rgba(255,171,64,.72)'}" style="transition:r .16s cubic-bezier(.34,1.2,.64,1),fill .14s"/>
-        <circle class="wcdhle" cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="${isL?4:2.8}" fill="${bgColor}" pointer-events="none" style="transition:r .16s cubic-bezier(.34,1.2,.64,1)"/>
-      </g>`;
-    });
-    // pulse on last dot
-    const lp=_pts[lastIdx];
-    const pulse=`<circle cx="${lp.x.toFixed(2)}" cy="${lp.y.toFixed(2)}" r="8" fill="#FF7025" opacity="0" pointer-events="none">
-      <animate attributeName="r" values="7;22;7" dur="4s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="0.14;0.01;0.14" dur="4s" repeatCount="indefinite"/>
-    </circle>`;
-    const animStyle=animate?`<style>.wcla-${uid}{stroke-dasharray:6000;stroke-dashoffset:6000;animation:wcli .85s cubic-bezier(.4,0,.2,1) forwards .04s}@keyframes wcli{to{stroke-dashoffset:0}}</style>`:'';
-    svg.innerHTML=`<defs>
-      <linearGradient id="wclg${uid}" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="#FF5015"/>
-        <stop offset="50%" stop-color="#FF7828"/>
-        <stop offset="100%" stop-color="#FFAB40"/>
-      </linearGradient>
-      <filter id="wcgf${uid}" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="b"/>
-        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-      </filter>
-      <clipPath id="wccp${uid}">
-        <rect x="${PAD.l-2}" y="0" width="${(cW+PAD.r+4).toFixed(0)}" height="${H}"/>
-      </clipPath>
-      ${animStyle}
-    </defs>
-    ${goalM}
-    <g clip-path="url(#wccp${uid})">
-      <path class="${animate?'wcla-'+uid:''}" d="${line}" fill="none" stroke="#FF6820" stroke-width="10" stroke-linecap="round" filter="url(#wcgf${uid})" opacity="${dark?.2:.1}"/>
-      <path class="${animate?'wcla-'+uid:''}" d="${line}" fill="none" stroke="url(#wclg${uid})" stroke-width="2.5" stroke-linecap="round"/>
-      ${pulse}
-    </g>
-    ${dotsHTML}${xlabs}`;
-    _bindDots();
-    if(animate){
-      setTimeout(()=>{scroll.scrollLeft=scroll.scrollWidth;_checkEndBtn();},40);
-    } else {
-      _checkEndBtn();
-    }
+    statEl.innerHTML=`<div class="sb-row">
+      <div class="sbox"><div class="sv" style="color:var(--sun)">${cw.toFixed(1)}</div><div class="sl">сейчас кг</div></div>
+      <div class="sbox"><div class="sv" style="color:var(--red)">${sw.toFixed(1)}</div><div class="sl">макс кг</div></div>
+      <div class="sbox"><div class="sv" style="color:var(--green)">${best.toFixed(1)}</div><div class="sl">мин кг</div></div>
+      ${gw?`<div class="sbox"><div class="sv" style="color:var(--water)">${gw.toFixed(1)}</div><div class="sl">цель кг</div></div>`:''}
+    </div>`;
   }
-
-  function _refreshDots(ai){
-    const svg=document.getElementById('wc-svg');if(!svg)return;
-    const n=_pts.length;
-    svg.querySelectorAll('.wcdg').forEach((g,i)=>{
-      const isL=i===n-1,isA=i===ai,bR=isL?7:5;
-      const core=g.querySelector('.wcdcore');
-      const ring=g.querySelector('.wcdring');
-      const hole=g.querySelector('.wcdhle');
-      if(isA){
-        core.setAttribute('r',bR+3.5);core.setAttribute('fill','#FFD060');
-        ring.setAttribute('r',bR+10);ring.setAttribute('opacity','.32');
-        hole.setAttribute('r',bR+1.5);
-      } else {
-        core.setAttribute('r',bR);core.setAttribute('fill',isL?'#FFAB40':'rgba(255,171,64,.72)');
-        ring.setAttribute('r','0');ring.setAttribute('opacity','0');
-        hole.setAttribute('r',isL?'4':'2.8');
-      }
-    });
-  }
-
-  function _setTTContent(i){
-    const pt=_pts[i],e=_data[i];
-    const delta=e.prev!==null?+(e.weight-e.prev).toFixed(1):null;
-    const scroll=document.getElementById('wc-scroll');
-    const stage=document.getElementById('wc-stage');
-    const tt=document.getElementById('wc-tt');
-    if(!scroll||!stage||!tt)return;
-    const td=document.getElementById('wc-tt-date');
-    if(td)td.textContent=_fmtFull(e.logged_at);
-    const tv=document.getElementById('wc-tt-val');
-    if(tv)tv.textContent=e.weight.toFixed(1);
-    const dEl=document.getElementById('wc-tt-delta');
-    if(dEl){
-      if(delta===null){dEl.className='wc-tt-delta zer';dEl.textContent='старт';}
-      else if(delta<0){dEl.className='wc-tt-delta neg';dEl.innerHTML=`<svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 20l-8-8h5V4h6v8h5z"/></svg>${delta}`;}
-      else if(delta>0){dEl.className='wc-tt-delta pos';dEl.innerHTML=`<svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l8 8h-5v8H9v-8H4z"/></svg>+${delta}`;}
-      else{dEl.className='wc-tt-delta zer';dEl.textContent='=';}
-    }
-    const dotX=Y_W+pt.x-scroll.scrollLeft;
-    const dotY=pt.y;
-    const sW=stage.clientWidth,sH=stage.clientHeight;
-    const TT_W=238,GAP=12;
-    let left=dotX-TT_W/2;
-    left=Math.max(Y_W+4,Math.min(sW-TT_W-4,left));
-    tt.style.left=left+'px';
-    if(dotY>sH*0.4){tt.style.top='auto';tt.style.bottom=(sH-dotY+GAP)+'px';}
-    else{tt.style.bottom='auto';tt.style.top=(dotY+GAP)+'px';}
-  }
-
-  function _activate(i){
-    if(i<0||i>=_pts.length||i===_activeI)return;
-    _activeI=i;
-    _refreshDots(i);
-    const tt=document.getElementById('wc-tt');
-    if(!tt)return;
-    if(_ttFadeTimer){clearTimeout(_ttFadeTimer);_ttFadeTimer=null;}
-    const wasVisible=tt.classList.contains('on');
-    if(wasVisible){
-      tt.classList.remove('on');
-      _ttFadeTimer=setTimeout(()=>{
-        _ttFadeTimer=null;
-        if(_activeI!==i)return;
-        _setTTContent(i);
-        tt.classList.add('on');
-      },120);
-    } else {
-      _setTTContent(i);
-      tt.classList.add('on');
-    }
-  }
-
-  function _hideTT(){
-    _activeI=-1;
-    if(_ttFadeTimer){clearTimeout(_ttFadeTimer);_ttFadeTimer=null;}
-    const tt=document.getElementById('wc-tt');if(tt)tt.classList.remove('on');
-    _refreshDots(-1);
-  }
-
-  function _bindDots(){
-    const svg=document.getElementById('wc-svg');if(!svg)return;
-    svg.querySelectorAll('.wcdg').forEach(g=>{
-      let _tapStartX=0,_tapStartY=0,_tapping=false;
-      // Use touchstart/touchend for tap detection — doesn't block native scroll
-      g.addEventListener('touchstart',ev=>{
-        _tapping=true;
-        _tapStartX=ev.touches[0].clientX;
-        _tapStartY=ev.touches[0].clientY;
-      },{passive:true});
-      g.addEventListener('touchmove',ev=>{
-        // Cancel tap if moved more than 8px
-        if(Math.abs(ev.touches[0].clientX-_tapStartX)>8||Math.abs(ev.touches[0].clientY-_tapStartY)>8)_tapping=false;
-      },{passive:true});
-      g.addEventListener('touchend',ev=>{
-        if(!_tapping)return;
-        _tapping=false;
-        _activate(parseInt(g.dataset.i));
-      },{passive:true});
-      // Mouse support
-      g.addEventListener('click',()=>_activate(parseInt(g.dataset.i)));
-    });
-  }
-
-  window.drawWeightChart=function(){};// no-op legacy
-
-  window._wcInit=function(){
-    _scrollEl=document.getElementById('wc-scroll');
-    if(!_scrollEl)return;
-    // hide TT on empty tap
-    _scrollEl.addEventListener('pointerdown',e=>{if(!e.target.closest('.wcdg'))_hideTT();},{passive:true});
-    // throttle scroll via rAF — avoid layout thrashing on every pixel
-    let _scrollRaf=null;
-    _scrollEl.addEventListener('scroll',()=>{
-      if(_scrollRaf)return;
-      _scrollRaf=requestAnimationFrame(()=>{
-        _scrollRaf=null;
-        _checkEndBtn();
-        if(_activeI>=0){const ai=_activeI;_activeI=-2;_activate(ai);}
-      });
-    },{passive:true});
-  };
-
-  window._wcCleanup=function(){
-    _activeI=-1;
-    if(_rafId){cancelAnimationFrame(_rafId);_rafId=null;}
-    if(_ttFadeTimer){clearTimeout(_ttFadeTimer);_ttFadeTimer=null;}
-    if(_endTimer){clearTimeout(_endTimer);_endTimer=null;}
-    const svg=document.getElementById('wc-svg');if(svg)svg.innerHTML='';
-    const yl=document.getElementById('wc-ylabels');if(yl)yl.innerHTML='';
-    const tt=document.getElementById('wc-tt');if(tt)tt.classList.remove('on');
-    _hideEndBtn();
-    _scrollEl=null;
-  };
-
-  window._populateWeightChart=function(){
-    const wl=gWL();
-    _data=[...wl].sort((a,b)=>a.logged_at.localeCompare(b.logged_at));
-    _data=_data.map((e,i)=>({...e,prev:i>0?_data[i-1].weight:null}));
-    _activeI=-1;
-    requestAnimationFrame(()=>{
-      _wcInit();
-      _draw(true);
-    });
-  };
-})();
+  requestAnimationFrame(()=>requestAnimationFrame(()=>drawWeightChart(data)));
+}
 
 /* ══ RENDERS ══ */
 function getHomeDesign(){return lsGet('home_design')||'classic';}
-
 function setHomeDesign(d){
   lsSet('home_design',d);
   ['classic','linear','bento'].forEach(k=>{
