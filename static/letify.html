@@ -655,6 +655,17 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 }
 .tg-env #wc-back-btn{display:none !important}
 #wc-back-btn:active{transform:scale(.93);opacity:.7}
+/* Download button */
+#wc-dl-btn{
+  position:absolute;top:calc(var(--st) + 10px);right:12px;z-index:30;
+  height:38px;padding:0 14px;border-radius:13px;
+  background:var(--bg3);border:none;cursor:pointer;
+  display:flex;align-items:center;gap:6px;
+  color:var(--text);font-family:inherit;font-size:12px;font-weight:800;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  transition:transform .1s,opacity .1s;white-space:nowrap;
+}
+#wc-dl-btn:active{transform:scale(.93);opacity:.7}
 #wc-stat-list{flex-shrink:0;padding:10px 16px 0;display:flex;gap:8px}
 #wc-stat-list .sbox{flex:1;background:var(--bg2);border-radius:14px;padding:10px 8px;box-shadow:var(--sh);text-align:center}
 .tg-dark #wc-stat-list .sbox{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);box-shadow:none}
@@ -690,16 +701,18 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 /* scroll */
 .wc-scroll{
-  position:absolute;inset:0;overflow-x:auto;overflow-y:hidden;
-  scrollbar-width:none;-webkit-overflow-scrolling:touch;
-  padding-left:52px;touch-action:pan-x;
-  will-change:scroll-position;
+  position:absolute;inset:0;overflow-x:scroll;overflow-y:hidden;
+  scrollbar-width:none;
+  padding-left:52px;
+  touch-action:pan-x;
+  -webkit-overflow-scrolling:touch;
   transform:translateZ(0);
+  backface-visibility:hidden;
 }
 .wc-scroll::-webkit-scrollbar{display:none}
 
 /* SVG */
-#wc-svg{display:block;transform:translateZ(0)}
+#wc-svg{display:block;transform:translateZ(0);touch-action:pan-x}
 
 /* tooltip */
 .wc-tt{
@@ -2266,6 +2279,10 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 <div class="push-page" id="pp-weight-chart">
   <div id="wc-stage">
     <button id="wc-back-btn" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <button id="wc-dl-btn" onclick="_wcDownloadCard()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 3v13M6 13l6 6 6-6"/><path d="M3 21h18"/></svg>
+      сохранить
+    </button>
     <div class="wc-dot-grid"></div>
     <div class="wc-yaxis"><div class="wc-ylabels" id="wc-ylabels"></div></div>
     <div class="wc-scroll" id="wc-scroll">
@@ -3648,6 +3665,158 @@ function toast(msg){/* toasts disabled */}
     if(btn)btn.classList.remove('show');
   }
 
+  window._wcDownloadCard=function(){
+    const data=_data;if(!data.length){return;}
+    const CW=1600,CH=900,DPR=2;
+    const W=CW*DPR,H=CH*DPR;
+    const cv=document.createElement('canvas');
+    cv.width=W;cv.height=H;
+    const cx=cv.getContext('2d');
+    cx.scale(DPR,DPR);
+    const dark=document.body.classList.contains('tg-dark');
+
+    // ── background ──
+    const bgGrad=cx.createLinearGradient(0,0,CW,CH);
+    if(dark){bgGrad.addColorStop(0,'#0d0a08');bgGrad.addColorStop(1,'#1a1108');}
+    else{bgGrad.addColorStop(0,'#FFF8F2');bgGrad.addColorStop(1,'#FAF0E8');}
+    cx.fillStyle=bgGrad;cx.fillRect(0,0,CW,CH);
+
+    // ── grid ──
+    cx.strokeStyle=dark?'rgba(255,255,255,.04)':'rgba(0,0,0,.05)';
+    cx.lineWidth=1;
+    const gSize=40;
+    for(let x=0;x<CW;x+=gSize){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,CH);cx.stroke();}
+    for(let y=0;y<CH;y+=gSize){cx.beginPath();cx.moveTo(0,y);cx.lineTo(CW,y);cx.stroke();}
+
+    // ── compute range ──
+    const u=gU();
+    const ws=data.map(d=>d.weight);
+    const sw=u.start_weight>0?u.start_weight:null;
+    const gw=u.goal_weight>0?u.goal_weight:null;
+    const cands=[...ws];if(sw)cands.push(sw);if(gw)cands.push(gw);
+    const rawMn=Math.min(...cands),rawMx=Math.max(...cands);
+    const sp=rawMx-rawMn||1;
+    const mn=rawMn-sp*0.08,mx=rawMx+sp*0.08;
+    const rng=mx-mn;
+
+    // ── layout ──
+    const PAD_L=110,PAD_R=60,PAD_T=120,PAD_B=130;
+    const gW=CW-PAD_L-PAD_R,gH=CH-PAD_T-PAD_B;
+    const n=data.length;
+    const xSt=n>1?gW/(n-1):gW/2;
+    const pts=data.map((d,i)=>({
+      x:PAD_L+i*xSt,
+      y:PAD_T+gH*(1-(d.weight-mn)/rng),
+      w:d.weight,
+      ts:d.logged_at
+    }));
+
+    // ── goal line ──
+    if(gw&&gw>mn&&gw<mx){
+      const gy=PAD_T+gH*(1-(gw-mn)/rng);
+      cx.save();
+      cx.setLineDash([8,10]);cx.lineWidth=2;
+      cx.strokeStyle=dark?'rgba(78,174,229,.5)':'rgba(78,174,229,.65)';
+      cx.beginPath();cx.moveTo(PAD_L,gy);cx.lineTo(CW-PAD_R,gy);cx.stroke();
+      cx.setLineDash([]);
+      cx.font='bold 20px Onest,system-ui,sans-serif';
+      cx.fillStyle=dark?'rgba(78,174,229,.7)':'rgba(78,174,229,.9)';
+      cx.textAlign='right';
+      cx.fillText(`цель ${gw} кг`,CW-PAD_R-8,gy-10);
+      cx.restore();
+    }
+
+    // ── Y labels ──
+    let step=0.5;
+    if(rng>25)step=5;else if(rng>12)step=2;else if(rng>6)step=1;
+    const dec=step<1?1:0;
+    const lMx=Math.floor(mx/step)*step,lMn=Math.ceil(mn/step)*step;
+    cx.font='bold 22px Onest,system-ui,sans-serif';
+    cx.fillStyle=dark?'rgba(255,175,80,.55)':'rgba(140,90,20,.6)';
+    cx.textAlign='right';
+    for(let v=lMx;v>=lMn-step*.01;v-=step){
+      const y=PAD_T+gH*(1-(v-mn)/rng);
+      cx.fillText(v.toFixed(dec),PAD_L-14,y+7);
+      cx.save();cx.strokeStyle=dark?'rgba(255,255,255,.04)':'rgba(0,0,0,.05)';
+      cx.lineWidth=1;cx.setLineDash([]);
+      cx.beginPath();cx.moveTo(PAD_L,y);cx.lineTo(CW-PAD_R,y);cx.stroke();
+      cx.restore();
+    }
+
+    // ── glow line ──
+    if(pts.length>1){
+      cx.save();
+      cx.filter='blur(8px)';
+      cx.strokeStyle='rgba(255,104,32,.35)';cx.lineWidth=16;cx.lineCap='round';cx.lineJoin='round';
+      cx.beginPath();
+      pts.forEach((p,i)=>{i===0?cx.moveTo(p.x,p.y):cx.lineTo(p.x,p.y);});
+      cx.stroke();cx.filter='none';cx.restore();
+    }
+
+    // ── gradient line ──
+    if(pts.length>1){
+      const lg=cx.createLinearGradient(PAD_L,0,CW-PAD_R,0);
+      lg.addColorStop(0,'#FF5015');lg.addColorStop(.5,'#FF7828');lg.addColorStop(1,'#FFAB40');
+      cx.strokeStyle=lg;cx.lineWidth=4;cx.lineCap='round';cx.lineJoin='round';
+      cx.beginPath();
+      pts.forEach((p,i)=>{i===0?cx.moveTo(p.x,p.y):cx.lineTo(p.x,p.y);});
+      cx.stroke();
+    }
+
+    // ── dots ──
+    pts.forEach((p,i)=>{
+      const isL=i===n-1,r=isL?10:7;
+      cx.beginPath();cx.arc(p.x,p.y,r,0,Math.PI*2);
+      cx.fillStyle=isL?'#FFAB40':'rgba(255,171,64,.8)';cx.fill();
+      cx.beginPath();cx.arc(p.x,p.y,isL?5.5:3.5,0,Math.PI*2);
+      cx.fillStyle=dark?'#111111':'#FAF7F2';cx.fill();
+    });
+
+    // ── X labels ──
+    const MNS=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+    cx.font='bold 20px Onest,system-ui,sans-serif';
+    cx.fillStyle=dark?'rgba(255,185,80,.45)':'rgba(140,90,10,.5)';
+    cx.textAlign='center';
+    const xStep=Math.max(1,Math.ceil(n/8));
+    pts.forEach((p,i)=>{
+      if(i%xStep===0||i===n-1){
+        const d2=new Date(p.ts);
+        cx.fillText(d2.getDate()+' '+MNS[d2.getMonth()],p.x,CH-PAD_B+46);
+      }
+    });
+
+    // ── header ──
+    cx.textAlign='left';
+    cx.font='900 48px Onest,system-ui,sans-serif';
+    cx.fillStyle=dark?'rgba(255,255,255,.9)':'rgba(28,22,8,.85)';
+    cx.fillText('динамика веса',PAD_L,68);
+    // current weight big
+    const cur=data[n-1].weight;
+    const diff=+(cur-data[0].weight).toFixed(1);
+    cx.textAlign='right';
+    cx.font='900 52px Onest,system-ui,sans-serif';
+    cx.fillStyle='#FFAB40';
+    cx.fillText(cur.toFixed(1)+' кг',CW-PAD_R,68);
+    cx.font='bold 26px Onest,system-ui,sans-serif';
+    cx.fillStyle=diff<=0?'#52C177':'#F45C5C';
+    cx.fillText((diff>0?'+':'')+diff+' кг',CW-PAD_R,100);
+
+    // ── branding ──
+    cx.textAlign='center';
+    cx.font='700 20px Onest,system-ui,sans-serif';
+    cx.fillStyle=dark?'rgba(255,255,255,.18)':'rgba(0,0,0,.18)';
+    cx.fillText('letify',CW/2,CH-24);
+
+    // ── download ──
+    cv.toBlob(blob=>{
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.href=url;a.download='weight_letify.png';
+      document.body.appendChild(a);a.click();
+      setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},2000);
+    },'image/png');
+  };
+
   window._wcScrollToEnd=function(){
     if(!_scrollEl)return;
     _hideEndBtn();
@@ -3712,8 +3881,8 @@ function toast(msg){/* toasts disabled */}
     let dotsHTML='';
     _pts.forEach((p,i)=>{
       const isL=i===lastIdx,r=isL?7:5;
-      dotsHTML+=`<g class="wcdg" data-i="${i}" style="touch-action:none;cursor:pointer">
-        <circle cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="22" fill="transparent" class="wcdhit"/>
+      dotsHTML+=`<g class="wcdg" data-i="${i}" style="touch-action:pan-x;cursor:pointer">
+        <circle cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="26" fill="transparent" class="wcdhit"/>
         <circle class="wcdring" cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="0" fill="none" stroke="rgba(255,171,64,.38)" stroke-width="1.5" opacity="0" style="transition:r .2s cubic-bezier(.34,1.3,.64,1),opacity .18s"/>
         <circle class="wcdcore" cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="${r}" fill="${isL?'#FFAB40':'rgba(255,171,64,.72)'}" style="transition:r .16s cubic-bezier(.34,1.2,.64,1),fill .14s"/>
         <circle class="wcdhle" cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="${isL?4:2.8}" fill="${bgColor}" pointer-events="none" style="transition:r .16s cubic-bezier(.34,1.2,.64,1)"/>
@@ -3837,21 +4006,24 @@ function toast(msg){/* toasts disabled */}
   function _bindDots(){
     const svg=document.getElementById('wc-svg');if(!svg)return;
     svg.querySelectorAll('.wcdg').forEach(g=>{
-      g.addEventListener('pointerdown',ev=>{
-        ev.preventDefault();ev.stopPropagation();
-        g.setPointerCapture(ev.pointerId);
+      let _tapStartX=0,_tapStartY=0,_tapping=false;
+      // Use touchstart/touchend for tap detection — doesn't block native scroll
+      g.addEventListener('touchstart',ev=>{
+        _tapping=true;
+        _tapStartX=ev.touches[0].clientX;
+        _tapStartY=ev.touches[0].clientY;
+      },{passive:true});
+      g.addEventListener('touchmove',ev=>{
+        // Cancel tap if moved more than 8px
+        if(Math.abs(ev.touches[0].clientX-_tapStartX)>8||Math.abs(ev.touches[0].clientY-_tapStartY)>8)_tapping=false;
+      },{passive:true});
+      g.addEventListener('touchend',ev=>{
+        if(!_tapping)return;
+        _tapping=false;
         _activate(parseInt(g.dataset.i));
-        const onMove=mv=>{
-          const r=svg.getBoundingClientRect();
-          const svgX=mv.clientX-r.left;
-          let best=-1,bestD=Infinity;
-          _pts.forEach((p,i)=>{const d=Math.abs(p.x-svgX);if(d<bestD){bestD=d;best=i;}});
-          if(best>=0&&best!==_activeI)_activate(best);
-        };
-        g.addEventListener('pointermove',onMove,{passive:true});
-        g.addEventListener('pointerup',()=>g.removeEventListener('pointermove',onMove),{once:true});
-        g.addEventListener('pointercancel',()=>g.removeEventListener('pointermove',onMove),{once:true});
-      },{passive:false});
+      },{passive:true});
+      // Mouse support
+      g.addEventListener('click',()=>_activate(parseInt(g.dataset.i)));
     });
   }
 
