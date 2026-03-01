@@ -2124,7 +2124,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
         </div>
         <div class="sc-meal-card" id="scm-lunch" onclick="setScMeal('lunch',this)">
           <div class="sc-meal-ico-wrap">
-            <iconify-icon icon="solar:bowl-spoon-bold" style="font-size:20px;color:var(--water)"></iconify-icon>
+            <iconify-icon icon="solar:sun-bold" style="font-size:20px;color:var(--water)"></iconify-icon>
           </div>
           <div>
             <div class="sc-meal-name">Обед</div>
@@ -2142,11 +2142,11 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
         </div>
         <div class="sc-meal-card" id="scm-snack" onclick="setScMeal('snack',this)">
           <div class="sc-meal-ico-wrap">
-            <iconify-icon icon="solar:apple-bold" style="font-size:20px;color:var(--green)"></iconify-icon>
+            <iconify-icon icon="solar:leaf-bold" style="font-size:20px;color:var(--green)"></iconify-icon>
           </div>
           <div>
             <div class="sc-meal-name">Перекус</div>
-            <div class="sc-meal-time">Между едой</div>
+            <div class="sc-meal-time">между едой</div>
           </div>
         </div>
       </div>
@@ -2374,7 +2374,13 @@ function pushPage(id){
   const pp=document.getElementById(id);
   if(pp){pp.classList.add('open');pp.scrollTop=0;const body=pp.querySelector('.pp-body');if(body)body.scrollTop=0;}
   _populatePP(id);
-  if(tg?.BackButton){tg.BackButton.show();tg.BackButton.onClick(popPage);}
+  if(tg?.BackButton){
+    tg.BackButton.show();
+    // каждой странице — свой обработчик назад
+    const handler=id==='pp-cal'?calBackOrPop:id==='pp-scanner'?scannerBack:popPage;
+    tg.BackButton.onClick(handler);
+    tg.BackButton._letifyHandler=handler; // сохраняем чтобы снять в popPage
+  }
   tg?.HapticFeedback?.impactOccurred('light');
 }
 function popPage(doRender=true){
@@ -2399,7 +2405,11 @@ function popPage(doRender=true){
     document.getElementById('nav')?.classList.remove('gone');
     const sb=Math.min(Math.max(tg?.safeAreaInset?.bottom??0,0),80);
     const nav=document.getElementById('nav');if(nav)nav.style.bottom=(12+sb)+'px';
-    if(tg?.BackButton){tg.BackButton.hide();tg.BackButton.offClick(popPage);}
+    if(tg?.BackButton){
+      tg.BackButton.hide();
+      if(tg.BackButton._letifyHandler){tg.BackButton.offClick(tg.BackButton._letifyHandler);tg.BackButton._letifyHandler=null;}
+      tg.BackButton.offClick(popPage);
+    }
     if(doRender&&_completingMap.size===0){const renders={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};renders[curTab]?.();}
   }
 }
@@ -2619,13 +2629,6 @@ function _setCalStep(n){
   });
   const titles=['название блюда','питательная ценность','приём пищи'];
   const t=document.getElementById('cal-step-title');if(t)t.textContent=titles[n-1];
-  // Telegram BackButton: на шаге 1 → закрыть страницу, на 2+ → назад по шагам
-  if(tg?.BackButton){
-    tg.BackButton.offClick(popPage);
-    tg.BackButton.offClick(calBackOrPop);
-    if(n===1){tg.BackButton.onClick(popPage);}
-    else{tg.BackButton.onClick(calBackOrPop);}
-  }
 }
 let _calGrams=100;
 function calRecalc(){
@@ -3611,12 +3614,6 @@ function _setScanStep(n){
   });
   const titles=['сканирование','продукт и порция','добавить в приём'];
   T('sc-step-title',titles[n-1]);
-  // Telegram BackButton: всегда идёт по шагам через scannerBack
-  if(tg?.BackButton){
-    tg.BackButton.offClick(popPage);
-    tg.BackButton.offClick(scannerBack);
-    tg.BackButton.onClick(scannerBack);
-  }
 }
 
 /* Update inline step indicators in camera area */
