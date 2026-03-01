@@ -494,6 +494,60 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 /* ══ AVATAR ══ */
 .pav{width:64px;height:64px;border-radius:20px;background:linear-gradient(135deg,var(--sun),var(--sun2));display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;color:#fff;box-shadow:0 5px 18px rgba(255,107,53,.25);flex-shrink:0}
 
+/* ══ PROFILE — ACCENT CARDS ══ */
+.pf-hero{
+  margin:6px 14px 0;
+  background:linear-gradient(135deg,rgba(255,107,53,.1),rgba(255,171,64,.05));
+  border:1px solid rgba(255,107,53,.18);border-radius:22px;
+  padding:16px;display:flex;align-items:center;gap:14px;
+  position:relative;overflow:hidden;
+}
+.tg-dark .pf-hero{background:linear-gradient(135deg,rgba(255,107,53,.12),rgba(255,171,64,.06))}
+.pf-hero::before{content:'';position:absolute;right:-18px;top:-18px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(255,107,53,.12),transparent 70%);pointer-events:none}
+.pf-av2{width:54px;height:54px;border-radius:18px;background:linear-gradient(135deg,var(--sun),var(--sun2));display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;flex-shrink:0;box-shadow:0 4px 14px rgba(255,107,53,.3)}
+.pf-hero-info{flex:1;min-width:0}
+.pf-hero-name{font-size:17px;font-weight:900;letter-spacing:-.025em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pf-hero-meta{font-size:11px;font-weight:600;color:var(--hint);margin-top:2px}
+.pf-hero-edit{width:32px;height:32px;border-radius:10px;background:rgba(255,255,255,.1);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:rgba(255,255,255,.6);transition:background .12s}
+.pf-hero-edit:active{background:rgba(255,255,255,.18)}
+.tg-dark .pf-hero-edit{background:rgba(255,255,255,.1)}
+
+.pf-bmi-chips{display:flex;gap:6px;margin:10px 14px 0}
+.pf-bmi-chip{flex:1;padding:10px 8px;border-radius:14px;background:var(--bg2);border:1px solid var(--brd);text-align:center}
+.tg-dark .pf-bmi-chip{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.08)}
+.pf-bmi-v{font-size:16px;font-weight:900;letter-spacing:-.03em;line-height:1}
+.pf-bmi-l{font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+
+.pf-sec{font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--hint);padding:14px 16px 8px}
+.pf-group{margin:0 14px;border-radius:18px;overflow:hidden;border:1px solid var(--brd);background:var(--bg2)}
+.tg-dark .pf-group{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.07)}
+.pf-row{
+  display:flex;align-items:center;gap:12px;padding:13px 14px;
+  border-bottom:1px solid var(--brd);cursor:pointer;
+  transition:background .12s;
+}
+.tg-dark .pf-row{border-bottom-color:rgba(255,255,255,.06)}
+.pf-row:last-child{border-bottom:none}
+.pf-row:active{background:rgba(0,0,0,.04)}
+.tg-dark .pf-row:active{background:rgba(255,255,255,.08)}
+.pf-row-ic{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pf-row-body{flex:1;min-width:0}
+.pf-row-lbl{font-size:14px;font-weight:800;letter-spacing:-.01em}
+.pf-row-val{font-size:11px;font-weight:600;color:var(--hint);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pf-row-chev{color:var(--hint);opacity:.4;flex-shrink:0}
+
+.pf-danger{
+  margin:10px 14px 0;padding:14px;
+  border-radius:16px;background:rgba(244,92,92,.07);border:1px solid rgba(244,92,92,.14);
+  display:flex;align-items:center;gap:10px;cursor:pointer;
+  transition:background .12s;
+}
+.pf-danger:active{background:rgba(244,92,92,.14)}
+.pf-danger-ic{width:34px;height:34px;border-radius:11px;background:rgba(244,92,92,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pf-danger-lbl{font-size:14px;font-weight:800;color:var(--red)}
+.pf-danger-sub{font-size:11px;font-weight:600;color:rgba(244,92,92,.5);margin-top:1px}
+.pf-ver{text-align:center;padding:14px 0 6px;font-size:11px;font-weight:600;color:var(--hint);opacity:.5}
+
 /* ══ TOAST ══ */
 /* toast removed */
 
@@ -1489,67 +1543,109 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 </div>
 
 <!-- ══ PROFILE ══ -->
-<div class="page" id="p-profile">
-<div style="display:flex;align-items:center;gap:14px;padding:4px 16px 0">
-  <div class="pav" id="pf-av">А</div>
+<div class="page" id="p-profile" style="overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none">
+
+<!-- Hero Card -->
+<div class="pf-hero" onclick="pushPage('pp-pdata')">
+  <div class="pf-av2" id="pf-av">?</div>
+  <div class="pf-hero-info">
+    <div class="pf-hero-name" id="pf-name">—</div>
+    <div class="pf-hero-meta" id="pf-meta">—</div>
+  </div>
+  <button class="pf-hero-edit" onclick="event.stopPropagation();pushPage('pp-pdata')">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+  </button>
+</div>
+
+<!-- BMI Chips -->
+<div class="pf-bmi-chips" id="pf-bmi-row" style="display:none">
+  <div class="pf-bmi-chip">
+    <div class="pf-bmi-v" style="color:var(--water)" id="pf-bmi">—</div>
+    <div class="pf-bmi-l">ИМТ</div>
+  </div>
+  <div class="pf-bmi-chip">
+    <div class="pf-bmi-v" style="color:var(--green)" id="pf-ideal">—</div>
+    <div class="pf-bmi-l">идеал кг</div>
+  </div>
+  <div class="pf-bmi-chip">
+    <div class="pf-bmi-v" style="color:var(--sun)" id="pf-bmr">—</div>
+    <div class="pf-bmi-l">BMR</div>
+  </div>
+</div>
+
+<!-- Настройки -->
+<div class="pf-sec">настройки</div>
+<div class="pf-group">
+  <div class="pf-row" onclick="pushPage('pp-pdata')">
+    <div class="pf-row-ic" style="background:rgba(255,107,53,.13)">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    </div>
+    <div class="pf-row-body">
+      <div class="pf-row-lbl">данные профиля</div>
+      <div class="pf-row-val" id="pf-pname">—</div>
+    </div>
+    <div class="pf-row-chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+  </div>
+  <div class="pf-row" onclick="pushPage('pp-start-weight')">
+    <div class="pf-row-ic" style="background:rgba(82,193,119,.13)">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#52C177" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 7l7-4 7 4"/><path d="M3 17h6a3 3 0 0 0 0-6H3l3 3-3 3zm18 0h-6a3 3 0 0 1 0-6h6l-3 3 3 3z"/></svg>
+    </div>
+    <div class="pf-row-body">
+      <div class="pf-row-lbl">начальный вес и цель</div>
+      <div class="pf-row-val" id="pf-sw">—</div>
+    </div>
+    <div class="pf-row-chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+  </div>
+  <div class="pf-row" onclick="pushPage('pp-goals')">
+    <div class="pf-row-ic" style="background:rgba(78,174,229,.13)">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#4EAEE5" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg>
+    </div>
+    <div class="pf-row-body">
+      <div class="pf-row-lbl">мои цели</div>
+      <div class="pf-row-val" id="pf-gw">—</div>
+    </div>
+    <div class="pf-row-chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+  </div>
+  <div class="pf-row" onclick="pushPage('pp-plan-settings')">
+    <div class="pf-row-ic" style="background:rgba(139,127,212,.13)">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#8B7FD4" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/></svg>
+    </div>
+    <div class="pf-row-body">
+      <div class="pf-row-lbl">план по дням</div>
+      <div class="pf-row-val">расписание</div>
+    </div>
+    <div class="pf-row-chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+  </div>
+</div>
+
+<!-- Персонализация -->
+<div class="pf-sec">персонализация</div>
+<div class="pf-group">
+  <div class="pf-row" onclick="pushPage('pp-design')">
+    <div class="pf-row-ic" style="background:rgba(255,171,64,.13)">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#FFAB40" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".7" fill="#FFAB40"/><circle cx="17.5" cy="10.5" r=".7" fill="#FFAB40"/><circle cx="8.5" cy="7.5" r=".7" fill="#FFAB40"/><circle cx="6.5" cy="12.5" r=".7" fill="#FFAB40"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+    </div>
+    <div class="pf-row-body">
+      <div class="pf-row-lbl">оформление</div>
+      <div class="pf-row-val" id="pf-design-val">классический</div>
+    </div>
+    <div class="pf-row-chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+  </div>
+</div>
+
+<!-- Danger -->
+<div class="pf-danger" onclick="resetAllData()">
+  <div class="pf-danger-ic">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F45C5C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+  </div>
   <div>
-    <div class="t2" id="pf-name">—</div>
-    <div class="t5" id="pf-meta" style="margin-top:2px">—</div>
+    <div class="pf-danger-lbl">сбросить все данные</div>
+    <div class="pf-danger-sub">удалит все записи и настройки навсегда</div>
   </div>
 </div>
-<div id="pf-bmi-row" style="margin-top:12px;padding:0 16px;display:none">
-  <div class="sb-row">
-    <div class="sbox"><div class="sv" id="pf-bmi">—</div><div class="sl">ИМТ</div></div>
-    <div class="sbox"><div class="sv" id="pf-ideal">—</div><div class="sl">идеал кг</div></div>
-    <div class="sbox"><div class="sv" id="pf-bmr">—</div><div class="sl">BMR</div></div>
-  </div>
-</div>
-<div class="sec">настройки</div>
-<div class="pad">
-<div class="card">
-  <div class="lt" onclick="pushPage('pp-pdata')">
-    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
-    <span class="lt-lbl">данные профиля</span>
-    <span class="lt-val" id="pf-pname">—</span>
-    <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-  </div>
-  <div class="lt" onclick="pushPage('pp-start-weight')">
-    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 7l7-4 7 4M3 17h6a3 3 0 0 0 0-6H3l3 3-3 3zm18 0h-6a3 3 0 0 1 0-6h6l-3 3 3 3z"/></svg></div>
-    <span class="lt-lbl">начальный вес и цель</span>
-    <span class="lt-val" id="pf-sw">—</span>
-    <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-  </div>
-  <div class="lt" style="padding-bottom:0;border:none" onclick="pushPage('pp-goals')">
-    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg></div>
-    <span class="lt-lbl">мои цели</span>
-    <span class="lt-val"><span id="pf-gw">—</span></span>
-    <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-  </div>
-  <div class="lt" style="padding-bottom:0;border:none" onclick="pushPage('pp-plan-settings')">
-    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/></svg></div>
-    <span class="lt-lbl">план по дням</span>
-    <span class="lt-val">расписание</span>
-    <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-  </div>
-</div>
-</div>
-<div class="sec">персонализация</div>
-<div class="pad">
-<div class="card">
-  <div class="lt" style="padding-bottom:0;border:none" onclick="pushPage('pp-design')">
-    <div class="lt-ic" style="background:rgba(255,107,53,.1)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--sun)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="var(--sun)"/><circle cx="17.5" cy="10.5" r=".5" fill="var(--sun)"/><circle cx="8.5" cy="7.5" r=".5" fill="var(--sun)"/><circle cx="6.5" cy="12.5" r=".5" fill="var(--sun)"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg></div>
-    <span class="lt-lbl">оформление</span>
-    <span class="lt-val" id="pf-design-val">классический</span>
-    <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-  </div>
-</div>
-</div>
-<div class="pad" style="margin-top:10px">
-  <button class="btn btn-danger" style="width:100%;padding:14px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="resetAllData()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> сбросить все данные</button>
-  <div class="clear-hint">удалит все записи и настройки навсегда</div>
-</div>
-<div style="text-align:center;padding:16px 0 8px"><div class="t5">letify · ver 4.3</div></div>
-<div style="height:8px"></div>
+
+<div class="pf-ver">letify · ver 4.3</div>
+<div style="height:calc(var(--page-bot)+8px)"></div>
 </div>
 
 </div><!-- /pages -->
@@ -4152,22 +4248,27 @@ function renderProgress(){
 
 function renderProfile(){
   const u=gU(),wl=gWL();
+  // Hero avatar + name
   const av=$('pf-av');if(av)av.textContent=(u.name||'?').charAt(0).toUpperCase();
   T('pf-name',u.name||'—');
-  const meta=[];if(u.age)meta.push(u.age+' лет');if(u.height)meta.push(u.height+' см');if(u.gender)meta.push(u.gender==='male'?'♂':'♀');
-  T('pf-meta',meta.join(' · ')||'—');
-  T('pf-gw',u.goal_weight?u.goal_weight+' кг':'—');T('pf-pname',u.name||'—');
+  const meta=[];if(u.height)meta.push(u.height+' см');if(u.age)meta.push(u.age+' лет');if(u.gender)meta.push(u.gender==='male'?'♂':'♀');
+  T('pf-meta',meta.join(' · ')||'заполни профиль →');
+  // Row values
+  T('pf-gw',u.goal_weight?u.goal_weight+' кг · цель':'—');
+  T('pf-pname',u.name||'—');
   const swLabel=u.start_weight&&u.start_weight>0?(u.start_weight.toFixed(1)+' кг · '+(u.goal_type==='gain'?'набор':'похудение')):'не задан';
   T('pf-sw',swLabel);
   // Design label
   const labels={classic:'классический',linear:'линейный',bento:'бенто'};
   T('pf-design-val',labels[getHomeDesign()]||'классический');
+  // BMI chips
   const bmiRow=$('pf-bmi-row');
   if(u.height&&wl.length){
     const cw=wl[wl.length-1].weight,h2=u.height/100;
-    T('pf-bmi',+(cw/h2/h2).toFixed(1));T('pf-ideal',+((u.height-100)*.9).toFixed(1));
+    T('pf-bmi',+(cw/h2/h2).toFixed(1));
+    T('pf-ideal',+((u.height-100)*.9).toFixed(1));
     T('pf-bmr',Math.round(u.gender==='female'?10*cw+6.25*u.height-5*(u.age||25)-161:10*cw+6.25*u.height-5*(u.age||25)+5));
-    if(bmiRow)bmiRow.style.display='';
+    if(bmiRow)bmiRow.style.display='flex';
   }else if(bmiRow)bmiRow.style.display='none';
 }
 
