@@ -943,20 +943,10 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .sc-confirm-name{font-size:17px;font-weight:900;letter-spacing:-.02em;line-height:1.2}
 .sc-confirm-kcal{font-size:13px;font-weight:700;color:var(--cal);margin-top:3px}
 
-/* ── sc-step — плавный переход ── */
-.sc-step{
-  opacity:0;
-  transform:translateY(10px);
-  pointer-events:none;
-  position:absolute;left:0;right:0;
-  transition:opacity .28s ease, transform .28s ease;
-}
-.sc-step.active{
-  opacity:1;
-  transform:translateY(0);
-  pointer-events:all;
-  position:relative;
-}
+/* ── sc-step — плавный вход через CSS-анимацию ── */
+.sc-step{display:none}
+.sc-step.active{display:block;animation:sc-step-in .25s ease forwards}
+@keyframes sc-step-in{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
 
 /* ── Existing items we patch ── */
 .kbzhu-row{display:flex;gap:6px;margin-top:10px}
@@ -2624,6 +2614,13 @@ function _setCalStep(n){
   });
   const titles=['название блюда','питательная ценность','приём пищи'];
   const t=document.getElementById('cal-step-title');if(t)t.textContent=titles[n-1];
+  // Telegram BackButton: на шаге 1 → закрыть страницу, на 2+ → назад по шагам
+  if(tg?.BackButton){
+    tg.BackButton.offClick(popPage);
+    tg.BackButton.offClick(calBackOrPop);
+    if(n===1){tg.BackButton.onClick(popPage);}
+    else{tg.BackButton.onClick(calBackOrPop);}
+  }
 }
 let _calGrams=100;
 function calRecalc(){
@@ -3601,31 +3598,20 @@ const _barcodeDetector='BarcodeDetector' in window
   : null;
 
 function _setScanStep(n){
-  const prev=_scStep;
   _scStep=n;
-  // убираем активный шаг с анимацией
-  const oldEl=document.getElementById('sc-s'+prev);
-  if(oldEl&&prev!==n){
-    oldEl.style.transition='opacity .2s ease,transform .2s ease';
-    oldEl.style.opacity='0';
-    oldEl.style.transform='translateY(-8px)';
-    setTimeout(()=>{
-      oldEl.classList.remove('active');
-      oldEl.style.transition='';oldEl.style.opacity='';oldEl.style.transform='';
-      // показываем новый
-      const newEl=document.getElementById('sc-s'+n);
-      if(newEl)newEl.classList.add('active');
-    },200);
-  }else{
-    [1,2,3].forEach(i=>document.getElementById('sc-s'+i)?.classList.toggle('active',i===n));
-  }
-  // пипки в хэдере
   [1,2,3].forEach(i=>{
+    document.getElementById('sc-s'+i)?.classList.toggle('active',i===n);
     const pip=document.getElementById('scp'+i);
     if(pip){pip.classList.toggle('on',i===n);pip.classList.toggle('done',i<n);if(i<n)pip.classList.remove('on');}
   });
   const titles=['сканирование','продукт и порция','добавить в приём'];
   T('sc-step-title',titles[n-1]);
+  // Telegram BackButton: всегда идёт по шагам через scannerBack
+  if(tg?.BackButton){
+    tg.BackButton.offClick(popPage);
+    tg.BackButton.offClick(scannerBack);
+    tg.BackButton.onClick(scannerBack);
+  }
 }
 
 /* Update inline step indicators in camera area */
