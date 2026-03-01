@@ -596,22 +596,28 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   padding:2px 16px 0;letter-spacing:.04em;text-transform:uppercase;
 }
 .wterm-periods{
-  display:flex;gap:0;border-bottom:1px solid var(--brd);
-  padding:0 4px;margin-top:10px;
+  display:flex;gap:5px;
+  padding:10px 14px 10px;
+  border-bottom:1px solid var(--brd);
 }
 .wterm-pbtn{
-  flex:1;padding:8px 0;background:transparent;border:none;border-bottom:2px solid transparent;
+  flex:1;padding:7px 4px;background:transparent;border:none;border-radius:99px;
   font-size:11px;font-weight:800;color:var(--hint);font-family:inherit;cursor:pointer;
-  letter-spacing:.04em;transition:color .14s,border-color .14s,background .14s;
-  margin-bottom:-1px;
+  letter-spacing:.04em;transition:color .15s,background .15s,box-shadow .15s;
 }
-.wterm-pbtn.on{color:var(--green);border-bottom-color:var(--green);background:rgba(82,193,119,.05)}
+.wterm-pbtn.on{
+  color:var(--green);
+  background:rgba(82,193,119,.14);
+  box-shadow:0 1px 6px rgba(82,193,119,.15);
+}
+.tg-dark .wterm-pbtn.on{background:rgba(82,193,119,.2)}
+.wterm-pbtn:active{opacity:.7;transition:opacity .07s}
 .wterm-chart-wrap{position:relative;background:transparent;margin:0;overflow:hidden}
 .wterm-tooltip{
   position:absolute;background:var(--bg2);border:1px solid var(--brd);
   border-radius:10px;padding:7px 12px;pointer-events:none;font-size:12px;font-weight:700;
   white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.25);transform:translateX(-50%);
-  top:8px;z-index:10;
+  top:8px;z-index:10;display:none;
 }
 .tg-dark .wterm-tooltip{background:#1C1C1C;border-color:rgba(255,255,255,.12)}
 .wterm-tt-val{color:var(--text);font-size:14px;font-weight:900}
@@ -623,19 +629,26 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .wterm-stat:last-child{border-right:none}
 .wterm-stat-lbl{font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.06em}
 .wterm-stat-val{font-size:15px;font-weight:900;margin-top:2px;letter-spacing:-.02em}
-.wterm-log{padding:12px 16px 0}
-.wterm-log-hdr{font-size:10px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.wterm-log{padding:12px 16px 4px;padding-bottom:calc(var(--sb)+32px)}
+.wterm-log-hdr{font-size:10px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
+.wterm-log-scroll{
+  max-height:38vh;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+  background:var(--bg2);border:1px solid var(--brd);border-radius:16px;overflow:hidden;
+  overflow-y:auto;
+}
+.tg-dark .wterm-log-scroll{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.08)}
+.wterm-log-scroll::-webkit-scrollbar{display:none}
 .wterm-log-item{
-  display:flex;align-items:center;padding:8px 0;
+  display:flex;align-items:center;padding:10px 14px;
   border-bottom:1px solid var(--brd);font-size:12px;font-weight:700;
 }
 .tg-dark .wterm-log-item{border-bottom-color:rgba(255,255,255,.06)}
 .wterm-log-item:last-child{border-bottom:none}
-.wterm-log-date{color:var(--hint);width:58px;flex-shrink:0;font-size:11px;font-weight:600}
+.wterm-log-date{color:var(--hint);width:56px;flex-shrink:0;font-size:11px;font-weight:600}
 .wterm-log-val{color:var(--text);margin-right:auto;font-size:13px;font-weight:800}
-.wterm-log-d{font-size:10px;font-weight:800;padding:2px 7px;border-radius:5px;flex-shrink:0}
-.wterm-log-d.neg{color:var(--green);background:rgba(82,193,119,.1)}
-.wterm-log-d.pos{color:var(--red);background:rgba(244,92,92,.1)}
+.wterm-log-d{font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;flex-shrink:0}
+.wterm-log-d.neg{color:var(--green);background:rgba(82,193,119,.12)}
+.wterm-log-d.pos{color:var(--red);background:rgba(244,92,92,.12)}
 .wterm-log-d.zero{color:var(--hint);background:var(--bg3)}
 
 /* ══ EMPTY ══ */
@@ -2172,10 +2185,11 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       <span class="wterm-change neutral" id="wterm-change">—</span>
     </div>
   </div>
+  <div style="flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none">
   <div class="wterm-meta-row" id="wterm-meta">— · —</div>
   <div class="wterm-periods" id="wterm-periods">
-    <button class="wterm-pbtn" onclick="wtermSetPeriod(this,'7d')">7Д</button>
-    <button class="wterm-pbtn on" onclick="wtermSetPeriod(this,'1m')">1М</button>
+    <button class="wterm-pbtn on" onclick="wtermSetPeriod(this,'7d')">7Д</button>
+    <button class="wterm-pbtn" onclick="wtermSetPeriod(this,'1m')">1М</button>
     <button class="wterm-pbtn" onclick="wtermSetPeriod(this,'3m')">3М</button>
     <button class="wterm-pbtn" onclick="wtermSetPeriod(this,'6m')">6М</button>
     <button class="wterm-pbtn" onclick="wtermSetPeriod(this,'all')">ВСЁ</button>
@@ -2189,6 +2203,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
   <div class="wterm-stats" id="wterm-stats"></div>
   <div class="wterm-log" id="wterm-log"></div>
+  </div>
 </div>
 
 <!-- PP: Настройки плана по дням -->
@@ -3629,37 +3644,52 @@ function _wtermRenderLog(all){
   const logEl=document.getElementById('wterm-log');
   if(!logEl)return;
   if(!all||!all.length){logEl.innerHTML='';return;}
-  const sorted=[...all].sort((a,b)=>b.logged_at.localeCompare(a.logged_at)).slice(0,15);
-  let html=`<div class="wterm-log-hdr">ИСТОРИЯ</div>`;
+  // Group by date: keep one entry per date (latest by time if multiple)
+  const byDate=new Map();
+  all.forEach(d=>{
+    const existing=byDate.get(d.logged_at);
+    if(!existing||d.id>existing.id)byDate.set(d.logged_at,d);
+  });
+  const sorted=[...byDate.values()].sort((a,b)=>b.logged_at.localeCompare(a.logged_at));
+  let itemsHtml='';
   sorted.forEach((d,i)=>{
     const prev=sorted[i+1];
     const delta=prev?(d.weight-prev.weight):0;
     const sign=delta<0?'neg':delta>0?'pos':'zero';
     const dStr=delta===0?'—':(delta>0?'+':'')+delta.toFixed(1);
     const isToday=d.logged_at===new Date().toISOString().slice(0,10);
-    html+=`<div class="wterm-log-item">
-      <span class="wterm-log-date">${_wtermFmtDate(d.logged_at)}${isToday?' <span style="color:var(--sun);font-size:9px">сег</span>':''}</span>
+    itemsHtml+=`<div class="wterm-log-item">
+      <span class="wterm-log-date">${_wtermFmtDate(d.logged_at)}${isToday?'<span style="margin-left:4px;color:var(--sun);font-size:9px;font-weight:800">сег</span>':''}</span>
       <span class="wterm-log-val">${(d.weight||0).toFixed(1)} кг</span>
       <span class="wterm-log-d ${sign}">${dStr}</span>
     </div>`;
   });
-  logEl.innerHTML=html;
+  logEl.innerHTML=`<div class="wterm-log-hdr">ИСТОРИЯ</div><div class="wterm-log-scroll">${itemsHtml}</div>`;
 }
 
 function _populateWeightChart(){
   const wl=gWL();
   const u=gU();
-  _wtermAllData=[...wl].sort((a,b)=>a.logged_at.localeCompare(b.logged_at));
+  // Deduplicate by date for chart (keep latest per date)
+  const byDate=new Map();
+  wl.forEach(d=>{
+    const existing=byDate.get(d.logged_at);
+    if(!existing||d.id>existing.id)byDate.set(d.logged_at,d);
+  });
+  _wtermAllData=[...byDate.values()].sort((a,b)=>a.logged_at.localeCompare(b.logged_at));
   _wtermGoal=u.goal_weight||0;
+  _wtermPeriod='7d';
+  // Reset period pills
+  document.querySelectorAll('.wterm-pbtn').forEach((b,i)=>{b.classList.toggle('on',i===0);});
 
-  // Header: ticker price + change
+  // Header
   const priceEl=document.getElementById('wterm-price');
   const changeEl=document.getElementById('wterm-change');
   const metaEl=document.getElementById('wterm-meta');
 
-  if(wl.length){
-    const cw=wl[wl.length-1].weight;
-    const sw=wl[0]?wl[0].weight:cw;
+  if(_wtermAllData.length){
+    const cw=_wtermAllData[_wtermAllData.length-1].weight;
+    const sw=_wtermAllData[0].weight;
     const delta=+(cw-sw).toFixed(1);
     if(priceEl)priceEl.textContent=cw.toFixed(1);
     if(changeEl){
@@ -3667,9 +3697,8 @@ function _populateWeightChart(){
       changeEl.className='wterm-change '+(delta<0?'up':delta>0?'down':'neutral');
     }
     if(metaEl){
-      const cnt=wl.length;
-      const recDate=_wtermFmtDate(wl[wl.length-1].logged_at);
-      metaEl.textContent=`СЕГОДНЯ · ${cnt} ${cnt===1?'ЗАПИСЬ':cnt<5?'ЗАПИСИ':'ЗАПИСЕЙ'}`;
+      const cnt=_wtermAllData.length;
+      metaEl.textContent=`ЗАПИСЕЙ · ${cnt}`;
     }
   } else {
     if(priceEl)priceEl.textContent='—';
@@ -3679,10 +3708,10 @@ function _populateWeightChart(){
 
   // Stats bar
   const statsEl=document.getElementById('wterm-stats');
-  if(statsEl&&wl.length){
-    const cw=wl[wl.length-1].weight;
-    const maxW=Math.max(...wl.map(d=>d.weight));
-    const minW=Math.min(...wl.map(d=>d.weight));
+  if(statsEl&&_wtermAllData.length){
+    const cw=_wtermAllData[_wtermAllData.length-1].weight;
+    const maxW=Math.max(..._wtermAllData.map(d=>d.weight));
+    const minW=Math.min(..._wtermAllData.map(d=>d.weight));
     const gw=_wtermGoal;
     statsEl.innerHTML=`
       <div class="wterm-stat"><div class="wterm-stat-lbl">сейчас</div><div class="wterm-stat-val" style="color:var(--sun)">${cw.toFixed(1)}</div></div>
@@ -3692,10 +3721,10 @@ function _populateWeightChart(){
     `;
   } else if(statsEl){statsEl.innerHTML='';}
 
-  // Log
+  // Log (uses raw wl for display but deduplicated)
   _wtermRenderLog(_wtermAllData);
 
-  // Draw chart
+  // Chart
   const filtered=_wtermFilterData(_wtermAllData,_wtermPeriod);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     drawTerminalWeightChart('wterm-canvas',filtered,_wtermGoal);
