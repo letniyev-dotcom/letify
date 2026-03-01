@@ -806,12 +806,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   overflow:hidden;
   position:relative;
   background:#050508;
-  box-shadow:0 8px 40px rgba(0,0,0,.28),0 2px 8px rgba(0,0,0,.15);
-  margin-bottom:0;
-  transition:box-shadow .4s ease;
-}
-.scanner-viewport.found{
-  box-shadow:0 0 0 2px var(--green), 0 0 28px rgba(82,193,119,.35), 0 8px 40px rgba(0,0,0,.28);
+  /* нет transition на box-shadow — дорого repaint */
 }
 
 .scanner-viewport video{
@@ -827,12 +822,8 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     radial-gradient(ellipse 55% 70% at 80% 75%,rgba(4,6,20,.85) 0%,transparent 65%),
     #05050a;
 }
-/* Subtle dot grid */
-.sc-cam-grid{
-  position:absolute;inset:0;pointer-events:none;
-  background-image:radial-gradient(circle,rgba(255,255,255,.055) 1px,transparent 1px);
-  background-size:22px 22px;opacity:.7;
-}
+/* dot grid removed — expensive over video */
+.sc-cam-grid{display:none}
 
 /* ── Viewfinder frame ── */
 .sc-vf{
@@ -910,13 +901,13 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   width:64px;height:64px;border-radius:50%;
   background:linear-gradient(135deg,var(--green),#7FD98B);
   display:flex;align-items:center;justify-content:center;
-  transform:scale(0) rotate(-20deg);opacity:0;
-  transition:transform .48s cubic-bezier(.34,1.35,.64,1),opacity .3s ease;
+  opacity:0;transform:scale(.7);
+  transition:opacity .3s ease, transform .3s cubic-bezier(.34,1.2,.64,1);
   box-shadow:0 8px 28px rgba(82,193,119,.55);
-  position:relative;z-index:2;
+  position:relative;z-index:2;will-change:opacity,transform;
 }
 .sc-success-overlay.show .sc-success-check{
-  transform:scale(1) rotate(0deg);opacity:1;transition-delay:.1s;
+  opacity:1;transform:scale(1);transition-delay:.08s;
 }
 .sc-success-title{
   font-size:17px;font-weight:900;color:#fff;letter-spacing:-.015em;
@@ -932,33 +923,38 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .sc-success-overlay.show .sc-success-sub{transform:none;opacity:1;transition-delay:.4s}
 
 /* ── Progress: Concept C — 3 horizontal segment bars ── */
-.sc-steps-row{
-  display:flex;gap:5px;
-  padding:14px 0 0;
+/* ── единая полоска прогресса сканера ── */
+.sc-progress-wrap{
+  padding:12px 0 4px;
 }
-.sc-step-item{
-  flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;
+.sc-progress-track{
+  width:100%;height:4px;border-radius:99px;
+  background:rgba(255,255,255,.08);
+  overflow:hidden;
+  position:relative;
 }
-.sc-step-track{
-  width:100%;height:5px;border-radius:99px;
-  background:var(--bg3);overflow:hidden;
-}
-.tg-dark .sc-step-track{background:rgba(255,255,255,.1)}
-.sc-step-fill{
+.tg-dark .sc-progress-track{background:rgba(255,255,255,.12)}
+.sc-progress-fill{
   height:100%;border-radius:99px;
-  transform:scaleX(0);transform-origin:left;
-  background:var(--bg3);
-  transition:transform .5s cubic-bezier(.25,.46,.45,.94),background .35s ease;
-  will-change:transform;
+  width:0%;
+  background:linear-gradient(90deg,var(--sun),var(--sun2));
+  transition:width .6s cubic-bezier(.4,0,.2,1), background .4s ease;
+  will-change:width;
 }
-.sc-step-item.active .sc-step-fill{transform:scaleX(.55);background:var(--sun)}
-.sc-step-item.done .sc-step-fill{transform:scaleX(1);background:var(--green)}
-.sc-step-lbl{
+.sc-progress-fill.done{background:linear-gradient(90deg,var(--green),#7FD98B);}
+.sc-progress-labels{
+  display:flex;justify-content:space-between;
+  margin-top:6px;
+}
+.sc-progress-lbl{
   font-size:9px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
-  color:var(--hint);transition:color .3s;text-align:center;white-space:nowrap;
+  color:rgba(255,255,255,.25);transition:color .3s ease;
+  flex:1;text-align:center;
 }
-.sc-step-item.active .sc-step-lbl{color:var(--sun)}
-.sc-step-item.done .sc-step-lbl{color:var(--green)}
+.sc-progress-lbl:first-child{text-align:left}
+.sc-progress-lbl:last-child{text-align:right}
+.sc-progress-lbl.active{color:var(--sun)}
+.sc-progress-lbl.done{color:rgba(82,193,119,.8)}
 
 /* ── PRODUCT SCREEN (step 2) ── */
 .sc-prod-header{
@@ -1094,10 +1090,21 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .sc-confirm-name{font-size:17px;font-weight:900;letter-spacing:-.02em;line-height:1.2}
 .sc-confirm-kcal{font-size:13px;font-weight:700;color:var(--cal);margin-top:3px}
 
-/* ── sc-step — плавный вход через CSS-анимацию ── */
-.sc-step{display:none}
-.sc-step.active{display:block;animation:sc-step-in .25s ease forwards}
-@keyframes sc-step-in{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+/* ── sc-step — GPU-only переход без layout reflow ── */
+.sc-step{
+  position:absolute;inset:0;
+  opacity:0;pointer-events:none;
+  transition:opacity .22s ease;
+  overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  padding:0 16px calc(var(--sb)+24px);
+}
+.sc-step::-webkit-scrollbar{display:none}
+.sc-step.active{
+  opacity:1;pointer-events:all;
+  position:relative;
+}
 
 /* ── Existing items we patch ── */
 .kbzhu-row{display:flex;gap:6px;margin-top:10px}
@@ -2110,10 +2117,10 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       <div class="pp-title" id="sc-step-title">сканирование</div>
     </div>
   </div>
-  <div class="pp-body" style="padding:16px 16px calc(var(--sb) + 24px)">
+  <div class="pp-body" style="padding:0;position:relative;overflow:hidden">
 
     <!-- ═══ STEP 1: CAMERA ═══ -->
-    <div class="sc-step active" id="sc-s1">
+    <div class="sc-step active" id="sc-s1" style="padding:16px 16px 0">
 
       <!-- Camera viewport -->
       <div class="scanner-viewport" id="scanner-viewport">
@@ -2150,19 +2157,15 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
         </div>
       </div>
 
-      <!-- Step progress — Concept C bars -->
-      <div class="sc-steps-row" id="sc-steps-row">
-        <div class="sc-step-item active" id="scsi-1">
-          <div class="sc-step-track"><div class="sc-step-fill"></div></div>
-          <div class="sc-step-lbl">наведите</div>
+      <!-- единая полоска прогресса -->
+      <div class="sc-progress-wrap">
+        <div class="sc-progress-track">
+          <div class="sc-progress-fill" id="sc-prog-bar"></div>
         </div>
-        <div class="sc-step-item" id="scsi-2">
-          <div class="sc-step-track"><div class="sc-step-fill"></div></div>
-          <div class="sc-step-lbl">сканирую</div>
-        </div>
-        <div class="sc-step-item" id="scsi-3">
-          <div class="sc-step-track"><div class="sc-step-fill"></div></div>
-          <div class="sc-step-lbl">готово</div>
+        <div class="sc-progress-labels">
+          <span class="sc-progress-lbl active" id="scsl-1">наведите</span>
+          <span class="sc-progress-lbl" id="scsl-2">сканирую</span>
+          <span class="sc-progress-lbl" id="scsl-3">готово</span>
         </div>
       </div>
 
@@ -2715,7 +2718,7 @@ function _populatePP(id){
     const ov=$('sc-success-overlay');if(ov)ov.classList.remove('show');
     const hint=$('sc-hint-area');if(hint)hint.style.opacity='1';
     const st=$('scanner-status');if(st)st.textContent='наведи на штрихкод';
-    const fill=$('sc-prog-fill');if(fill){fill.style.width='0%';fill.classList.remove('complete');}
+    const bar=$('sc-prog-bar');if(bar){bar.style.width='0%';bar.classList.remove('done');}
     // Reset step dots
     [1,2,3].forEach(i=>{
       const el=document.getElementById('scsi-'+i);
@@ -3980,7 +3983,21 @@ function _setScanStep(n){
 
 /* Update inline step indicators in camera area */
 function _setScanProgress(state){
-  // state: 1=наводим, 2=сканируем, 3=готово
+  // state: 1=наводим(20%), 2=сканируем(60%), 3=готово(100%)
+  const bar=$('sc-prog-bar');
+  const pcts=[0,20,60,100];
+  if(bar){
+    bar.style.width=pcts[state]+'%';
+    bar.classList.toggle('done',state===3);
+  }
+  [1,2,3].forEach(i=>{
+    const lbl=document.getElementById('scsl-'+i);
+    if(!lbl)return;
+    lbl.classList.remove('active','done');
+    if(i<state)lbl.classList.add('done');
+    else if(i===state)lbl.classList.add('active');
+  });
+  // совместимость со старыми scsi-* ссылками
   [1,2,3].forEach(i=>{
     const el=document.getElementById('scsi-'+i);
     if(!el)return;
