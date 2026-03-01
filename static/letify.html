@@ -546,10 +546,10 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   border-color:var(--scan-border,rgba(255,255,255,.8));border-style:solid;border-width:0;
   transition:border-color .4s ease;
 }
-.scanner-corner.tl{top:16px;left:16px;border-top-width:3px;border-left-width:3px;border-radius:8px 0 0 0}
-.scanner-corner.tr{top:16px;right:16px;border-top-width:3px;border-right-width:3px;border-radius:0 8px 0 0}
-.scanner-corner.bl{bottom:16px;left:16px;border-bottom-width:3px;border-left-width:3px;border-radius:0 0 0 8px}
-.scanner-corner.br{bottom:16px;right:16px;border-bottom-width:3px;border-right-width:3px;border-radius:0 0 8px 0}
+.scanner-corner.tl{top:16px;left:16px;border-top-width:3px;border-left-width:3px;border-radius:16px 0 0 0}
+.scanner-corner.tr{top:16px;right:16px;border-top-width:3px;border-right-width:3px;border-radius:0 16px 0 0}
+.scanner-corner.bl{bottom:16px;left:16px;border-bottom-width:3px;border-left-width:3px;border-radius:0 0 0 16px}
+.scanner-corner.br{bottom:16px;right:16px;border-bottom-width:3px;border-right-width:3px;border-radius:0 0 16px 0}
 .scanner-viewport.found .scanner-corner{--scan-border:var(--green) !important;}
 .scanner-found-card{
   background:var(--bg2);border-radius:18px;padding:16px;
@@ -1617,7 +1617,7 @@ async function reload(){
 }
 
 const gU=()=>C.user;
-const gWL=()=>C.weight_log.map(r=>({weight:r.weight,logged_at:(r.logged_at||'').slice(0,10)})).sort((a,b)=>(a.logged_at||'').localeCompare(b.logged_at||''));
+const gWL=()=>C.weight_log.map(r=>({weight:r.weight,logged_at:(r.logged_at||'').slice(0,10),_full:(r.logged_at||'')})).sort((a,b)=>a._full.localeCompare(b._full));
 const gSL=()=>C.sleep_log.map(r=>({hours:r.hours,quality:r.quality,logged_at:(r.logged_at||'').slice(0,10)}));
 const gWD=()=>C.water;
 const gCD=()=>C.calories;
@@ -1661,7 +1661,9 @@ function setTTab(t){
 
 /* ══ PUSH PAGES ══ */
 let curPushPage=null;
+const _pageStack=[];
 function pushPage(id){
+  if(curPushPage)_pageStack.push(curPushPage);
   curPushPage=id;navHidden=true;
   document.getElementById('nav')?.classList.add('gone');
   const pp=document.getElementById(id);
@@ -1685,12 +1687,16 @@ function popPage(doRender=true){
     pp.style.opacity='0';pp.style.transform='translateY(10px) translateZ(0)';
     setTimeout(()=>{pp.style.transition='none';pp.classList.remove('open');pp.style.opacity='';pp.style.transform='';pp.style.pointerEvents='';setTimeout(()=>{pp.style.transition='';},10);},200);
   }
-  curPushPage=null;navHidden=false;
-  document.getElementById('nav')?.classList.remove('gone');
-  const sb=Math.min(Math.max(tg?.safeAreaInset?.bottom??0,0),80);
-  const nav=document.getElementById('nav');if(nav)nav.style.bottom=(12+sb)+'px';
-  if(tg?.BackButton){tg.BackButton.hide();tg.BackButton.offClick(popPage);}
-  if(doRender&&_completingMap.size===0){const renders={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};renders[curTab]?.();}
+  const prev=_pageStack.pop()||null;
+  curPushPage=prev;
+  if(!prev){
+    navHidden=false;
+    document.getElementById('nav')?.classList.remove('gone');
+    const sb=Math.min(Math.max(tg?.safeAreaInset?.bottom??0,0),80);
+    const nav=document.getElementById('nav');if(nav)nav.style.bottom=(12+sb)+'px';
+    if(tg?.BackButton){tg.BackButton.hide();tg.BackButton.offClick(popPage);}
+    if(doRender&&_completingMap.size===0){const renders={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};renders[curTab]?.();}
+  }
 }
 
 function _populatePP(id){
@@ -1814,7 +1820,7 @@ function _populatePP(id){
     });
     T('sc-step-title','сканирование');
     const nf=$('scanner-not-found');if(nf)nf.style.display='none';
-    const cb=$('scanner-continue-btn');if(cb){cb.style.display='none';cb._barcode=null;}
+    const cb=$('scanner-continue-btn');if(cb){cb.style.display='none';}
     const vp=$('scanner-viewport');if(vp)vp.classList.remove('found');
     const st=$('scanner-status');if(st)st.textContent='наведи на штрихкод';
     // Reset meal type selection
@@ -2691,13 +2697,19 @@ function _renderPsTasksList(){
   // We also look at repeat_days from activities directly
   // For now filter from C.acts_today using repeat_days or days_of_week
   const filtered = allActs.filter(a=>{
-    if(!a.repeat_days && !a.days_of_week) return true; // daily
-    const days = a.repeat_days||[];
-    const dw = typeof a.days_of_week==='string'
-      ? a.days_of_week.split(',').filter(Boolean).map(Number)
+    const rd = a.repeat_days;
+    const dw = a.days_of_week;
+    // Check if this is a truly recurring activity
+    const hasDays = (Array.isArray(rd)&&rd.length>0) || (typeof dw==='string'&&dw.trim()!=='');
+    if(!hasDays){
+      // One-time activity (days_of_week='' from server) — show for ALL days in settings view
+      return true;
+    }
+    const days = Array.isArray(rd)?rd:[];
+    const dwArr = typeof dw==='string'&&dw.trim()!==''
+      ? dw.split(',').filter(Boolean).map(Number)
       : [];
-    const combined = [...new Set([...days,...dw])];
-    if(!combined.length) return true; // daily
+    const combined = [...new Set([...days,...dwArr])];
     return combined.includes(_psDow);
   });
   if(!filtered.length){
@@ -2767,7 +2779,7 @@ async function startScanner(){
   const vid=$('scanner-video');
   const status=$('scanner-status');
   const nf=$('scanner-not-found');if(nf)nf.style.display='none';
-  const cb=$('scanner-continue-btn');if(cb){cb.style.display='none';cb._barcode=null;}
+  const cb=$('scanner-continue-btn');if(cb){cb.style.display='none';}
   if(vp)vp.classList.remove('found');
   if(status)status.textContent='наведи на штрихкод';
   try{
@@ -2806,17 +2818,15 @@ function _startBarcodeDetect(vid){
         navigator.vibrate?.([60]);
         const st=$('scanner-status');if(st)st.textContent='✓ штрихкод найден';
         const vp=$('scanner-viewport');if(vp)vp.classList.add('found');
-        const cb=$('scanner-continue-btn');if(cb){cb._barcode=barcode;cb.style.display='';}
+        // Auto-advance after short delay so user sees green corners
+        setTimeout(()=>_lookupBarcode(barcode),600);
       }
     }catch{}
   },350);
 }
 
 function scannerContinue(){
-  const cb=$('scanner-continue-btn');
-  if(!cb||!cb._barcode)return;
-  cb.style.display='none';
-  _lookupBarcode(cb._barcode);
+  // No-op: auto-advance is handled in _startBarcodeDetect
 }
 
 function manualBarcode(){
@@ -2902,7 +2912,7 @@ function _showScannerNotFound(barcode){
 
 function scannerRetry(){
   const nf=$('scanner-not-found');if(nf)nf.style.display='none';
-  const cb=$('scanner-continue-btn');if(cb){cb.style.display='none';cb._barcode=null;}
+  const cb=$('scanner-continue-btn');if(cb){cb.style.display='none';}
   const vp=$('scanner-viewport');if(vp)vp.classList.remove('found');
   const st=$('scanner-status');if(st)st.textContent='наведи на штрихкод';
   _setScanStep(1);
