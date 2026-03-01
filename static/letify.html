@@ -89,17 +89,14 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .push-page{
   position:fixed;inset:0;z-index:60;
   background:var(--bg);
-  overflow-y:auto;overflow-x:hidden;
-  -webkit-overflow-scrolling:touch;touch-action:pan-y;
-  scrollbar-width:none;
+  overflow:hidden;
   opacity:0;
-  transform:translateX(20px);
-  transition:opacity .18s ease, transform .18s ease;
+  transform:translateX(28px);
+  transition:opacity .22s cubic-bezier(.4,0,.2,1), transform .22s cubic-bezier(.4,0,.2,1);
   pointer-events:none;
   display:flex;flex-direction:column;
   backface-visibility:hidden;-webkit-backface-visibility:hidden;
   will-change:opacity,transform;
-  contain:layout;
 }
 .push-page::-webkit-scrollbar{display:none}
 .push-page.open{opacity:1;transform:translateX(0);pointer-events:all}
@@ -686,12 +683,9 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .wterm-log{padding:12px 16px 4px;padding-bottom:calc(var(--sb)+32px)}
 .wterm-log-hdr{font-size:10px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
 .wterm-log-scroll{
-  max-height:38vh;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
   background:var(--bg2);border:1px solid var(--brd);border-radius:16px;overflow:hidden;
-  overflow-y:auto;
 }
 .tg-dark .wterm-log-scroll{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.08)}
-.wterm-log-scroll::-webkit-scrollbar{display:none}
 .wterm-log-item{
   display:flex;align-items:center;padding:10px 14px;
   border-bottom:1px solid var(--brd);font-size:12px;font-weight:700;
@@ -2281,7 +2275,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       <span class="wterm-change neutral" id="wterm-change">—</span>
     </div>
   </div>
-  <div style="flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none">
+  <div style="flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:calc(var(--sb)+24px)">
   <div class="wterm-meta-row" id="wterm-meta">— · —</div>
   <div class="wterm-periods" id="wterm-periods">
     <button class="wterm-pbtn on" onclick="wtermSetPeriod(this,'7d')">7Д</button>
@@ -2772,20 +2766,21 @@ function pushPage(id){
   document.getElementById('nav')?.classList.add('gone');
   const pp=document.getElementById(id);
   if(pp){
-    // force layout flush перед добавлением класса чтобы transition сработал чисто
-    pp.getBoundingClientRect();
-    pp.classList.add('open');
-    pp.scrollTop=0;
-    const body=pp.querySelector('.pp-body');if(body)body.scrollTop=0;
+    pp.getBoundingClientRect(); // force layout so transition fires cleanly
+    requestAnimationFrame(()=>{
+      pp.classList.add('open');
+      pp.scrollTop=0;
+      const body=pp.querySelector('.pp-body');if(body)body.scrollTop=0;
+      const scroll=pp.querySelector('[style*="overflow-y:auto"]');if(scroll)scroll.scrollTop=0;
+    });
+    // populate AFTER animation completes to avoid jank
+    setTimeout(()=>_populatePP(id), 200);
   }
-  // defer populate чтобы не блокировать первый кадр анимации
-  requestAnimationFrame(()=>_populatePP(id));
   if(tg?.BackButton){
     tg.BackButton.show();
-    // каждой странице — свой обработчик назад
     const handler=id==='pp-cal'?calBackOrPop:id==='pp-scanner'?scannerBack:popPage;
     tg.BackButton.onClick(handler);
-    tg.BackButton._letifyHandler=handler; // сохраняем чтобы снять в popPage
+    tg.BackButton._letifyHandler=handler;
   }
   tg?.HapticFeedback?.impactOccurred('light');
 }
@@ -2869,13 +2864,14 @@ function _populatePP(id){
   }
   if(id==='pp-history'){
     const wl=gWL(),wd=gWD(),acts=gActs();
-    const l20=[...wl].reverse().slice(0,20);
+    // Show all entries, newest first, with correct delta vs previous entry
+    const sorted=[...wl].sort((a,b)=>b.id-a.id).slice(0,50);
     const HH=(eid,v)=>{const el=document.getElementById(eid);if(el)el.innerHTML=v;};
     const emptyMsg='<div style="text-align:center;padding:16px;color:var(--hint);font-size:13px;font-weight:600">нет записей</div>';
-    HH('pp-whist',l20.length?l20.map((e,i)=>{
-      const prev=l20[i+1];
-      const diff=prev?+(e.weight-prev.weight).toFixed(1):0;
-      const diffHtml=diff?('<div class="hr-diff '+(diff<0?'d-neg':'d-pos')+'">'+(diff>0?'+':'')+diff+'</div>'):'<div></div>';
+    HH('pp-whist',sorted.length?sorted.map((e,i)=>{
+      const prev=sorted[i+1];
+      const diff=prev?+(e.weight-prev.weight).toFixed(1):null;
+      const diffHtml=diff!=null&&diff!==0?('<div class="hr-diff '+(diff<0?'d-neg':'d-pos')+'">'+(diff>0?'+':'')+diff+'</div>'):'<div class="hr-diff" style="color:var(--hint)">—</div>';
       return '<div class="hr"><div class="hr-d">'+fmtD(e.logged_at)+'</div><div class="hr-v">'+e.weight.toFixed(1)+' кг</div>'+diffHtml+'</div>';
     }).join(''):emptyMsg);
     T('pp-at-t',acts.filter(a=>a.completed).length);
@@ -3580,13 +3576,13 @@ let _wtermAllData=[], _wtermGoal=0, _wtermPeriod='1m';
 function _wtermFilterData(all, period){
   if(!all||!all.length)return[];
   const sorted=[...all].sort((a,b)=>a.logged_at.localeCompare(b.logged_at));
-  const now=new Date();
-  const cutoffs={'7d':7,'1m':31,'3m':92,'6m':183,'all':99999};
+  if(period==='all')return sorted;
+  const cutoffs={'7d':7,'1m':31,'3m':92,'6m':183};
   const days=cutoffs[period]||31;
-  const cut=new Date(now.getTime()-days*86400000);
+  const cut=new Date(Date.now()-days*86400000);
   const cutStr=cut.toISOString().slice(0,10);
-  const filtered=period==='all'?sorted:sorted.filter(d=>d.logged_at>=cutStr);
-  return filtered.length>=2?filtered:sorted;
+  const filtered=sorted.filter(d=>d.logged_at>=cutStr);
+  return filtered.length?filtered:sorted.slice(-1); // show at least last point
 }
 
 function drawTerminalWeightChart(canvasId, data, goalVal){
@@ -3596,9 +3592,13 @@ function drawTerminalWeightChart(canvasId, data, goalVal){
   const PR=window.devicePixelRatio||1;
   const W=canvas.parentElement.clientWidth||document.documentElement.clientWidth||360;
   const H=200;
-  canvas.width=W*PR; canvas.height=H*PR;
-  canvas.style.width=W+'px'; canvas.style.height=H+'px';
-  ctx.scale(PR,PR);
+  // Only resize canvas if dimensions actually changed (avoids flash)
+  const newW=Math.round(W*PR), newH=Math.round(H*PR);
+  if(canvas.width!==newW||canvas.height!==newH){
+    canvas.width=newW; canvas.height=newH;
+    canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  }
+  ctx.setTransform(PR,0,0,PR,0,0);
   ctx.clearRect(0,0,W,H);
 
   const dark=document.body.classList.contains('tg-dark');
@@ -3610,9 +3610,12 @@ function drawTerminalWeightChart(canvasId, data, goalVal){
   const pad={top:18,right:44,bottom:26,left:40};
   const cw=W-pad.left-pad.right, ch=H-pad.top-pad.bottom;
 
-  const vals=data.map(d=>d.weight||d.v||0);
-  let minV=Math.min(...vals,goalVal||999)-0.5;
-  let maxV=Math.max(...vals)+0.5;
+  const vals=data.map(d=>d.weight||d.v||0).filter(v=>v>0);
+  if(!vals.length){ctx.setLineDash([]);return;}
+  const goalInRange=goalVal&&goalVal>0;
+  let minV=Math.min(...vals,(goalInRange?goalVal:Infinity))-0.5;
+  let maxV=Math.max(...vals,(goalInRange?goalVal:-Infinity))+0.5;
+  if(!isFinite(minV))minV=0;if(!isFinite(maxV))maxV=100;
   const range=maxV-minV||1;
   const px=i=>pad.left+(i/(data.length-1||1))*cw;
   const py=v=>pad.top+(1-(v-minV)/range)*ch;
@@ -3628,15 +3631,32 @@ function drawTerminalWeightChart(canvasId, data, goalVal){
   }
 
   // Goal dashed line
-  if(goalVal&&goalVal>0&&goalVal>=minV&&goalVal<=maxV){
-    const gy=py(goalVal);
-    ctx.beginPath(); ctx.strokeStyle='rgba(255,107,53,.35)'; ctx.lineWidth=1.5; ctx.setLineDash([5,4]);
-    ctx.moveTo(pad.left,gy); ctx.lineTo(W-pad.right,gy); ctx.stroke(); ctx.setLineDash([]);
-    ctx.fillStyle='rgba(255,107,53,.7)'; ctx.font=`700 9px Onest`; ctx.textAlign='left';
+  if(goalVal&&goalVal>0){
+    const gy=Math.max(pad.top+2,Math.min(H-pad.bottom-2,py(goalVal)));
+    ctx.beginPath();ctx.strokeStyle='rgba(255,107,53,.4)';ctx.lineWidth=1.5;ctx.setLineDash([5,4]);
+    ctx.moveTo(pad.left,gy);ctx.lineTo(W-pad.right,gy);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='rgba(255,107,53,.75)';ctx.font=`700 9px Onest`;ctx.textAlign='left';
     ctx.fillText('цель',W-pad.right+3,gy+3);
   }
 
-  if(data.length<2){ctx.setLineDash([]);return;}
+  if(data.length<2){
+    // Single point - draw a dot and horizontal line
+    if(data.length===1){
+      const v=vals[0];
+      const cy=H/2;
+      ctx.beginPath();ctx.strokeStyle='rgba(82,193,119,.15)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+      ctx.moveTo(pad.left,cy);ctx.lineTo(W-pad.right,cy);ctx.stroke();ctx.setLineDash([]);
+      ctx.beginPath();ctx.arc(pad.left+cw/2,cy,5,0,Math.PI*2);
+      ctx.fillStyle='#52C177';ctx.fill();
+      ctx.beginPath();ctx.arc(pad.left+cw/2,cy,5,0,Math.PI*2);
+      ctx.strokeStyle=bgC;ctx.lineWidth=2;ctx.stroke();
+      ctx.fillStyle='rgba(82,193,119,.85)';ctx.font=`700 9px Onest,sans-serif`;ctx.textAlign='left';
+      ctx.fillText(v.toFixed(1)+' кг',W-pad.right+3,cy+3);
+    }
+    ctx.setLineDash([]);
+    canvas._wdata=data;canvas._wvals=vals;canvas._wpad=pad;canvas._wcw=cw;canvas._wch=ch;canvas._wrange={minV,maxV,range};
+    return;
+  }
 
   // Area gradient
   const grad=ctx.createLinearGradient(0,pad.top,0,H-pad.bottom);
@@ -3726,76 +3746,69 @@ function _wtermInitCrosshair(){
 }
 
 function wtermSetPeriod(btn,period){
+  if(_wtermPeriod===period)return;
   document.querySelectorAll('.wterm-pbtn').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
   _wtermPeriod=period;
   const filtered=_wtermFilterData(_wtermAllData,period);
-  requestAnimationFrame(()=>{
-    drawTerminalWeightChart('wterm-canvas',filtered,_wtermGoal);
-    _wtermRenderLog(_wtermAllData);
-  });
+  requestAnimationFrame(()=>drawTerminalWeightChart('wterm-canvas',filtered,_wtermGoal));
 }
 
 function _wtermRenderLog(all){
   const logEl=document.getElementById('wterm-log');
   if(!logEl)return;
   if(!all||!all.length){logEl.innerHTML='';return;}
-  // Group by date: keep one entry per date (latest by time if multiple)
-  const byDate=new Map();
-  all.forEach(d=>{
-    const existing=byDate.get(d.logged_at);
-    if(!existing||d.id>existing.id)byDate.set(d.logged_at,d);
-  });
-  const sorted=[...byDate.values()].sort((a,b)=>b.logged_at.localeCompare(a.logged_at));
+  // Show last 3 deduplicated entries (there's a full history page for more)
+  const sorted=[...all].sort((a,b)=>b.logged_at.localeCompare(a.logged_at));
+  const last3=sorted.slice(0,3);
   let itemsHtml='';
-  sorted.forEach((d,i)=>{
+  last3.forEach((d,i)=>{
     const prev=sorted[i+1];
-    const delta=prev?(d.weight-prev.weight):0;
-    const sign=delta<0?'neg':delta>0?'pos':'zero';
-    const dStr=delta===0?'—':(delta>0?'+':'')+delta.toFixed(1);
+    const delta=prev?(+(d.weight-prev.weight).toFixed(1)):null;
+    const sign=delta===null?'zero':delta<0?'neg':delta>0?'pos':'zero';
+    const dStr=delta===null?'—':delta===0?'—':(delta>0?'+':'')+delta.toFixed(1);
     const isToday=d.logged_at===new Date().toISOString().slice(0,10);
     itemsHtml+=`<div class="wterm-log-item">
-      <span class="wterm-log-date">${_wtermFmtDate(d.logged_at)}${isToday?'<span style="margin-left:4px;color:var(--sun);font-size:9px;font-weight:800">сег</span>':''}</span>
+      <span class="wterm-log-date">${_wtermFmtDate(d.logged_at)}<span style="margin-left:4px;font-size:9px;font-weight:800;color:${isToday?'var(--sun)':'transparent'}">${isToday?'сег':''}</span></span>
       <span class="wterm-log-val">${(d.weight||0).toFixed(1)} кг</span>
       <span class="wterm-log-d ${sign}">${dStr}</span>
     </div>`;
   });
-  logEl.innerHTML=`<div class="wterm-log-hdr">ИСТОРИЯ</div><div class="wterm-log-scroll">${itemsHtml}</div>`;
+  const moreCount=all.length-3;
+  const moreHtml=moreCount>0?`<div style="text-align:center;padding:8px 0 2px;font-size:11px;font-weight:700;color:var(--hint)">+${moreCount} в истории →</div>`:'';
+  logEl.innerHTML=`<div class="wterm-log-hdr">ИСТОРИЯ</div><div class="wterm-log-scroll">${itemsHtml}</div>${moreHtml}`;
 }
 
 function _populateWeightChart(){
   const wl=gWL();
   const u=gU();
-  // Deduplicate by date for chart (keep latest per date)
+  // Deduplicate by date for chart (keep latest entry per date by id)
   const byDate=new Map();
   wl.forEach(d=>{
-    const existing=byDate.get(d.logged_at);
-    if(!existing||d.id>existing.id)byDate.set(d.logged_at,d);
+    const ex=byDate.get(d.logged_at);
+    if(!ex||(d.id||0)>(ex.id||0))byDate.set(d.logged_at,d);
   });
   _wtermAllData=[...byDate.values()].sort((a,b)=>a.logged_at.localeCompare(b.logged_at));
   _wtermGoal=u.goal_weight||0;
   _wtermPeriod='7d';
   // Reset period pills
-  document.querySelectorAll('.wterm-pbtn').forEach((b,i)=>{b.classList.toggle('on',i===0);});
+  document.querySelectorAll('.wterm-pbtn').forEach((b,i)=>b.classList.toggle('on',i===0));
 
-  // Header
+  // Header: current weight + total delta from first to last
   const priceEl=document.getElementById('wterm-price');
   const changeEl=document.getElementById('wterm-change');
   const metaEl=document.getElementById('wterm-meta');
 
   if(_wtermAllData.length){
     const cw=_wtermAllData[_wtermAllData.length-1].weight;
-    const sw=_wtermAllData[0].weight;
-    const delta=+(cw-sw).toFixed(1);
+    const firstW=_wtermAllData[0].weight;
+    const delta=+(cw-firstW).toFixed(1);
     if(priceEl)priceEl.textContent=cw.toFixed(1);
     if(changeEl){
       changeEl.textContent=delta===0?'0.0':(delta<0?'▼ ':delta>0?'▲ ':'')+Math.abs(delta).toFixed(1);
       changeEl.className='wterm-change '+(delta<0?'up':delta>0?'down':'neutral');
     }
-    if(metaEl){
-      const cnt=_wtermAllData.length;
-      metaEl.textContent=`ЗАПИСЕЙ · ${cnt}`;
-    }
+    if(metaEl)metaEl.textContent=`${_wtermAllData.length} ЗАПИСЕЙ`;
   } else {
     if(priceEl)priceEl.textContent='—';
     if(changeEl){changeEl.textContent='—';changeEl.className='wterm-change neutral';}
@@ -3815,17 +3828,17 @@ function _populateWeightChart(){
       <div class="wterm-stat"><div class="wterm-stat-lbl">мин</div><div class="wterm-stat-val" style="color:var(--green)">${minW.toFixed(1)}</div></div>
       ${gw?`<div class="wterm-stat"><div class="wterm-stat-lbl">цель</div><div class="wterm-stat-val" style="color:var(--water)">${gw.toFixed(1)}</div></div>`:''}
     `;
-  } else if(statsEl){statsEl.innerHTML='';}
+  } else if(statsEl)statsEl.innerHTML='';
 
-  // Log (uses raw wl for display but deduplicated)
+  // Log: show last 3 entries
   _wtermRenderLog(_wtermAllData);
 
-  // Chart
+  // Chart: draw after layout is settled
   const filtered=_wtermFilterData(_wtermAllData,_wtermPeriod);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+  requestAnimationFrame(()=>{
     drawTerminalWeightChart('wterm-canvas',filtered,_wtermGoal);
     _wtermInitCrosshair();
-  }));
+  });
 }
 
 /* ══ RENDERS ══ */
