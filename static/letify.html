@@ -79,7 +79,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   opacity:0;pointer-events:none;
   transform:translateY(6px);
   transition:opacity .2s ease,transform .2s ease;
-  contain:strict;
+  contain:content;
   will-change:opacity,transform;
 }
 .page::-webkit-scrollbar{display:none}
@@ -97,9 +97,11 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   display:flex;flex-direction:column;
   backface-visibility:hidden;-webkit-backface-visibility:hidden;
   will-change:opacity,transform;
+  contain:layout style;
 }
 .push-page::-webkit-scrollbar{display:none}
 .push-page.open{opacity:1;transform:translateX(0);pointer-events:all}
+.push-page.closing{opacity:0;transform:translateX(28px);transition:opacity .22s cubic-bezier(.4,0,.2,1),transform .22s cubic-bezier(.4,0,.2,1);}
 .pp-hdr{
   flex-shrink:0;
   padding-top:calc(var(--st) + 10px);padding-bottom:12px;
@@ -240,7 +242,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 /* ══ PROGRESS BAR ══ */
 .pb{height:6px;background:rgba(0,0,0,.06);border-radius:99px;overflow:hidden;margin-top:10px}
-.pbf{height:100%;border-radius:99px;transition:width .7s cubic-bezier(.25,.46,.45,.94);will-change:width}
+.pbf{height:100%;border-radius:99px;transition:width .7s cubic-bezier(.25,.46,.45,.94)}
 .pb-sun{background:linear-gradient(90deg,var(--sun),var(--sun2))}
 .pb-water{background:var(--water)}
 .pb-sleep{background:var(--sleep)}
@@ -280,7 +282,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .hl-metric-of{font-size:11px;font-weight:700;color:var(--hint);margin-left:2px}
 .hl-bar{height:6px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden}
 .tg-dark .hl-bar{background:rgba(255,255,255,.1)}
-.hl-bar-fill{height:100%;border-radius:99px;transition:width .7s cubic-bezier(.25,.46,.45,.94);will-change:width}
+.hl-bar-fill{height:100%;border-radius:99px;transition:width .7s cubic-bezier(.25,.46,.45,.94)}
 .hl-metric-footer{display:flex;justify-content:space-between;align-items:center;margin-top:5px;min-height:16px}
 .hl-macros{display:flex;gap:5px}
 .hl-mac{font-size:9px;font-weight:800}
@@ -615,8 +617,11 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .wtr-ring-wrap{
   position:relative;display:flex;align-items:center;justify-content:center;
   padding:8px 0 4px;
+  isolation:isolate;
 }
-.wtr-ring-svg{overflow:visible;filter:drop-shadow(0 0 12px rgba(78,174,229,.18))}
+.wtr-ring-svg{overflow:visible;will-change:transform;transform:translateZ(0)}
+/* drop-shadow moved to wrapper to avoid re-filter on every dashoffset frame */
+.wtr-ring-wrap::before{content:'';position:absolute;inset:8px 0 4px;border-radius:50%;pointer-events:none;}
 .wtr-ring-center{
   position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
   text-align:center;pointer-events:none;
@@ -1301,7 +1306,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .cal-meal-kcal{font-size:15px;font-weight:900}
 .cal-meal-cnt{font-size:10px;font-weight:700;color:var(--hint)}
 .cal-meal-pbar{height:3px;background:rgba(255,255,255,.09);border-radius:99px;overflow:hidden}
-.cal-meal-pbar-f{height:100%;border-radius:99px;transition:width .7s cubic-bezier(.25,.46,.45,.94);will-change:width}
+.cal-meal-pbar-f{height:100%;border-radius:99px;transition:width .7s cubic-bezier(.25,.46,.45,.94)}
 </style>
 </head>
 <body>
@@ -1347,7 +1352,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       <circle id="wtr-arc" cx="105" cy="105" r="86" fill="none" stroke="url(#wtr-grad)" stroke-width="11"
         stroke-linecap="round" stroke-dasharray="540.4" stroke-dashoffset="540.4"
         transform="rotate(-90 105 105)"
-        style="transition:stroke-dashoffset .85s cubic-bezier(.25,.46,.45,.94)"/>
+        style="transition:stroke-dashoffset .85s cubic-bezier(.25,.46,.45,.94);will-change:stroke-dashoffset"/>
     </svg>
     <div class="wtr-ring-center">
       <div id="w-total" class="wtr-ring-num">0</div>
@@ -2736,6 +2741,7 @@ const totalCal=()=>Object.values(gCD()).reduce((a,b)=>a+b,0);
 const TABS=['home','track','plan','sleep','progress','profile'];
 let curTab='home',trackTab='water',navHidden=false;
 
+const _visitedTabs=new Set(['home']); // home rendered on init
 function navTo(tab){
   if(tab===curTab&&!curPushPage)return;
   if(curPushPage)popPage(false);
@@ -2744,9 +2750,16 @@ function navTo(tab){
   const pg=document.getElementById('p-'+tab);
   if(pg){pg.scrollTop=0;pg.classList.add('active');}
   TABS.forEach(t=>{document.getElementById('nt-'+t)?.classList.toggle('on',t===tab);});
-  const renders={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};
-  renders[tab]?.();
   tg?.HapticFeedback?.selectionChanged();
+  const renders={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};
+  if(_visitedTabs.has(tab)){
+    // already visited: defer render after transition so animation stays smooth
+    setTimeout(()=>renders[tab]?.(), 220);
+  } else {
+    // first visit: render immediately (page is blank, no content flash)
+    _visitedTabs.add(tab);
+    renders[tab]?.();
+  }
 }
 function setTTab(t){
   trackTab=t;
@@ -2766,15 +2779,15 @@ function pushPage(id){
   document.getElementById('nav')?.classList.add('gone');
   const pp=document.getElementById(id);
   if(pp){
-    pp.getBoundingClientRect(); // force layout so transition fires cleanly
-    requestAnimationFrame(()=>{
+    // double rAF: lets browser paint the hidden state before .open triggers transition
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      pp.classList.remove('closing');
       pp.classList.add('open');
       pp.scrollTop=0;
       const body=pp.querySelector('.pp-body');if(body)body.scrollTop=0;
-      const scroll=pp.querySelector('[style*="overflow-y:auto"]');if(scroll)scroll.scrollTop=0;
-    });
+    }));
     // populate AFTER animation completes to avoid jank
-    setTimeout(()=>_populatePP(id), 200);
+    setTimeout(()=>_populatePP(id), 250);
   }
   if(tg?.BackButton){
     tg.BackButton.show();
@@ -2797,8 +2810,8 @@ function popPage(doRender=true){
   const pp=document.getElementById(curPushPage);
   if(pp){
     pp.style.pointerEvents='none';
-    pp.style.opacity='0';pp.style.transform='translateY(10px) translateZ(0)';
-    setTimeout(()=>{pp.style.transition='none';pp.classList.remove('open');pp.style.opacity='';pp.style.transform='';pp.style.pointerEvents='';setTimeout(()=>{pp.style.transition='';},10);},200);
+    pp.classList.add('closing');
+    setTimeout(()=>{pp.classList.remove('open','closing');pp.style.pointerEvents='';},230);
   }
   const prev=_pageStack.pop()||null;
   curPushPage=prev;
