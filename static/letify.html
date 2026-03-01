@@ -668,6 +668,10 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   background:#050508;
   box-shadow:0 8px 40px rgba(0,0,0,.28),0 2px 8px rgba(0,0,0,.15);
   margin-bottom:0;
+  transition:box-shadow .4s ease;
+}
+.scanner-viewport.found{
+  box-shadow:0 0 0 2px var(--green), 0 0 28px rgba(82,193,119,.35), 0 8px 40px rgba(0,0,0,.28);
 }
 .scanner-viewport video{
   width:100%;height:100%;object-fit:cover;display:block;
@@ -696,19 +700,20 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   pointer-events:none;
 }
 .sc-vf-corner{
-  position:absolute;width:26px;height:26px;
-  border-style:solid;border-color:rgba(255,255,255,.82);
-  transition:border-color .4s ease,width .3s cubic-bezier(.34,1.2,.64,1),height .3s cubic-bezier(.34,1.2,.64,1),box-shadow .4s ease;
+  position:absolute;
+  width:26px;height:26px;
+  background:transparent;
+  border-style:solid;
+  border-color:rgba(255,255,255,.82);
+  transition:border-color .35s ease;
 }
-.sc-vf-corner.tl{top:0;left:0;border-width:2.5px 0 0 2.5px;border-radius:16px 0 0 0}
-.sc-vf-corner.tr{top:0;right:0;border-width:2.5px 2.5px 0 0;border-radius:0 16px 0 0}
-.sc-vf-corner.bl{bottom:0;left:0;border-width:0 0 2.5px 2.5px;border-radius:0 0 0 16px}
-.sc-vf-corner.br{bottom:0;right:0;border-width:0 2.5px 2.5px 0;border-radius:0 0 16px 0}
-/* Found state — expand + turn green */
+.sc-vf-corner.tl{top:0;left:0;border-width:2.5px 0 0 2.5px;border-radius:14px 0 0 0}
+.sc-vf-corner.tr{top:0;right:0;border-width:2.5px 2.5px 0 0;border-radius:0 14px 0 0}
+.sc-vf-corner.bl{bottom:0;left:0;border-width:0 0 2.5px 2.5px;border-radius:0 0 0 14px}
+.sc-vf-corner.br{bottom:0;right:0;border-width:0 2.5px 2.5px 0;border-radius:0 0 14px 0}
+/* Found state — только цвет меняется, без size/shadow артефактов */
 .scanner-viewport.found .sc-vf-corner{
   border-color:var(--green);
-  width:34px;height:34px;
-  box-shadow:0 0 14px rgba(82,193,119,.4);
 }
 
 /* ── Hint chip ── */
