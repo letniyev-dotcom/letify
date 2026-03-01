@@ -729,15 +729,20 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .wc-tt-delta.pos{background:rgba(244,92,92,.12);color:#F45C5C}
 .wc-tt-delta.zer{background:rgba(255,255,255,.07);color:rgba(255,255,255,.35)}
 
-/* zoom hint */
-.wc-zoom-hint{
-  position:absolute;bottom:12px;right:12px;z-index:20;
-  padding:4px 10px;border-radius:99px;
-  background:var(--bg3);border:1px solid var(--brd);
-  font-size:9px;font-weight:700;color:var(--hint);
-  opacity:0;transition:opacity .3s;pointer-events:none;
+/* scroll-to-end button */
+#wc-to-end{
+  position:absolute;bottom:20px;right:16px;z-index:25;
+  display:flex;align-items:center;gap:6px;
+  padding:9px 14px;border-radius:99px;border:none;cursor:pointer;
+  background:var(--sun);color:#fff;
+  font-family:inherit;font-size:12px;font-weight:800;
+  box-shadow:0 4px 16px rgba(255,107,53,.38);
+  opacity:0;pointer-events:none;
+  transform:translateY(8px) scale(.94);
+  transition:opacity .22s ease,transform .22s cubic-bezier(.34,1.2,.64,1);
 }
-.wc-zoom-hint.show{opacity:1}
+#wc-to-end.show{opacity:1;pointer-events:all;transform:none}
+#wc-to-end:active{transform:scale(.95);opacity:.85}
 
 /* ══ EMPTY ══ */
 .empty{text-align:center;padding:40px 20px;animation:empty-fadein .35s ease forwards}
@@ -2273,7 +2278,10 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
         <div class="wc-tt-delta zer" id="wc-tt-delta"></div>
       </div>
     </div>
-    <div class="wc-zoom-hint" id="wc-zoom-hint"><span id="wc-zoom-txt">0%</span></div>
+    <button id="wc-to-end" onclick="_wcScrollToEnd()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l8 8h-5v8H9v-8H4z" transform="rotate(90 12 12)"/></svg>
+      в конец
+    </button>
   </div>
 </div>
 
@@ -3551,34 +3559,21 @@ let _tt;
 function toast(msg){/* toasts disabled */}
 
 /* ══ WEIGHT CHART ══ */
-/* ══════════════════════════════════════
-   WEIGHT CHART — full-height, no tabs
-══════════════════════════════════════ */
 (function(){
-  const Y_W=52, PT_MIN=52, PT_MAX=200, N_GRID=5;
+  const Y_W=52, PT_SP=80; // fixed point spacing in px
   const PAD={l:16,r:28,t:40,b:42};
   let _data=[], _pts=[], _svgW=1, _svgH=1;
   let _activeI=-1;
-  let _ptSp=80;
-  let _period=null;
-  let _pinching=false, _ptSp0=80, _dist0=0;
-  let _anchorSvgX=0, _anchorViewX=0, _pendingOldW=1, _pendingPtSp=null;
-  let _rafId=null, _zoomTimer=null;
+  let _rafId=null;
   let _scrollEl=null;
+  let _ttFadeTimer=null;
+  let _endTimer=null;
 
-  // Show date; when zoomed in and entries on same day visible, show time too
-  function _fmt(s,showTime){
+  function _fmt(s){
     const d=new Date(s);
     const MNS=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
-    const base=d.getDate()+'\u00a0'+MNS[d.getMonth()];
-    if(showTime){
-      const h=d.getHours().toString().padStart(2,'0');
-      const m=d.getMinutes().toString().padStart(2,'0');
-      return h+':'+m;
-    }
-    return base;
+    return d.getDate()+'\u00a0'+MNS[d.getMonth()];
   }
-  // Full date+time for tooltip
   function _fmtFull(s){
     const d=new Date(s);
     const MNS=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
@@ -3592,13 +3587,11 @@ function toast(msg){/* toasts disabled */}
     const u=gU();
     const sw=u.start_weight>0?u.start_weight:null;
     const gw=u.goal_weight>0?u.goal_weight:null;
-    // Include start and goal in range so chart always shows the full journey
     const candidates=[...ws];
     if(sw)candidates.push(sw);
     if(gw)candidates.push(gw);
     const rMn=Math.min(...candidates),rMx=Math.max(...candidates);
     const sp=rMx-rMn||1;
-    // Add small padding so points aren't at exact edges
     return{mn:rMn-sp*0.08,mx:rMx+sp*0.08};
   }
 
@@ -3618,11 +3611,12 @@ function toast(msg){/* toasts disabled */}
     if(!el)return;
     const cH=H-PAD.t-PAD.b;
     const range=mx-mn;
-    // Always use 1kg steps; if range > ~15kg, use 2kg, etc.
-    const rawRange=range;
+    // Smart step: 0.5kg for small range, 1kg standard, 2/5 for large
     let step=1;
-    if(rawRange>30)step=5;
-    else if(rawRange>15)step=2;
+    if(range<=4)step=0.5;
+    else if(range<=8)step=1;
+    else if(range<=20)step=2;
+    else step=5;
     const dec=step<1?1:0;
     const labelMx=Math.floor(mx/step)*step;
     const labelMn=Math.ceil(mn/step)*step;
@@ -3634,6 +3628,32 @@ function toast(msg){/* toasts disabled */}
     el.innerHTML=html;
   }
 
+  function _checkEndBtn(){
+    if(!_scrollEl||!_svgW)return;
+    const maxScroll=_svgW-(_scrollEl.clientWidth-Y_W);
+    if(maxScroll<=0){_hideEndBtn();return;}
+    const distFromEnd=maxScroll-_scrollEl.scrollLeft;
+    const btn=document.getElementById('wc-to-end');
+    if(!btn)return;
+    // Show if scrolled more than half a screen from end OR at very start
+    if(distFromEnd>_scrollEl.clientWidth*0.55||_scrollEl.scrollLeft<10){
+      btn.classList.add('show');
+    } else {
+      _hideEndBtn();
+    }
+  }
+
+  function _hideEndBtn(){
+    const btn=document.getElementById('wc-to-end');
+    if(btn)btn.classList.remove('show');
+  }
+
+  window._wcScrollToEnd=function(){
+    if(!_scrollEl)return;
+    _hideEndBtn();
+    _scrollEl.scrollTo({left:_scrollEl.scrollWidth,behavior:'smooth'});
+  };
+
   function _draw(animate){
     const stage=document.getElementById('wc-stage');
     const scroll=document.getElementById('wc-scroll');
@@ -3643,11 +3663,12 @@ function toast(msg){/* toasts disabled */}
     if(!n){svg.innerHTML='';return;}
     const H=stage.clientHeight||440;
     const viewW=scroll.clientWidth-Y_W;
-    const W=Math.max(viewW+1,PAD.l+(n>1?(n-1)*_ptSp:_ptSp)+PAD.r);
+    // Width: fit all points with PT_SP spacing, but at least full viewport
+    const W=Math.max(viewW+1, PAD.l+(n>1?(n-1)*PT_SP:PT_SP)+PAD.r);
     _svgW=W;_svgH=H;
     svg.setAttribute('width',W);svg.setAttribute('height',H);
     svg.style.width=W+'px';svg.style.height=H+'px';
-    const cW=W-PAD.l-PAD.r,cH=H-PAD.t-PAD.b;
+    const cW=W-PAD.l-PAD.r, cH=H-PAD.t-PAD.b;
     const {mn,mx}=_getRange(d);
     const rng=mx-mn;
     const xSt=n>1?cW/(n-1):cW/2;
@@ -3657,31 +3678,32 @@ function toast(msg){/* toasts disabled */}
     const line=_smooth(_pts);
     const dark=document.body.classList.contains('tg-dark');
     const goalClr=dark?'rgba(78,174,229,.55)':'rgba(78,174,229,.6)';
-    const goalTxtClr=dark?'rgba(78,174,229,.75)':'rgba(78,174,229,.85)';
-    const xlabClr=dark?'rgba(255,185,80,.45)':'rgba(140,90,10,.45)';
-    // Get CSS bg color for dot holes (avoid transparent holes on light theme)
+    const goalTxtClr=dark?'rgba(78,174,229,.8)':'rgba(78,174,229,.9)';
+    const xlabClr=dark?'rgba(255,185,80,.5)':'rgba(140,90,10,.5)';
     const bgColor=dark?'#111111':'#FAF7F2';
-    // no SVG grid — CSS background-image grid handles it
-    let grid='';
     // goal marker
     const gw=gU().goal_weight;
     let goalM='';
     if(gw&&gw>mn&&gw<mx){
       const gy=(PAD.t+cH*(1-(gw-mn)/rng)).toFixed(1);
-      goalM=`<line x1="${PAD.l}" y1="${gy}" x2="${(W-PAD.r).toFixed(0)}" y2="${gy}" stroke="${goalClr}" stroke-width="1.5" stroke-dasharray="4,7"/>
-      <text x="${(W-PAD.r-3).toFixed(0)}" y="${(parseFloat(gy)-6).toFixed(0)}" text-anchor="end" font-family="Onest,sans-serif" font-size="10" font-weight="800" fill="${goalTxtClr}">цель ${gw}</text>`;
+      goalM=`<line x1="${PAD.l}" y1="${gy}" x2="${(W-PAD.r).toFixed(0)}" y2="${gy}" stroke="${goalClr}" stroke-width="1.5" stroke-dasharray="5,6"/>
+      <text x="${(W-PAD.r-3).toFixed(0)}" y="${(parseFloat(gy)-7).toFixed(0)}" text-anchor="end" font-family="Onest,sans-serif" font-size="10" font-weight="800" fill="${goalTxtClr}">цель ${gw}</text>`;
     }
-    // x date labels — show time when pts per day density is high (zoomed in)
+    // x labels — smart density
     let xlabs='';
-    const step=Math.max(1,Math.ceil(n/6));
-    // Detect if any entries share the same day (so we need to show times)
+    const step=Math.max(1,Math.ceil(n/Math.max(2,Math.floor(viewW/80))));
     const daySet=new Set(_data.map(e=>new Date(e.logged_at).toDateString()));
-    const hasSameDayEntries=daySet.size<n;
-    // Show time instead of date when zoomed in enough (pt spacing > 100px) and same-day entries exist
-    const showTime=hasSameDayEntries&&_ptSp>100;
+    const hasSameDay=daySet.size<n;
     _pts.forEach((p,i)=>{
       if(i%step===0||i===n-1){
-        const lbl=_fmt(p.d,showTime&&hasSameDayEntries&&_ptSp>80);
+        // If same-day entries exist, show time when spacing allows
+        let lbl=_fmt(p.d);
+        if(hasSameDay&&PT_SP>=80){
+          const d2=new Date(p.d);
+          const h=d2.getHours().toString().padStart(2,'0');
+          const m2=d2.getMinutes().toString().padStart(2,'0');
+          lbl=h+':'+m2;
+        }
         xlabs+=`<text x="${p.x.toFixed(1)}" y="${(H-6).toFixed(0)}" text-anchor="middle" font-family="Onest,sans-serif" font-size="10" font-weight="700" fill="${xlabClr}">${lbl}</text>`;
       }
     });
@@ -3719,7 +3741,7 @@ function toast(msg){/* toasts disabled */}
       </clipPath>
       ${animStyle}
     </defs>
-    ${grid}${goalM}
+    ${goalM}
     <g clip-path="url(#wccp${uid})">
       <path class="${animate?'wcla-'+uid:''}" d="${line}" fill="none" stroke="#FF6820" stroke-width="10" stroke-linecap="round" filter="url(#wcgf${uid})" opacity="${dark?.2:.1}"/>
       <path class="${animate?'wcla-'+uid:''}" d="${line}" fill="none" stroke="url(#wclg${uid})" stroke-width="2.5" stroke-linecap="round"/>
@@ -3727,7 +3749,11 @@ function toast(msg){/* toasts disabled */}
     </g>
     ${dotsHTML}${xlabs}`;
     _bindDots();
-    if(animate)setTimeout(()=>scroll.scrollLeft=scroll.scrollWidth,40);
+    if(animate){
+      setTimeout(()=>{scroll.scrollLeft=scroll.scrollWidth;_checkEndBtn();},40);
+    } else {
+      _checkEndBtn();
+    }
   }
 
   function _refreshDots(ai){
@@ -3749,8 +3775,6 @@ function toast(msg){/* toasts disabled */}
       }
     });
   }
-
-  let _ttFadeTimer=null;
 
   function _setTTContent(i){
     const pt=_pts[i],e=_data[i];
@@ -3790,16 +3814,14 @@ function toast(msg){/* toasts disabled */}
     if(_ttFadeTimer){clearTimeout(_ttFadeTimer);_ttFadeTimer=null;}
     const wasVisible=tt.classList.contains('on');
     if(wasVisible){
-      // Fade out, then reposition + fade in
       tt.classList.remove('on');
       _ttFadeTimer=setTimeout(()=>{
         _ttFadeTimer=null;
-        if(_activeI!==i)return; // already moved to another
+        if(_activeI!==i)return;
         _setTTContent(i);
         tt.classList.add('on');
       },120);
     } else {
-      // First show — just position and fade in
       _setTTContent(i);
       tt.classList.add('on');
     }
@@ -3833,15 +3855,6 @@ function toast(msg){/* toasts disabled */}
     });
   }
 
-  function _showZoom(){
-    const hint=document.getElementById('wc-zoom-hint');if(!hint)return;
-    const pct=Math.round((_ptSp-PT_MIN)/(PT_MAX-PT_MIN)*100);
-    const zt=document.getElementById('wc-zoom-txt');if(zt)zt.textContent=pct+'%';
-    hint.classList.add('show');
-    clearTimeout(_zoomTimer);
-    _zoomTimer=setTimeout(()=>hint.classList.remove('show'),1200);
-  }
-
   window.drawWeightChart=function(){};// no-op legacy
 
   window._wcInit=function(){
@@ -3849,89 +3862,30 @@ function toast(msg){/* toasts disabled */}
     if(!_scrollEl)return;
     // hide TT on empty tap
     _scrollEl.addEventListener('pointerdown',e=>{if(!e.target.closest('.wcdg'))_hideTT();},{passive:true});
-    // update TT on scroll
+    // update TT position on scroll + check end button
     _scrollEl.addEventListener('scroll',()=>{
-      if(_activeI<0)return;
-      const ai=_activeI;_activeI=-2;_activate(ai);
-    },{passive:true});
-
-    // ── pinch zoom ── use CSS scaleX during gesture, redraw on end for zero jitter
-    let _scaleX=1, _originX=0;
-    _scrollEl.addEventListener('touchstart',e=>{
-      if(e.touches.length===2){
-        _pinching=true;_ptSp0=_ptSp;
-        _dist0=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
-        const midX=(e.touches[0].clientX+e.touches[1].clientX)/2;
-        const r=_scrollEl.getBoundingClientRect();
-        _anchorViewX=midX-r.left-Y_W;
-        _anchorSvgX=_scrollEl.scrollLeft+_anchorViewX;
-        _pendingOldW=_svgW;
-        _scaleX=1;
-        _originX=_anchorSvgX; // pivot in SVG coords
-        const svg=document.getElementById('wc-svg');
-        if(svg){svg.style.transformOrigin=_originX+'px 0';svg.style.willChange='transform';}
-      }
-    },{passive:true});
-
-    _scrollEl.addEventListener('touchmove',e=>{
-      if(!_pinching||e.touches.length<2)return;
-      e.preventDefault();
-      const dist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
-      const rawScale=dist/_dist0;
-      const newPtSp=Math.max(PT_MIN,Math.min(PT_MAX,_ptSp0*rawScale));
-      _scaleX=newPtSp/_ptSp0;
-      const svg=document.getElementById('wc-svg');
-      if(svg)svg.style.transform=`scaleX(${_scaleX})`;
-      // Adjust scroll so anchor stays under fingers
-      const newScroll=_anchorSvgX*_scaleX-_anchorViewX;
-      _scrollEl.scrollLeft=Math.max(0,newScroll);
-      // Show zoom hint
-      const pct=Math.round((newPtSp-PT_MIN)/(PT_MAX-PT_MIN)*100);
-      const zt=document.getElementById('wc-zoom-txt');if(zt)zt.textContent=pct+'%';
-      const hint=document.getElementById('wc-zoom-hint');
-      if(hint){hint.classList.add('show');clearTimeout(_zoomTimer);_zoomTimer=setTimeout(()=>hint.classList.remove('show'),1200);}
-    },{passive:false});
-
-    _scrollEl.addEventListener('touchend',e=>{
-      if(!_pinching)return;
-      if(e.touches.length<2){
-        _pinching=false;
-        if(_rafId){cancelAnimationFrame(_rafId);_rafId=null;}
-        // Compute final ptSp from last scaleX
-        const newPtSp=Math.max(PT_MIN,Math.min(PT_MAX,Math.round(_ptSp0*_scaleX)));
-        // Reset CSS transform before redraw
-        const svg=document.getElementById('wc-svg');
-        if(svg){svg.style.transform='';svg.style.transformOrigin='';svg.style.willChange='';}
-        _ptSp=newPtSp;
-        // Redraw with new spacing, then restore scroll anchor
-        const savedAnchorSvgX=_anchorSvgX;
-        const savedAnchorViewX=_anchorViewX;
-        const oldW=_pendingOldW;
-        _draw(false);
-        const newScroll=savedAnchorSvgX*(_svgW/oldW)-savedAnchorViewX;
-        _scrollEl.scrollLeft=Math.max(0,Math.min(newScroll,_svgW-(_scrollEl.clientWidth-Y_W)));
-        _scaleX=1;
-      }
+      _checkEndBtn();
+      if(_activeI>=0){const ai=_activeI;_activeI=-2;_activate(ai);}
     },{passive:true});
   };
 
   window._wcCleanup=function(){
-    _activeI=-1;_pinching=false;
+    _activeI=-1;
     if(_rafId){cancelAnimationFrame(_rafId);_rafId=null;}
     if(_ttFadeTimer){clearTimeout(_ttFadeTimer);_ttFadeTimer=null;}
+    if(_endTimer){clearTimeout(_endTimer);_endTimer=null;}
     const svg=document.getElementById('wc-svg');if(svg)svg.innerHTML='';
     const yl=document.getElementById('wc-ylabels');if(yl)yl.innerHTML='';
     const tt=document.getElementById('wc-tt');if(tt)tt.classList.remove('on');
+    _hideEndBtn();
     _scrollEl=null;
   };
 
   window._populateWeightChart=function(){
     const wl=gWL();
-    // Sort by timestamp, keep all entries (including same-day at different times)
     _data=[...wl].sort((a,b)=>a.logged_at.localeCompare(b.logged_at));
-    // Add prev reference
     _data=_data.map((e,i)=>({...e,prev:i>0?_data[i-1].weight:null}));
-    _ptSp=80;_activeI=-1;_pinching=false;
+    _activeI=-1;
     requestAnimationFrame(()=>{
       _wcInit();
       _draw(true);
