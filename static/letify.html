@@ -2715,6 +2715,7 @@ async function apiPost(path,body){
 async function reload(){
   await loadData();
   if(_completingMap.size>0)return;
+  // only re-render the currently active tab — others re-render when navigated to
   const rMap={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};
   rMap[curTab]?.();
 }
@@ -2741,25 +2742,33 @@ const totalCal=()=>Object.values(gCD()).reduce((a,b)=>a+b,0);
 const TABS=['home','track','plan','sleep','progress','profile'];
 let curTab='home',trackTab='water',navHidden=false;
 
-const _visitedTabs=new Set(['home']); // home rendered on init
+// render gate: prevents multiple renders in same animation frame
+let _renderPending={};
+function _scheduleRender(key,fn){
+  if(_renderPending[key])return;
+  _renderPending[key]=true;
+  requestAnimationFrame(()=>{delete _renderPending[key];fn();});
+}
+
 function navTo(tab){
   if(tab===curTab&&!curPushPage)return;
   if(curPushPage)popPage(false);
+  const prevTab=curTab;
   curTab=tab;
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  const pg=document.getElementById('p-'+tab);
-  if(pg){pg.scrollTop=0;pg.classList.add('active');}
+  const renders={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};
+  // Step 1: update nav highlights
   TABS.forEach(t=>{document.getElementById('nt-'+t)?.classList.toggle('on',t===tab);});
   tg?.HapticFeedback?.selectionChanged();
-  const renders={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};
-  if(_visitedTabs.has(tab)){
-    // already visited: defer render after transition so animation stays smooth
-    setTimeout(()=>renders[tab]?.(), 220);
-  } else {
-    // first visit: render immediately (page is blank, no content flash)
-    _visitedTabs.add(tab);
-    renders[tab]?.();
-  }
+  // Step 2: render target content while it's still invisible (opacity:0 from CSS)
+  renders[tab]?.();
+  // Step 3: swap active class in next frame — CSS transition plays with content already present
+  requestAnimationFrame(()=>{
+    if(prevTab!==tab){
+      document.getElementById('p-'+prevTab)?.classList.remove('active');
+    }
+    const pg=document.getElementById('p-'+tab);
+    if(pg){pg.scrollTop=0;pg.classList.add('active');}
+  });
 }
 function setTTab(t){
   trackTab=t;
@@ -2779,15 +2788,15 @@ function pushPage(id){
   document.getElementById('nav')?.classList.add('gone');
   const pp=document.getElementById(id);
   if(pp){
-    // double rAF: lets browser paint the hidden state before .open triggers transition
+    // Step 1: populate while page is opacity:0 (invisible) — no flash, no delay
+    _populatePP(id);
+    pp.scrollTop=0;
+    const body=pp.querySelector('.pp-body');if(body)body.scrollTop=0;
+    // Step 2: double rAF so browser paints populated content before transition starts
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
       pp.classList.remove('closing');
       pp.classList.add('open');
-      pp.scrollTop=0;
-      const body=pp.querySelector('.pp-body');if(body)body.scrollTop=0;
     }));
-    // populate AFTER animation completes to avoid jank
-    setTimeout(()=>_populatePP(id), 250);
   }
   if(tg?.BackButton){
     tg.BackButton.show();
@@ -2825,7 +2834,11 @@ function popPage(doRender=true){
       if(tg.BackButton._letifyHandler){tg.BackButton.offClick(tg.BackButton._letifyHandler);tg.BackButton._letifyHandler=null;}
       tg.BackButton.offClick(popPage);
     }
-    if(doRender&&_completingMap.size===0){const renders={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};renders[curTab]?.();}
+    if(doRender&&_completingMap.size===0){
+      const renders={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};
+      // render immediately — underlying page is already visible, content should be fresh
+      renders[curTab]?.();
+    }
   }
 }
 
@@ -3454,6 +3467,7 @@ function resetAllData(){
     weight_log:[],sleep_log:[],acts_today:[],products:[]
   };
   _completingMap.clear();
+  // guards in each render fn skip hidden tabs automatically
   renderHome();renderProfile();renderProgress();renderPlan();renderSleep();renderTrack(trackTab);
   toast('все данные сброшены');
   tg?.HapticFeedback?.notificationOccurred('warning');
@@ -3846,12 +3860,15 @@ function _populateWeightChart(){
   // Log: show last 3 entries
   _wtermRenderLog(_wtermAllData);
 
-  // Chart: draw after layout is settled
+  // Chart: draw after open animation so canvas has correct dimensions
   const filtered=_wtermFilterData(_wtermAllData,_wtermPeriod);
-  requestAnimationFrame(()=>{
-    drawTerminalWeightChart('wterm-canvas',filtered,_wtermGoal);
-    _wtermInitCrosshair();
-  });
+  // Use 250ms timeout to draw after the push-page open transition (220ms) completes
+  setTimeout(()=>{
+    requestAnimationFrame(()=>{
+      drawTerminalWeightChart('wterm-canvas',filtered,_wtermGoal);
+      _wtermInitCrosshair();
+    });
+  }, 240);
 }
 
 /* ══ RENDERS ══ */
@@ -3901,6 +3918,8 @@ function _homeData(){
 }
 
 function renderHome(){
+  // skip if home is not the current tab (will render on navTo)
+  if(curTab!=='home'&&!document.getElementById('p-home')?.classList.contains('active'))return;
   const d=getHomeDesign();
   const pg=$('p-home');
   if(pg){pg.classList.toggle('layout-linear',d==='linear');pg.classList.toggle('layout-bento',d==='bento');}
@@ -4117,7 +4136,10 @@ function renderHomeBento(){
 </div>`;
 }
 
-function renderTrack(tab){if(tab==='water')renderWater();else renderCal();}
+function renderTrack(tab){
+  if(curTab!=='track'&&!document.getElementById('p-track')?.classList.contains('active'))return;
+  if(tab==='water')renderWater();else renderCal();
+}
 function renderWater(){
   const u=gU(),wd=gWD();
   const wt=wd.total||0,wg=u.water_goal||2000,wp=Math.min(1,wt/wg);
@@ -4165,6 +4187,7 @@ function renderCal(){
 }
 
 function renderPlan(){
+  if(curTab!=='plan'&&!document.getElementById('p-plan')?.classList.contains('active'))return;
   if(_completingMap.size>0)return;
   const acts=gActs();const now=new Date();
   const mons=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
@@ -4206,6 +4229,7 @@ function renderPlan(){
 setInterval(()=>{if(curTab==='plan'&&_completingMap.size===0)renderPlan();},30000);
 
 function renderSleep(){
+  if(curTab!=='sleep'&&!document.getElementById('p-sleep')?.classList.contains('active'))return;
   const sl=gSL();
   if(sl.length){const last=sl[sl.length-1];T('sl-h',last.hours.toFixed(1));T('sl-qico',qIco(last.quality));H('sl-dots',Array.from({length:5},(_,i)=>`<div class="sqd${i<last.quality?' on':''}"></div>`).join(''));}
   else{T('sl-h','—');T('sl-qico','—');H('sl-dots','');}
@@ -4214,6 +4238,7 @@ function renderSleep(){
 }
 
 function renderProgress(){
+  if(curTab!=='progress'&&!document.getElementById('p-progress')?.classList.contains('active'))return;
   const u=gU(),wl=gWL(),sl=gSL(),wd=gWD();
   if(wl.length){
     const cw=wl[wl.length-1].weight;
@@ -4273,6 +4298,7 @@ function renderProgress(){
 }
 
 function renderProfile(){
+  if(curTab!=='profile'&&!document.getElementById('p-profile')?.classList.contains('active'))return;
   const u=gU(),wl=gWL();
   // Hero avatar + name
   const av=$('pf-av');if(av)av.textContent=(u.name||'?').charAt(0).toUpperCase();
