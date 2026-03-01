@@ -492,7 +492,72 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tg-dark .ttab{color:rgba(255,255,255,.4)}
 
 /* ══ AVATAR ══ */
-.pav{width:64px;height:64px;border-radius:20px;background:linear-gradient(135deg,var(--sun),var(--sun2));display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;color:#fff;box-shadow:0 5px 18px rgba(255,107,53,.25);flex-shrink:0;overflow:hidden}
+.pav{
+  width:64px;height:64px;border-radius:20px;
+  background:linear-gradient(135deg,var(--sun),var(--sun2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;font-weight:900;color:#fff;
+  box-shadow:0 5px 18px rgba(255,107,53,.25);
+  flex-shrink:0;overflow:hidden;position:relative;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .15s ease,box-shadow .15s ease;
+}
+.pav:active{transform:scale(.93);box-shadow:0 2px 8px rgba(255,107,53,.18)}
+.pav img.pav-img{
+  width:100%;height:100%;object-fit:cover;
+  border-radius:inherit;display:block;
+  position:absolute;inset:0;
+  opacity:0;
+  transition:opacity .5s cubic-bezier(.4,0,.2,1);
+  pointer-events:none;
+}
+.pav img.pav-img.loaded{opacity:1}
+.pav-cam{
+  position:absolute;inset:0;
+  background:rgba(0,0,0,.38);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;
+  transition:opacity .18s ease;
+  border-radius:inherit;
+  pointer-events:none;
+}
+.pav:active .pav-cam{opacity:1}
+.pav-spinner{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--sun),var(--sun2));
+  border-radius:inherit;
+  z-index:2;
+  opacity:0;
+  transition:opacity .2s ease;
+  pointer-events:none;
+}
+.pav-spinner.show{opacity:1}
+.pav-spinner svg{animation:pav-spin .85s linear infinite}
+@keyframes pav-spin{to{transform:rotate(360deg)}}
+.pav-wrap{position:relative;display:inline-block;flex-shrink:0}
+.pav-edit-badge{
+  position:absolute;bottom:-5px;right:-5px;
+  width:22px;height:22px;border-radius:7px;
+  background:var(--sun);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(255,107,53,.45);
+  border:2.5px solid var(--bg);
+  pointer-events:none;
+  transition:transform .15s ease;
+}
+.pav-wrap:active .pav-edit-badge{transform:scale(.9)}
+@keyframes pav-ripple{0%{transform:scale(0);opacity:.4}100%{transform:scale(3);opacity:0}}
+.pav-ripple{
+  position:absolute;
+  width:64px;height:64px;
+  border-radius:50%;
+  background:rgba(255,255,255,.5);
+  animation:pav-ripple .55s ease-out forwards;
+  pointer-events:none;
+  top:0;left:0;
+}
 
 /* ══ TOAST ══ */
 /* toast removed */
@@ -1373,12 +1438,28 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 <!-- ══ PROFILE ══ -->
 <div class="page" id="p-profile">
 <div style="display:flex;align-items:center;gap:14px;padding:4px 16px 0">
-  <div class="pav" id="pf-av">А</div>
+  <div class="pav-wrap" onclick="pickAvatar()">
+    <div class="pav" id="pf-av">
+      <span id="pf-av-letter">А</span>
+      <img class="pav-img" id="pf-av-img" alt="" src="">
+      <div class="pav-cam">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      </div>
+      <div class="pav-spinner" id="pf-av-spinner">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="2.5" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+      </div>
+    </div>
+    <div class="pav-edit-badge">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    </div>
+  </div>
   <div>
     <div class="t2" id="pf-name">—</div>
     <div class="t5" id="pf-meta" style="margin-top:2px">—</div>
   </div>
 </div>
+<!-- Hidden file input for avatar pick -->
+<input type="file" id="pf-av-input" accept="image/*" style="display:none" onchange="onAvatarPicked(this)">
 <div id="pf-bmi-row" style="margin-top:12px;padding:0 16px;display:none">
   <div class="sb-row">
     <div class="sbox"><div class="sv" id="pf-bmi">—</div><div class="sl">ИМТ</div></div>
@@ -3861,16 +3942,95 @@ function renderProgress(){
   T('pw-sleep',sl.length?+(sl.slice(-7).reduce((a,b)=>a+b.hours,0)/Math.min(7,sl.length)).toFixed(1):'—');
 }
 
+/* ══ AVATAR SYSTEM ══ */
+const AV_KEY='lf2_user_avatar';
+
+function _loadAvatarFromStorage(){
+  try{return localStorage.getItem(AV_KEY)||null;}catch{return null;}
+}
+function _saveAvatarToStorage(dataUrl){
+  try{localStorage.setItem(AV_KEY,dataUrl);}catch{}
+}
+
+function _applyAvatar(dataUrl,animate){
+  const letter=$('pf-av-letter');
+  const img=$('pf-av-img');
+  if(!img)return;
+  if(animate){
+    // show spinner
+    const sp=$('pf-av-spinner');
+    if(sp)sp.classList.add('show');
+    // small delay to let spinner appear, then load image
+    setTimeout(()=>{
+      img.onload=()=>{
+        if(sp)sp.classList.remove('show');
+        if(letter)letter.style.display='none';
+        requestAnimationFrame(()=>{img.classList.add('loaded');});
+        // ripple effect
+        const av=$('pf-av');
+        if(av){const r=document.createElement('div');r.className='pav-ripple';av.appendChild(r);setTimeout(()=>r.remove(),600);}
+      };
+      img.onerror=()=>{if(sp)sp.classList.remove('show');}
+      img.src=dataUrl;
+    },320);
+  } else {
+    // silent restore from storage
+    img.onload=()=>{
+      if(letter)letter.style.display='none';
+      img.classList.add('loaded');
+    };
+    img.src=dataUrl;
+  }
+}
+
+function pickAvatar(){
+  tg?.HapticFeedback?.impactOccurred('light');
+  const inp=$('pf-av-input');
+  if(inp)inp.click();
+}
+
+function onAvatarPicked(input){
+  const file=input.files&&input.files[0];
+  if(!file)return;
+  tg?.HapticFeedback?.impactOccurred('medium');
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const raw=e.target.result;
+    // Resize/compress via canvas to max 256x256, quality 0.82
+    const image=new Image();
+    image.onload=()=>{
+      const MAX=256;
+      const canvas=document.createElement('canvas');
+      const ratio=Math.min(MAX/image.width,MAX/image.height,1);
+      canvas.width=Math.round(image.width*ratio);
+      canvas.height=Math.round(image.height*ratio);
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(image,0,0,canvas.width,canvas.height);
+      const compressed=canvas.toDataURL('image/jpeg',0.82);
+      _saveAvatarToStorage(compressed);
+      _applyAvatar(compressed,true);
+    };
+    image.src=raw;
+  };
+  reader.readAsDataURL(file);
+  // reset input so same file can be picked again
+  input.value='';
+}
+
 function renderProfile(){
   const u=gU(),wl=gWL();
-  const av=$('pf-av');
-  if(av){
-    const photoUrl=tgUser?.photo_url;
-    if(photoUrl){
-      av.innerHTML=`<img src="${photoUrl}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block;">`;
-    } else {
-      av.innerHTML=(u.name||'?').charAt(0).toUpperCase();
+  // Avatar
+  const letter=$('pf-av-letter');
+  const img=$('pf-av-img');
+  const saved=_loadAvatarFromStorage();
+  if(saved&&img){
+    if(!img.classList.contains('loaded')){
+      _applyAvatar(saved,false);
     }
+  } else {
+    if(letter)letter.style.display='';
+    if(img){img.classList.remove('loaded');img.src='';}
+    if(letter)letter.textContent=(u.name||'?').charAt(0).toUpperCase();
   }
   T('pf-name',u.name||'—');
   const meta=[];if(u.age)meta.push(u.age+' лет');if(u.height)meta.push(u.height+' см');if(u.gender)meta.push(u.gender==='male'?'♂':'♀');
