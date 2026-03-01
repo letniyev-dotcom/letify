@@ -110,7 +110,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   cursor:pointer;border:none;color:var(--text);flex-shrink:0;
   transition:transform .1s,background .1s;
 }
-.pp-back:active{transform:scale(.95);transition:transform .07s ease;background:rgba(0,0,0,.07)}
+.pp-back:active{transform:scale(.95);transition:transform .12s ease;background:rgba(0,0,0,.07)}
 .tg-dark .pp-back:active{background:rgba(255,255,255,.18)}
 .pp-title{font-size:18px;font-weight:900;letter-spacing:-.02em}
 .pp-subtitle{font-size:11px;font-weight:500;color:var(--hint);margin-top:1px}
@@ -204,7 +204,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   transition:color .15s ease-out,background .15s ease-out,transform .2s ease-out;
 }
 .nt.on{color:var(--sun);background:rgba(255,107,53,.1)}
-.nt:active{transform:scale(.94);transition:transform .08s ease}
+.nt:active{transform:scale(.94);transition:transform .12s ease}
 .nt svg{width:22px;height:22px;flex-shrink:0}
 
 /* ══ TYPOGRAPHY ══ */
@@ -315,8 +315,8 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tg-dark .mr{border-bottom-color:rgba(255,255,255,.08)}
 
 /* ══ BTNS ══ */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;cursor:pointer;font-family:inherit;font-weight:800;transition:transform .2s ease-out,opacity .2s ease-out}
-.btn:active{transform:scale(.97);opacity:.9;transition:transform .08s ease,opacity .08s ease}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;cursor:pointer;font-family:inherit;font-weight:800;transition:transform .18s ease,opacity .18s ease}
+.btn:active{transform:scale(.97);opacity:.88;transition:transform .12s ease,opacity .12s ease}
 .btn-p{background:linear-gradient(135deg,var(--sun),var(--sun2));color:#fff;padding:15px 20px;font-size:15px;border-radius:14px;box-shadow:0 4px 16px rgba(255,107,53,.28);width:100%;letter-spacing:.01em}
 .btn-g{background:var(--bg3);color:var(--text);padding:11px 16px;font-size:13px;border-radius:11px}
 .btn-water{background:rgba(78,174,229,.1);color:var(--water);padding:13px 8px;font-size:13px;border-radius:12px;flex:1;font-weight:800}
@@ -467,8 +467,8 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tg-dark #nav{background:rgba(20,14,8,.96);border-color:rgba(255,255,255,.1)}
 .tg-dark .empty svg{opacity:.15}
 .tg-dark .banner::after{opacity:.5}
-.stepper-btn{transition:opacity .12s ease,transform .12s ease}
-.stepper-btn:active{background:transparent !important;transform:scale(.91);opacity:.65}
+.stepper-btn{transition:opacity .16s ease,transform .16s ease}
+.stepper-btn:active{background:transparent !important;transform:scale(.93);opacity:.6}
 .btn-water:active{opacity:.75 !important}
 
 /* ══ CLEAR BTN HINT ══ */
@@ -481,6 +481,118 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   -webkit-overflow-scrolling:touch;scrollbar-width:none;
 }
 .hist-scroll::-webkit-scrollbar{display:none}
+
+/* ══ VARIANT E ─ CAL INPUT STEP 2 ══ */
+.ve-hero{
+  background:linear-gradient(135deg,rgba(244,129,74,.1),rgba(255,171,64,.04));
+  border-radius:20px;padding:16px 18px;
+  display:flex;align-items:flex-start;justify-content:space-between;
+  margin-bottom:14px;gap:12px;
+  border:1px solid rgba(255,107,53,.13);
+  position:relative;overflow:hidden;
+}
+.ve-hero::before{
+  content:'';position:absolute;top:-40px;right:-24px;width:110px;height:110px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,107,53,.1),transparent 70%);
+  pointer-events:none;
+}
+.ve-kcal{font-size:48px;font-weight:900;color:var(--cal);line-height:1;letter-spacing:-.04em}
+.ve-sub{font-size:12px;font-weight:700;color:var(--hint);margin-top:3px}
+.ve-go{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;padding-top:2px}
+.ve-go-lbl{font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--hint)}
+.ve-go-btn{width:46px;height:46px;border-radius:14px;background:rgba(255,107,53,.15);border:1.5px solid rgba(255,107,53,.28);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--sun);transition:background .18s ease,transform .16s ease,opacity .16s ease;flex-shrink:0}
+.ve-go-btn:active{background:rgba(255,107,53,.26);transform:scale(.95);opacity:.85}
+.ve-go-btn svg{width:20px;height:20px;stroke:currentColor;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+.ve-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:0}
+.ve-f{background:var(--bg3);border:1px solid var(--brd);border-radius:14px;padding:10px 12px;transition:border-color .18s ease,box-shadow .18s ease,background .18s ease}
+.ve-f:focus-within{background:rgba(255,107,53,.07);border-color:rgba(255,107,53,.35);box-shadow:0 0 0 3px rgba(255,107,53,.07)}
+.ve-f.kcal-f:focus-within{background:rgba(244,129,74,.1);border-color:rgba(244,129,74,.4);box-shadow:0 0 0 3px rgba(244,129,74,.08)}
+.tg-dark .ve-f{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.09)}
+.ve-f label{display:block;font-size:9px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--hint);margin-bottom:4px}
+.ve-f.kcal-f label{color:rgba(244,129,74,.7)}
+.ve-f input{width:100%;background:transparent;border:none;outline:none;font-family:inherit;font-size:21px;font-weight:900;color:var(--text);text-align:right}
+.ve-f input::placeholder{color:var(--hint);font-size:16px;font-weight:600}
+
+/* ══ VARIANT E ─ CAL STEP 3 ══ */
+.ve-s3-wrap{background:var(--bg2);border-radius:20px;border:1px solid var(--brd);overflow:hidden;margin-bottom:14px}
+.tg-dark .ve-s3-wrap{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.09)}
+.ve-s3-top{padding:16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--brd)}
+.tg-dark .ve-s3-top{border-bottom-color:rgba(255,255,255,.08)}
+.ve-s3-kcal{font-size:40px;font-weight:900;color:var(--cal);line-height:1;letter-spacing:-.03em}
+.ve-s3-sub{font-size:11px;font-weight:700;color:var(--hint);margin-top:2px}
+.ve-drum{display:flex;align-items:center;gap:0;background:var(--bg3);border-radius:14px;overflow:hidden}
+.ve-drum-btn{width:40px;height:48px;border:none;background:transparent;color:var(--hint);font-size:20px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;transition:color .16s ease,background .16s ease,opacity .16s ease}
+.ve-drum-btn:active{opacity:.65;background:rgba(255,107,53,.1);color:var(--sun)}
+.ve-drum-val{font-size:24px;font-weight:900;color:var(--text);min-width:56px;text-align:center}
+.ve-drum-g{font-size:11px;font-weight:700;color:var(--hint);padding-right:12px}
+.ve-s3-macs{display:flex;gap:0;border-bottom:1px solid var(--brd)}
+.tg-dark .ve-s3-macs{border-bottom-color:rgba(255,255,255,.08)}
+.ve-s3-mac{flex:1;padding:10px 6px;text-align:center;border-right:1px solid var(--brd)}
+.tg-dark .ve-s3-mac{border-right-color:rgba(255,255,255,.08)}
+.ve-s3-mac:last-child{border-right:none}
+.ve-s3-mac-v{font-size:16px;font-weight:900}
+.ve-s3-mac-l{font-size:8px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.04em;margin-top:1px}
+.ve-s3-meals{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.ve-s3-meal{padding:12px 4px;border-right:1px solid var(--brd);text-align:center;cursor:pointer;background:transparent;border-top:none;border-bottom:none;border-left:none;font-family:inherit;transition:background .18s ease,opacity .16s ease;position:relative}
+.tg-dark .ve-s3-meal{border-right-color:rgba(255,255,255,.08)}
+.ve-s3-meal:last-child{border-right:none}
+.ve-s3-meal span{display:block;font-size:18px;margin-bottom:3px}
+.ve-s3-meal div{font-size:10px;font-weight:800;color:var(--hint);transition:color .18s ease}
+.ve-s3-meal.on{background:rgba(255,107,53,.08)}
+.ve-s3-meal.on div{color:var(--text)}
+.ve-s3-meal.on::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--sun),var(--sun2))}
+.ve-s3-meal:active{opacity:.72}
+
+/* ══ MEAL DETAIL PUSH PAGE ─ DONUT GLOW ══ */
+.md-hero{
+  background:linear-gradient(160deg,rgba(255,107,53,.07),rgba(0,0,0,0));
+  border-radius:22px;border:1px solid rgba(255,107,53,.1);
+  padding:22px 18px 18px;
+  display:flex;flex-direction:column;align-items:center;
+  margin-bottom:14px;
+  position:relative;overflow:hidden;
+}
+.md-hero::before{
+  content:'';position:absolute;top:-50px;left:50%;transform:translateX(-50%);
+  width:220px;height:220px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,107,53,.08),transparent 70%);
+  pointer-events:none;
+}
+.md-ring-wrap{position:relative;width:170px;height:170px;margin-bottom:14px}
+.md-ring-wrap svg{position:absolute;inset:0;width:100%;height:100%}
+.md-ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+.md-ring-ico{font-size:28px;margin-bottom:2px}
+.md-ring-kcal{font-size:28px;font-weight:900;color:var(--cal);line-height:1;letter-spacing:-.03em}
+.md-ring-lbl{font-size:10px;font-weight:700;color:var(--hint)}
+.md-legs{display:flex;gap:18px}
+.md-leg{display:flex;align-items:center;gap:7px}
+.md-leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.md-leg-v{font-size:15px;font-weight:900;line-height:1}
+.md-leg-l{font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.04em}
+
+.md-list-wrap{background:var(--bg2);border-radius:18px;border:1px solid var(--brd);overflow:hidden;margin-bottom:12px}
+.tg-dark .md-list-wrap{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.09)}
+.md-list-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--brd)}
+.tg-dark .md-list-hdr{border-bottom-color:rgba(255,255,255,.08)}
+.md-list-title{font-size:11px;font-weight:800;color:var(--hint);text-transform:uppercase;letter-spacing:.06em}
+.md-clear-btn{display:flex;align-items:center;gap:5px;background:rgba(244,92,92,.09);color:var(--red);border:none;border-radius:9px;padding:6px 10px;font-family:inherit;font-size:11px;font-weight:800;cursor:pointer;transition:background .18s ease,opacity .16s ease,transform .16s ease}
+.md-clear-btn:active{background:rgba(244,92,92,.18);opacity:.8;transform:scale(.96)}
+.tg-dark .md-clear-btn{background:rgba(244,92,92,.15)}
+.md-list-scroll{max-height:44vh;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:6px 12px 10px}
+.md-list-scroll::-webkit-scrollbar{display:none}
+.md-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--brd)}
+.md-item:last-child{border-bottom:none;padding-bottom:0}
+.md-item:first-child{padding-top:0}
+.tg-dark .md-item{border-bottom-color:rgba(255,255,255,.07)}
+.md-item-ico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.md-item-name{flex:1;font-size:13px;font-weight:800}
+.md-item-sub{font-size:10px;color:var(--hint);font-weight:600;margin-top:1px}
+.md-item-right{text-align:right;flex-shrink:0}
+.md-item-kcal{font-size:14px;font-weight:900;color:var(--cal)}
+.md-item-g{font-size:10px;font-weight:700;color:var(--hint);margin-top:1px}
+.md-empty{text-align:center;padding:28px 16px;color:var(--hint);font-size:13px;font-weight:600}
 
 /* ══ PLAN ADD BTN — no longer used, kept for compat ══ */
 #pl-add-btn-wrap{display:none}
@@ -582,10 +694,10 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   padding:12px 8px;border:2px solid var(--brd);border-radius:12px;
   background:var(--bg3);color:var(--hint);
   font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;
-  transition:all .14s ease;
+  transition:border-color .18s ease,background .18s ease,color .18s ease,transform .16s ease,opacity .16s ease;
 }
 .scm-btn.on{border-color:var(--sun);background:rgba(255,107,53,.1);color:var(--text);}
-.scm-btn:active{transform:scale(.96);}
+.scm-btn:active{transform:scale(.97);opacity:.85;}
 /* Scanner step pages */
 .sc-step{display:none}
 .sc-step.active{display:block}
@@ -905,7 +1017,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
   </div>
   <div class="lt" onclick="pushPage('pp-start-weight')">
-    <div class="lt-ic">⚖️</div>
+    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 7l7-4 7 4M3 17h6a3 3 0 0 0 0-6H3l3 3-3 3zm18 0h-6a3 3 0 0 1 0-6h6l-3 3 3 3z"/></svg></div>
     <span class="lt-lbl">начальный вес и цель</span>
     <span class="lt-val" id="pf-sw">—</span>
     <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
@@ -925,7 +1037,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 </div>
 </div>
 <div class="pad" style="margin-top:10px">
-  <button class="btn btn-danger" style="width:100%;padding:14px" onclick="resetAllData()">🗑 сбросить все данные</button>
+  <button class="btn btn-danger" style="width:100%;padding:14px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="resetAllData()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> сбросить все данные</button>
   <div class="clear-hint">удалит все записи и настройки навсегда</div>
 </div>
 <div style="text-align:center;padding:16px 0 8px"><div class="t5">letify · ver 4.3</div></div>
@@ -1070,70 +1182,88 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       </div>
       <button class="btn btn-p" style="margin-top:20px" onclick="calStep2()">далее →</button>
     </div>
-    <!-- Step 2: Macros only (per 100g) -->
+    <!-- Step 2: Macros only (per 100g) — Variant E design -->
     <div class="act-step" id="cal-s2">
       <div class="act-hint">питательная ценность на 100 г</div>
-      <div class="big-val-card" style="background:linear-gradient(135deg,rgba(244,129,74,.08),rgba(244,129,74,.03))">
-        <div class="big-val" style="color:var(--cal)" id="cal-preview">0</div>
-        <div class="big-val-unit">ккал / 100 г</div>
-      </div>
-      <div class="m3-card" style="padding:14px">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div class="m3-field" style="margin-bottom:0">
-            <div class="m3-label">ккал / 100г</div>
-            <input class="m3-input num" id="inp-kcal100" type="number" inputmode="decimal" placeholder="200" oninput="calRecalc()">
-          </div>
-          <div class="m3-field" style="margin-bottom:0">
-            <div class="m3-label">белки / 100г</div>
-            <input class="m3-input num" id="inp-prot100" type="number" inputmode="decimal" step="0.1" placeholder="0" oninput="calRecalc()">
-          </div>
-          <div class="m3-field" style="margin-bottom:0">
-            <div class="m3-label">жиры / 100г</div>
-            <input class="m3-input num" id="inp-fat100" type="number" inputmode="decimal" step="0.1" placeholder="0" oninput="calRecalc()">
-          </div>
-          <div class="m3-field" style="margin-bottom:0">
-            <div class="m3-label">углеводы / 100г</div>
-            <input class="m3-input num" id="inp-carb100" type="number" inputmode="decimal" step="0.1" placeholder="0" oninput="calRecalc()">
-          </div>
+      <!-- Hero card with kcal preview + forward button -->
+      <div class="ve-hero">
+        <div>
+          <div class="ve-kcal" id="cal-preview">0</div>
+          <div class="ve-sub">ккал / 100 г</div>
+        </div>
+        <div class="ve-go">
+          <div class="ve-go-lbl">далее</div>
+          <button class="ve-go-btn" onclick="calStep3()">
+            <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
         </div>
       </div>
-      <button class="btn btn-p" style="margin-top:20px" onclick="calStep3()">далее →</button>
+      <!-- Fields 2x2 with glow -->
+      <div class="ve-fields">
+        <div class="ve-f kcal-f">
+          <label>ккал / 100г</label>
+          <input class="m3-input num" id="inp-kcal100" type="number" inputmode="decimal" placeholder="200" oninput="calRecalc()">
+        </div>
+        <div class="ve-f">
+          <label>белки / 100г</label>
+          <input class="m3-input num" id="inp-prot100" type="number" inputmode="decimal" step="0.1" placeholder="0" oninput="calRecalc()">
+        </div>
+        <div class="ve-f">
+          <label>жиры / 100г</label>
+          <input class="m3-input num" id="inp-fat100" type="number" inputmode="decimal" step="0.1" placeholder="0" oninput="calRecalc()">
+        </div>
+        <div class="ve-f">
+          <label>углеводы / 100г</label>
+          <input class="m3-input num" id="inp-carb100" type="number" inputmode="decimal" step="0.1" placeholder="0" oninput="calRecalc()">
+        </div>
+      </div>
     </div>
-    <!-- Step 3: Weight + Meal type -->
+    <!-- Step 3: Weight + Meal type — Variant E card -->
     <div class="act-step" id="cal-s3">
       <div class="act-hint">порция и приём пищи</div>
-      <div class="big-val-card" style="background:linear-gradient(135deg,rgba(244,129,74,.08),rgba(244,129,74,.03));margin-bottom:12px">
-        <div class="big-val" style="color:var(--cal)" id="cal-confirm-kcal">0</div>
-        <div class="big-val-unit">ккал · <span id="cal-portion-lbl">100</span> г</div>
-      </div>
-      <div class="m3-card" style="padding:14px;margin-bottom:12px">
-        <div style="font-size:13px;font-weight:700;color:var(--hint);margin-bottom:6px" id="cal-confirm-desc">—</div>
-        <div class="m3-field" style="margin-bottom:10px">
-          <div class="m3-label">вес порции, г</div>
-          <input class="m3-input num" id="inp-weight" type="number" inputmode="decimal" placeholder="100" value="100" oninput="calRecalc()">
-        </div>
-        <div id="cal-macro-preview" style="display:flex;gap:6px">
-          <div style="flex:1;background:var(--bg3);border-radius:10px;padding:8px;text-align:center">
-            <div style="font-size:14px;font-weight:800;color:var(--green)" id="cal-prev-prot">0</div>
-            <div style="font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase">белки г</div>
+      <div class="ve-s3-wrap">
+        <!-- Kcal + drum stepper -->
+        <div class="ve-s3-top">
+          <div>
+            <div class="ve-s3-kcal" id="cal-confirm-kcal">0</div>
+            <div class="ve-s3-sub" id="cal-confirm-desc2">ккал за порцию</div>
           </div>
-          <div style="flex:1;background:var(--bg3);border-radius:10px;padding:8px;text-align:center">
-            <div style="font-size:14px;font-weight:800;color:var(--sun)" id="cal-prev-fat">0</div>
-            <div style="font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase">жиры г</div>
-          </div>
-          <div style="flex:1;background:var(--bg3);border-radius:10px;padding:8px;text-align:center">
-            <div style="font-size:14px;font-weight:800;color:var(--sleep)" id="cal-prev-carb">0</div>
-            <div style="font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase">углев. г</div>
+          <div class="ve-drum">
+            <button class="ve-drum-btn" onclick="stepCalGram(-10)">−</button>
+            <div class="ve-drum-val" id="cal-gram-disp">100</div>
+            <div class="ve-drum-g">г</div>
+            <button class="ve-drum-btn" onclick="stepCalGram(10)">+</button>
           </div>
         </div>
-      </div>
-      <div class="m3-card" style="padding:14px;margin-bottom:12px">
-        <div style="font-size:11px;font-weight:700;color:var(--hint);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">когда ты это ел?</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <button class="scm-btn on" id="scm2-breakfast" onclick="setMeal2('breakfast',this)">🌅 завтрак</button>
-          <button class="scm-btn" id="scm2-lunch" onclick="setMeal2('lunch',this)">☀️ обед</button>
-          <button class="scm-btn" id="scm2-dinner" onclick="setMeal2('dinner',this)">🌙 ужин</button>
-          <button class="scm-btn" id="scm2-snack" onclick="setMeal2('snack',this)">🍑 перекус</button>
+        <!-- Macros row -->
+        <div class="ve-s3-macs">
+          <div class="ve-s3-mac">
+            <div class="ve-s3-mac-v" style="color:var(--green)" id="cal-prev-prot">0</div>
+            <div class="ve-s3-mac-l">белки г</div>
+          </div>
+          <div class="ve-s3-mac">
+            <div class="ve-s3-mac-v" style="color:var(--sun)" id="cal-prev-fat">0</div>
+            <div class="ve-s3-mac-l">жиры г</div>
+          </div>
+          <div class="ve-s3-mac">
+            <div class="ve-s3-mac-v" style="color:var(--sleep)" id="cal-prev-carb">0</div>
+            <div class="ve-s3-mac-l">углев. г</div>
+          </div>
+        </div>
+        <!-- Meal type tabs -->
+        <div class="ve-s3-meals">
+          <button class="ve-s3-meal on" id="ve-meal-breakfast" onclick="setMealE('breakfast',this)">
+            <span>🌅</span><div>завтрак</div>
+          </button>
+          <button class="ve-s3-meal" id="ve-meal-lunch" onclick="setMealE('lunch',this)">
+            <span>☀️</span><div>обед</div>
+          </button>
+          <button class="ve-s3-meal" id="ve-meal-dinner" onclick="setMealE('dinner',this)">
+            <span>🌙</span><div>ужин</div>
+          </button>
+          <button class="ve-s3-meal" id="ve-meal-snack" onclick="setMealE('snack',this)">
+            <span>🍑</span><div>перекус</div>
+          </button>
         </div>
       </div>
       <button class="btn btn-p" onclick="submitCal()">добавить ✓</button>
@@ -1141,8 +1271,82 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
 </div>
 
+<!-- PP: Детализация приёма пищи (Donut Glow) -->
+<div class="push-page" id="pp-meal-detail">
+  <div class="pp-hdr">
+    <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <div>
+      <div class="pp-title" id="md-title">завтрак</div>
+      <div class="pp-subtitle" id="md-subtitle">сегодня</div>
+    </div>
+  </div>
+  <div class="pp-body">
+    <!-- Donut Glow hero -->
+    <div class="md-hero">
+      <div class="md-ring-wrap">
+        <svg viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="glow-p"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <filter id="glow-f"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <filter id="glow-c"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <circle cx="90" cy="90" r="72" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="20"/>
+          <circle id="md-arc-c" cx="90" cy="90" r="72" fill="none" stroke="#8B7FD4" stroke-width="20"
+            stroke-dasharray="0 452.4" stroke-dashoffset="113.1"
+            stroke-linecap="round" filter="url(#glow-c)"/>
+          <circle id="md-arc-p" cx="90" cy="90" r="72" fill="none" stroke="#52C177" stroke-width="20"
+            stroke-dasharray="0 452.4" stroke-dashoffset="113.1"
+            stroke-linecap="round" filter="url(#glow-p)"/>
+          <circle id="md-arc-f" cx="90" cy="90" r="72" fill="none" stroke="#FF6B35" stroke-width="20"
+            stroke-dasharray="0 452.4" stroke-dashoffset="113.1"
+            stroke-linecap="round" filter="url(#glow-f)"/>
+        </svg>
+        <div class="md-ring-center">
+          <div class="md-ring-ico" id="md-ico">🌅</div>
+          <div class="md-ring-kcal" id="md-kcal">0</div>
+          <div class="md-ring-lbl">ккал</div>
+        </div>
+      </div>
+      <div class="md-legs">
+        <div class="md-leg">
+          <div class="md-leg-dot" style="background:#52C177;box-shadow:0 0 6px rgba(82,193,119,.5)"></div>
+          <div>
+            <div class="md-leg-v" style="color:#52C177" id="md-prot">0г</div>
+            <div class="md-leg-l">белки</div>
+          </div>
+        </div>
+        <div class="md-leg">
+          <div class="md-leg-dot" style="background:#FF6B35;box-shadow:0 0 6px rgba(255,107,53,.5)"></div>
+          <div>
+            <div class="md-leg-v" style="color:#FF6B35" id="md-fat">0г</div>
+            <div class="md-leg-l">жиры</div>
+          </div>
+        </div>
+        <div class="md-leg">
+          <div class="md-leg-dot" style="background:#8B7FD4;box-shadow:0 0 6px rgba(139,127,212,.5)"></div>
+          <div>
+            <div class="md-leg-v" style="color:#8B7FD4" id="md-carb">0г</div>
+            <div class="md-leg-l">углев.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Food list -->
+    <div class="md-list-wrap">
+      <div class="md-list-hdr">
+        <div class="md-list-title">записи</div>
+        <button class="md-clear-btn" onclick="clearMealEntries()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          очистить
+        </button>
+      </div>
+      <div class="md-list-scroll" id="md-list"></div>
+    </div>
+  </div>
+</div>
+
 <!-- PP: Данные профиля -->
-<div class="push-page" id="pp-pdata">
   <div class="pp-hdr">
     <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
     <div><div class="pp-title">данные профиля</div></div>
@@ -1928,24 +2132,30 @@ function _setCalStep(n){
   const titles=['название блюда','питательная ценность','приём пищи'];
   const t=document.getElementById('cal-step-title');if(t)t.textContent=titles[n-1];
 }
+let _calGrams=100;
 function calRecalc(){
   const kcal100=parseFloat(document.getElementById('inp-kcal100')?.value)||0;
   const prot100=parseFloat(document.getElementById('inp-prot100')?.value)||0;
   const fat100=parseFloat(document.getElementById('inp-fat100')?.value)||0;
   const carb100=parseFloat(document.getElementById('inp-carb100')?.value)||0;
-  const w=parseFloat(document.getElementById('inp-weight')?.value)||100;
+  const w=_calGrams;
   const k=Math.round(kcal100*w/100);
   const pr=+(prot100*w/100).toFixed(1);
   const fa=+(fat100*w/100).toFixed(1);
   const ca=+(carb100*w/100).toFixed(1);
-  // Step 2 big-val: show kcal per 100g
+  // Step 2: show kcal per 100g
   const p2=$('cal-preview');if(p2)p2.textContent=Math.round(kcal100)||0;
-  // Step 3 big-val: show portion total
+  // Step 3: show portion total + drum
   const p3=$('cal-confirm-kcal');if(p3)p3.textContent=k;
-  const pl=$('cal-portion-lbl');if(pl)pl.textContent=Math.round(w);
+  const gd=$('cal-gram-disp');if(gd)gd.textContent=w;
   const pp=$('cal-prev-prot');if(pp)pp.textContent=pr;
   const pf=$('cal-prev-fat');if(pf)pf.textContent=fa;
   const pc=$('cal-prev-carb');if(pc)pc.textContent=ca;
+}
+function stepCalGram(d){
+  _calGrams=Math.max(5,Math.min(2000,_calGrams+d));
+  calRecalc();
+  tg?.HapticFeedback?.selectionChanged();
 }
 function calStep2(){
   _setCalStep(2);
@@ -1955,7 +2165,7 @@ function calStep3(){
   const kcal100=parseFloat(document.getElementById('inp-kcal100')?.value)||0;
   if(!kcal100){toast('введи калории');return;}
   const desc=document.getElementById('inp-cal-desc')?.value||'';
-  T('cal-confirm-desc',desc||'ручной ввод');
+  const d2=$('cal-confirm-desc2');if(d2)d2.textContent=desc||'ручной ввод';
   calRecalc();
   _setCalStep(3);
   tg?.HapticFeedback?.selectionChanged();
@@ -1964,14 +2174,94 @@ function calBackOrPop(){
   if(_calStep>1){_setCalStep(_calStep-1);}
   else popPage();
 }
-function setMeal2(m,el){
-  _mealType2=m;
-  ['breakfast','lunch','dinner','snack'].forEach(x=>{document.getElementById('scm2-'+x)?.classList.toggle('on',x===m);});
+let _mealTypeE='breakfast';
+function setMealE(m,el){
+  _mealTypeE=m;
+  document.querySelectorAll('.ve-s3-meal').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
   tg?.HapticFeedback?.selectionChanged();
 }
+function setMeal2(m,el){
+  _mealTypeE=m;
+  setMealE(m,document.getElementById('ve-meal-'+m)||el);
+}
 
-/* ══ TIME PICKER ══ */
-let _timeH=8,_timeM=0,_timeEH=9,_timeEM=0;
+/* ══ MEAL DETAIL SCREEN ══ */
+let _currentMealKey=null;
+function getMealEntries(mealType){
+  return lsGet('meal_entries_'+TODAY+'_'+mealType)||[];
+}
+function openMealDetail(mealType){
+  _currentMealKey=mealType;
+  const MEALS={breakfast:{i:'🌅',n:'завтрак'},lunch:{i:'☀️',n:'обед'},dinner:{i:'🌙',n:'ужин'},snack:{i:'🍑',n:'перекус'}};
+  const m=MEALS[mealType]||{i:'🍽',n:mealType};
+  T('md-title',m.i+' '+m.n);
+  T('md-subtitle','сегодня');
+  const el=$('md-ico');if(el)el.textContent=m.i;
+  renderMealDetail();
+  pushPage('pp-meal-detail');
+  tg?.HapticFeedback?.selectionChanged();
+}
+function renderMealDetail(){
+  if(!_currentMealKey)return;
+  const entries=getMealEntries(_currentMealKey);
+  const totalKcal=entries.reduce((s,e)=>s+(e.kcal||0),0);
+  const totalProt=+entries.reduce((s,e)=>s+(e.prot||0),0).toFixed(1);
+  const totalFat=+entries.reduce((s,e)=>s+(e.fat||0),0).toFixed(1);
+  const totalCarb=+entries.reduce((s,e)=>s+(e.carb||0),0).toFixed(1);
+  T('md-kcal',totalKcal||0);
+  T('md-prot',totalProt+'г');
+  T('md-fat',totalFat+'г');
+  T('md-carb',totalCarb+'г');
+  const CIRC=452.4;
+  const total=totalProt+totalFat+totalCarb||1;
+  const cLen=totalKcal?Math.max(8,(totalCarb/total)*CIRC*0.9):0;
+  const pLen=totalKcal?Math.max(8,(totalProt/total)*CIRC*0.9):0;
+  const fLen=totalKcal?Math.max(8,(totalFat/total)*CIRC*0.9):0;
+  const gap=7;
+  const arcC=$('md-arc-c'),arcP=$('md-arc-p'),arcF=$('md-arc-f');
+  const BASE_OFF=113.1;
+  if(!totalKcal){
+    [arcC,arcP,arcF].forEach(a=>{if(a){a.setAttribute('stroke-dasharray','0 452.4');a.setAttribute('stroke-dashoffset','113.1');}});
+  } else {
+    if(arcC){arcC.setAttribute('stroke-dasharray',cLen+' '+CIRC);arcC.setAttribute('stroke-dashoffset',BASE_OFF);}
+    const pOff=-(cLen+gap)+BASE_OFF;
+    if(arcP){arcP.setAttribute('stroke-dasharray',pLen+' '+CIRC);arcP.setAttribute('stroke-dashoffset',pOff);}
+    const fOff=-(cLen+gap+pLen+gap)+BASE_OFF;
+    if(arcF){arcF.setAttribute('stroke-dasharray',fLen+' '+CIRC);arcF.setAttribute('stroke-dashoffset',fOff);}
+  }
+  const list=$('md-list');
+  if(!list)return;
+  if(!entries.length){
+    list.innerHTML='<div class="md-empty">нет записей за сегодня</div>';
+    return;
+  }
+  const MEAL_COLORS={breakfast:'rgba(255,152,0,',lunch:'rgba(255,107,53,',dinner:'rgba(139,127,212,',snack:'rgba(82,193,119,'};
+  const col=MEAL_COLORS[_currentMealKey]||'rgba(255,107,53,';
+  list.innerHTML=entries.map(e=>`
+    <div class="md-item">
+      <div class="md-item-ico" style="background:${col}0.12)">${e.desc?e.desc[0].toUpperCase():'🍽'}</div>
+      <div style="flex:1">
+        <div class="md-item-name">${e.desc||'ручной ввод'}</div>
+        <div class="md-item-sub">${e.prot||0}б · ${e.fat||0}ж · ${e.carb||0}у</div>
+      </div>
+      <div class="md-item-right">
+        <div class="md-item-kcal">${e.kcal||0}</div>
+        <div class="md-item-g">${e.grams||100}г</div>
+      </div>
+    </div>
+  `).join('');
+}
+function clearMealEntries(){
+  if(!_currentMealKey)return;
+  if(!confirm('Очистить все записи?'))return;
+  lsSet('meal_entries_'+TODAY+'_'+_currentMealKey,[]);
+  if(C.calories)C.calories[_currentMealKey]=0;
+  if(!UID)lsSet('cd_'+TODAY,C.calories||{});
+  renderMealDetail();renderTrack('cal');renderHome();
+  toast('записи очищены');
+  tg?.HapticFeedback?.notificationOccurred('success');
+}
 function _updateTimeDisplay(){
   const pad=v=>String(v).padStart(2,'0');
   const hd=document.getElementById('time-h-disp'),md=document.getElementById('time-m-disp');
@@ -2290,21 +2580,25 @@ async function submitCal(){
   const prot100=parseFloat(document.getElementById('inp-prot100')?.value)||0;
   const fat100=parseFloat(document.getElementById('inp-fat100')?.value)||0;
   const carb100=parseFloat(document.getElementById('inp-carb100')?.value)||0;
-  const w=parseFloat(document.getElementById('inp-weight')?.value)||100;
+  const w=_calGrams||100;
   if(!kcal100||kcal100<1){toast('введи калории');return;}
   const _calVal=Math.round(kcal100*w/100);
   const prot=+(prot100*w/100).toFixed(1);
   const fat=+(fat100*w/100).toFixed(1);
   const carb=+(carb100*w/100).toFixed(1);
   popPage();
-  if(!C.calories)C.calories={};C.calories[_mealType2]=(C.calories[_mealType2]||0)+_calVal;
+  if(!C.calories)C.calories={};C.calories[_mealTypeE]=(C.calories[_mealTypeE]||0)+_calVal;
   if(!C.macros)C.macros={prot:0,fat:0,carb:0};
-  C.macros.prot=+(( C.macros.prot||0)+prot).toFixed(1);
+  C.macros.prot=+((C.macros.prot||0)+prot).toFixed(1);
   C.macros.fat=+((C.macros.fat||0)+fat).toFixed(1);
   C.macros.carb=+((C.macros.carb||0)+carb).toFixed(1);
+  // Store per-meal food entry for detail screen
+  const entry={id:Date.now(),desc:desc||'ручной ввод',kcal:_calVal,prot,fat,carb,grams:w,ts:new Date().toISOString()};
+  const key='meal_entries_'+TODAY+'_'+_mealTypeE;
+  const existing=lsGet(key)||[];existing.push(entry);lsSet(key,existing);
   if(!UID){lsSet('cd_'+TODAY,C.calories);lsSet('macros_'+TODAY,C.macros);}
   renderTrack('cal');renderHome();toast('+'+_calVal+' ккал');tg?.HapticFeedback?.notificationOccurred('success');
-  await apiPost('/api/calories',{amount:_calVal,meal_type:_mealType2,description:desc,prot,fat,carb});await reload();
+  await apiPost('/api/calories',{amount:_calVal,meal_type:_mealTypeE,description:desc,prot,fat,carb});await reload();
 }
 function _saveProfileSilent(){
   const name=document.getElementById('inp-pname')?.value?.trim();
@@ -2572,7 +2866,24 @@ function renderCal(){
   const m=C.macros||{prot:0,fat:0,carb:0};
   T('c-prot',m.prot||0);T('c-fat',m.fat||0);T('c-carb',m.carb||0);
   const MEALS=[{k:'breakfast',i:'🌅',n:'завтрак',col:'#FF9800'},{k:'lunch',i:'☀️',n:'обед',col:'#FF6B35'},{k:'dinner',i:'🌙',n:'ужин',col:'#8B7FD4'},{k:'snack',i:'🍑',n:'перекус',col:'#52C177'}];
-  H('c-meals',MEALS.map(m=>`<div class="mr"><div class="mr-ico" style="background:${m.col}18;color:${m.col}">${m.i}</div><div style="flex:1"><div class="mr-name">${m.n}</div>${!cd[m.k]?`<div class="t5" style="font-size:10px">не записано</div>`:''}</div><div class="mr-kcal" style="${cd[m.k]?'color:var(--cal)':'color:var(--hint)'}">${cd[m.k]||'—'} ${cd[m.k]?'ккал':''}</div></div>`).join(''));
+  H('c-meals',MEALS.map(m=>{
+    const entries=getMealEntries(m.k);
+    const kcal=entries.reduce((s,e)=>s+(e.kcal||0),0);
+    const cnt=entries.length;
+    return`<div class="mr" style="cursor:pointer" onclick="openMealDetail('${m.k}')">
+      <div class="mr-ico" style="background:${m.col}18;color:${m.col}">${m.i}</div>
+      <div style="flex:1">
+        <div class="mr-name">${m.n}</div>
+        ${!cnt?`<div class="t5" style="font-size:10px">не записано</div>`:`<div class="t5" style="font-size:10px">${cnt} ${cnt===1?'блюдо':cnt<5?'блюда':'блюд'}</div>`}
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div class="mr-kcal" style="${kcal?'color:var(--cal)':'color:var(--hint)'}">
+          ${kcal||'—'} ${kcal?'ккал':''}
+        </div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--hint)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+    </div>`;
+  }).join(''));
 }
 
 function renderPlan(){
