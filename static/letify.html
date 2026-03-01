@@ -693,12 +693,13 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   position:absolute;inset:0;overflow-x:auto;overflow-y:hidden;
   scrollbar-width:none;-webkit-overflow-scrolling:touch;
   padding-left:52px;touch-action:pan-x;
+  will-change:scroll-position;
+  transform:translateZ(0);
 }
 .wc-scroll::-webkit-scrollbar{display:none}
 
 /* SVG */
-#wc-svg{transition:opacity .15s ease}
-#wc-svg.fading{opacity:0}
+#wc-svg{display:block;transform:translateZ(0)}
 
 /* tooltip */
 .wc-tt{
@@ -3611,12 +3612,11 @@ function toast(msg){/* toasts disabled */}
     if(!el)return;
     const cH=H-PAD.t-PAD.b;
     const range=mx-mn;
-    // Smart step: 0.5kg for small range, 1kg standard, 2/5 for large
-    let step=1;
-    if(range<=4)step=0.5;
-    else if(range<=8)step=1;
-    else if(range<=20)step=2;
-    else step=5;
+    // Smart step — 0.5kg for ranges up to ~10kg, then 1, 2, 5
+    let step=0.5;
+    if(range>25)step=5;
+    else if(range>12)step=2;
+    else if(range>6)step=1;
     const dec=step<1?1:0;
     const labelMx=Math.floor(mx/step)*step;
     const labelMn=Math.ceil(mn/step)*step;
@@ -3862,10 +3862,15 @@ function toast(msg){/* toasts disabled */}
     if(!_scrollEl)return;
     // hide TT on empty tap
     _scrollEl.addEventListener('pointerdown',e=>{if(!e.target.closest('.wcdg'))_hideTT();},{passive:true});
-    // update TT position on scroll + check end button
+    // throttle scroll via rAF — avoid layout thrashing on every pixel
+    let _scrollRaf=null;
     _scrollEl.addEventListener('scroll',()=>{
-      _checkEndBtn();
-      if(_activeI>=0){const ai=_activeI;_activeI=-2;_activate(ai);}
+      if(_scrollRaf)return;
+      _scrollRaf=requestAnimationFrame(()=>{
+        _scrollRaf=null;
+        _checkEndBtn();
+        if(_activeI>=0){const ai=_activeI;_activeI=-2;_activate(ai);}
+      });
     },{passive:true});
   };
 
