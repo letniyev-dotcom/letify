@@ -816,11 +816,11 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .scanner-viewport.not-found .sc-vf-corner{
   animation:vf-red-pulse 1.4s ease-in-out 3;
 }
-@keyframes vf-red-pulse{
-  0%{border-color:rgba(255,255,255,.82)}
-  40%{border-color:rgba(244,92,92,.95)}
-  60%{border-color:rgba(244,92,92,.95)}
-  100%{border-color:rgba(255,255,255,.82)}
+@keyframes vf-red-opacity{
+  0%{opacity:0}
+  30%{opacity:1}
+  70%{opacity:1}
+  100%{opacity:0}
 }
 .scanner-viewport video{
   width:100%;height:100%;object-fit:cover;display:block;
@@ -851,18 +851,39 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .sc-vf-corner{
   position:absolute;
   width:26px;height:26px;
-  background:transparent;
-  border-style:solid;
-  border-color:rgba(255,255,255,.82);
-  transition:border-color .35s ease;
+  will-change:opacity;
 }
-.sc-vf-corner.tl{top:0;left:0;border-width:2.5px 0 0 2.5px;border-radius:14px 0 0 0}
-.sc-vf-corner.tr{top:0;right:0;border-width:2.5px 2.5px 0 0;border-radius:0 14px 0 0}
-.sc-vf-corner.bl{bottom:0;left:0;border-width:0 0 2.5px 2.5px;border-radius:0 0 0 14px}
-.sc-vf-corner.br{bottom:0;right:0;border-width:0 2.5px 2.5px 0;border-radius:0 0 14px 0}
-/* Found state — только цвет меняется, без size/shadow артефактов */
-.scanner-viewport.found .sc-vf-corner{
-  border-color:var(--green);
+/* белые уголки — base layer */
+.sc-vf-corner::before{
+  content:'';position:absolute;inset:0;
+  border-style:solid;border-color:rgba(255,255,255,.82);
+  background:transparent;
+}
+/* зелёные уголки — поверх, появляются при found */
+.sc-vf-corner::after{
+  content:'';position:absolute;inset:0;
+  border-style:solid;border-color:var(--green);
+  background:transparent;
+  opacity:0;transition:opacity .3s ease;will-change:opacity;
+}
+.sc-vf-corner.tl::before,.sc-vf-corner.tl::after{border-width:2.5px 0 0 2.5px;border-radius:14px 0 0 0}
+.sc-vf-corner.tr::before,.sc-vf-corner.tr::after{border-width:2.5px 2.5px 0 0;border-radius:0 14px 0 0}
+.sc-vf-corner.bl::before,.sc-vf-corner.bl::after{border-width:0 0 2.5px 2.5px;border-radius:0 0 0 14px}
+.sc-vf-corner.br::before,.sc-vf-corner.br::after{border-width:0 2.5px 2.5px 0;border-radius:0 0 14px 0}
+/* found: зелёные уголки поверх */
+.scanner-viewport.found .sc-vf-corner::after{opacity:1;}
+/* red overlay layer — анимируем opacity а не border-color */
+.sc-vf-red{
+  position:absolute;inset:0;
+  border-style:solid;border-color:rgba(244,92,92,.95);
+  background:transparent;opacity:0;will-change:opacity;
+}
+.sc-vf-corner.tl .sc-vf-red{border-width:2.5px 0 0 2.5px;border-radius:14px 0 0 0}
+.sc-vf-corner.tr .sc-vf-red{border-width:2.5px 2.5px 0 0;border-radius:0 14px 0 0}
+.sc-vf-corner.bl .sc-vf-red{border-width:0 0 2.5px 2.5px;border-radius:0 0 0 14px}
+.sc-vf-corner.br .sc-vf-red{border-width:0 2.5px 2.5px 0;border-radius:0 0 14px 0}
+.scanner-viewport.not-found .sc-vf-red{
+  animation:vf-red-opacity 1.4s ease-in-out 3;
 }
 
 /* ── Hint chip ── */
@@ -874,16 +895,15 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 }
 .sc-hint-chip{
   display:inline-flex;align-items:center;gap:6px;
-  background:rgba(255,255,255,.1);
-  border:1px solid rgba(255,255,255,.12);
-  backdrop-filter:blur(6px);
+  background:rgba(10,10,10,.55);
+  border:1px solid rgba(255,255,255,.1);
   border-radius:99px;padding:5px 12px;
   font-size:11px;font-weight:700;color:rgba(255,255,255,.75);
   letter-spacing:.02em;
 }
 .sc-hint-dot{
   width:5px;height:5px;border-radius:50%;background:var(--sun);
-  animation:sc-dot-pulse 1.7s ease-in-out infinite;
+  /* no pulse animation — saves GPU on camera layer */
 }
 @keyframes sc-dot-pulse{0%,100%{opacity:.45;transform:scale(1)}50%{opacity:1;transform:scale(1.45)}}
 
@@ -897,8 +917,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   transition:background .5s ease;
 }
 .sc-success-overlay.show{
-  background:rgba(0,0,0,.8);
-  backdrop-filter:blur(3px);
+  background:rgba(0,0,0,.82);
   opacity:1;
 }
 /* Ripple rings behind check */
@@ -951,11 +970,14 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 }
 .tg-dark .sc-step-track{background:rgba(255,255,255,.1)}
 .sc-step-fill{
-  height:100%;border-radius:99px;width:0%;
-  transition:width .55s cubic-bezier(.4,0,.2,1),background .4s ease;
+  height:100%;border-radius:99px;
+  transform:scaleX(0);transform-origin:left;
+  background:var(--bg3);
+  transition:transform .5s cubic-bezier(.25,.46,.45,.94),background .35s ease;
+  will-change:transform;
 }
-.sc-step-item.active .sc-step-fill{width:55%;background:var(--sun)}
-.sc-step-item.done .sc-step-fill{width:100%;background:var(--green)}
+.sc-step-item.active .sc-step-fill{transform:scaleX(.55);background:var(--sun)}
+.sc-step-item.done .sc-step-fill{transform:scaleX(1);background:var(--green)}
 .sc-step-lbl{
   font-size:9px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
   color:var(--hint);transition:color .3s;text-align:center;white-space:nowrap;
@@ -2127,10 +2149,10 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
         <video id="scanner-video" autoplay playsinline muted style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block"></video>
         <!-- viewfinder — clean edge corners -->
         <div class="sc-vf" id="sc-vf">
-          <div class="sc-vf-corner tl"></div>
-          <div class="sc-vf-corner tr"></div>
-          <div class="sc-vf-corner bl"></div>
-          <div class="sc-vf-corner br"></div>
+          <div class="sc-vf-corner tl"><div class="sc-vf-red"></div></div>
+          <div class="sc-vf-corner tr"><div class="sc-vf-red"></div></div>
+          <div class="sc-vf-corner bl"><div class="sc-vf-red"></div></div>
+          <div class="sc-vf-corner br"><div class="sc-vf-red"></div></div>
         </div>
         <!-- hint -->
         <div class="sc-hint-area" id="sc-hint-area">
@@ -2565,7 +2587,7 @@ function popPage(doRender=true){
   if(!curPushPage)return;
   if(curPushPage==='pp-pdata')_saveProfileSilent();
   if(curPushPage==='pp-goals')_saveGoalsSilent();
-  if(curPushPage==='pp-scanner')stopScanner(true);
+  if(curPushPage==='pp-scanner')stopScanner(false);  // keep stream alive — no permission dialog
   if(curPushPage==='pp-weight-chart'){
     const wrap=document.getElementById('wchart-svg-wrap');
     if(wrap)wrap.innerHTML='';
@@ -2728,7 +2750,13 @@ function _populatePP(id){
     ['breakfast','lunch','dinner','snack'].forEach(x=>{document.getElementById('scm-'+x)?.classList.toggle('on',x==='breakfast');});
     // Reset brand tag
     const bt=$('sc-brand-tag');if(bt)bt.style.display='none';
-    setTimeout(startScanner,200);
+    // если stream уже прогрет — стартуем сразу в следующем кадре
+    if(_scanStream){
+      requestAnimationFrame(()=>requestAnimationFrame(startScanner));
+    }else{
+      // нет stream — небольшая задержка чтобы анимация открытия страницы успела
+      setTimeout(startScanner,120);
+    }
   }
 }
 
@@ -3989,7 +4017,7 @@ function _setScanProgress(state){
 
 function scannerBack(){
   if(_scStep>1){_setScanStep(_scStep-1);if(_scStep===1)startScanner();}
-  else{stopScanner(true);popPage();}
+  else{stopScanner(false);popPage();}
 }
 
 async function startScanner(){
@@ -4009,10 +4037,10 @@ async function startScanner(){
     }
     if(vid){
       vid.srcObject=_scanStream;
-      // GPU compositing hint — убирает лаги отрисовки видео
       vid.style.transform='translateZ(0)';
       vid.style.willChange='transform';
-      await vid.play();
+      // play() не awaitable — не блокируем UI
+      vid.play().catch(()=>{});
     }
     // hide fake bg when real camera is on
     const bg=$('sc-cam-bg');const gr=$('sc-cam-grid');
@@ -4025,8 +4053,18 @@ async function startScanner(){
 
 function stopScanner(releaseCamera=false){
   if(_scanInterval){clearInterval(_scanInterval);_scanInterval=null;}
-  _scanRafId=(_scanRafId&&cancelAnimationFrame(_scanRafId),null);
+  if(_scanRafId!=null){cancelAnimationFrame(_scanRafId);_scanRafId=null;}
   if(releaseCamera&&_scanStream){_scanStream.getTracks().forEach(t=>t.stop());_scanStream=null;const vid=$('scanner-video');if(vid){vid.srcObject=null;}}
+}
+
+// Предзагружаем поток камеры заранее — без показа видео
+async function _prewarmCamera(){
+  if(_scanStream)return;
+  try{
+    _scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}}});
+    const vid=$('scanner-video');
+    if(vid){vid.srcObject=_scanStream;vid.style.transform='translateZ(0)';vid.style.willChange='transform';}
+  }catch(e){}
 }
 
 let _scanRafId=null;
@@ -4245,7 +4283,7 @@ async function submitScanned(){
   const fat=+(p.fat*_scGrams/100).toFixed(1);
   const carb=+(p.carb*_scGrams/100).toFixed(1);
   const desc=p.name+' '+_scGrams+'г';
-  stopScanner(true);popPage();
+  stopScanner(false);popPage();
   if(!C.calories)C.calories={};
   C.calories[_scMealType]=(C.calories[_scMealType]||0)+kcal;
   if(!C.macros)C.macros={prot:0,fat:0,carb:0};
@@ -4282,6 +4320,15 @@ document.addEventListener('DOMContentLoaded',async()=>{
     if(sp){sp.classList.add('hiding');setTimeout(()=>sp.remove(),520);}
   },1200);
   setInterval(async()=>{if(curTab==='home'&&_completingMap.size===0){await loadData();renderHome();}},30000);
+  // освобождаем камеру только при сворачивании приложения
+  document.addEventListener('visibilitychange',()=>{
+    if(document.hidden&&_scanStream){
+      stopScanner(false); // стоп детекции
+      // НЕ останавливаем tracks — при возврате не нужен диалог разрешений
+    }
+  });
+  // Предзагрузка камеры при первом касании кнопки сканера
+  document.querySelector('[onclick*="pp-scanner"]')?.addEventListener('touchstart',_prewarmCamera,{once:true,passive:true});
 });
 </script>
 </body>
