@@ -4033,7 +4033,7 @@ function _updateNavAvatar(){
   if(saved&&img){
     img.src=saved;img.style.display='block';
     if(svg)svg.style.display='none';
-    if(wrap){wrap.style.background='transparent';wrap.style.border='1.5px solid rgba(255,255,255,.15)';wrap.style.borderRadius='9px';}
+    if(wrap){wrap.style.background='transparent';wrap.style.border='none';wrap.style.borderRadius='9px';}
     const sc=_loadAvatarColor();
     if(sc&&wrap)wrap.style.boxShadow=`0 0 8px rgba(${sc},.4)`;
   }else if(img){
