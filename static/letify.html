@@ -245,7 +245,147 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .aw{position:relative;display:inline-flex;align-items:center;justify-content:center}
 .ai{position:absolute;text-align:center;pointer-events:none}
 
-/* ══ STAT BOX ══ */
+/* ══ HOME LINEAR LAYOUT ══ */
+#p-home.layout-linear,#p-home.layout-bento{overflow:hidden!important}
+.hl-body{display:flex;flex-direction:column;padding:6px 14px 10px;gap:9px;height:100%;box-sizing:border-box}
+.hl-header{display:flex;justify-content:space-between;align-items:flex-start;flex-shrink:0}
+.hl-greeting{font-size:22px;font-weight:900;letter-spacing:-.03em;line-height:1.1}
+.hl-days-badge{display:flex;align-items:center;gap:8px;background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.2);border-radius:14px;padding:8px 12px;margin-top:2px}
+.hl-days-ico{color:rgba(255,107,53,.75);flex-shrink:0}
+.hl-days-num{font-size:20px;font-weight:900;color:var(--sun);letter-spacing:-.04em;line-height:1}
+.hl-days-lbl{font-size:8px;font-weight:800;color:rgba(255,107,53,.65);text-transform:uppercase;letter-spacing:.07em;margin-top:1px}
+.hl-banner{flex-shrink:0;background:linear-gradient(130deg,var(--sun),var(--sun2));border-radius:18px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden}
+.hl-banner::before{content:'';position:absolute;right:-20px;top:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.11);pointer-events:none}
+.hl-banner::after{content:'';position:absolute;right:40px;bottom:-30px;width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,.07);pointer-events:none}
+.hl-banner-text{font-size:12px;font-weight:700;opacity:.8;color:#fff}
+.hl-banner-days{font-size:22px;font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1.15}
+.hl-banner-sub{font-size:10px;opacity:.72;font-weight:600;color:#fff;margin-top:2px}
+.hl-metrics{flex-shrink:0}
+.hl-card{background:var(--bg2);border-radius:18px;padding:14px 16px;box-shadow:var(--sh)}
+.tg-dark .hl-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);box-shadow:none}
+.hl-metric{cursor:pointer;padding-bottom:13px;border-bottom:1px solid var(--brd);transition:opacity .12s}
+.hl-metric:active{opacity:.6}
+.hl-metric:last-child{padding-bottom:0;border-bottom:none}
+.hl-metric+.hl-metric{padding-top:13px}
+.hl-metric-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.hl-metric-left{display:flex;align-items:center;gap:8px}
+.hl-metric-ico{width:28px;height:28px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hl-metric-name{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--hint)}
+.hl-metric-val{font-size:20px;font-weight:900;letter-spacing:-.03em}
+.hl-metric-of{font-size:11px;font-weight:700;color:var(--hint);margin-left:2px}
+.hl-bar{height:6px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden}
+.tg-dark .hl-bar{background:rgba(255,255,255,.1)}
+.hl-bar-fill{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.34,1.1,.64,1)}
+.hl-metric-footer{display:flex;justify-content:space-between;align-items:center;margin-top:5px;min-height:16px}
+.hl-macros{display:flex;gap:5px}
+.hl-mac{font-size:9px;font-weight:800}
+.hl-sleep-dots{display:flex;gap:3px}
+.hl-sd{width:13px;height:4px;border-radius:99px;background:rgba(255,255,255,.1)}
+.hl-sd.on{background:var(--sleep)}
+.hl-weight{flex-shrink:0;background:var(--bg2);border-radius:18px;padding:13px 15px;box-shadow:var(--sh);cursor:pointer;transition:opacity .12s}
+.hl-weight:active{opacity:.7}
+.tg-dark .hl-weight{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);box-shadow:none}
+.hl-weight-top{display:flex;align-items:center;justify-content:space-between}
+.hl-weight-left{display:flex;align-items:center;gap:10px}
+.hl-weight-ico{width:34px;height:34px;border-radius:11px;background:rgba(255,107,53,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hl-weight-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--hint)}
+.hl-weight-nums{display:flex;align-items:baseline;gap:4px;margin-top:2px}
+.hl-weight-cur{font-size:22px;font-weight:900;letter-spacing:-.03em}
+.hl-weight-goal{font-size:12px;font-weight:700;color:var(--hint)}
+.hl-weight-pct{font-size:22px;font-weight:900;color:var(--sun);letter-spacing:-.03em;line-height:1}
+.hl-weight-pct-lbl{font-size:8px;font-weight:700;color:var(--hint);margin-top:2px}
+.hl-plan{flex-shrink:0;display:flex;flex-direction:column;gap:5px}
+.hl-plan-lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--hint)}
+.hl-plan-item{background:var(--bg2);border-radius:13px;padding:9px 12px;display:flex;align-items:center;gap:9px;box-shadow:var(--sh)}
+.tg-dark .hl-plan-item{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);box-shadow:none}
+.hl-plan-ico{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.hl-plan-name{font-size:11px;font-weight:800;line-height:1.2;flex:1}
+.hl-plan-sub{font-size:9px;color:var(--hint);font-weight:600;margin-top:1px}
+.hl-plan-pill{font-size:8px;font-weight:800;padding:3px 8px;border-radius:99px;flex-shrink:0}
+.hl-streak{display:flex;align-items:center;gap:7px;background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.15);border-radius:13px;padding:9px 12px;flex-shrink:0}
+.hl-streak-ico{color:var(--sun);flex-shrink:0}
+.hl-streak-val{font-size:12px;font-weight:900;color:var(--sun)}
+.hl-streak-lbl{font-size:9px;font-weight:700;color:rgba(255,107,53,.6)}
+
+/* ══ HOME BENTO LAYOUT ══ */
+.hb-body{display:flex;flex-direction:column;padding:6px 12px 8px;gap:7px;height:100%;box-sizing:border-box}
+.hb-header{display:flex;justify-content:space-between;align-items:flex-start;flex-shrink:0;padding:0 2px}
+.hb-greeting{font-size:19px;font-weight:900;letter-spacing:-.03em;line-height:1.1}
+.hb-days{background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.18);border-radius:12px;padding:6px 10px;text-align:center;flex-shrink:0}
+.hb-days-n{font-size:20px;font-weight:900;color:var(--sun);letter-spacing:-.04em;line-height:1}
+.hb-days-l{font-size:8px;font-weight:700;color:rgba(255,107,53,.65);text-transform:uppercase;letter-spacing:.06em}
+.hb-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:7px;min-height:0}
+.hb-card{background:var(--bg2);border-radius:18px;padding:12px;border:1px solid var(--brd);display:flex;flex-direction:column;cursor:pointer;transition:opacity .12s;overflow:hidden}
+.hb-card:active{opacity:.7}
+.tg-dark .hb-card{background:rgba(255,255,255,.07)}
+.hb-full{grid-column:1/-1}
+.hb-banner{background:linear-gradient(130deg,var(--sun),var(--sun2));border-radius:16px;padding:11px 15px;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden}
+.hb-banner::after{content:'';position:absolute;right:-15px;bottom:-15px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.12)}
+.hb-banner-label{font-size:10px;font-weight:700;opacity:.78;color:#fff}
+.hb-banner-days{font-size:22px;font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1.1}
+.hb-banner-sub{font-size:9px;opacity:.68;color:#fff;font-weight:600}
+.hb-card-lbl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--hint);display:flex;align-items:center;gap:5px;margin-bottom:8px}
+.hb-card-val{font-size:26px;font-weight:900;letter-spacing:-.04em;line-height:1}
+.hb-card-sub{font-size:10px;color:var(--hint);font-weight:600;margin-top:2px}
+.hb-mini-pb{height:4px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden;margin-top:auto;padding-top:0}
+.hb-mini-pbf{height:100%;border-radius:99px}
+.hb-card-pct{font-size:12px;font-weight:900;margin-top:5px}
+.hb-macros{display:flex;gap:5px;margin-top:7px}
+.hb-mac{flex:1;background:rgba(255,255,255,.05);border-radius:8px;padding:4px 5px;text-align:center}
+.hb-mac-v{font-size:11px;font-weight:900}
+.hb-mac-l{font-size:7px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.04em}
+.hb-sleep-dots{display:flex;gap:3px;margin-top:auto;padding-top:7px}
+.hb-sd{width:11px;height:4px;border-radius:99px;background:rgba(255,255,255,.08)}
+.hb-sd.on{background:var(--sleep)}
+.hb-right-col{display:flex;flex-direction:column;gap:7px}
+.hb-weight{grid-column:1/-1;background:var(--bg2);border-radius:14px;border:1px solid var(--brd);padding:10px 13px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;flex-shrink:0;transition:opacity .12s}
+.hb-weight:active{opacity:.7}
+.tg-dark .hb-weight{background:rgba(255,255,255,.07)}
+.hb-w-left{display:flex;align-items:center;gap:9px}
+.hb-w-ico{width:30px;height:30px;border-radius:9px;background:rgba(255,107,53,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hb-w-lbl{font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.06em}
+.hb-w-vals{display:flex;align-items:baseline;gap:4px;margin-top:1px}
+.hb-w-cur{font-size:18px;font-weight:900;letter-spacing:-.03em}
+.hb-w-goal{font-size:11px;font-weight:700;color:var(--hint)}
+.hb-w-pct{font-size:18px;font-weight:900;color:var(--sun);letter-spacing:-.03em}
+.hb-w-pct-lbl{font-size:8px;font-weight:700;color:var(--hint);margin-top:1px;text-align:right}
+.hb-plan-item{display:flex;align-items:center;gap:7px;margin-top:7px}
+.hb-plan-ico{width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px}
+.hb-plan-name{font-size:11px;font-weight:800;line-height:1.2}
+.hb-plan-sub{font-size:9px;color:var(--hint);font-weight:600}
+.hb-streak-num{font-size:28px;font-weight:900;color:var(--sun);letter-spacing:-.04em;line-height:1;text-align:center;flex:1;display:flex;align-items:center;justify-content:center}
+.hb-streak-lbl{font-size:9px;font-weight:700;color:var(--hint);text-align:center;text-transform:uppercase;letter-spacing:.06em}
+.hb-streak-dots{display:flex;gap:3px;justify-content:center;margin-top:auto;padding-top:5px}
+.hb-ssd{height:4px;border-radius:99px;flex:1;background:rgba(255,255,255,.08)}
+.hb-ssd.on{background:var(--sun)}
+
+/* ══ DESIGN PICKER ══ */
+.dp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.dp-option{background:var(--bg3);border-radius:18px;padding:14px;cursor:pointer;border:2px solid transparent;transition:all .2s;position:relative;overflow:hidden}
+.dp-option.selected{border-color:var(--sun);background:rgba(255,107,53,.08)}
+.dp-option:active{transform:scale(.97);transition:transform .1s}
+.dp-thumb{width:100%;aspect-ratio:9/16;border-radius:10px;background:rgba(255,255,255,.05);margin-bottom:10px;overflow:hidden;position:relative}
+.dp-name{font-size:13px;font-weight:900;margin-bottom:2px}
+.dp-desc{font-size:11px;color:var(--hint);font-weight:500;line-height:1.4}
+.dp-check{position:absolute;top:10px;right:10px;width:22px;height:22px;border-radius:50%;background:var(--sun);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s}
+.dp-option.selected .dp-check{opacity:1}
+/* Thumbnail previews */
+.dp-t-classic .dp-t-arc{width:36px;height:36px;position:absolute;border-radius:50%;border:3px solid var(--cal);opacity:.7}
+.dp-t-header{height:22px;background:rgba(255,255,255,.07);border-radius:6px;margin:8px 6px 4px}
+.dp-t-banner{height:30px;background:linear-gradient(130deg,rgba(255,107,53,.5),rgba(255,171,64,.3));border-radius:8px;margin:0 6px 5px}
+.dp-t-bars{margin:0 6px;display:flex;flex-direction:column;gap:3px}
+.dp-t-bar-row{display:flex;gap:6px;align-items:center}
+.dp-t-bar-ico{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.dp-t-bar-track{flex:1;height:4px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden}
+.dp-t-bar-fill{height:100%;border-radius:99px}
+.dp-t-arcs{display:flex;justify-content:space-around;align-items:center;padding:8px 6px}
+.dp-t-arc-wrap{display:flex;flex-direction:column;align-items:center;gap:4px}
+.dp-t-arc-svg{opacity:.8}
+.dp-t-weight{height:22px;background:rgba(255,255,255,.06);border-radius:6px;margin:4px 6px}
+.dp-t-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:0 6px}
+.dp-t-tile{background:rgba(255,255,255,.06);border-radius:7px;padding:5px}
+.dp-t-tile-v{font-size:9px;font-weight:900;color:var(--cal)}
+.dp-t-tile-lbl{font-size:6px;color:var(--hint);font-weight:600}
 .sb-row{display:flex;gap:8px}
 .sbox{flex:1;background:var(--bg2);border-radius:var(--r);padding:12px;box-shadow:var(--sh);text-align:center}
 .tg-dark .sbox{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);box-shadow:none}
@@ -1034,89 +1174,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 <div id="pages">
 
 <!-- ══ HOME ══ -->
-<div class="page active" id="p-home">
-<div class="pad" style="display:flex;align-items:flex-start;justify-content:space-between;padding-top:2px">
-  <div>
-    <div class="t1">привет, <span class="grad" id="h-name">…</span></div>
-    <div class="t5" style="margin-top:3px" id="h-date">загружается…</div>
-  </div>
-  <div style="text-align:right;padding-top:4px">
-    <div class="t5">до лета</div>
-    <div style="font-size:22px;font-weight:900;color:var(--sun);line-height:1.1" id="h-days">—</div>
-    <div class="t5" id="h-dunit">дней</div>
-  </div>
-</div>
-<div class="pad gap">
-<div class="banner">
-  <div style="font-size:13px;font-weight:800;opacity:.88;margin-bottom:2px">путь к лету</div>
-  <div style="font-size:28px;font-weight:900;line-height:1.1"><span id="h-ddays">—</span> дней</div>
-  <div style="font-size:11px;opacity:.72;font-weight:600;margin-top:3px">ты делаешь это каждый день</div>
-</div>
-</div>
-<div class="pad gap">
-<div class="card" style="padding:16px 6px 12px">
-  <div style="display:flex;justify-content:space-around;align-items:center">
-    <div style="text-align:center;cursor:pointer" onclick="navTo('track')">
-      <div class="aw">
-        <svg width="68" height="68" viewBox="0 0 68 68"><circle cx="34" cy="34" r="26" fill="none" stroke="rgba(78,174,229,.15)" stroke-width="5"/><circle cx="34" cy="34" r="26" fill="none" stroke="var(--water)" stroke-width="5" stroke-linecap="round" stroke-dasharray="163.4" id="arc-w" stroke-dashoffset="163.4" transform="rotate(-90 34 34)" style="transition:stroke-dashoffset .9s cubic-bezier(.34,1.1,.64,1)"/></svg>
-        <div class="ai"><div style="font-size:13px;font-weight:900;color:var(--water)" id="arc-wpct">0%</div></div>
-      </div>
-      <div style="font-size:11px;font-weight:900;margin-top:4px" id="arc-wml">0</div>
-      <div class="t5" style="font-size:10px">мл</div>
-    </div>
-    <div style="text-align:center;cursor:pointer" onclick="navTo('track')">
-      <div class="aw">
-        <svg width="82" height="82" viewBox="0 0 82 82"><circle cx="41" cy="41" r="33" fill="none" stroke="rgba(244,129,74,.15)" stroke-width="6"/><circle cx="41" cy="41" r="33" fill="none" stroke="var(--cal)" stroke-width="6" stroke-linecap="round" stroke-dasharray="207.3" id="arc-c" stroke-dashoffset="207.3" transform="rotate(-90 41 41)" style="transition:stroke-dashoffset .9s cubic-bezier(.34,1.1,.64,1)"/></svg>
-        <div class="ai"><div style="font-size:15px;font-weight:900;color:var(--cal)" id="arc-cpct">0%</div></div>
-      </div>
-      <div style="font-size:13px;font-weight:900;margin-top:4px" id="arc-cval">0</div>
-      <div class="t5" style="font-size:10px">ккал</div>
-      <div id="arc-macros" style="margin-top:4px;display:flex;gap:4px;justify-content:center"></div>
-    </div>
-    <div style="text-align:center;cursor:pointer" onclick="navTo('sleep')">
-      <div class="aw">
-        <svg width="68" height="68" viewBox="0 0 68 68"><circle cx="34" cy="34" r="26" fill="none" stroke="rgba(139,127,212,.15)" stroke-width="5"/><circle cx="34" cy="34" r="26" fill="none" stroke="var(--sleep)" stroke-width="5" stroke-linecap="round" stroke-dasharray="163.4" id="arc-s" stroke-dashoffset="163.4" transform="rotate(-90 34 34)" style="transition:stroke-dashoffset .9s cubic-bezier(.34,1.1,.64,1)"/></svg>
-        <div class="ai"><div style="font-size:13px;font-weight:900;color:var(--sleep)" id="arc-sh">—</div></div>
-      </div>
-      <div class="sq" id="arc-sq" style="justify-content:center;margin-top:4px"></div>
-      <div class="t5" style="font-size:10px;margin-top:2px">часов</div>
-    </div>
-  </div>
-</div>
-</div>
-<div class="pad gap">
-<div class="card" style="cursor:pointer" onclick="navTo('progress')">
-  <div style="display:flex;align-items:center;justify-content:space-between">
-    <div>
-      <div class="t5" style="margin-bottom:3px">вес</div>
-      <div style="display:flex;align-items:baseline;gap:5px">
-        <span style="font-size:26px;font-weight:900;letter-spacing:-.02em" id="h-wcur">—</span>
-        <span class="t5">→ <b style="color:var(--text)" id="h-wgoal">—</b> кг</span>
-      </div>
-    </div>
-    <div style="text-align:right">
-      <div style="font-size:24px;font-weight:900;color:var(--sun)" id="h-wpct">—</div>
-      <div class="t5">к цели</div>
-    </div>
-  </div>
-  <div class="pb gap"><div class="pbf pb-sun" id="h-wbar" style="width:0%"></div></div>
-</div>
-</div>
-<div id="h-plan-sec" style="display:none">
-  <div class="sec">сегодня</div>
-  <div class="pad" id="h-plan-list"></div>
-</div>
-<div class="pad" id="h-streak-w" style="margin-top:10px;display:none">
-  <div style="background:linear-gradient(90deg,rgba(255,107,53,.07),rgba(255,171,64,.04));border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;gap:10px">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--sun)"><path d="M12 2c0 5.5-5 7-5 11a5 5 0 0 0 10 0c0-4-5-5.5-5-11z"/></svg>
-    <div>
-      <div style="font-size:13px;font-weight:900" id="h-sval">7 дней подряд</div>
-      <div class="t5">серия воды</div>
-    </div>
-  </div>
-</div>
-<div style="height:8px"></div>
-</div>
+<div class="page active" id="p-home"><div id="h-content" style="min-height:100%;display:flex;flex-direction:column"></div></div>
 
 <!-- ══ TRACK ══ -->
 <div class="page" id="p-track">
@@ -1351,6 +1409,15 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
 </div>
 </div>
+<div class="sec">персонализация</div>
+<div class="pad">
+<div class="card">
+  <div class="lt" style="padding-bottom:0;border:none" onclick="pushPage('pp-design')">
+    <div class="lt-ic" style="background:rgba(255,107,53,.1)"><iconify-icon icon="solar:pallete-bold" width="18" style="color:var(--sun)"></iconify-icon></div>
+    <span class="lt-lbl">оформление</span>
+    <span class="lt-val" id="pf-design-val">классический</span>
+    <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+  </div>
 <div class="pad" style="margin-top:10px">
   <button class="btn btn-danger" style="width:100%;padding:14px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="resetAllData()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> сбросить все данные</button>
   <div class="clear-hint">удалит все записи и настройки навсегда</div>
@@ -1814,6 +1881,110 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       <div class="sbox"><div class="sv grad" id="pp-at-t">0</div><div class="sl">тренировок</div></div>
       <div class="sbox"><div class="sv grad" id="pp-at-w">0</div><div class="sl">воды л</div></div>
       <div class="sbox"><div class="sv grad" id="pp-at-s">0</div><div class="sl">серия дн</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- PP: Оформление -->
+<div class="push-page" id="pp-design">
+  <div class="pp-hdr">
+    <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <div><div class="pp-title">оформление</div><div class="pp-subtitle">выбери стиль главного экрана</div></div>
+  </div>
+  <div class="pp-body">
+    <div class="m3-sec" style="padding-top:0">стиль главного экрана</div>
+    <div class="dp-grid">
+
+      <!-- Classic -->
+      <div class="dp-option" id="dp-classic" onclick="setHomeDesign('classic')">
+        <div class="dp-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="dp-thumb">
+          <div style="padding:6px 5px">
+            <div class="dp-t-header"></div>
+            <div class="dp-t-banner"></div>
+            <div class="dp-t-arcs">
+              <div class="dp-t-arc-wrap">
+                <svg class="dp-t-arc-svg" width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="11" fill="none" stroke="rgba(78,174,229,.2)" stroke-width="2.5"/><circle cx="15" cy="15" r="11" fill="none" stroke="#4EAEE5" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="69" stroke-dashoffset="69" transform="rotate(-90 15 15)"/></svg>
+                <div style="width:20px;height:3px;background:rgba(255,255,255,.1);border-radius:99px"></div>
+              </div>
+              <div class="dp-t-arc-wrap">
+                <svg class="dp-t-arc-svg" width="38" height="38" viewBox="0 0 38 38"><circle cx="19" cy="19" r="14" fill="none" stroke="rgba(244,129,74,.2)" stroke-width="3"/><circle cx="19" cy="19" r="14" fill="none" stroke="#F4814A" stroke-width="3" stroke-linecap="round" stroke-dasharray="88" stroke-dashoffset="82.7" transform="rotate(-90 19 19)"/></svg>
+                <div style="width:24px;height:3px;background:rgba(255,255,255,.1);border-radius:99px"></div>
+              </div>
+              <div class="dp-t-arc-wrap">
+                <svg class="dp-t-arc-svg" width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="11" fill="none" stroke="rgba(139,127,212,.2)" stroke-width="2.5"/><circle cx="15" cy="15" r="11" fill="none" stroke="#8B7FD4" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="69" stroke-dashoffset="58" transform="rotate(-90 15 15)"/></svg>
+                <div style="width:20px;height:3px;background:rgba(255,255,255,.1);border-radius:99px"></div>
+              </div>
+            </div>
+            <div class="dp-t-weight"></div>
+          </div>
+        </div>
+        <div class="dp-name">Классический</div>
+        <div class="dp-desc">Три дуговых кольца с прогрессом</div>
+      </div>
+
+      <!-- Linear -->
+      <div class="dp-option" id="dp-linear" onclick="setHomeDesign('linear')">
+        <div class="dp-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="dp-thumb">
+          <div style="padding:6px 5px">
+            <div class="dp-t-header"></div>
+            <div class="dp-t-banner"></div>
+            <div style="margin:5px 6px;background:rgba(255,255,255,.05);border-radius:8px;padding:7px 7px">
+              <div class="dp-t-bars">
+                <div class="dp-t-bar-row">
+                  <div class="dp-t-bar-ico" style="background:rgba(244,129,74,.15)"></div>
+                  <div class="dp-t-bar-track"><div class="dp-t-bar-fill" style="width:6%;background:#F4814A"></div></div>
+                </div>
+                <div style="height:5px"></div>
+                <div class="dp-t-bar-row">
+                  <div class="dp-t-bar-ico" style="background:rgba(78,174,229,.15)"></div>
+                  <div class="dp-t-bar-track"><div class="dp-t-bar-fill" style="width:68%;background:#4EAEE5"></div></div>
+                </div>
+                <div style="height:5px"></div>
+                <div class="dp-t-bar-row">
+                  <div class="dp-t-bar-ico" style="background:rgba(139,127,212,.15)"></div>
+                  <div class="dp-t-bar-track"><div class="dp-t-bar-fill" style="width:82%;background:#8B7FD4"></div></div>
+                </div>
+              </div>
+            </div>
+            <div class="dp-t-weight" style="margin-top:5px"></div>
+          </div>
+        </div>
+        <div class="dp-name">Линейный</div>
+        <div class="dp-desc">Прогресс-бары в одной карточке</div>
+      </div>
+
+      <!-- Bento — full width -->
+      <div class="dp-option" id="dp-bento" onclick="setHomeDesign('bento')" style="grid-column:1/-1;display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center">
+        <div class="dp-check" style="top:12px;right:12px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="dp-thumb" style="width:100px;aspect-ratio:auto;height:110px;flex-shrink:0">
+          <div style="padding:6px 5px">
+            <div style="height:14px;background:rgba(255,255,255,.06);border-radius:4px;margin-bottom:4px"></div>
+            <div class="dp-t-grid">
+              <div class="dp-t-tile" style="grid-column:1/-1;background:linear-gradient(130deg,rgba(255,107,53,.3),rgba(255,171,64,.15));height:22px;border-radius:6px;display:flex;align-items:center;padding:4px 6px"><div style="font-size:6px;font-weight:900;color:#fff">путь к лету</div></div>
+              <div class="dp-t-tile">
+                <div class="dp-t-tile-v">120</div>
+                <div class="dp-t-tile-lbl">ккал</div>
+                <div style="height:2px;background:rgba(244,129,74,.3);border-radius:99px;margin-top:4px"></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <div class="dp-t-tile" style="flex:1"><div class="dp-t-tile-v" style="color:#4EAEE5;font-size:8px">1350</div><div class="dp-t-tile-lbl">мл</div></div>
+                <div class="dp-t-tile" style="flex:1"><div class="dp-t-tile-v" style="color:#8B7FD4;font-size:8px">7.5</div><div class="dp-t-tile-lbl">ч сна</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="dp-name">Бенто</div>
+          <div class="dp-desc">Сетка карточек с максимумом данных на экране без прокрутки</div>
+        </div>
+      </div>
+
+    </div>
+    <div style="background:rgba(255,107,53,.07);border:1px solid rgba(255,107,53,.15);border-radius:14px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start">
+      <iconify-icon icon="solar:info-circle-bold" width="18" style="color:var(--sun);flex-shrink:0;margin-top:1px"></iconify-icon>
+      <div style="font-size:12px;font-weight:600;color:rgba(255,107,53,.8);line-height:1.5">Изменение сразу применяется к главному экрану. Все данные остаются на месте.</div>
     </div>
   </div>
 </div>
@@ -3267,85 +3438,266 @@ function _populateWeightChart(){
 }
 
 /* ══ RENDERS ══ */
-function renderHome(){
+function getHomeDesign(){return lsGet('home_design')||'classic';}
+function setHomeDesign(d){
+  lsSet('home_design',d);
+  ['classic','linear','bento'].forEach(k=>{
+    const el=document.getElementById('dp-'+k);
+    if(el)el.classList.toggle('selected',k===d);
+  });
+  const labels={classic:'классический',linear:'линейный',bento:'бенто'};
+  T('pf-design-val',labels[d]||'классический');
+  const pg=$('p-home');
+  if(pg){pg.classList.toggle('layout-linear',d==='linear');pg.classList.toggle('layout-bento',d==='bento');}
+  renderHome();
+  tg?.HapticFeedback?.selectionChanged();
+}
+
+function _homeData(){
   const u=gU(),wl=gWL(),sl=gSL(),wd=gWD();
-  T('h-name',u.name||'—');
   const now=new Date();
   const days=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
   const mons=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
-  T('h-date',days[now.getDay()]+', '+now.getDate()+' '+mons[now.getMonth()]);
-  const dsl=dts();T('h-days',dsl);T('h-dunit',pD(dsl));T('h-ddays',dsl);
+  const dateStr=days[now.getDay()]+', '+now.getDate()+' '+mons[now.getMonth()];
+  const dsl=dts();
   const wt=wd.total||0,wg=u.water_goal||2000,wp=Math.min(1,wt/wg);
-  T('arc-wpct',Math.round(wp*100)+'%');T('arc-wml',wt);
-  requestAnimationFrame(()=>{const a=$('arc-w');if(a)a.setAttribute('stroke-dashoffset',163.4*(1-wp));});
   const ct=totalCal(),cg=u.cal_goal||2000,cp=Math.min(1,ct/cg);
-  T('arc-cpct',Math.round(cp*100)+'%');T('arc-cval',ct);
-  requestAnimationFrame(()=>{const a=$('arc-c');if(a)a.setAttribute('stroke-dashoffset',207.3*(1-cp));});
-  // Show КБЖУ macros below calorie arc if any data
   const mac=C.macros||{};
-  const amEl=$('arc-macros');
-  if(amEl){
-    if((mac.prot||0)+(mac.fat||0)+(mac.carb||0)>0){
-      amEl.innerHTML=`<span style="font-size:9px;font-weight:800;color:var(--green)">${mac.prot||0}б</span><span style="font-size:9px;font-weight:800;color:var(--sun)">${mac.fat||0}ж</span><span style="font-size:9px;font-weight:800;color:var(--sleep)">${mac.carb||0}у</span>`;
-    }else{amEl.innerHTML='';}
-  }
-  if(sl.length){
-    const last=sl[sl.length-1];
-    const sqEl=$('arc-sq');if(sqEl)sqEl.innerHTML=Array.from({length:5},(_,i)=>`<div class="sqd${i<last.quality?' on':''}"></div>`).join('');
-    requestAnimationFrame(()=>{const a=$('arc-s');if(a)a.setAttribute('stroke-dashoffset',163.4*(1-Math.min(1,last.hours/9)));});
-    T('arc-sh',last.hours.toFixed(1));
-  }
-  // Weight progress — ONLY use explicit start_weight; never derive from log entries
-  {const cw_h=wl.length?wl[wl.length-1].weight:null;
-  const gw_h=u.goal_weight||0;
-  const sw_h=u.start_weight&&u.start_weight>0?u.start_weight:null;
-  T('h-wcur',cw_h!=null?cw_h.toFixed(1):'—');
-  T('h-wgoal',gw_h?gw_h.toFixed(1):'—');
-  if(cw_h!=null&&gw_h&&sw_h&&Math.abs(sw_h-gw_h)>0.01){
-    const total=Math.abs(sw_h-gw_h),done=Math.abs(sw_h-cw_h);
-    const pct=Math.min(100,Math.max(0,Math.round(done/total*100)));
-    T('h-wpct',pct+'%');
-    requestAnimationFrame(()=>{const b=$('h-wbar');if(b)b.style.width=pct+'%';});
-  }else{
-    T('h-wpct',sw_h&&gw_h?'0%':'—');
-    requestAnimationFrame(()=>{const b=$('h-wbar');if(b)b.style.width='0%';});
-  }}
+  let sleepPct=0,sleepH='—',sqArr=[];
+  if(sl.length){const last=sl[sl.length-1];sleepPct=Math.min(1,last.hours/9);sleepH=last.hours.toFixed(1);sqArr=Array.from({length:5},(_,i)=>i<last.quality);}
+  const cw=wl.length?wl[wl.length-1].weight:null;
+  const gw=u.goal_weight||0;
+  const sw=u.start_weight&&u.start_weight>0?u.start_weight:null;
+  let wpct='—',wbar=0;
+  if(cw!=null&&gw&&sw&&Math.abs(sw-gw)>0.01){const total=Math.abs(sw-gw),done=Math.abs(sw-cw);wbar=Math.min(100,Math.max(0,Math.round(done/total*100)));wpct=wbar+'%';}
+  else{wpct=(sw&&gw)?'0%':'—';}
   const streak=gStreak();
-  const sw=$('h-streak-w');if(sw)sw.style.display=streak>=2?'':'none';
-  T('h-sval',streak+' дней подряд');
   const acts=gActs();
-  const ps=$('h-plan-sec'),pl=$('h-plan-list');
-  if(ps&&pl){
-    if(!acts.length){ps.style.display='none';}
-    else{
-      ps.style.display='';const nt=new Date();
-      const current=acts.find(a=>{
-        if(a.completed)return false;
-        const[hh,mm]=(a.time||'00:00').split(':').map(Number);
-        const at=new Date();at.setHours(hh,mm,0,0);const et=new Date(at.getTime()+(a.duration||30)*60000);
-        return nt>=at&&nt<=et;
-      });
-      const upcoming=acts.filter(a=>{
-        if(a.completed)return false;
-        const[hh,mm]=(a.time||'00:00').split(':').map(Number);
-        const at=new Date();at.setHours(hh,mm,0,0);return at>nt;
-      }).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
-      const next=upcoming[0];
-      const toShow=[current,next].filter(Boolean);
-      if(!toShow.length){ps.style.display='none';}
-      else{
-        pl.innerHTML=toShow.map(a=>{
-          const ico=ACT_ICO[a.type]||'✨',col=ACT_COL[a.type]||'#FF9800',done=a.completed;
-          const[hh,mm]=(a.time||'00:00').split(':').map(Number);
-          const at=new Date();at.setHours(hh,mm,0,0);const et=new Date(at.getTime()+(a.duration||30)*60000);
-          const ts=`${a.time}–${String(et.getHours()).padStart(2,'0')}:${String(et.getMinutes()).padStart(2,'0')}`;
-          const isNow=nt>=at&&nt<=et;
-          const badge=done?`<span class="pill p-ok">✓</span>`:isNow?`<span class="pill p-now">идёт сейчас</span>`:`<span class="pill p-soon">${a.time}</span>`;
-          return`<div class="ac${done?' done':''}"><div class="ac-ico" style="background:${col}18">${done?'✅':ico}</div><div class="ac-body"><div class="ac-name">${a.name}</div><div class="ac-sub">${ts} · ${a.duration} мин</div></div>${badge}</div>`;
-        }).join('');
-      }
-    }
+  let planItems=[];
+  if(acts.length){
+    const nt=new Date();
+    const current=acts.find(a=>{if(a.completed)return false;const[hh,mm]=(a.time||'00:00').split(':').map(Number);const at=new Date();at.setHours(hh,mm,0,0);const et=new Date(at.getTime()+(a.duration||30)*60000);return nt>=at&&nt<=et;});
+    const upcoming=acts.filter(a=>{if(a.completed)return false;const[hh,mm]=(a.time||'00:00').split(':').map(Number);const at=new Date();at.setHours(hh,mm,0,0);return at>nt;}).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
+    planItems=[current,upcoming[0]].filter(Boolean);
   }
+  return{u,dateStr,dsl,wt,wg,wp,ct,cg,cp,mac,sleepPct,sleepH,sqArr,cw,gw,sw,wpct,wbar,streak,planItems};
+}
+
+function renderHome(){
+  const d=getHomeDesign();
+  const pg=$('p-home');
+  if(pg){pg.classList.toggle('layout-linear',d==='linear');pg.classList.toggle('layout-bento',d==='bento');}
+  ['classic','linear','bento'].forEach(k=>{const el=document.getElementById('dp-'+k);if(el)el.classList.toggle('selected',k===d);});
+  const labels={classic:'классический',linear:'линейный',bento:'бенто'};
+  T('pf-design-val',labels[d]||'классический');
+  if(d==='linear')renderHomeLinear();
+  else if(d==='bento')renderHomeBento();
+  else renderHomeClassic();
+}
+
+function renderHomeClassic(){
+  const{u,dateStr,dsl,wt,wg,wp,ct,cg,cp,mac,sleepPct,sleepH,sqArr,cw,gw,wpct,wbar,streak,planItems}=_homeData();
+  const macHtml=(mac.prot||0)+(mac.fat||0)+(mac.carb||0)>0
+    ?`<span style="font-size:9px;font-weight:800;color:var(--green)">${mac.prot||0}б</span><span style="font-size:9px;font-weight:800;color:var(--sun)">${mac.fat||0}ж</span><span style="font-size:9px;font-weight:800;color:var(--sleep)">${mac.carb||0}у</span>`:'';
+  const arcW=(163.4*(1-wp)).toFixed(2),arcC=(207.3*(1-cp)).toFixed(2),arcS=(163.4*(1-sleepPct)).toFixed(2);
+  const sqHtml=sqArr.map((on,i)=>`<div class="sqd${on?' on':''}"></div>`).join('');
+  let planHtml='';
+  if(planItems.length){
+    const nt=new Date();
+    planHtml=`<div class="sec">сегодня</div><div class="pad">`+planItems.map(a=>{
+      const ico=ACT_ICO[a.type]||'✨',col=ACT_COL[a.type]||'#FF9800',done=a.completed;
+      const[hh,mm]=(a.time||'00:00').split(':').map(Number);
+      const at=new Date();at.setHours(hh,mm,0,0);const et=new Date(at.getTime()+(a.duration||30)*60000);
+      const ts=`${a.time}–${String(et.getHours()).padStart(2,'0')}:${String(et.getMinutes()).padStart(2,'0')}`;
+      const isNow=nt>=at&&nt<=et;
+      const badge=done?`<span class="pill p-ok">✓</span>`:isNow?`<span class="pill p-now">идёт сейчас</span>`:`<span class="pill p-soon">${a.time}</span>`;
+      return`<div class="ac${done?' done':''}"><div class="ac-ico" style="background:${col}18">${ico}</div><div class="ac-body"><div class="ac-name">${a.name}</div><div class="ac-sub">${ts} · ${a.duration} мин</div></div>${badge}</div>`;
+    }).join('')+`</div>`;
+  }
+  const streakHtml=streak>=2?`<div class="pad" style="margin-top:10px"><div style="background:linear-gradient(90deg,rgba(255,107,53,.07),rgba(255,171,64,.04));border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;gap:10px"><svg width="20" height="20" viewBox="0 0 24 24" fill="var(--sun)"><path d="M12 2c0 5.5-5 7-5 11a5 5 0 0 0 10 0c0-4-5-5.5-5-11z"/></svg><div><div style="font-size:13px;font-weight:900">${streak} дней подряд</div><div class="t5">серия воды</div></div></div></div>`:'';
+  const el=$('h-content');if(!el)return;
+  el.style.display='block';
+  el.innerHTML=`
+<div class="pad" style="display:flex;align-items:flex-start;justify-content:space-between;padding-top:2px">
+  <div><div class="t1">привет, <span class="grad">${u.name||'—'}</span></div><div class="t5" style="margin-top:3px">${dateStr}</div></div>
+  <div style="text-align:right;padding-top:4px"><div class="t5">до лета</div><div style="font-size:22px;font-weight:900;color:var(--sun);line-height:1.1">${dsl}</div><div class="t5">${pD(dsl)}</div></div>
+</div>
+<div class="pad gap"><div class="banner">
+  <div style="font-size:13px;font-weight:800;opacity:.88;margin-bottom:2px">путь к лету</div>
+  <div style="font-size:28px;font-weight:900;line-height:1.1">${dsl} дней</div>
+  <div style="font-size:11px;opacity:.72;font-weight:600;margin-top:3px">ты делаешь это каждый день</div>
+</div></div>
+<div class="pad gap"><div class="card" style="padding:16px 6px 12px">
+  <div style="display:flex;justify-content:space-around;align-items:center">
+    <div style="text-align:center;cursor:pointer" onclick="navTo('track')">
+      <div class="aw"><svg width="68" height="68" viewBox="0 0 68 68"><circle cx="34" cy="34" r="26" fill="none" stroke="rgba(78,174,229,.15)" stroke-width="5"/><circle cx="34" cy="34" r="26" fill="none" stroke="var(--water)" stroke-width="5" stroke-linecap="round" stroke-dasharray="163.4" stroke-dashoffset="${arcW}" transform="rotate(-90 34 34)" style="transition:stroke-dashoffset .9s cubic-bezier(.34,1.1,.64,1)"/></svg>
+      <div class="ai"><div style="font-size:13px;font-weight:900;color:var(--water)">${Math.round(wp*100)}%</div></div></div>
+      <div style="font-size:11px;font-weight:900;margin-top:4px">${wt}</div><div class="t5" style="font-size:10px">мл</div>
+    </div>
+    <div style="text-align:center;cursor:pointer" onclick="navTo('track')">
+      <div class="aw"><svg width="82" height="82" viewBox="0 0 82 82"><circle cx="41" cy="41" r="33" fill="none" stroke="rgba(244,129,74,.15)" stroke-width="6"/><circle cx="41" cy="41" r="33" fill="none" stroke="var(--cal)" stroke-width="6" stroke-linecap="round" stroke-dasharray="207.3" stroke-dashoffset="${arcC}" transform="rotate(-90 41 41)" style="transition:stroke-dashoffset .9s cubic-bezier(.34,1.1,.64,1)"/></svg>
+      <div class="ai"><div style="font-size:15px;font-weight:900;color:var(--cal)">${Math.round(cp*100)}%</div></div></div>
+      <div style="font-size:13px;font-weight:900;margin-top:4px">${ct}</div><div class="t5" style="font-size:10px">ккал</div>
+      <div style="margin-top:4px;display:flex;gap:4px;justify-content:center">${macHtml}</div>
+    </div>
+    <div style="text-align:center;cursor:pointer" onclick="navTo('sleep')">
+      <div class="aw"><svg width="68" height="68" viewBox="0 0 68 68"><circle cx="34" cy="34" r="26" fill="none" stroke="rgba(139,127,212,.15)" stroke-width="5"/><circle cx="34" cy="34" r="26" fill="none" stroke="var(--sleep)" stroke-width="5" stroke-linecap="round" stroke-dasharray="163.4" stroke-dashoffset="${arcS}" transform="rotate(-90 34 34)" style="transition:stroke-dashoffset .9s cubic-bezier(.34,1.1,.64,1)"/></svg>
+      <div class="ai"><div style="font-size:13px;font-weight:900;color:var(--sleep)">${sleepH}</div></div></div>
+      <div class="sq" style="justify-content:center;margin-top:4px">${sqHtml}</div><div class="t5" style="font-size:10px;margin-top:2px">часов</div>
+    </div>
+  </div>
+</div></div>
+<div class="pad gap"><div class="card" style="cursor:pointer" onclick="navTo('progress')">
+  <div style="display:flex;align-items:center;justify-content:space-between">
+    <div><div class="t5" style="margin-bottom:3px">вес</div>
+      <div style="display:flex;align-items:baseline;gap:5px"><span style="font-size:26px;font-weight:900;letter-spacing:-.02em">${cw!=null?cw.toFixed(1):'—'}</span><span class="t5">→ <b style="color:var(--text)">${gw?gw.toFixed(1):'—'}</b> кг</span></div>
+    </div>
+    <div style="text-align:right"><div style="font-size:24px;font-weight:900;color:var(--sun)">${wpct}</div><div class="t5">к цели</div></div>
+  </div>
+  <div class="pb gap"><div class="pbf pb-sun" style="width:${wbar}%"></div></div>
+</div></div>
+${planHtml}${streakHtml}<div style="height:8px"></div>`;
+}
+
+function renderHomeLinear(){
+  const{u,dateStr,dsl,wt,wg,wp,ct,cg,cp,mac,sleepPct,sleepH,sqArr,cw,gw,wpct,wbar,streak,planItems}=_homeData();
+  const sdHtml=sqArr.map(on=>`<div class="hl-sd${on?' on':''}"></div>`).join('');
+  const macHtml=(mac.prot||0)+(mac.fat||0)+(mac.carb||0)>0
+    ?`<span class="hl-mac" style="color:var(--green)">${mac.prot||0}б</span><span class="hl-mac" style="color:var(--sun)">${mac.fat||0}ж</span><span class="hl-mac" style="color:var(--sleep)">${mac.carb||0}у</span>`:'';
+  let planHtml='';
+  if(planItems.length){
+    const nt=new Date();
+    const pills={done:'background:rgba(82,193,119,.1);color:var(--green)',now:'background:rgba(78,174,229,.1);color:var(--water)',soon:'background:rgba(255,107,53,.1);color:var(--sun)',late:'background:rgba(244,92,92,.1);color:var(--red)',later:'background:rgba(255,255,255,.07);color:var(--hint)'};
+    planHtml=`<div class="hl-plan"><div class="hl-plan-lbl">сегодня</div>`+planItems.map(a=>{
+      const st=actStatus(a);const col=ACT_COL[a.type]||'#FF9800';
+      return`<div class="hl-plan-item"><div class="hl-plan-ico" style="background:${col}15;font-size:13px">${ACT_ICO[a.type]||'✨'}</div><div style="flex:1"><div class="hl-plan-name">${a.name}</div><div class="hl-plan-sub">${fmtRange(a)} · ${a.duration} мин</div></div><div class="hl-plan-pill" style="${pills[st.s]||pills.later}">${st.l}</div></div>`;
+    }).join('')+`</div>`;
+  }
+  const streakHtml=streak>=2?`<div class="hl-streak"><iconify-icon icon="solar:fire-bold" width="16" class="hl-streak-ico"></iconify-icon><div><div class="hl-streak-val">${streak} дней подряд</div><div class="hl-streak-lbl">серия воды</div></div></div>`:'';
+  const el=$('h-content');if(!el)return;
+  el.style.display='flex';el.style.flexDirection='column';el.style.height='100%';
+  el.innerHTML=`<div class="hl-body">
+  <div class="hl-header">
+    <div><div class="hl-greeting">привет, <span class="grad">${u.name||'—'}</span></div><div class="t5" style="margin-top:3px">${dateStr}</div></div>
+    <div class="hl-days-badge"><iconify-icon icon="solar:sun-bold" width="16" class="hl-days-ico"></iconify-icon><div><div class="hl-days-num">${dsl}</div><div class="hl-days-lbl">${pD(dsl)}</div></div></div>
+  </div>
+  <div class="hl-banner" style="z-index:1">
+    <div style="z-index:1"><div class="hl-banner-text">путь к лету</div><div class="hl-banner-days">${dsl} дней</div><div class="hl-banner-sub">ты делаешь это каждый день</div></div>
+    <iconify-icon icon="solar:running-bold" width="32" style="color:rgba(255,255,255,.3);z-index:1;flex-shrink:0"></iconify-icon>
+  </div>
+  <div class="hl-metrics"><div class="hl-card">
+    <div class="hl-metric" onclick="navTo('track')">
+      <div class="hl-metric-top">
+        <div class="hl-metric-left"><div class="hl-metric-ico" style="background:rgba(244,129,74,.12)"><iconify-icon icon="solar:fire-bold" width="14" style="color:var(--cal)"></iconify-icon></div><span class="hl-metric-name">калории</span></div>
+        <div><span class="hl-metric-val" style="color:var(--cal)">${ct}</span><span class="hl-metric-of">/ ${cg} ккал</span></div>
+      </div>
+      <div class="hl-bar"><div class="hl-bar-fill" style="width:${Math.round(cp*100)}%;background:linear-gradient(90deg,var(--cal),var(--sun2))"></div></div>
+      <div class="hl-metric-footer"><div class="hl-macros">${macHtml}</div><span style="font-size:10px;font-weight:800;color:var(--cal)">${Math.round(cp*100)}%</span></div>
+    </div>
+    <div class="hl-metric" onclick="navTo('track')">
+      <div class="hl-metric-top">
+        <div class="hl-metric-left"><div class="hl-metric-ico" style="background:rgba(78,174,229,.12)"><iconify-icon icon="solar:waterdrops-bold" width="14" style="color:var(--water)"></iconify-icon></div><span class="hl-metric-name">вода</span></div>
+        <div><span class="hl-metric-val" style="color:var(--water)">${wt}</span><span class="hl-metric-of">/ ${wg} мл</span></div>
+      </div>
+      <div class="hl-bar"><div class="hl-bar-fill" style="width:${Math.round(wp*100)}%;background:var(--water)"></div></div>
+      <div class="hl-metric-footer"><span style="font-size:10px;font-weight:700;color:var(--hint)">${Math.round(wp*100)}%</span>${streak>=2?`<span style="font-size:10px;font-weight:800;color:var(--sun)">${streak} дн. подряд 🔥</span>`:''}</div>
+    </div>
+    <div class="hl-metric" onclick="navTo('sleep')">
+      <div class="hl-metric-top">
+        <div class="hl-metric-left"><div class="hl-metric-ico" style="background:rgba(139,127,212,.12)"><iconify-icon icon="solar:moon-bold" width="14" style="color:var(--sleep)"></iconify-icon></div><span class="hl-metric-name">сон</span></div>
+        <div><span class="hl-metric-val" style="color:var(--sleep)">${sleepH}</span><span class="hl-metric-of">/ 8 ч</span></div>
+      </div>
+      <div class="hl-bar"><div class="hl-bar-fill" style="width:${Math.round(sleepPct*100)}%;background:var(--sleep)"></div></div>
+      <div class="hl-metric-footer"><div class="hl-sleep-dots">${sdHtml}</div></div>
+    </div>
+  </div></div>
+  <div class="hl-weight" onclick="navTo('progress')">
+    <div class="hl-weight-top">
+      <div class="hl-weight-left"><div class="hl-weight-ico"><iconify-icon icon="solar:scale-bold" width="16" style="color:var(--sun)"></iconify-icon></div>
+        <div><div class="hl-weight-lbl">вес</div><div class="hl-weight-nums"><span class="hl-weight-cur">${cw!=null?cw.toFixed(1):'—'}</span><span class="hl-weight-goal">→ ${gw?gw.toFixed(1):'—'} кг</span></div></div>
+      </div>
+      <div style="text-align:right"><div class="hl-weight-pct">${wpct}</div><div class="hl-weight-pct-lbl">к цели</div></div>
+    </div>
+    <div class="hl-bar" style="margin-top:9px"><div class="hl-bar-fill" style="width:${wbar}%;background:linear-gradient(90deg,var(--sun),var(--sun2))"></div></div>
+  </div>
+  ${planHtml}${streakHtml}
+</div>`;
+}
+
+function renderHomeBento(){
+  const{u,dateStr,dsl,wt,wg,wp,ct,cg,cp,mac,sleepPct,sleepH,sqArr,cw,gw,wpct,wbar,streak,planItems}=_homeData();
+  const sdHtml=sqArr.map(on=>`<div class="hb-sd${on?' on':''}"></div>`).join('');
+  const strkDotsHtml=Array.from({length:Math.min(streak,7)},(_,i)=>`<div class="hb-ssd on"></div>`).concat(Array.from({length:Math.max(0,7-Math.min(streak,7))},()=>`<div class="hb-ssd"></div>`)).join('');
+  const macHtml=(mac.prot||0)+(mac.fat||0)+(mac.carb||0)>0
+    ?`<div class="hb-macros"><div class="hb-mac"><div class="hb-mac-v" style="color:var(--green)">${mac.prot||0}г</div><div class="hb-mac-l">б</div></div><div class="hb-mac"><div class="hb-mac-v" style="color:var(--cal)">${mac.fat||0}г</div><div class="hb-mac-l">ж</div></div><div class="hb-mac"><div class="hb-mac-v" style="color:var(--sleep)">${mac.carb||0}г</div><div class="hb-mac-l">у</div></div></div>`:'';
+  let planCol='';
+  if(planItems.length){
+    planCol=planItems.slice(0,2).map(a=>{
+      const col=ACT_COL[a.type]||'#FF9800';const st=actStatus(a);
+      return`<div class="hb-plan-item"><div class="hb-plan-ico" style="background:${col}15">${ACT_ICO[a.type]||'✨'}</div><div><div class="hb-plan-name">${a.name}</div><div class="hb-plan-sub">${a.time} · ${st.l}</div></div></div>`;
+    }).join('');
+  } else {
+    planCol=`<div style="flex:1;display:flex;align-items:center;justify-content:center;opacity:.3"><iconify-icon icon="solar:calendar-mark-bold" width="28"></iconify-icon></div>`;
+  }
+  const el=$('h-content');if(!el)return;
+  el.style.display='flex';el.style.flexDirection='column';el.style.height='100%';
+  el.innerHTML=`<div class="hb-body">
+  <div class="hb-header">
+    <div><div class="hb-greeting">привет, <span class="grad">${u.name||'—'}</span></div><div class="t5" style="margin-top:3px">${dateStr}</div></div>
+    <div class="hb-days"><div class="hb-days-n">${dsl}</div><div class="hb-days-l">${pD(dsl)}</div></div>
+  </div>
+  <div class="hb-grid">
+    <!-- Banner -->
+    <div class="hb-banner hb-full" style="flex-shrink:0">
+      <div style="z-index:1"><div class="hb-banner-label">путь к лету</div><div class="hb-banner-days">${dsl} дней</div><div class="hb-banner-sub">ты делаешь это каждый день</div></div>
+      <iconify-icon icon="solar:sun-bold" width="28" style="color:rgba(255,255,255,.4);z-index:1"></iconify-icon>
+    </div>
+    <!-- Calories -->
+    <div class="hb-card" onclick="navTo('track')">
+      <div class="hb-card-lbl"><iconify-icon icon="solar:fire-bold" width="11"></iconify-icon>калории</div>
+      <div class="hb-card-val" style="color:var(--cal)">${ct}</div>
+      <div class="hb-card-sub">из ${cg} ккал</div>
+      ${macHtml}
+      <div class="hb-mini-pb" style="margin-top:${macHtml?'6px':'auto'}"><div class="hb-mini-pbf" style="width:${Math.round(cp*100)}%;background:linear-gradient(90deg,var(--cal),var(--sun2))"></div></div>
+      <div class="hb-card-pct" style="color:var(--cal)">${Math.round(cp*100)}%</div>
+    </div>
+    <!-- Right: water + sleep -->
+    <div class="hb-right-col">
+      <div class="hb-card" style="flex:1" onclick="navTo('track')">
+        <div class="hb-card-lbl"><iconify-icon icon="solar:waterdrops-bold" width="11"></iconify-icon>вода</div>
+        <div class="hb-card-val" style="color:var(--water);font-size:22px">${wt}</div>
+        <div class="hb-card-sub">из ${wg} мл</div>
+        <div class="hb-mini-pb"><div class="hb-mini-pbf" style="width:${Math.round(wp*100)}%;background:var(--water)"></div></div>
+        <div class="hb-card-pct" style="color:var(--water)">${Math.round(wp*100)}%</div>
+      </div>
+      <div class="hb-card" style="flex:1" onclick="navTo('sleep')">
+        <div class="hb-card-lbl"><iconify-icon icon="solar:moon-bold" width="11"></iconify-icon>сон</div>
+        <div class="hb-card-val" style="color:var(--sleep);font-size:22px">${sleepH}</div>
+        <div class="hb-card-sub">часов</div>
+        <div class="hb-sleep-dots" style="margin-top:auto;padding-top:6px">${sdHtml}</div>
+      </div>
+    </div>
+    <!-- Plan -->
+    <div class="hb-card" onclick="navTo('plan')">
+      <div class="hb-card-lbl"><iconify-icon icon="solar:calendar-mark-bold" width="11"></iconify-icon>сегодня</div>
+      ${planCol}
+    </div>
+    <!-- Streak -->
+    <div class="hb-card">
+      <div class="hb-card-lbl"><iconify-icon icon="solar:fire-bold" width="11"></iconify-icon>серия</div>
+      <div class="hb-streak-num">${streak>=2?`<div style="font-size:28px;font-weight:900;color:var(--sun);letter-spacing:-.04em">${streak}</div>`:`<div style="font-size:11px;font-weight:700;color:var(--hint);opacity:.5">нет серии</div>`}</div>
+      ${streak>=2?`<div class="hb-streak-lbl">дней воды</div>`:''}
+      <div class="hb-streak-dots" style="margin-top:auto;padding-top:5px">${strkDotsHtml}</div>
+    </div>
+    <!-- Weight -->
+    <div class="hb-weight" onclick="navTo('progress')">
+      <div class="hb-w-left"><div class="hb-w-ico"><iconify-icon icon="solar:scale-bold" width="14" style="color:var(--sun)"></iconify-icon></div>
+        <div><div class="hb-w-lbl">вес</div><div class="hb-w-vals"><span class="hb-w-cur">${cw!=null?cw.toFixed(1):'—'}</span><span class="hb-w-goal">→ ${gw?gw.toFixed(1):'—'} кг</span></div></div>
+      </div>
+      <div style="text-align:right"><div class="hb-w-pct">${wpct}</div><div class="hb-w-pct-lbl">к цели</div></div>
+    </div>
+  </div>
+</div>`;
 }
 
 function renderTrack(tab){if(tab==='water')renderWater();else renderCal();}
@@ -3506,11 +3858,11 @@ function renderProfile(){
   const meta=[];if(u.age)meta.push(u.age+' лет');if(u.height)meta.push(u.height+' см');if(u.gender)meta.push(u.gender==='male'?'♂':'♀');
   T('pf-meta',meta.join(' · ')||'—');
   T('pf-gw',u.goal_weight?u.goal_weight+' кг':'—');T('pf-pname',u.name||'—');
-  // Show start weight + goal type
-  const swLabel=u.start_weight&&u.start_weight>0
-    ?(u.start_weight.toFixed(1)+' кг · '+(u.goal_type==='gain'?'набор':'похудение'))
-    :'не задан';
+  const swLabel=u.start_weight&&u.start_weight>0?(u.start_weight.toFixed(1)+' кг · '+(u.goal_type==='gain'?'набор':'похудение')):'не задан';
   T('pf-sw',swLabel);
+  // Design label
+  const labels={classic:'классический',linear:'линейный',bento:'бенто'};
+  T('pf-design-val',labels[getHomeDesign()]||'классический');
   const bmiRow=$('pf-bmi-row');
   if(u.height&&wl.length){
     const cw=wl[wl.length-1].weight,h2=u.height/100;
@@ -3866,6 +4218,11 @@ document.addEventListener('DOMContentLoaded',async()=>{
   const dark=tg?.colorScheme==='dark'||window.matchMedia?.('(prefers-color-scheme:dark)').matches;
   if(dark)document.body.classList.add('tg-dark');
   tg?.onEvent('themeChanged',()=>{document.body.classList.toggle('tg-dark',tg?.colorScheme==='dark');applyTheme();});
+  // Init design state
+  const d=getHomeDesign();
+  const pg=document.getElementById('p-home');
+  if(pg){pg.classList.toggle('layout-linear',d==='linear');pg.classList.toggle('layout-bento',d==='bento');}
+  ['classic','linear','bento'].forEach(k=>{const el=document.getElementById('dp-'+k);if(el)el.classList.toggle('selected',k===d);});
   await loadData();
   renderHome();
   setTimeout(()=>{
