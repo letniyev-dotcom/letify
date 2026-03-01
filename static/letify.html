@@ -498,37 +498,48 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   display:flex;align-items:center;justify-content:center;
   font-size:26px;font-weight:900;color:#fff;
   box-shadow:0 5px 18px rgba(255,107,53,.25);
-  flex-shrink:0;overflow:hidden;position:relative;
+  flex-shrink:0;
+  /* clip-path + overflow:hidden для надёжного клипа на мобиле */
+  overflow:hidden;
+  clip-path:inset(0 round 20px);
+  -webkit-clip-path:inset(0 round 20px);
+  position:relative;
   cursor:pointer;
   -webkit-tap-highlight-color:transparent;
-  transition:transform .15s ease,box-shadow .15s ease;
+  transition:transform .15s ease, box-shadow .6s cubic-bezier(.4,0,.2,1);
+  /* форсируем аппаратное ускорение */
+  transform:translateZ(0);
+  -webkit-transform:translateZ(0);
 }
-.pav:active{transform:scale(.93);box-shadow:0 2px 8px rgba(255,107,53,.18)}
 .pav img.pav-img{
-  width:100%;height:100%;object-fit:cover;
-  border-radius:inherit;display:block;
-  position:absolute;inset:0;
+  /* z-index:1 — перекрывает градиентный фон полностью */
+  position:absolute;
+  top:-1px;left:-1px;right:-1px;bottom:-1px;  /* +1px со всех сторон — убивает субпиксельные щели */
+  width:calc(100% + 2px);height:calc(100% + 2px);
+  object-fit:cover;
+  display:block;
   opacity:0;
+  z-index:1;
   transition:opacity .5s cubic-bezier(.4,0,.2,1);
   pointer-events:none;
+  border-radius:0; /* clip идёт от родителя */
 }
 .pav img.pav-img.loaded{opacity:1}
 .pav-cam{
   position:absolute;inset:0;
-  background:rgba(0,0,0,.38);
+  background:rgba(0,0,0,.42);
   display:flex;align-items:center;justify-content:center;
   opacity:0;
   transition:opacity .18s ease;
-  border-radius:inherit;
   pointer-events:none;
+  z-index:3;
 }
 .pav:active .pav-cam{opacity:1}
 .pav-spinner{
   position:absolute;inset:0;
   display:flex;align-items:center;justify-content:center;
   background:linear-gradient(135deg,var(--sun),var(--sun2));
-  border-radius:inherit;
-  z-index:2;
+  z-index:4;
   opacity:0;
   transition:opacity .2s ease;
   pointer-events:none;
@@ -536,6 +547,39 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .pav-spinner.show{opacity:1}
 .pav-spinner svg{animation:pav-spin .85s linear infinite}
 @keyframes pav-spin{to{transform:rotate(360deg)}}
+/* long-press delete overlay */
+.pav-del-overlay{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.55);
+  opacity:0;
+  z-index:5;
+  pointer-events:none;
+  transition:opacity .15s ease;
+}
+.pav-del-overlay.show{opacity:1}
+.pav-del-ring{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  z-index:6;
+  pointer-events:none;
+}
+.pav-del-ring svg{
+  position:absolute;
+  transform:rotate(-90deg);
+}
+.pav-del-ring .ring-track{
+  stroke:rgba(255,255,255,.18);
+  fill:none;
+}
+.pav-del-ring .ring-fill{
+  fill:none;
+  stroke:#F45C5C;
+  stroke-linecap:round;
+  stroke-dasharray:188;
+  stroke-dashoffset:188;
+  transition:stroke-dashoffset linear;
+}
 .pav-wrap{position:relative;display:inline-block;flex-shrink:0}
 @keyframes pav-ripple{0%{transform:scale(0);opacity:.4}100%{transform:scale(3);opacity:0}}
 .pav-ripple{
@@ -546,6 +590,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   animation:pav-ripple .55s ease-out forwards;
   pointer-events:none;
   top:0;left:0;
+  z-index:2;
 }
 
 /* ══ TOAST ══ */
@@ -1427,7 +1472,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 <!-- ══ PROFILE ══ -->
 <div class="page" id="p-profile">
 <div style="display:flex;align-items:center;gap:14px;padding:4px 16px 0">
-  <div class="pav-wrap" onclick="pickAvatar()">
+  <div class="pav-wrap" id="pf-av-wrap">
     <div class="pav" id="pf-av">
       <span id="pf-av-letter">А</span>
       <img class="pav-img" id="pf-av-img" alt="" src="">
@@ -1436,6 +1481,16 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       </div>
       <div class="pav-spinner" id="pf-av-spinner">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="2.5" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+      </div>
+      <!-- long-press delete -->
+      <div class="pav-del-overlay" id="pf-del-overlay">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F45C5C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+      </div>
+      <div class="pav-del-ring" id="pf-del-ring">
+        <svg width="64" height="64" viewBox="0 0 64 64">
+          <circle class="ring-track" cx="32" cy="32" r="30" stroke-width="3"/>
+          <circle class="ring-fill" id="pf-del-ring-fill" cx="32" cy="32" r="30" stroke-width="3"/>
+        </svg>
       </div>
     </div>
   </div>
@@ -4031,6 +4086,116 @@ function pickAvatar(){
   if(inp)inp.click();
 }
 
+/* ── Long-press to delete avatar (5 sec) ── */
+let _pavPressTimer=null;
+let _pavAnimStart=null;
+let _pavAnimFrame=null;
+const PAV_HOLD_MS=5000;
+
+function _pavCancelLongPress(){
+  if(_pavPressTimer){clearTimeout(_pavPressTimer);_pavPressTimer=null;}
+  if(_pavAnimFrame){cancelAnimationFrame(_pavAnimFrame);_pavAnimFrame=null;}
+  _pavAnimStart=null;
+  const overlay=$('pf-del-overlay');
+  const ring=$('pf-del-ring-fill');
+  if(overlay)overlay.classList.remove('show');
+  if(ring){ring.style.transition='';ring.style.strokeDashoffset='188';}
+}
+
+function _pavStartLongPress(e){
+  // Only trigger if avatar is loaded
+  const img=$('pf-av-img');
+  if(!img||!img.classList.contains('loaded'))return;
+  // Prevent normal click from firing too
+  e.preventDefault?.();
+  tg?.HapticFeedback?.impactOccurred('light');
+  const overlay=$('pf-del-overlay');
+  const ring=$('pf-del-ring-fill');
+  if(overlay)overlay.classList.add('show');
+  const circumference=188;
+  if(ring){
+    ring.style.transition='';
+    ring.style.strokeDashoffset=String(circumference);
+  }
+  _pavAnimStart=performance.now();
+  function animateRing(now){
+    const elapsed=now-_pavAnimStart;
+    const progress=Math.min(1,elapsed/PAV_HOLD_MS);
+    if(ring)ring.style.strokeDashoffset=String(circumference*(1-progress));
+    if(progress<1){
+      _pavAnimFrame=requestAnimationFrame(animateRing);
+    }
+  }
+  _pavAnimFrame=requestAnimationFrame(animateRing);
+  _pavPressTimer=setTimeout(()=>{
+    _pavCancelLongPress();
+    _deleteAvatar();
+  },PAV_HOLD_MS);
+}
+
+function _deleteAvatar(){
+  tg?.HapticFeedback?.notificationOccurred('success');
+  const img=$('pf-av-img');
+  const letter=$('pf-av-letter');
+  const av=$('pf-av');
+  // fade out image
+  if(img){
+    img.style.transition='opacity .4s ease';
+    img.style.opacity='0';
+    setTimeout(()=>{
+      img.classList.remove('loaded');
+      img.src='';
+      img.style.transition='';
+      img.style.opacity='';
+    },420);
+  }
+  // restore default glow
+  if(av){
+    av.style.transition='box-shadow .5s ease';
+    av.style.boxShadow='0 5px 18px rgba(255,107,53,.25)';
+  }
+  if(letter){
+    letter.style.display='';
+    const u=gU();
+    letter.textContent=(u.name||'?').charAt(0).toUpperCase();
+  }
+  try{localStorage.removeItem(AV_KEY);localStorage.removeItem(AV_CLR_KEY);}catch{}
+}
+
+function _initAvatarHandlers(){
+  const wrap=$('pf-av-wrap');
+  if(!wrap||wrap._pavInited)return;
+  wrap._pavInited=true;
+  // tap = pick photo (only when no image loaded)
+  // long press = delete (only when image loaded)
+  wrap.addEventListener('touchstart',e=>{
+    _pavPressStart=performance.now();
+    _pavStartLongPress(e);
+  },{passive:false});
+  wrap.addEventListener('touchend',e=>{
+    const held=performance.now()-(_pavPressStart||0);
+    _pavCancelLongPress();
+    if(held<300){
+      // short tap → pick
+      pickAvatar();
+    }
+  },{passive:true});
+  wrap.addEventListener('touchmove',()=>{_pavCancelLongPress();},{passive:true});
+  wrap.addEventListener('touchcancel',()=>{_pavCancelLongPress();},{passive:true});
+  // Mouse fallback for desktop
+  wrap.addEventListener('mousedown',e=>{
+    _pavPressStart=performance.now();
+    _pavStartLongPress(e);
+  });
+  wrap.addEventListener('mouseup',e=>{
+    const held=performance.now()-(_pavPressStart||0);
+    _pavCancelLongPress();
+    if(held<300)pickAvatar();
+  });
+  wrap.addEventListener('mouseleave',()=>{_pavCancelLongPress();});
+}
+let _pavPressStart=0;
+
 function onAvatarPicked(input){
   const file=input.files&&input.files[0];
   if(!file)return;
@@ -4062,6 +4227,8 @@ function onAvatarPicked(input){
 
 function renderProfile(){
   const u=gU(),wl=gWL();
+  // Init touch/click handlers once
+  _initAvatarHandlers();
   // Avatar
   const letter=$('pf-av-letter');
   const img=$('pf-av-img');
