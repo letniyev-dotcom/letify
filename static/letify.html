@@ -526,8 +526,8 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .ve-s3-kcal{font-size:40px;font-weight:900;color:var(--cal);line-height:1;letter-spacing:-.03em}
 .ve-s3-sub{font-size:11px;font-weight:700;color:var(--hint);margin-top:2px}
 .ve-drum{display:flex;align-items:center;gap:0;background:var(--bg3);border-radius:14px;overflow:hidden}
-.ve-drum-btn{width:40px;height:48px;border:none;background:transparent;color:var(--hint);font-size:20px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;transition:color .16s ease,background .16s ease,opacity .16s ease}
-.ve-drum-btn:active{opacity:.5;background:rgba(255,255,255,.05);color:var(--hint);transform:scale(.94);transition:opacity .08s ease,transform .08s ease,background .08s ease}
+.ve-drum-btn{width:40px;height:48px;border:none;background:transparent;color:var(--hint);font-size:20px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;transition:transform .15s ease;-webkit-tap-highlight-color:transparent}
+.ve-drum-btn:active{transform:scale(.85);transition:transform .07s ease}
 .ve-drum-val{font-size:24px;font-weight:900;color:var(--text);min-width:56px;text-align:center}
 .ve-drum-g{font-size:11px;font-weight:700;color:var(--hint);padding-right:12px}
 .ve-s3-macs{display:flex;gap:0;border-bottom:1px solid var(--brd)}
@@ -538,15 +538,13 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .ve-s3-mac-v{font-size:16px;font-weight:900}
 .ve-s3-mac-l{font-size:8px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.04em;margin-top:1px}
 .ve-s3-meals{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
-.ve-s3-meal{padding:12px 4px;border-right:1px solid var(--brd);text-align:center;cursor:pointer;background:transparent;border-top:none;border-bottom:none;border-left:none;font-family:inherit;transition:opacity .18s ease,transform .15s ease;position:relative}
+.ve-s3-meal{padding:12px 4px;border-right:1px solid var(--brd);text-align:center;cursor:pointer;background:transparent;border-top:none;border-bottom:none;border-left:none;font-family:inherit;transition:background .22s ease;position:relative;-webkit-tap-highlight-color:transparent}
 .tg-dark .ve-s3-meal{border-right-color:rgba(255,255,255,.08)}
 .ve-s3-meal:last-child{border-right:none}
-.ve-s3-meal span{display:block;font-size:18px;margin-bottom:3px;transition:transform .2s ease}
-.ve-s3-meal div{font-size:10px;font-weight:800;color:var(--hint);transition:color .2s ease}
-.ve-s3-meal.on div{color:var(--text)}
-.ve-s3-meal.on span{transform:scale(1.12)}
-.ve-s3-meal.on::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--sun),var(--sun2));transition:all .2s ease}
-.ve-s3-meal:active{opacity:.6;transform:scale(.93);transition:opacity .08s ease,transform .08s ease}
+.ve-s3-meal span{display:block;font-size:18px;margin-bottom:3px}
+.ve-s3-meal div{font-size:10px;font-weight:800;color:var(--hint);transition:color .22s ease}
+.ve-s3-meal.on{background:radial-gradient(ellipse 80% 100% at 50% 100%,rgba(255,107,53,.18) 0%,transparent 70%)}
+.ve-s3-meal.on div{color:var(--sun)}
 
 /* ══ MEAL DETAIL PUSH PAGE ─ DONUT GLOW ══ */
 .md-hero{
@@ -721,12 +719,57 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tg-dark .sc-calc-macro{background:rgba(255,255,255,.07)}
 .sc-calc-macro-v{font-size:15px;font-weight:900}
 .sc-calc-macro-l{font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.04em;margin-top:1px}
-/* КБЖУ track row on calories tab */
+/* ══ KBZHU track row ══ */
 .kbzhu-track-row{display:flex;gap:6px;margin-top:10px}
 .kbzhu-track-box{flex:1;background:var(--bg2);border-radius:12px;padding:10px 8px;text-align:center;box-shadow:var(--sh)}
 .tg-dark .kbzhu-track-box{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);box-shadow:none}
 .kbzhu-track-v{font-size:17px;font-weight:900}
 .kbzhu-track-l{font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+
+/* ══ CAL TILES (Variant C) ══ */
+.cal-hero-row{display:flex;gap:10px;padding:0 0 10px}
+.cal-hero-main{
+  flex:1;border-radius:18px;padding:16px;
+  background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.16);
+  position:relative;overflow:hidden;
+}
+.cal-hero-main::before{
+  content:'';position:absolute;bottom:-20px;right:-20px;
+  width:100px;height:100px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,107,53,.12),transparent 70%);
+  pointer-events:none;
+}
+.cal-hero-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,107,53,.55);margin-bottom:6px}
+.cal-hero-num{font-size:42px;font-weight:900;letter-spacing:-.04em;color:var(--cal);line-height:.95}
+.cal-hero-of{font-size:10px;font-weight:700;color:rgba(255,255,255,.35);margin-top:8px}
+.cal-hero-macs{display:flex;gap:10px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,107,53,.12)}
+.cal-hero-mac{text-align:left}
+.cal-hero-mac-v{font-size:11px;font-weight:900;line-height:1}
+.cal-hero-mac-l{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:rgba(255,255,255,.3);margin-top:1px}
+.cal-hero-side{display:flex;flex-direction:column;gap:8px;width:74px}
+.cal-side-box{
+  flex:1;border-radius:14px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);
+}
+.cal-side-v{font-size:17px;font-weight:900;line-height:1;margin-bottom:3px}
+.cal-side-l{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--hint)}
+
+.cal-meal-tile{
+  background:var(--bg2);border-radius:16px;border:1px solid var(--brd);
+  padding:13px 14px;margin-bottom:8px;cursor:pointer;
+  transition:opacity .14s ease,transform .14s ease;
+  position:relative;overflow:hidden;
+}
+.tg-dark .cal-meal-tile{background:rgba(255,255,255,.06)}
+.cal-meal-tile:active{opacity:.7;transform:scale(.98);transition:opacity .07s ease,transform .07s ease}
+.cal-meal-tile-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.cal-meal-ico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.cal-meal-name{font-size:14px;font-weight:800;flex:1}
+.cal-meal-kcal{font-size:15px;font-weight:900}
+.cal-meal-cnt{font-size:10px;font-weight:700;color:var(--hint)}
+.cal-meal-pbar{height:3px;background:rgba(255,255,255,.09);border-radius:99px;overflow:hidden}
+.cal-meal-pbar-f{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.34,1.1,.64,1)}
 </style>
 </head>
 <body>
@@ -862,19 +905,41 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 </div>
 <div id="tt-cal-body" style="display:none">
 <div class="pad">
-<div class="card" style="margin-top:4px;text-align:center;padding:20px 16px">
-  <div class="t5">калорий сегодня</div>
-  <div style="font-size:48px;font-weight:900;color:var(--cal);line-height:1.1;margin:6px 0" id="c-total">0</div>
-  <div class="t5">из <span id="c-goal">2000</span> ккал</div>
-  <div class="pb" style="margin-top:12px;height:7px"><div class="pbf pb-sun" id="c-bar" style="width:0%"></div></div>
-  <div class="kbzhu-track-row" style="margin-top:14px">
-    <div class="kbzhu-track-box"><div class="kbzhu-track-v" id="c-prot" style="color:var(--green)">0</div><div class="kbzhu-track-l">белки г</div></div>
-    <div class="kbzhu-track-box"><div class="kbzhu-track-v" id="c-fat" style="color:var(--sun)">0</div><div class="kbzhu-track-l">жиры г</div></div>
-    <div class="kbzhu-track-box"><div class="kbzhu-track-v" id="c-carb" style="color:var(--sleep)">0</div><div class="kbzhu-track-l">углев. г</div></div>
+  <!-- Hero row: main tile + side stats -->
+  <div class="cal-hero-row" style="margin-top:4px">
+    <div class="cal-hero-main">
+      <div class="cal-hero-label">калорий сегодня</div>
+      <div class="cal-hero-num" id="c-total">0</div>
+      <div class="cal-hero-of">из <span id="c-goal">2000</span> ккал</div>
+      <div class="cal-hero-macs">
+        <div class="cal-hero-mac">
+          <div class="cal-hero-mac-v" id="c-prot" style="color:var(--green)">0г</div>
+          <div class="cal-hero-mac-l">белки</div>
+        </div>
+        <div class="cal-hero-mac">
+          <div class="cal-hero-mac-v" id="c-fat" style="color:var(--sun)">0г</div>
+          <div class="cal-hero-mac-l">жиры</div>
+        </div>
+        <div class="cal-hero-mac">
+          <div class="cal-hero-mac-v" id="c-carb" style="color:var(--sleep)">0г</div>
+          <div class="cal-hero-mac-l">углев.</div>
+        </div>
+      </div>
+    </div>
+    <div class="cal-hero-side">
+      <div class="cal-side-box">
+        <div class="cal-side-v" id="c-pct" style="color:var(--sun)">0%</div>
+        <div class="cal-side-l">нормы</div>
+      </div>
+      <div class="cal-side-box">
+        <div class="cal-side-v" id="c-remain" style="color:rgba(255,255,255,.6)">2000</div>
+        <div class="cal-side-l">остаток</div>
+      </div>
+    </div>
   </div>
-</div>
-<div class="card gap" style="padding:12px 14px"><div id="c-meals"></div></div>
-<button class="btn btn-p gap" onclick="pushPage('pp-cal')">добавить еду</button>
+  <!-- Meal tiles -->
+  <div id="c-meals"></div>
+  <button class="btn btn-p gap" onclick="pushPage('pp-cal')">добавить еду</button>
 </div>
 </div>
 </div>
@@ -2866,26 +2931,32 @@ function renderCal(){
   const u=gU(),cd=gCD();
   const ct=totalCal(),cg=u.cal_goal||2000,cp=Math.min(100,Math.round(ct/cg*100));
   T('c-total',ct);T('c-goal',cg);
-  requestAnimationFrame(()=>{const b=$('c-bar');if(b)b.style.width=cp+'%';});
+  T('c-pct',cp+'%');
+  T('c-remain',Math.max(0,cg-ct));
   const m=C.macros||{prot:0,fat:0,carb:0};
-  T('c-prot',m.prot||0);T('c-fat',m.fat||0);T('c-carb',m.carb||0);
-  const MEALS=[{k:'breakfast',i:'🌅',n:'завтрак',col:'#FF9800'},{k:'lunch',i:'☀️',n:'обед',col:'#FF6B35'},{k:'dinner',i:'🌙',n:'ужин',col:'#8B7FD4'},{k:'snack',i:'🍑',n:'перекус',col:'#52C177'}];
+  T('c-prot',(m.prot||0)+'г');T('c-fat',(m.fat||0)+'г');T('c-carb',(m.carb||0)+'г');
+  const MEALS=[{k:'breakfast',i:'🌅',n:'завтрак',col:'#FFAB40',bg:'rgba(255,171,64,.12)'},{k:'lunch',i:'☀️',n:'обед',col:'#FF6B35',bg:'rgba(255,107,53,.12)'},{k:'dinner',i:'🌙',n:'ужин',col:'#8B7FD4',bg:'rgba(139,127,212,.12)'},{k:'snack',i:'🍑',n:'перекус',col:'#52C177',bg:'rgba(82,193,119,.1)'}];
   H('c-meals',MEALS.map(m=>{
     const entries=getMealEntries(m.k);
     const kcal=entries.reduce((s,e)=>s+(e.kcal||0),0);
     const cnt=entries.length;
-    return`<div class="mr" style="cursor:pointer" onclick="openMealDetail('${m.k}')">
-      <div class="mr-ico" style="background:${m.col}18;color:${m.col}">${m.i}</div>
-      <div style="flex:1">
-        <div class="mr-name">${m.n}</div>
-        ${!cnt?`<div class="t5" style="font-size:10px">не записано</div>`:`<div class="t5" style="font-size:10px">${cnt} ${cnt===1?'блюдо':cnt<5?'блюда':'блюд'}</div>`}
-      </div>
-      <div style="display:flex;align-items:center;gap:6px">
-        <div class="mr-kcal" style="${kcal?'color:var(--cal)':'color:var(--hint)'}">
-          ${kcal||'—'} ${kcal?'ккал':''}
+    const pct=ct>0?Math.min(100,Math.round(kcal/ct*100)):0;
+    if(!cnt)return`<div class="cal-meal-tile" style="opacity:.48;display:flex;align-items:center;gap:10px" onclick="openMealDetail('${m.k}')">
+      <div class="cal-meal-ico" style="background:${m.bg}">${m.i}</div>
+      <div class="cal-meal-name">${m.n}</div>
+      <div style="color:rgba(255,255,255,.18);font-size:13px;font-weight:900">—</div>
+      <div style="width:22px;height:22px;border-radius:50%;border:1.5px dashed rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.25);font-size:14px;flex-shrink:0">+</div>
+    </div>`;
+    return`<div class="cal-meal-tile" onclick="openMealDetail('${m.k}')">
+      <div class="cal-meal-tile-top">
+        <div class="cal-meal-ico" style="background:${m.bg}">${m.i}</div>
+        <div>
+          <div class="cal-meal-name">${m.n}</div>
+          <div class="cal-meal-cnt">${cnt} ${cnt===1?'блюдо':cnt<5?'блюда':'блюд'}</div>
         </div>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--hint)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        <div class="cal-meal-kcal" style="color:${m.col}">${kcal} <span style="font-size:10px;font-weight:700;color:var(--hint)">ккал</span></div>
       </div>
+      <div class="cal-meal-pbar"><div class="cal-meal-pbar-f" style="width:${pct}%;background:${m.col}"></div></div>
     </div>`;
   }).join(''));
 }
