@@ -537,17 +537,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .pav-spinner svg{animation:pav-spin .85s linear infinite}
 @keyframes pav-spin{to{transform:rotate(360deg)}}
 .pav-wrap{position:relative;display:inline-block;flex-shrink:0}
-.pav-edit-badge{
-  position:absolute;bottom:-5px;right:-5px;
-  width:22px;height:22px;border-radius:7px;
-  background:var(--sun);
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 2px 8px rgba(255,107,53,.45);
-  border:2.5px solid var(--bg);
-  pointer-events:none;
-  transition:transform .15s ease;
-}
-.pav-wrap:active .pav-edit-badge{transform:scale(.9)}
 @keyframes pav-ripple{0%{transform:scale(0);opacity:.4}100%{transform:scale(3);opacity:0}}
 .pav-ripple{
   position:absolute;
@@ -1448,9 +1437,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       <div class="pav-spinner" id="pf-av-spinner">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="2.5" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
       </div>
-    </div>
-    <div class="pav-edit-badge">
-      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
     </div>
   </div>
   <div>
@@ -3944,6 +3930,7 @@ function renderProgress(){
 
 /* ══ AVATAR SYSTEM ══ */
 const AV_KEY='lf2_user_avatar';
+const AV_CLR_KEY='lf2_user_avatar_color';
 
 function _loadAvatarFromStorage(){
   try{return localStorage.getItem(AV_KEY)||null;}catch{return null;}
@@ -3951,33 +3938,88 @@ function _loadAvatarFromStorage(){
 function _saveAvatarToStorage(dataUrl){
   try{localStorage.setItem(AV_KEY,dataUrl);}catch{}
 }
+function _loadAvatarColor(){
+  try{return localStorage.getItem(AV_CLR_KEY)||null;}catch{return null;}
+}
+function _saveAvatarColor(rgb){
+  try{localStorage.setItem(AV_CLR_KEY,rgb);}catch{}
+}
+
+// Extract dominant vibrant color from image via canvas sampling
+function _extractDominantColor(canvas){
+  const ctx=canvas.getContext('2d');
+  const w=canvas.width,h=canvas.height;
+  // Sample a grid of pixels across the image
+  const step=Math.max(1,Math.floor(Math.min(w,h)/24));
+  let rSum=0,gSum=0,bSum=0,count=0;
+  // We cluster: skip near-white/near-black/near-grey to find the vibrant tone
+  const data=ctx.getImageData(0,0,w,h).data;
+  for(let y=0;y<h;y+=step){
+    for(let x=0;x<w;x+=step){
+      const i=(y*w+x)*4;
+      const r=data[i],g=data[i+1],b=data[i+2];
+      // Skip near-grey (low saturation) and very dark/light
+      const max=Math.max(r,g,b),min=Math.min(r,g,b);
+      const sat=max===0?0:(max-min)/max;
+      const lum=(max+min)/510; // 0..1
+      if(sat>0.18&&lum>0.12&&lum<0.88){
+        rSum+=r;gSum+=g;bSum+=b;count++;
+      }
+    }
+  }
+  if(count<5){
+    // Fallback: just average everything
+    count=0;rSum=0;gSum=0;bSum=0;
+    for(let y=0;y<h;y+=step){for(let x=0;x<w;x+=step){const i=(y*w+x)*4;rSum+=data[i];gSum+=data[i+1];bSum+=data[i+2];count++;}}
+  }
+  if(count===0)return null;
+  return `${Math.round(rSum/count)},${Math.round(gSum/count)},${Math.round(bSum/count)}`;
+}
+
+function _applyGlow(rgb,animate){
+  const av=$('pf-av');
+  if(!av)return;
+  const shadow=`0 5px 18px rgba(${rgb},.45)`;
+  const shadowActive=`0 2px 8px rgba(${rgb},.2)`;
+  if(animate){
+    av.style.transition='box-shadow .6s cubic-bezier(.4,0,.2,1)';
+  } else {
+    av.style.transition='';
+  }
+  av.style.setProperty('--pav-glow',`rgba(${rgb},.45)`);
+  av.style.boxShadow=shadow;
+  // Override :active shadow via CSS variable trick — set a data attr for CSS
+  av.dataset.glowRgb=rgb;
+}
 
 function _applyAvatar(dataUrl,animate){
   const letter=$('pf-av-letter');
   const img=$('pf-av-img');
   if(!img)return;
   if(animate){
-    // show spinner
     const sp=$('pf-av-spinner');
     if(sp)sp.classList.add('show');
-    // small delay to let spinner appear, then load image
     setTimeout(()=>{
       img.onload=()=>{
         if(sp)sp.classList.remove('show');
         if(letter)letter.style.display='none';
         requestAnimationFrame(()=>{img.classList.add('loaded');});
-        // ripple effect
+        // Ripple
         const av=$('pf-av');
         if(av){const r=document.createElement('div');r.className='pav-ripple';av.appendChild(r);setTimeout(()=>r.remove(),600);}
+        // Apply saved color with animation
+        const saved=_loadAvatarColor();
+        if(saved)_applyGlow(saved,true);
       };
       img.onerror=()=>{if(sp)sp.classList.remove('show');}
       img.src=dataUrl;
     },320);
   } else {
-    // silent restore from storage
     img.onload=()=>{
       if(letter)letter.style.display='none';
       img.classList.add('loaded');
+      const saved=_loadAvatarColor();
+      if(saved)_applyGlow(saved,false);
     };
     img.src=dataUrl;
   }
@@ -3996,7 +4038,6 @@ function onAvatarPicked(input){
   const reader=new FileReader();
   reader.onload=e=>{
     const raw=e.target.result;
-    // Resize/compress via canvas to max 256x256, quality 0.82
     const image=new Image();
     image.onload=()=>{
       const MAX=256;
@@ -4007,13 +4048,15 @@ function onAvatarPicked(input){
       const ctx=canvas.getContext('2d');
       ctx.drawImage(image,0,0,canvas.width,canvas.height);
       const compressed=canvas.toDataURL('image/jpeg',0.82);
+      // Extract color before saving
+      const rgb=_extractDominantColor(canvas);
+      if(rgb){_saveAvatarColor(rgb);}
       _saveAvatarToStorage(compressed);
       _applyAvatar(compressed,true);
     };
     image.src=raw;
   };
   reader.readAsDataURL(file);
-  // reset input so same file can be picked again
   input.value='';
 }
 
