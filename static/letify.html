@@ -813,15 +813,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .scanner-viewport.found{
   box-shadow:0 0 0 2px var(--green), 0 0 28px rgba(82,193,119,.35), 0 8px 40px rgba(0,0,0,.28);
 }
-.scanner-viewport.not-found .sc-vf-corner{
-  animation:vf-red-pulse 1.4s ease-in-out 3;
-}
-@keyframes vf-red-opacity{
-  0%{opacity:0}
-  30%{opacity:1}
-  70%{opacity:1}
-  100%{opacity:0}
-}
+
 .scanner-viewport video{
   width:100%;height:100%;object-fit:cover;display:block;
   transform:translateZ(0);will-change:transform;
@@ -842,7 +834,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   background-size:22px 22px;opacity:.7;
 }
 
-/* ── Viewfinder frame — Concept C: clean full-edge corners ── */
+/* ── Viewfinder frame ── */
 .sc-vf{
   position:absolute;
   inset:14px;
@@ -850,40 +842,23 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 }
 .sc-vf-corner{
   position:absolute;
-  width:26px;height:26px;
-  will-change:opacity;
-}
-/* белые уголки — base layer */
-.sc-vf-corner::before{
-  content:'';position:absolute;inset:0;
-  border-style:solid;border-color:rgba(255,255,255,.82);
+  width:28px;height:28px;
+  border-style:solid;
+  border-color:rgba(255,255,255,.85);
   background:transparent;
+  transition:border-color .3s ease;
 }
-/* зелёные уголки — поверх, появляются при found */
-.sc-vf-corner::after{
-  content:'';position:absolute;inset:0;
-  border-style:solid;border-color:var(--green);
-  background:transparent;
-  opacity:0;transition:opacity .3s ease;will-change:opacity;
+.sc-vf-corner.tl{top:0;left:0;border-width:2.5px 0 0 2.5px;border-radius:12px 0 0 0}
+.sc-vf-corner.tr{top:0;right:0;border-width:2.5px 2.5px 0 0;border-radius:0 12px 0 0}
+.sc-vf-corner.bl{bottom:0;left:0;border-width:0 0 2.5px 2.5px;border-radius:0 0 0 12px}
+.sc-vf-corner.br{bottom:0;right:0;border-width:0 2.5px 2.5px 0;border-radius:0 0 12px 0}
+.scanner-viewport.found .sc-vf-corner{border-color:var(--green);}
+.scanner-viewport.not-found .sc-vf-corner{
+  animation:vf-red-pulse 1.4s ease-in-out 3;
 }
-.sc-vf-corner.tl::before,.sc-vf-corner.tl::after{border-width:2.5px 0 0 2.5px;border-radius:14px 0 0 0}
-.sc-vf-corner.tr::before,.sc-vf-corner.tr::after{border-width:2.5px 2.5px 0 0;border-radius:0 14px 0 0}
-.sc-vf-corner.bl::before,.sc-vf-corner.bl::after{border-width:0 0 2.5px 2.5px;border-radius:0 0 0 14px}
-.sc-vf-corner.br::before,.sc-vf-corner.br::after{border-width:0 2.5px 2.5px 0;border-radius:0 0 14px 0}
-/* found: зелёные уголки поверх */
-.scanner-viewport.found .sc-vf-corner::after{opacity:1;}
-/* red overlay layer — анимируем opacity а не border-color */
-.sc-vf-red{
-  position:absolute;inset:0;
-  border-style:solid;border-color:rgba(244,92,92,.95);
-  background:transparent;opacity:0;will-change:opacity;
-}
-.sc-vf-corner.tl .sc-vf-red{border-width:2.5px 0 0 2.5px;border-radius:14px 0 0 0}
-.sc-vf-corner.tr .sc-vf-red{border-width:2.5px 2.5px 0 0;border-radius:0 14px 0 0}
-.sc-vf-corner.bl .sc-vf-red{border-width:0 0 2.5px 2.5px;border-radius:0 0 0 14px}
-.sc-vf-corner.br .sc-vf-red{border-width:0 2.5px 2.5px 0;border-radius:0 0 14px 0}
-.scanner-viewport.not-found .sc-vf-red{
-  animation:vf-red-opacity 1.4s ease-in-out 3;
+@keyframes vf-red-pulse{
+  0%,100%{border-color:rgba(255,255,255,.85)}
+  40%,60%{border-color:rgba(244,92,92,.95)}
 }
 
 /* ── Hint chip ── */
@@ -2149,10 +2124,10 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
         <video id="scanner-video" autoplay playsinline muted style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block"></video>
         <!-- viewfinder — clean edge corners -->
         <div class="sc-vf" id="sc-vf">
-          <div class="sc-vf-corner tl"><div class="sc-vf-red"></div></div>
-          <div class="sc-vf-corner tr"><div class="sc-vf-red"></div></div>
-          <div class="sc-vf-corner bl"><div class="sc-vf-red"></div></div>
-          <div class="sc-vf-corner br"><div class="sc-vf-red"></div></div>
+          <div class="sc-vf-corner tl"></div>
+          <div class="sc-vf-corner tr"></div>
+          <div class="sc-vf-corner bl"></div>
+          <div class="sc-vf-corner br"></div>
         </div>
         <!-- hint -->
         <div class="sc-hint-area" id="sc-hint-area">
