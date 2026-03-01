@@ -165,9 +165,9 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .stepper-wrap{display:flex;align-items:center;gap:0;background:var(--bg3);border-radius:16px;overflow:hidden}
 .stepper-btn{
   width:56px;height:64px;background:transparent;border:none;cursor:pointer;
-  font-size:26px;font-weight:700;color:var(--sun);font-family:inherit;flex-shrink:0;
+  font-size:26px;font-weight:700;color:var(--hint);font-family:inherit;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
-  transition:background .1s;-webkit-tap-highlight-color:transparent;
+  transition:background .18s ease,opacity .18s ease,transform .15s ease;-webkit-tap-highlight-color:transparent;
 }
 .stepper-val{
   flex:1;text-align:center;font-size:38px;font-weight:700;letter-spacing:-.02em;
@@ -360,14 +360,16 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .type-card{
   padding:14px 10px;border-radius:14px;border:2px solid transparent;
   background:var(--bg3);cursor:pointer;text-align:center;
-  transition:background .14s ease,border-color .14s ease,transform .12s ease,opacity .12s ease;
+  transition:background .2s ease,border-color .2s ease,transform .15s ease,opacity .15s ease,box-shadow .2s ease;
 }
-.type-card:active{transform:scale(.96);opacity:.9;transition:transform .08s ease,opacity .08s ease}
-.type-card.on{background:rgba(255,107,53,.08);border-color:var(--sun)}
+.type-card:active{transform:scale(.95);opacity:.85;transition:transform .1s ease,opacity .1s ease}
+.type-card.on{background:var(--bg3);border-color:transparent;box-shadow:none}
+.type-card.on .type-card-lbl-wrap{background:rgba(255,107,53,.15);border-radius:8px;padding:2px 6px;display:inline-block;color:var(--sun)}
 .type-card-ico{font-size:28px;margin-bottom:4px;line-height:1}
 .type-card-lbl{font-size:12px;font-weight:700;color:var(--text)}
+.type-card-lbl-wrap{display:inline-block;border-radius:8px;padding:2px 6px;transition:background .2s ease,color .2s ease}
 .tg-dark .type-card{background:rgba(255,255,255,.07)}
-.tg-dark .type-card.on{background:rgba(255,107,53,.16)}
+.tg-dark .type-card.on{background:rgba(255,255,255,.07)}
 
 /* ══ DURATION GRID ══ */
 .dur-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:4px}
@@ -467,8 +469,9 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tg-dark #nav{background:rgba(20,14,8,.96);border-color:rgba(255,255,255,.1)}
 .tg-dark .empty svg{opacity:.15}
 .tg-dark .banner::after{opacity:.5}
-.stepper-btn{transition:opacity .16s ease,transform .16s ease}
-.stepper-btn:active{background:transparent !important;transform:scale(.93);opacity:.6}
+.stepper-btn{transition:opacity .18s ease,transform .15s ease,background .15s ease}
+.stepper-btn:active{background:rgba(0,0,0,.06) !important;transform:scale(.9);opacity:.55;transition:opacity .07s ease,transform .07s ease,background .07s ease}
+.tg-dark .stepper-btn:active{background:rgba(255,255,255,.08) !important}
 .btn-water:active{opacity:.75 !important}
 
 /* ══ CLEAR BTN HINT ══ */
@@ -524,7 +527,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .ve-s3-sub{font-size:11px;font-weight:700;color:var(--hint);margin-top:2px}
 .ve-drum{display:flex;align-items:center;gap:0;background:var(--bg3);border-radius:14px;overflow:hidden}
 .ve-drum-btn{width:40px;height:48px;border:none;background:transparent;color:var(--hint);font-size:20px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;transition:color .16s ease,background .16s ease,opacity .16s ease}
-.ve-drum-btn:active{opacity:.65;background:rgba(255,107,53,.1);color:var(--sun)}
+.ve-drum-btn:active{opacity:.5;background:rgba(255,255,255,.05);color:var(--hint);transform:scale(.94);transition:opacity .08s ease,transform .08s ease,background .08s ease}
 .ve-drum-val{font-size:24px;font-weight:900;color:var(--text);min-width:56px;text-align:center}
 .ve-drum-g{font-size:11px;font-weight:700;color:var(--hint);padding-right:12px}
 .ve-s3-macs{display:flex;gap:0;border-bottom:1px solid var(--brd)}
@@ -535,15 +538,15 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .ve-s3-mac-v{font-size:16px;font-weight:900}
 .ve-s3-mac-l{font-size:8px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.04em;margin-top:1px}
 .ve-s3-meals{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
-.ve-s3-meal{padding:12px 4px;border-right:1px solid var(--brd);text-align:center;cursor:pointer;background:transparent;border-top:none;border-bottom:none;border-left:none;font-family:inherit;transition:background .18s ease,opacity .16s ease;position:relative}
+.ve-s3-meal{padding:12px 4px;border-right:1px solid var(--brd);text-align:center;cursor:pointer;background:transparent;border-top:none;border-bottom:none;border-left:none;font-family:inherit;transition:opacity .18s ease,transform .15s ease;position:relative}
 .tg-dark .ve-s3-meal{border-right-color:rgba(255,255,255,.08)}
 .ve-s3-meal:last-child{border-right:none}
-.ve-s3-meal span{display:block;font-size:18px;margin-bottom:3px}
-.ve-s3-meal div{font-size:10px;font-weight:800;color:var(--hint);transition:color .18s ease}
-.ve-s3-meal.on{background:rgba(255,107,53,.08)}
+.ve-s3-meal span{display:block;font-size:18px;margin-bottom:3px;transition:transform .2s ease}
+.ve-s3-meal div{font-size:10px;font-weight:800;color:var(--hint);transition:color .2s ease}
 .ve-s3-meal.on div{color:var(--text)}
-.ve-s3-meal.on::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--sun),var(--sun2))}
-.ve-s3-meal:active{opacity:.72}
+.ve-s3-meal.on span{transform:scale(1.12)}
+.ve-s3-meal.on::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--sun),var(--sun2));transition:all .2s ease}
+.ve-s3-meal:active{opacity:.6;transform:scale(.93);transition:opacity .08s ease,transform .08s ease}
 
 /* ══ MEAL DETAIL PUSH PAGE ─ DONUT GLOW ══ */
 .md-hero{
@@ -1406,12 +1409,12 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       </div>
       <div style="margin:14px 0 8px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--hint)">или выбери</div>
       <div class="type-grid" id="act-quick">
-        <div class="type-card on" onclick="actQuick('пробежка','run',this)"><div class="type-card-ico">🏃</div><div class="type-card-lbl">пробежка</div></div>
-        <div class="type-card" onclick="actQuick('зал','gym',this)"><div class="type-card-ico">💪</div><div class="type-card-lbl">зал</div></div>
-        <div class="type-card" onclick="actQuick('йога','yoga',this)"><div class="type-card-ico">🧘</div><div class="type-card-lbl">йога</div></div>
-        <div class="type-card" onclick="actQuick('ходьба','walk',this)"><div class="type-card-ico">🚶</div><div class="type-card-lbl">ходьба</div></div>
-        <div class="type-card" onclick="actQuick('велосипед','bike',this)"><div class="type-card-ico">🚴</div><div class="type-card-lbl">велосипед</div></div>
-        <div class="type-card" onclick="actQuick('другое','other',this)"><div class="type-card-ico">✨</div><div class="type-card-lbl">другое</div></div>
+        <div class="type-card on" onclick="actQuick('пробежка','run',this)"><div class="type-card-ico">🏃</div><div class="type-card-lbl-wrap"><div class="type-card-lbl">пробежка</div></div></div>
+        <div class="type-card" onclick="actQuick('зал','gym',this)"><div class="type-card-ico">💪</div><div class="type-card-lbl-wrap"><div class="type-card-lbl">зал</div></div></div>
+        <div class="type-card" onclick="actQuick('йога','yoga',this)"><div class="type-card-ico">🧘</div><div class="type-card-lbl-wrap"><div class="type-card-lbl">йога</div></div></div>
+        <div class="type-card" onclick="actQuick('ходьба','walk',this)"><div class="type-card-ico">🚶</div><div class="type-card-lbl-wrap"><div class="type-card-lbl">ходьба</div></div></div>
+        <div class="type-card" onclick="actQuick('велосипед','bike',this)"><div class="type-card-ico">🚴</div><div class="type-card-lbl-wrap"><div class="type-card-lbl">велосипед</div></div></div>
+        <div class="type-card" onclick="actQuick('другое','other',this)"><div class="type-card-ico">✨</div><div class="type-card-lbl-wrap"><div class="type-card-lbl">другое</div></div></div>
       </div>
     </div>
     <div class="act-step" id="act-s2">
@@ -1678,10 +1681,10 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       </div>
       <div class="m3-sec">приём пищи</div>
       <div class="type-grid" style="grid-template-columns:1fr 1fr">
-        <div class="type-card on" id="scm-breakfast" onclick="setScMeal('breakfast',this)"><div class="type-card-ico">🌅</div><div class="type-card-lbl">завтрак</div></div>
-        <div class="type-card" id="scm-lunch" onclick="setScMeal('lunch',this)"><div class="type-card-ico">☀️</div><div class="type-card-lbl">обед</div></div>
-        <div class="type-card" id="scm-dinner" onclick="setScMeal('dinner',this)"><div class="type-card-ico">🌙</div><div class="type-card-lbl">ужин</div></div>
-        <div class="type-card" id="scm-snack" onclick="setScMeal('snack',this)"><div class="type-card-ico">🍎</div><div class="type-card-lbl">перекус</div></div>
+        <div class="type-card on" id="scm-breakfast" onclick="setScMeal('breakfast',this)"><div class="type-card-ico">🌅</div><div class="type-card-lbl-wrap"><div class="type-card-lbl">завтрак</div></div></div>
+        <div class="type-card" id="scm-lunch" onclick="setScMeal('lunch',this)"><div class="type-card-ico">☀️</div><div class="type-card-lbl-wrap"><div class="type-card-lbl">обед</div></div></div>
+        <div class="type-card" id="scm-dinner" onclick="setScMeal('dinner',this)"><div class="type-card-ico">🌙</div><div class="type-card-lbl-wrap"><div class="type-card-lbl">ужин</div></div></div>
+        <div class="type-card" id="scm-snack" onclick="setScMeal('snack',this)"><div class="type-card-ico">🍎</div><div class="type-card-lbl-wrap"><div class="type-card-lbl">перекус</div></div></div>
       </div>
       <button class="btn btn-p" style="margin-top:20px;width:100%" onclick="submitScanned()">добавить ✓</button>
     </div>
