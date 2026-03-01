@@ -89,11 +89,12 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   -webkit-overflow-scrolling:touch;touch-action:pan-y;
   scrollbar-width:none;
   opacity:0;
-  transform:translateX(28px);
-  transition:opacity .22s ease, transform .22s ease;
+  transform:translateX(20px);
+  transition:opacity .18s ease, transform .18s ease;
   pointer-events:none;
   display:flex;flex-direction:column;
   backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  will-change:opacity,transform;
 }
 .push-page::-webkit-scrollbar{display:none}
 .push-page.open{opacity:1;transform:translateX(0);pointer-events:all}
@@ -812,6 +813,15 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 }
 .scanner-viewport.found{
   box-shadow:0 0 0 2px var(--green), 0 0 28px rgba(82,193,119,.35), 0 8px 40px rgba(0,0,0,.28);
+}
+.scanner-viewport.not-found .sc-vf-corner{
+  border-color:var(--red);
+  animation:vf-red-flash .4s ease 2;
+}
+@keyframes vf-red-flash{
+  0%{border-color:rgba(255,255,255,.82)}
+  50%{border-color:var(--red)}
+  100%{border-color:rgba(255,255,255,.82)}
 }
 .scanner-viewport video{
   width:100%;height:100%;object-fit:cover;display:block;
@@ -2139,7 +2149,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
               <iconify-icon icon="solar:check-circle-bold" style="font-size:32px;color:#fff"></iconify-icon>
             </div>
           </div>
-          <div class="sc-success-title">Отсканировано!</div>
+          <div class="sc-success-title">отсканировано</div>
           <div class="sc-success-sub" id="sc-success-product-name"></div>
         </div>
       </div>
@@ -2148,30 +2158,19 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       <div class="sc-steps-row" id="sc-steps-row">
         <div class="sc-step-item active" id="scsi-1">
           <div class="sc-step-track"><div class="sc-step-fill"></div></div>
-          <div class="sc-step-lbl">Наведите</div>
+          <div class="sc-step-lbl">наведите</div>
         </div>
         <div class="sc-step-item" id="scsi-2">
           <div class="sc-step-track"><div class="sc-step-fill"></div></div>
-          <div class="sc-step-lbl">Сканирую</div>
+          <div class="sc-step-lbl">сканирую</div>
         </div>
         <div class="sc-step-item" id="scsi-3">
           <div class="sc-step-track"><div class="sc-step-fill"></div></div>
-          <div class="sc-step-lbl">Готово</div>
+          <div class="sc-step-lbl">готово</div>
         </div>
       </div>
 
-      <!-- Not found block -->
-      <div id="scanner-not-found" style="display:none;text-align:center;padding:20px 0">
-        <div style="width:56px;height:56px;border-radius:18px;background:rgba(244,92,92,.1);border:1px solid rgba(244,92,92,.18);display:flex;align-items:center;justify-content:center;margin:0 auto 12px">
-          <iconify-icon icon="solar:magnifer-bold" style="font-size:26px;color:var(--red)"></iconify-icon>
-        </div>
-        <div style="font-size:16px;font-weight:900;margin-bottom:4px">Продукт не найден</div>
-        <div class="t5" style="margin-bottom:18px">Штрихкод: <span id="sc-barcode-val">—</span></div>
-        <button class="btn btn-g" style="width:100%;padding:13px" onclick="scannerRetry()">
-          <iconify-icon icon="solar:restart-bold" style="font-size:16px"></iconify-icon>
-          Попробовать снова
-        </button>
-      </div>
+      <!-- not-found: handled by red flash on corners -->
 
     </div><!-- /sc-s1 -->
 
@@ -2708,7 +2707,7 @@ function _populatePP(id){
     });
     T('sc-step-title','сканирование');
     // Reset new UI
-    const nf=$('scanner-not-found');if(nf)nf.style.display='none';
+    
     const vp=$('scanner-viewport');if(vp)vp.classList.remove('found');
     const ov=$('sc-success-overlay');if(ov)ov.classList.remove('show');
     const hint=$('sc-hint-area');if(hint)hint.style.opacity='1';
@@ -3991,7 +3990,7 @@ async function startScanner(){
   const vp=$('scanner-viewport');
   const vid=$('scanner-video');
   const status=$('scanner-status');
-  const nf=$('scanner-not-found');if(nf)nf.style.display='none';
+  
   if(vp)vp.classList.remove('found');
   const ov=$('sc-success-overlay');if(ov)ov.classList.remove('show');
   const hint=$('sc-hint-area');if(hint)hint.style.opacity='1';
@@ -4085,42 +4084,39 @@ function manualBarcode(){
   _lookupBarcode(code);
 }
 
+const _EANDB_JWT='eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJkZjRlYjU2Yi0xYjA2LTQ4NDEtYjVkYS05YzdmY2ZjMzg5NDYiLCJzdWIiOiIzODExYjJlNy00MGVhLTRkMzMtYTRlNS1kNGE0NmY4NTg5MjAiLCJpc3MiOiJjb20uZWFuLWRiIiwiaWF0IjoxNzcyMzExNjUyLCJleHAiOjE4MDM4NDc2NTIsImlzQXBpIjoidHJ1ZSJ9.6UtDsv1qK4KR-OxBwQzFUciEPpbCWGvqSajkDYjm2czU5TeqWaRBODYbhW82zIDUMznLt-OegWqo-BU-lygx_w';
+
 async function _lookupBarcode(barcode){
   const st=$('scanner-status');if(st)st.textContent='загружаю данные…';
   try{
-    const resp=await fetch(`https://world.openfoodfacts.org/api/v2/product/${barcode}.json?fields=product_name,product_name_ru,brands,nutriments,nutriments_estimated`);
+    const resp=await fetch(`https://api.ean-db.com/api/v2/product/${barcode}`,{
+      headers:{'Authorization':'Bearer '+_EANDB_JWT,'Accept':'application/json'}
+    });
+    if(!resp.ok){_showScannerNotFound(barcode);return;}
     const data=await resp.json();
-    if(data.status===1&&data.product){
-      const p=data.product;
-      const n=p.nutriments||{};
-      let kcal=0;
-      if(n['energy-kcal_100g']!=null&&n['energy-kcal_100g']!==''){kcal=parseFloat(n['energy-kcal_100g']);}
-      else if(n['energy-kcal']!=null&&n['energy-kcal']!==''){kcal=parseFloat(n['energy-kcal']);}
-      else if(n['energy_100g']!=null&&n['energy_100g']!==''){kcal=Math.round(parseFloat(n['energy_100g'])/4.184);}
-      else if(n['energy']!=null&&n['energy']!==''){kcal=Math.round(parseFloat(n['energy'])/4.184);}
-      const parseMacro=(...keys)=>{for(const k of keys){if(n[k]!=null&&n[k]!=='')return+(parseFloat(n[k])||0).toFixed(1);}return 0;};
-      const prot=parseMacro('proteins_100g','proteins','protein_100g','protein');
-      const fat=parseMacro('fat_100g','fat','lipids_100g','total-fat_100g');
-      const carb=parseMacro('carbohydrates_100g','carbohydrates','carbs_100g','sugars_100g');
-      const name=p.product_name_ru||p.product_name||'Неизвестный продукт';
-      _scFoundProduct={name,brand:p.brands||'',kcal:Math.round(isNaN(kcal)?0:kcal),prot:isNaN(prot)?0:prot,fat:isNaN(fat)?0:fat,carb:isNaN(carb)?0:carb};
-      // Show "готово" progress
-      _setScanProgress(3);
-      // Show success overlay with product name
-      const subEl=$('sc-success-product-name');
-      if(subEl)subEl.textContent=name;
-      const ov=$('sc-success-overlay');
-      if(ov)ov.classList.add('show');
-      // Hide hint
-      const hint=$('sc-hint-area');if(hint)hint.style.opacity='0';
-      // Transition to step 2 after overlay shown
-      setTimeout(()=>{
-        if(ov)ov.classList.remove('show');
-        _showScanProductStep();
-      },1800);
-    }else{
-      _showScannerNotFound(barcode);
-    }
+    const p=data.product||data;
+    const attrs=p.attributes||p||{};
+    const name=(attrs.name_translations&&(attrs.name_translations.ru||attrs.name_translations.en))||attrs.name||p.name||'неизвестный продукт';
+    const brand=(attrs.brand_translations&&(attrs.brand_translations.ru||attrs.brand_translations.en))||attrs.brand||p.brand||'';
+    const n=attrs.nutriments||attrs.nutrients||attrs||{};
+    const parseN=(...keys)=>{for(const k of keys){const v=n[k];if(v!=null&&v!=='')return+(parseFloat(v)||0).toFixed(1);}return 0;};
+    let kcal=parseN('energy_kcal_100g','energy-kcal_100g','energy_kcal','calories_100g','calories','kcal_100g','energy_value');
+    if(!kcal){const kj=parseN('energy_kj_100g','energy-kj_100g','energy_kj','energy_100g');if(kj)kcal=+(parseFloat(kj)/4.184).toFixed(0);}
+    const prot=parseN('proteins_100g','protein_100g','protein','proteins');
+    const fat=parseN('fat_100g','fat','lipids_100g','total-fat_100g');
+    const carb=parseN('carbohydrates_100g','carbohydrates','carbs_100g');
+    if(!name&&kcal===0){_showScannerNotFound(barcode);return;}
+    _scFoundProduct={name,brand,kcal:Math.round(isNaN(kcal)?0:+kcal),prot:isNaN(+prot)?0:+prot,fat:isNaN(+fat)?0:+fat,carb:isNaN(+carb)?0:+carb};
+    _setScanProgress(3);
+    const subEl=$('sc-success-product-name');
+    if(subEl)subEl.textContent=name;
+    const ov=$('sc-success-overlay');
+    if(ov)ov.classList.add('show');
+    const hint=$('sc-hint-area');if(hint)hint.style.opacity='0';
+    setTimeout(()=>{
+      if(ov)ov.classList.remove('show');
+      _showScanProductStep();
+    },1800);
   }catch(e){_showScannerNotFound(barcode);}
 }
 
@@ -4150,16 +4146,20 @@ function _updateScCalc(){
 }
 
 function _showScannerNotFound(barcode){
-  T('sc-barcode-val',barcode);
-  const nf=$('scanner-not-found');if(nf)nf.style.display='';
-  const st=$('scanner-status');if(st)st.textContent='продукт не найден';
-  const vp=$('scanner-viewport');if(vp)vp.classList.remove('found');
-  _setScanProgress(1);
+  const st=$('scanner-status');if(st)st.textContent='не найдено';
+  const vp=$('scanner-viewport');if(vp){vp.classList.remove('found');vp.classList.add('not-found');}
+  tg?.HapticFeedback?.notificationOccurred('error');
+  navigator.vibrate?.([40,60,40]);
+  setTimeout(()=>{
+    const v=$('scanner-viewport');if(v)v.classList.remove('not-found');
+    const s=$('scanner-status');if(s)s.textContent='наведи на штрихкод';
+    _setScanProgress(1);
+    startScanner();
+  },800);
 }
 
 function scannerRetry(){
-  const nf=$('scanner-not-found');if(nf)nf.style.display='none';
-  const vp=$('scanner-viewport');if(vp)vp.classList.remove('found');
+  const vp=$('scanner-viewport');if(vp){vp.classList.remove('found');vp.classList.remove('not-found');}
   const ov=$('sc-success-overlay');if(ov)ov.classList.remove('show');
   const hint=$('sc-hint-area');if(hint)hint.style.opacity='1';
   _setScanStep(1);
