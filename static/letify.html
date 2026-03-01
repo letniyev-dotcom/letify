@@ -640,18 +640,86 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .m3-tog-lbl{flex:1;font-size:14px;font-weight:700}
 .tg-dark .m3-tog-row{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08)}
 
-/* ══ WEIGHT CHART push page ══ */
-.wchart-push-wrap{
-  width:100%;
-  overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:none;
-  padding-bottom:4px;
-  isolation:isolate;
-  transform:translateZ(0);
-  -webkit-transform:translateZ(0);
+/* ══ WEIGHT CHART push page v2 ══ */
+#pp-weight-chart{display:flex;flex-direction:column;overflow:hidden}
+#pp-weight-chart .pp-body{display:none}
+#wc-stat-list{flex-shrink:0;padding:10px 16px 0;display:flex;gap:8px}
+#wc-stat-list .sbox{flex:1;background:var(--bg2);border-radius:14px;padding:10px 8px;box-shadow:var(--sh);text-align:center}
+.tg-dark #wc-stat-list .sbox{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);box-shadow:none}
+#wc-stat-list .sv{font-size:17px;font-weight:900;margin-bottom:1px}
+#wc-stat-list .sl{font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.05em}
+
+/* chart stage */
+#wc-stage{flex:1;position:relative;min-height:0;overflow:hidden;background:#0E0B08}
+
+/* dot grid */
+.wc-dot-grid{
+  position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(circle,rgba(255,255,255,.04) 1px,transparent 1px);
+  background-size:22px 22px;
 }
-.wchart-push-wrap::-webkit-scrollbar{display:none}
+
+/* y-axis */
+.wc-yaxis{
+  position:absolute;left:0;top:0;bottom:0;width:48px;z-index:10;pointer-events:none;
+  background:linear-gradient(90deg,rgba(14,11,8,.96) 55%,transparent 100%);
+}
+.wc-ylabels{position:absolute;inset:0;transition:opacity .2s ease}
+.wc-ylabels.fading{opacity:0}
+.wc-ylbl{
+  position:absolute;right:0;width:100%;
+  font-size:11px;font-weight:700;color:rgba(255,160,50,.32);
+  text-align:right;padding-right:9px;line-height:1;transform:translateY(-50%);
+}
+
+/* scroll */
+.wc-scroll{
+  position:absolute;inset:0;overflow-x:auto;overflow-y:hidden;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  padding-left:48px;touch-action:pan-x;
+}
+.wc-scroll::-webkit-scrollbar{display:none}
+
+/* SVG */
+#wc-svg{transition:opacity .15s ease}
+#wc-svg.fading{opacity:0}
+
+/* tooltip */
+.wc-tt{
+  position:absolute;z-index:20;pointer-events:none;
+  opacity:0;transform:translateY(5px) scale(.94);
+  transition:opacity .16s ease,transform .18s cubic-bezier(.34,1.15,.64,1),left .04s linear,top .04s linear,bottom .04s linear;
+}
+.wc-tt.on{opacity:1;transform:translateY(0) scale(1)}
+.wc-tt-body{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(18,13,8,.97);
+  border:1px solid rgba(255,165,55,.2);border-radius:13px;
+  padding:9px 13px;
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  box-shadow:0 10px 32px rgba(0,0,0,.6);white-space:nowrap;
+}
+.wc-tt-date{font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,171,64,.5);flex-shrink:0}
+.wc-tt-sep{width:1px;height:18px;background:rgba(255,255,255,.1);flex-shrink:0}
+.wc-tt-val{font-size:18px;font-weight:900;letter-spacing:-.04em;color:#fff;line-height:1}
+.wc-tt-unit{font-size:11px;font-weight:700;color:rgba(255,255,255,.3);margin-left:2px}
+.wc-tt-delta{
+  display:inline-flex;align-items:center;gap:3px;
+  padding:3px 8px;border-radius:99px;font-size:10px;font-weight:800;flex-shrink:0;
+}
+.wc-tt-delta.neg{background:rgba(82,193,119,.14);color:#52C177}
+.wc-tt-delta.pos{background:rgba(244,92,92,.12);color:#F45C5C}
+.wc-tt-delta.zer{background:rgba(255,255,255,.07);color:rgba(255,255,255,.35)}
+
+/* zoom hint */
+.wc-zoom-hint{
+  position:absolute;bottom:12px;right:12px;z-index:20;
+  padding:4px 10px;border-radius:99px;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);
+  font-size:9px;font-weight:700;color:rgba(255,255,255,.28);
+  opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.wc-zoom-hint.show{opacity:1}
 
 /* ══ EMPTY ══ */
 .empty{text-align:center;padding:40px 20px;animation:empty-fadein .35s ease forwards}
@@ -2176,11 +2244,22 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
     <div><div class="pp-title">динамика веса</div><div class="pp-subtitle" id="wc-sub">история</div></div>
   </div>
-  <div class="pp-body" style="padding:12px 12px calc(var(--sb)+24px)">
-    <div class="wchart-push-wrap" id="wchart-container">
-      <div id="wchart-svg-wrap"></div>
+  <div id="wc-stat-list"></div>
+  <div id="wc-stage">
+    <div class="wc-dot-grid"></div>
+    <div class="wc-yaxis"><div class="wc-ylabels" id="wc-ylabels"></div></div>
+    <div class="wc-scroll" id="wc-scroll">
+      <svg id="wc-svg" style="display:block"></svg>
     </div>
-    <div style="margin-top:16px" id="wc-stat-list"></div>
+    <div class="wc-tt" id="wc-tt">
+      <div class="wc-tt-body">
+        <div class="wc-tt-date" id="wc-tt-date"></div>
+        <div class="wc-tt-sep"></div>
+        <div><span class="wc-tt-val" id="wc-tt-val">—</span><span class="wc-tt-unit">кг</span></div>
+        <div class="wc-tt-delta zer" id="wc-tt-delta"></div>
+      </div>
+    </div>
+    <div class="wc-zoom-hint" id="wc-zoom-hint"><span id="wc-zoom-txt">0%</span></div>
   </div>
 </div>
 
@@ -2680,8 +2759,7 @@ function popPage(doRender=true){
   if(curPushPage==='pp-goals')_saveGoalsSilent();
   if(curPushPage==='pp-scanner')stopScanner(false);  // keep stream alive — no permission dialog
   if(curPushPage==='pp-weight-chart'){
-    const wrap=document.getElementById('wchart-svg-wrap');
-    if(wrap)wrap.innerHTML='';
+    _wcCleanup();
   }
   const pp=document.getElementById(curPushPage);
   if(pp){
@@ -3459,112 +3537,340 @@ let _tt;
 function toast(msg){/* toasts disabled */}
 
 /* ══ WEIGHT CHART ══ */
-function drawWeightChart(data){
-  const wrap=document.getElementById('wchart-svg-wrap');
-  const container=document.getElementById('wchart-container');
-  if(!wrap||!container)return;
-  data=[...data].sort((a,b)=>(a.logged_at||'').localeCompare(b.logged_at||''));
-  if(!data||data.length<2){
-    wrap.innerHTML=`<div style="text-align:center;padding:48px 16px;color:var(--hint);font-size:13px;font-weight:700">нет данных для графика<br><span style="font-size:11px;opacity:.6">запиши хотя бы 2 записи веса</span></div>`;
-    return;
-  }
-  const byDate=new Map();
-  data.forEach(d=>byDate.set(d.logged_at,d));
-  data=[...byDate.values()].sort((a,b)=>a.logged_at.localeCompare(b.logged_at));
-  const n=data.length;
-  const containerW=container.clientWidth||320;
-  const minColW=56;
-  const W=Math.max(containerW-4,n*minColW+40);
-  const H=160,PAD={l:36,r:16,t:32,b:28};
-  const chartW=W-PAD.l-PAD.r,chartH=H-PAD.t-PAD.b;
-  const ws=data.map(d=>d.weight);
-  const rawMin=Math.min(...ws),rawMax=Math.max(...ws);
-  const span=rawMax-rawMin||0.5;
-  const mn=rawMin-span*0.2,mx=rawMax+span*0.2,rng=mx-mn;
-  const xStep=n>1?chartW/(n-1):0;
-  const pts=data.map((d,i)=>({x:PAD.l+i*xStep,y:PAD.t+chartH*(1-(d.weight-mn)/rng),w:d.weight,d:d.logged_at}));
-  const dark=document.body.classList.contains('tg-dark');
-  const accent='#FF6B35';
-  const hintC=dark?'rgba(255,255,255,0.3)':'rgba(0,0,0,0.28)';
-  const labelC=dark?'rgba(255,255,255,0.5)':'rgba(0,0,0,0.45)';
-  const bg2C=dark?'#181818':'#ffffff';
-  const gridC=dark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.06)';
-  function makePath(pts){
-    if(pts.length===1)return`M${pts[0].x},${pts[0].y}`;
-    let d=`M${pts[0].x},${pts[0].y}`;
-    for(let i=0;i<pts.length-1;i++){const cx=(pts[i].x+pts[i+1].x)/2;d+=` C${cx},${pts[i].y} ${cx},${pts[i+1].y} ${pts[i+1].x},${pts[i+1].y}`;}
-    return d;
-  }
-  const linePath=makePath(pts);
-  const fillPath=linePath+` L${pts[pts.length-1].x},${H-PAD.b+4} L${pts[0].x},${H-PAD.b+4} Z`;
-  const uid=Math.random().toString(36).slice(2,7);
-  const gradId='g'+uid,glowId='gw'+uid,clipId='cl'+uid;
-  const yLabels=[0.15,0.5,0.85].map(f=>{
-    const gy=PAD.t+chartH*f,val=mx-rng*f;
-    return`<text x="${PAD.l-4}" y="${gy+4}" text-anchor="end" font-family="Onest,sans-serif" font-size="8.5" font-weight="700" fill="${hintC}">${val.toFixed(1)}</text>
-    <line x1="${PAD.l}" y1="${gy}" x2="${W-PAD.r}" y2="${gy}" stroke="${gridC}" stroke-width="1" stroke-dasharray="3,3"/>`;
-  }).join('');
-  const lastIdx=pts.length-1;
-  const dotsHTML=pts.map((p,i)=>{
-    const isLast=i===lastIdx,r=isLast?5.5:3.5;
-    const lbX=Math.max(PAD.l+10,Math.min(W-PAD.r-10,p.x));
-    return`<circle cx="${p.x}" cy="${p.y}" r="${r}" fill="${accent}" opacity="${isLast?1:0.75}"/>
-    <circle cx="${p.x}" cy="${p.y}" r="${r-1.8}" fill="${bg2C}"/>
-    <text x="${lbX}" y="${p.y-9}" text-anchor="middle" font-family="Onest,sans-serif" font-size="${isLast?10:8.5}" font-weight="${isLast?900:700}" fill="${isLast?accent:labelC}">${p.w.toFixed(1)}</text>
-    <text x="${lbX}" y="${H-PAD.b+14}" text-anchor="middle" font-family="Onest,sans-serif" font-size="8" font-weight="600" fill="${hintC}">${fmtMD(p.d)}</text>`;
-  }).join('');
-  const lastPt=pts[lastIdx];
-  wrap.style.width=W+'px';wrap.style.minWidth=W+'px';wrap.style.display='block';
-  wrap.innerHTML=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="display:block;overflow:visible">
-  <defs>
-    <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="${accent}" stop-opacity="0.25"/>
-      <stop offset="100%" stop-color="${accent}" stop-opacity="0.02"/>
-    </linearGradient>
-    <filter id="${glowId}" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-    <clipPath id="${clipId}"><rect x="${PAD.l}" y="0" width="${chartW}" height="${H}"/></clipPath>
-  </defs>
-  ${yLabels}
-  <g clip-path="url(#${clipId})">
-    <path d="${fillPath}" fill="url(#${gradId})"/>
-    <path d="${linePath}" fill="none" stroke="${accent}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#${glowId})" opacity="0.5"/>
-    <path d="${linePath}" fill="none" stroke="${accent}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="${lastPt.x}" cy="${lastPt.y}" r="14" fill="${accent}" opacity="0.1">
-      <animate attributeName="r" values="10;16;10" dur="2.8s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values="0.1;0.04;0.1" dur="2.8s" repeatCount="indefinite"/>
-    </circle>
-  </g>
-  ${dotsHTML}
-</svg>`;
-  setTimeout(()=>{container.scrollLeft=container.scrollWidth;},60);
-}
+/* ══════════════════════════════════════
+   WEIGHT CHART — full-height, no tabs
+══════════════════════════════════════ */
+(function(){
+  const Y_W=48, PT_MIN=52, PT_MAX=180, N_GRID=5;
+  const PAD={l:16,r:28,t:40,b:36};
+  let _data=[], _pts=[], _svgW=1, _svgH=1;
+  let _activeI=-1;
+  let _ptSp=80;
+  let _period=null;
+  let _pinching=false, _ptSp0=80, _dist0=0;
+  let _anchorSvgX=0, _anchorViewX=0, _pendingOldW=1, _pendingPtSp=null;
+  let _rafId=null, _zoomTimer=null;
+  let _yDec=-1, _yFadeTimer=null;
+  let _scrollEl=null;
 
-function _populateWeightChart(){
-  const wl=gWL();
-  const data=wl.length>30?wl.slice(-30):wl;
-  const sub=document.getElementById('wc-sub');
-  if(sub)sub.textContent=data.length+' записей · последние '+Math.min(30,data.length)+' дней';
-  const statEl=document.getElementById('wc-stat-list');
-  if(statEl&&wl.length){
-    const cw=wl[wl.length-1].weight;
-    const sw=Math.max(...wl.map(d=>d.weight));
-    const best=Math.min(...wl.map(d=>d.weight));
-    const gw=gU().goal_weight;
-    statEl.innerHTML=`<div class="sb-row">
-      <div class="sbox"><div class="sv" style="color:var(--sun)">${cw.toFixed(1)}</div><div class="sl">сейчас кг</div></div>
-      <div class="sbox"><div class="sv" style="color:var(--red)">${sw.toFixed(1)}</div><div class="sl">макс кг</div></div>
-      <div class="sbox"><div class="sv" style="color:var(--green)">${best.toFixed(1)}</div><div class="sl">мин кг</div></div>
-      ${gw?`<div class="sbox"><div class="sv" style="color:var(--water)">${gw.toFixed(1)}</div><div class="sl">цель кг</div></div>`:''}
-    </div>`;
+  function _fmt(s){const d=new Date(s);const MNS=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];return d.getDate()+'\u00a0'+MNS[d.getMonth()];}
+
+  function _getRange(d){
+    const ws=d.map(v=>v.weight);
+    const rMn=Math.min(...ws),rMx=Math.max(...ws);
+    const sp=rMx-rMn||0.5;
+    const z=(_ptSp-PT_MIN)/(PT_MAX-PT_MIN);
+    const pad=0.22-z*0.18;
+    return{mn:rMn-sp*pad,mx:rMx+sp*pad};
   }
-  requestAnimationFrame(()=>requestAnimationFrame(()=>drawWeightChart(data)));
-}
+
+  function _smooth(arr){
+    if(!arr.length)return'';
+    if(arr.length===1)return`M${arr[0].x.toFixed(1)},${arr[0].y.toFixed(1)}`;
+    let p=`M${arr[0].x.toFixed(1)},${arr[0].y.toFixed(1)}`;
+    for(let i=0;i<arr.length-1;i++){
+      const cx=((arr[i].x+arr[i+1].x)/2).toFixed(1);
+      p+=` C${cx},${arr[i].y.toFixed(1)} ${cx},${arr[i+1].y.toFixed(1)} ${arr[i+1].x.toFixed(1)},${arr[i+1].y.toFixed(1)}`;
+    }
+    return p;
+  }
+
+  function _buildYLabels(mn,mx,H){
+    const el=document.getElementById('wc-ylabels');
+    if(!el)return;
+    const cH=H-PAD.t-PAD.b;
+    const range=mx-mn;
+    const roughStep=range/N_GRID;
+    const mag=Math.pow(10,Math.floor(Math.log10(roughStep||1)));
+    const step=mag*([1,2,5,10].find(m=>mag*m>=roughStep)||10);
+    const dec=step<1?1:0;
+    function rebuild(){
+      const labelMx=Math.floor(mx/step)*step;
+      const labelMn=Math.ceil(mn/step)*step;
+      let html='';
+      for(let v=labelMx;v>=labelMn-step*0.01;v-=step){
+        const y=(PAD.t+cH*(1-(v-mn)/range)).toFixed(1);
+        html+=`<div class="wc-ylbl" style="top:${y}px">${v.toFixed(dec)}</div>`;
+      }
+      el.innerHTML=html;
+    }
+    if(dec!==_yDec&&_yDec!==-1){
+      if(_yFadeTimer){clearTimeout(_yFadeTimer);_yFadeTimer=null;}
+      el.classList.add('fading');
+      _yFadeTimer=setTimeout(()=>{rebuild();el.classList.remove('fading');_yDec=dec;_yFadeTimer=null;},180);
+    } else {rebuild();_yDec=dec;}
+  }
+
+  function _draw(animate){
+    const stage=document.getElementById('wc-stage');
+    const scroll=document.getElementById('wc-scroll');
+    const svg=document.getElementById('wc-svg');
+    if(!stage||!scroll||!svg)return;
+    const d=_data, n=d.length;
+    if(!n){svg.innerHTML='';return;}
+    const H=stage.clientHeight||440;
+    const viewW=scroll.clientWidth-Y_W;
+    const W=Math.max(viewW+1,PAD.l+(n>1?(n-1)*_ptSp:_ptSp)+PAD.r);
+    _svgW=W;_svgH=H;
+    svg.setAttribute('width',W);svg.setAttribute('height',H);
+    svg.style.width=W+'px';svg.style.height=H+'px';
+    const cW=W-PAD.l-PAD.r,cH=H-PAD.t-PAD.b;
+    const {mn,mx}=_getRange(d);
+    const rng=mx-mn;
+    const xSt=n>1?cW/(n-1):cW/2;
+    _pts=d.map((e,i)=>({x:PAD.l+i*xSt,y:PAD.t+cH*(1-(e.weight-mn)/rng),w:e.weight,d:e.logged_at,prev:i>0?d[i-1].weight:null}));
+    _buildYLabels(mn,mx,H);
+    const uid='wc'+Math.random().toString(36).slice(2,6);
+    const line=_smooth(_pts);
+    // grid
+    let grid='';
+    for(let i=0;i<=N_GRID;i++){
+      const gy=(PAD.t+cH*(i/N_GRID)).toFixed(1);
+      grid+=`<line x1="${PAD.l}" y1="${gy}" x2="${(W-PAD.r).toFixed(0)}" y2="${gy}" stroke="rgba(255,200,80,.04)" stroke-width="1"/>`;
+    }
+    // goal marker
+    const gw=gU().goal_weight;
+    let goalM='';
+    if(gw&&gw>mn&&gw<mx){
+      const gy=(PAD.t+cH*(1-(gw-mn)/rng)).toFixed(1);
+      goalM=`<line x1="${PAD.l}" y1="${gy}" x2="${(W-PAD.r).toFixed(0)}" y2="${gy}" stroke="rgba(78,174,229,.3)" stroke-width="1.5" stroke-dasharray="4,7"/>
+      <text x="${(W-PAD.r-3).toFixed(0)}" y="${(parseFloat(gy)-6).toFixed(0)}" text-anchor="end" font-family="Onest,sans-serif" font-size="10" font-weight="800" fill="rgba(78,174,229,.4)">цель ${gw}</text>`;
+    }
+    // x date labels
+    let xlabs='';
+    const step=Math.max(1,Math.ceil(n/6));
+    _pts.forEach((p,i)=>{
+      if(i%step===0||i===n-1)
+        xlabs+=`<text x="${p.x.toFixed(1)}" y="${(H-PAD.b+20).toFixed(0)}" text-anchor="middle" font-family="Onest,sans-serif" font-size="10" font-weight="700" fill="rgba(255,175,60,.22)">${_fmt(p.d)}</text>`;
+    });
+    // dots
+    const lastIdx=n-1;
+    let dotsHTML='';
+    _pts.forEach((p,i)=>{
+      const isL=i===lastIdx,r=isL?7:5;
+      dotsHTML+=`<g class="wcdg" data-i="${i}" style="touch-action:none;cursor:pointer">
+        <circle cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="22" fill="transparent" class="wcdhit"/>
+        <circle class="wcdring" cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="0" fill="none" stroke="rgba(255,171,64,.38)" stroke-width="1.5" opacity="0" style="transition:r .2s cubic-bezier(.34,1.3,.64,1),opacity .18s"/>
+        <circle class="wcdcore" cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="${r}" fill="${isL?'#FFAB40':'rgba(255,171,64,.72)'}" style="transition:r .16s cubic-bezier(.34,1.2,.64,1),fill .14s"/>
+        <circle class="wcdhle" cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="${isL?4:2.8}" fill="#0E0B08" pointer-events="none" style="transition:r .16s cubic-bezier(.34,1.2,.64,1)"/>
+      </g>`;
+    });
+    // pulse on last dot
+    const lp=_pts[lastIdx];
+    const pulse=`<circle cx="${lp.x.toFixed(2)}" cy="${lp.y.toFixed(2)}" r="8" fill="#FF7025" opacity="0" pointer-events="none">
+      <animate attributeName="r" values="7;22;7" dur="4s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.14;0.01;0.14" dur="4s" repeatCount="indefinite"/>
+    </circle>`;
+    const animStyle=animate?`<style>.wcla-${uid}{stroke-dasharray:6000;stroke-dashoffset:6000;animation:wcli .85s cubic-bezier(.4,0,.2,1) forwards .04s}@keyframes wcli{to{stroke-dashoffset:0}}</style>`:'';
+    svg.innerHTML=`<defs>
+      <linearGradient id="wclg${uid}" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#FF5015"/>
+        <stop offset="50%" stop-color="#FF7828"/>
+        <stop offset="100%" stop-color="#FFAB40"/>
+      </linearGradient>
+      <filter id="wcgf${uid}" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="wccp${uid}">
+        <rect x="${PAD.l-2}" y="0" width="${(cW+PAD.r+4).toFixed(0)}" height="${H}"/>
+      </clipPath>
+      ${animStyle}
+    </defs>
+    ${grid}${goalM}
+    <g clip-path="url(#wccp${uid})">
+      <path class="${animate?'wcla-'+uid:''}" d="${line}" fill="none" stroke="#FF6820" stroke-width="10" stroke-linecap="round" filter="url(#wcgf${uid})" opacity=".2"/>
+      <path class="${animate?'wcla-'+uid:''}" d="${line}" fill="none" stroke="url(#wclg${uid})" stroke-width="2.5" stroke-linecap="round"/>
+      ${pulse}
+    </g>
+    ${dotsHTML}${xlabs}`;
+    _bindDots();
+    if(animate)setTimeout(()=>scroll.scrollLeft=scroll.scrollWidth,40);
+  }
+
+  function _refreshDots(ai){
+    const svg=document.getElementById('wc-svg');if(!svg)return;
+    const n=_pts.length;
+    svg.querySelectorAll('.wcdg').forEach((g,i)=>{
+      const isL=i===n-1,isA=i===ai,bR=isL?7:5;
+      const core=g.querySelector('.wcdcore');
+      const ring=g.querySelector('.wcdring');
+      const hole=g.querySelector('.wcdhle');
+      if(isA){
+        core.setAttribute('r',bR+3.5);core.setAttribute('fill','#FFD060');
+        ring.setAttribute('r',bR+10);ring.setAttribute('opacity','.32');
+        hole.setAttribute('r',bR+1.5);
+      } else {
+        core.setAttribute('r',bR);core.setAttribute('fill',isL?'#FFAB40':'rgba(255,171,64,.72)');
+        ring.setAttribute('r','0');ring.setAttribute('opacity','0');
+        hole.setAttribute('r',isL?'4':'2.8');
+      }
+    });
+  }
+
+  function _activate(i){
+    if(i<0||i>=_pts.length||i===_activeI)return;
+    _activeI=i;
+    const pt=_pts[i],e=_data[i];
+    const delta=e.prev!==null?+(e.weight-e.prev).toFixed(1):null;
+    _refreshDots(i);
+    const scroll=document.getElementById('wc-scroll');
+    const stage=document.getElementById('wc-stage');
+    if(!scroll||!stage)return;
+    const dotX=Y_W+pt.x-scroll.scrollLeft;
+    const dotY=pt.y;
+    // fill tooltip
+    const td=document.getElementById('wc-tt-date');
+    if(td)td.textContent=_fmt(e.logged_at);
+    const tv=document.getElementById('wc-tt-val');
+    if(tv)tv.textContent=e.weight.toFixed(1);
+    const dEl=document.getElementById('wc-tt-delta');
+    if(dEl){
+      if(delta===null){dEl.className='wc-tt-delta zer';dEl.textContent='старт';}
+      else if(delta<0){dEl.className='wc-tt-delta neg';dEl.innerHTML=`<svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 20l-8-8h5V4h6v8h5z"/></svg>${delta}`;}
+      else if(delta>0){dEl.className='wc-tt-delta pos';dEl.innerHTML=`<svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l8 8h-5v8H9v-8H4z"/></svg>+${delta}`;}
+      else{dEl.className='wc-tt-delta zer';dEl.textContent='=';}
+    }
+    const tt=document.getElementById('wc-tt');if(!tt)return;
+    const sW=stage.clientWidth,sH=stage.clientHeight;
+    const TT_W=238,GAP=12;
+    let left=dotX-TT_W/2;
+    left=Math.max(Y_W+4,Math.min(sW-TT_W-4,left));
+    tt.style.left=left+'px';
+    if(dotY>sH*0.4){tt.style.top='auto';tt.style.bottom=(sH-dotY+GAP)+'px';}
+    else{tt.style.bottom='auto';tt.style.top=(dotY+GAP)+'px';}
+    tt.classList.add('on');
+  }
+
+  function _hideTT(){
+    _activeI=-1;
+    const tt=document.getElementById('wc-tt');if(tt)tt.classList.remove('on');
+    _refreshDots(-1);
+  }
+
+  function _bindDots(){
+    const svg=document.getElementById('wc-svg');if(!svg)return;
+    svg.querySelectorAll('.wcdg').forEach(g=>{
+      g.addEventListener('pointerdown',ev=>{
+        ev.preventDefault();ev.stopPropagation();
+        g.setPointerCapture(ev.pointerId);
+        _activate(parseInt(g.dataset.i));
+        const onMove=mv=>{
+          const r=svg.getBoundingClientRect();
+          const svgX=mv.clientX-r.left;
+          let best=-1,bestD=Infinity;
+          _pts.forEach((p,i)=>{const d=Math.abs(p.x-svgX);if(d<bestD){bestD=d;best=i;}});
+          if(best>=0&&best!==_activeI)_activate(best);
+        };
+        g.addEventListener('pointermove',onMove,{passive:true});
+        g.addEventListener('pointerup',()=>g.removeEventListener('pointermove',onMove),{once:true});
+        g.addEventListener('pointercancel',()=>g.removeEventListener('pointermove',onMove),{once:true});
+      },{passive:false});
+    });
+  }
+
+  function _showZoom(){
+    const hint=document.getElementById('wc-zoom-hint');if(!hint)return;
+    const pct=Math.round((_ptSp-PT_MIN)/(PT_MAX-PT_MIN)*100);
+    const zt=document.getElementById('wc-zoom-txt');if(zt)zt.textContent=pct+'%';
+    hint.classList.add('show');
+    clearTimeout(_zoomTimer);
+    _zoomTimer=setTimeout(()=>hint.classList.remove('show'),1200);
+  }
+
+  window.drawWeightChart=function(){};// no-op legacy
+
+  window._wcInit=function(){
+    _scrollEl=document.getElementById('wc-scroll');
+    if(!_scrollEl)return;
+    // hide TT on empty tap
+    _scrollEl.addEventListener('pointerdown',e=>{if(!e.target.closest('.wcdg'))_hideTT();},{passive:true});
+    // update TT on scroll
+    _scrollEl.addEventListener('scroll',()=>{
+      if(_activeI<0)return;
+      const ai=_activeI;_activeI=-2;_activate(ai);
+    },{passive:true});
+    // pinch zoom
+    _scrollEl.addEventListener('touchstart',e=>{
+      if(e.touches.length===2){
+        _pinching=true;_ptSp0=_ptSp;
+        _dist0=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+        const midX=(e.touches[0].clientX+e.touches[1].clientX)/2;
+        const r=_scrollEl.getBoundingClientRect();
+        _anchorViewX=midX-r.left-Y_W;
+        _anchorSvgX=_scrollEl.scrollLeft+_anchorViewX;
+        _pendingOldW=_svgW;
+      }
+    },{passive:true});
+    _scrollEl.addEventListener('touchmove',e=>{
+      if(!_pinching||e.touches.length<2)return;
+      e.preventDefault();
+      const dist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+      const newPtSp=Math.max(PT_MIN,Math.min(PT_MAX,Math.round(_ptSp0*(dist/_dist0))));
+      if(newPtSp===_ptSp)return;
+      _pendingPtSp=newPtSp;
+      if(_rafId)cancelAnimationFrame(_rafId);
+      _rafId=requestAnimationFrame(()=>{
+        _rafId=null;
+        const oldW=_pendingOldW;
+        _ptSp=_pendingPtSp;
+        _draw(false);
+        const newScroll=_anchorSvgX*(_svgW/oldW)-_anchorViewX;
+        _scrollEl.scrollLeft=Math.max(0,Math.min(newScroll,_svgW-(_scrollEl.clientWidth-Y_W)));
+        _pendingOldW=_svgW;
+        _showZoom();
+      });
+    },{passive:false});
+    _scrollEl.addEventListener('touchend',e=>{
+      if(e.touches.length<2){_pinching=false;if(_rafId){cancelAnimationFrame(_rafId);_rafId=null;}}
+    },{passive:true});
+  };
+
+  window._wcCleanup=function(){
+    _activeI=-1;_yDec=-1;_pinching=false;
+    if(_rafId){cancelAnimationFrame(_rafId);_rafId=null;}
+    if(_yFadeTimer){clearTimeout(_yFadeTimer);_yFadeTimer=null;}
+    const svg=document.getElementById('wc-svg');if(svg)svg.innerHTML='';
+    const yl=document.getElementById('wc-ylabels');if(yl)yl.innerHTML='';
+    const tt=document.getElementById('wc-tt');if(tt)tt.classList.remove('on');
+    _scrollEl=null;
+  };
+
+  window._populateWeightChart=function(){
+    const wl=gWL();
+    // deduplicate by date, sort, take all
+    const byDate=new Map();
+    wl.forEach(e=>byDate.set(e.logged_at,e));
+    _data=[...byDate.values()].sort((a,b)=>a.logged_at.localeCompare(b.logged_at));
+    // subtitle
+    const sub=document.getElementById('wc-sub');
+    if(sub)sub.textContent=_data.length+'\u00a0записей';
+    // stats
+    const statEl=document.getElementById('wc-stat-list');
+    if(statEl&&_data.length){
+      const cw=_data[_data.length-1].weight;
+      const best=Math.min(..._data.map(d=>d.weight));
+      const worst=Math.max(..._data.map(d=>d.weight));
+      const gw=gU().goal_weight;
+      const diff=+(_data[_data.length-1].weight-_data[0].weight).toFixed(1);
+      statEl.innerHTML=`
+        <div class="sbox"><div class="sv" style="color:var(--sun)">${cw.toFixed(1)}</div><div class="sl">сейчас</div></div>
+        <div class="sbox"><div class="sv" style="color:${diff<=0?'var(--green)':'var(--red)'}">${diff<=0?'':'+'}&thinsp;${diff}</div><div class="sl">за период</div></div>
+        <div class="sbox"><div class="sv" style="color:var(--green)">${best.toFixed(1)}</div><div class="sl">мин</div></div>
+        ${gw?`<div class="sbox"><div class="sv" style="color:var(--water)">${gw.toFixed?gw.toFixed(1):gw}</div><div class="sl">цель</div></div>`:''}
+      `;
+    } else if(statEl){statEl.innerHTML='';}
+    _ptSp=80;_yDec=-1;_activeI=-1;_pinching=false;
+    requestAnimationFrame(()=>{
+      _wcInit();
+      _draw(true);
+    });
+  };
+})();
 
 /* ══ RENDERS ══ */
 function getHomeDesign(){return lsGet('home_design')||'classic';}
+
 function setHomeDesign(d){
   lsSet('home_design',d);
   ['classic','linear','bento'].forEach(k=>{
