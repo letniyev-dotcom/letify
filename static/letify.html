@@ -79,7 +79,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   opacity:0;pointer-events:none;
   transform:translateY(6px);
   transition:opacity .2s ease,transform .2s ease;
-  contain:content;
+  contain:strict;
   will-change:opacity,transform;
 }
 .page::-webkit-scrollbar{display:none}
@@ -243,7 +243,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 /* ══ PROGRESS BAR ══ */
 .pb{height:6px;background:rgba(0,0,0,.06);border-radius:99px;overflow:hidden;margin-top:10px}
-.pbf{height:100%;border-radius:99px;transition:width .7s cubic-bezier(.25,.46,.45,.94)}
+.pbf{height:100%;border-radius:99px;transition:width .7s cubic-bezier(.25,.46,.45,.94);will-change:width}
 .pb-sun{background:linear-gradient(90deg,var(--sun),var(--sun2))}
 .pb-water{background:var(--water)}
 .pb-sleep{background:var(--sleep)}
@@ -283,7 +283,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .hl-metric-of{font-size:11px;font-weight:700;color:var(--hint);margin-left:2px}
 .hl-bar{height:6px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden}
 .tg-dark .hl-bar{background:rgba(255,255,255,.1)}
-.hl-bar-fill{height:100%;border-radius:99px;transition:width .7s cubic-bezier(.25,.46,.45,.94)}
+.hl-bar-fill{height:100%;border-radius:99px;transition:width .7s cubic-bezier(.25,.46,.45,.94);will-change:width}
 .hl-metric-footer{display:flex;justify-content:space-between;align-items:center;margin-top:5px;min-height:16px}
 .hl-macros{display:flex;gap:5px}
 .hl-mac{font-size:9px;font-weight:800}
@@ -494,60 +494,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 /* ══ AVATAR ══ */
 .pav{width:64px;height:64px;border-radius:20px;background:linear-gradient(135deg,var(--sun),var(--sun2));display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;color:#fff;box-shadow:0 5px 18px rgba(255,107,53,.25);flex-shrink:0}
 
-/* ══ PROFILE — ACCENT CARDS ══ */
-.pf-hero{
-  margin:6px 14px 0;
-  background:linear-gradient(135deg,rgba(255,107,53,.1),rgba(255,171,64,.05));
-  border:1px solid rgba(255,107,53,.18);border-radius:22px;
-  padding:16px;display:flex;align-items:center;gap:14px;
-  position:relative;overflow:hidden;
-}
-.tg-dark .pf-hero{background:linear-gradient(135deg,rgba(255,107,53,.12),rgba(255,171,64,.06))}
-.pf-hero::before{content:'';position:absolute;right:-18px;top:-18px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(255,107,53,.12),transparent 70%);pointer-events:none}
-.pf-av2{width:54px;height:54px;border-radius:18px;background:linear-gradient(135deg,var(--sun),var(--sun2));display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;flex-shrink:0;box-shadow:0 4px 14px rgba(255,107,53,.3)}
-.pf-hero-info{flex:1;min-width:0}
-.pf-hero-name{font-size:17px;font-weight:900;letter-spacing:-.025em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pf-hero-meta{font-size:11px;font-weight:600;color:var(--hint);margin-top:2px}
-.pf-hero-edit{width:32px;height:32px;border-radius:10px;background:rgba(255,255,255,.1);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:rgba(255,255,255,.6);transition:background .12s}
-.pf-hero-edit:active{background:rgba(255,255,255,.18)}
-.tg-dark .pf-hero-edit{background:rgba(255,255,255,.1)}
-
-.pf-bmi-chips{display:flex;gap:6px;margin:10px 14px 0}
-.pf-bmi-chip{flex:1;padding:10px 8px;border-radius:14px;background:var(--bg2);border:1px solid var(--brd);text-align:center}
-.tg-dark .pf-bmi-chip{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.08)}
-.pf-bmi-v{font-size:16px;font-weight:900;letter-spacing:-.03em;line-height:1}
-.pf-bmi-l{font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
-
-.pf-sec{font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--hint);padding:14px 16px 8px}
-.pf-group{margin:0 14px;border-radius:18px;overflow:hidden;border:1px solid var(--brd);background:var(--bg2)}
-.tg-dark .pf-group{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.07)}
-.pf-row{
-  display:flex;align-items:center;gap:12px;padding:13px 14px;
-  border-bottom:1px solid var(--brd);cursor:pointer;
-  transition:background .12s;
-}
-.tg-dark .pf-row{border-bottom-color:rgba(255,255,255,.06)}
-.pf-row:last-child{border-bottom:none}
-.pf-row:active{background:rgba(0,0,0,.04)}
-.tg-dark .pf-row:active{background:rgba(255,255,255,.08)}
-.pf-row-ic{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.pf-row-body{flex:1;min-width:0}
-.pf-row-lbl{font-size:14px;font-weight:800;letter-spacing:-.01em}
-.pf-row-val{font-size:11px;font-weight:600;color:var(--hint);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pf-row-chev{color:var(--hint);opacity:.4;flex-shrink:0}
-
-.pf-danger{
-  margin:10px 14px 0;padding:14px;
-  border-radius:16px;background:rgba(244,92,92,.07);border:1px solid rgba(244,92,92,.14);
-  display:flex;align-items:center;gap:10px;cursor:pointer;
-  transition:background .12s;
-}
-.pf-danger:active{background:rgba(244,92,92,.14)}
-.pf-danger-ic{width:34px;height:34px;border-radius:11px;background:rgba(244,92,92,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.pf-danger-lbl{font-size:14px;font-weight:800;color:var(--red)}
-.pf-danger-sub{font-size:11px;font-weight:600;color:rgba(244,92,92,.5);margin-top:1px}
-.pf-ver{text-align:center;padding:14px 0 6px;font-size:11px;font-weight:600;color:var(--hint);opacity:.5}
-
 /* ══ TOAST ══ */
 /* toast removed */
 
@@ -613,97 +559,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   -webkit-transform:translateZ(0);
 }
 .wchart-push-wrap::-webkit-scrollbar{display:none}
-
-/* ══ WATER RING ══ */
-.wtr-ring-wrap{
-  position:relative;display:flex;align-items:center;justify-content:center;
-  padding:8px 0 4px;
-  isolation:isolate;
-}
-.wtr-ring-svg{overflow:visible;will-change:transform;transform:translateZ(0)}
-/* drop-shadow moved to wrapper to avoid re-filter on every dashoffset frame */
-.wtr-ring-wrap::before{content:'';position:absolute;inset:8px 0 4px;border-radius:50%;pointer-events:none;}
-.wtr-ring-center{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  text-align:center;pointer-events:none;
-}
-.wtr-ring-num{font-size:42px;font-weight:900;color:var(--water);letter-spacing:-.04em;line-height:1}
-.wtr-ring-unit{font-size:12px;font-weight:700;color:var(--hint);margin-top:2px}
-.wtr-ring-of{font-size:11px;font-weight:600;color:var(--hint);margin-top:2px}
-.wtr-chips{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
-.wtr-chip{
-  padding:14px 8px;border-radius:14px;font-size:14px;font-weight:800;
-  background:rgba(78,174,229,.1);border:1.5px solid rgba(78,174,229,.18);
-  color:var(--water);cursor:pointer;text-align:center;font-family:inherit;
-  transition:transform .1s,background .1s,opacity .1s;
-}
-.wtr-chip:active{transform:scale(.96);opacity:.75}
-.tg-dark .wtr-chip{background:rgba(78,174,229,.15);border-color:rgba(78,174,229,.25);color:#7ecef5}
-
-/* ══ WEIGHT TERMINAL CHART ══ */
-.wterm-ticker-row{display:flex;align-items:baseline;gap:8px;padding:0}
-.wterm-ticker{font-size:11px;font-weight:700;color:var(--hint);letter-spacing:.08em;text-transform:uppercase}
-.wterm-price{font-size:28px;font-weight:900;letter-spacing:-.04em;color:var(--text)}
-.wterm-change{font-size:13px;font-weight:800;padding:2px 8px;border-radius:6px}
-.wterm-change.up{color:var(--green);background:rgba(82,193,119,.12)}
-.wterm-change.down{color:var(--red);background:rgba(244,92,92,.12)}
-.wterm-change.neutral{color:var(--hint);background:var(--bg3)}
-.wterm-meta-row{
-  font-size:10px;font-weight:700;color:var(--hint);
-  padding:2px 16px 0;letter-spacing:.04em;text-transform:uppercase;
-}
-.wterm-periods{
-  display:flex;gap:5px;
-  padding:10px 14px 10px;
-  border-bottom:1px solid var(--brd);
-}
-.wterm-pbtn{
-  flex:1;padding:7px 4px;background:transparent;border:none;border-radius:99px;
-  font-size:11px;font-weight:800;color:var(--hint);font-family:inherit;cursor:pointer;
-  letter-spacing:.04em;transition:color .15s,background .15s,box-shadow .15s;
-}
-.wterm-pbtn.on{
-  color:var(--green);
-  background:rgba(82,193,119,.14);
-  box-shadow:0 1px 6px rgba(82,193,119,.15);
-}
-.tg-dark .wterm-pbtn.on{background:rgba(82,193,119,.2)}
-.wterm-pbtn:active{opacity:.7;transition:opacity .07s}
-.wterm-chart-wrap{position:relative;background:transparent;margin:0;overflow:hidden}
-.wterm-tooltip{
-  position:absolute;background:var(--bg2);border:1px solid var(--brd);
-  border-radius:10px;padding:7px 12px;pointer-events:none;font-size:12px;font-weight:700;
-  white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.25);transform:translateX(-50%);
-  top:8px;z-index:10;display:none;
-}
-.tg-dark .wterm-tooltip{background:#1C1C1C;border-color:rgba(255,255,255,.12)}
-.wterm-tt-val{color:var(--text);font-size:14px;font-weight:900}
-.wterm-tt-date{color:var(--hint);font-size:10px;margin-top:1px}
-.wterm-stats{
-  display:flex;gap:0;border-top:1px solid var(--brd);border-bottom:1px solid var(--brd);
-}
-.wterm-stat{flex:1;padding:10px 8px;border-right:1px solid var(--brd);text-align:center}
-.wterm-stat:last-child{border-right:none}
-.wterm-stat-lbl{font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.06em}
-.wterm-stat-val{font-size:15px;font-weight:900;margin-top:2px;letter-spacing:-.02em}
-.wterm-log{padding:12px 16px 4px;padding-bottom:calc(var(--sb)+32px)}
-.wterm-log-hdr{font-size:10px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
-.wterm-log-scroll{
-  background:var(--bg2);border:1px solid var(--brd);border-radius:16px;overflow:hidden;
-}
-.tg-dark .wterm-log-scroll{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.08)}
-.wterm-log-item{
-  display:flex;align-items:center;padding:10px 14px;
-  border-bottom:1px solid var(--brd);font-size:12px;font-weight:700;
-}
-.tg-dark .wterm-log-item{border-bottom-color:rgba(255,255,255,.06)}
-.wterm-log-item:last-child{border-bottom:none}
-.wterm-log-date{color:var(--hint);width:56px;flex-shrink:0;font-size:11px;font-weight:600}
-.wterm-log-val{color:var(--text);margin-right:auto;font-size:13px;font-weight:800}
-.wterm-log-d{font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;flex-shrink:0}
-.wterm-log-d.neg{color:var(--green);background:rgba(82,193,119,.12)}
-.wterm-log-d.pos{color:var(--red);background:rgba(244,92,92,.12)}
-.wterm-log-d.zero{color:var(--hint);background:var(--bg3)}
 
 /* ══ EMPTY ══ */
 .empty{text-align:center;padding:40px 20px;animation:empty-fadein .35s ease forwards}
@@ -1307,7 +1162,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .cal-meal-kcal{font-size:15px;font-weight:900}
 .cal-meal-cnt{font-size:10px;font-weight:700;color:var(--hint)}
 .cal-meal-pbar{height:3px;background:rgba(255,255,255,.09);border-radius:99px;overflow:hidden}
-.cal-meal-pbar-f{height:100%;border-radius:99px;transition:width .7s cubic-bezier(.25,.46,.45,.94)}
+.cal-meal-pbar-f{height:100%;border-radius:99px;transition:width .7s cubic-bezier(.25,.46,.45,.94);will-change:width}
 </style>
 </head>
 <body>
@@ -1336,54 +1191,27 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
 </div>
 <div id="tt-water-body">
-<div class="pad" style="padding-top:4px">
-
-  <!-- Arc Ring -->
-  <div class="wtr-ring-wrap">
-    <svg class="wtr-ring-svg" width="210" height="210" viewBox="0 0 210 210">
-      <defs>
-        <linearGradient id="wtr-grad" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="#4EAEE5"/>
-          <stop offset="100%" stop-color="#6DC8F5"/>
-        </linearGradient>
-      </defs>
-      <!-- track -->
-      <circle cx="105" cy="105" r="86" fill="none" stroke="rgba(78,174,229,.12)" stroke-width="11"/>
-      <!-- progress -->
-      <circle id="wtr-arc" cx="105" cy="105" r="86" fill="none" stroke="url(#wtr-grad)" stroke-width="11"
-        stroke-linecap="round" stroke-dasharray="540.4" stroke-dashoffset="540.4"
-        transform="rotate(-90 105 105)"
-        style="transition:stroke-dashoffset .85s cubic-bezier(.25,.46,.45,.94);will-change:stroke-dashoffset"/>
-    </svg>
-    <div class="wtr-ring-center">
-      <div id="w-total" class="wtr-ring-num">0</div>
-      <div class="wtr-ring-unit">мл выпито</div>
-      <div class="wtr-ring-of">из <span id="w-goal">2000</span> мл</div>
-    </div>
-  </div>
-
-  <!-- Streak -->
-  <div id="w-streak" style="text-align:center;margin-bottom:14px;min-height:26px"></div>
-
-  <!-- Chips -->
-  <div class="wtr-chips">
-    <button class="wtr-chip" onclick="addW(150)">+150 мл</button>
-    <button class="wtr-chip" onclick="addW(200)">+200 мл</button>
-    <button class="wtr-chip" onclick="addW(250)">+250 мл</button>
-    <button class="wtr-chip" onclick="addW(500)">+500 мл</button>
-  </div>
-
-  <!-- Undo -->
-  <button class="btn btn-g" style="width:100%;padding:12px;margin-top:4px" onclick="undoW()">отменить последнее</button>
-
-  <!-- History -->
-  <div style="margin-top:8px">
-    <button class="btn btn-g" style="width:100%;padding:12px;display:flex;align-items:center;justify-content:space-between" onclick="pushPage('pp-water-hist')">
-      <span style="font-size:13px;font-weight:800">история сегодня</span>
-      <span style="color:var(--hint);font-size:13px">→</span>
-    </button>
-  </div>
-
+<div class="pad">
+<div class="card" style="margin-top:4px;text-align:center;padding:20px 16px;background:linear-gradient(160deg,rgba(78,174,229,.06),rgba(78,174,229,.02))">
+  <div class="t5">выпито сегодня</div>
+  <div style="font-size:52px;font-weight:900;color:var(--water);line-height:1.1;margin:6px 0" id="w-total">0</div>
+  <div class="t5">из <span id="w-goal">2000</span> мл</div>
+  <div class="pb" style="margin-top:12px;height:7px"><div class="pbf pb-water" id="w-bar" style="width:0%"></div></div>
+  <div id="w-streak" style="margin-top:9px"></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px">
+  <button class="btn btn-water" onclick="addW(150)">+150 мл</button>
+  <button class="btn btn-water" onclick="addW(200)">+200 мл</button>
+  <button class="btn btn-water" onclick="addW(250)">+250 мл</button>
+  <button class="btn btn-water" onclick="addW(500)">+500 мл</button>
+</div>
+<button class="btn btn-g" style="margin-top:7px;width:100%;padding:12px" onclick="undoW()">отменить последнее</button>
+<div style="margin-top:10px">
+  <button class="btn btn-g" style="width:100%;padding:12px;display:flex;align-items:center;justify-content:space-between" onclick="pushPage('pp-water-hist')">
+    <span style="font-size:13px;font-weight:800">история сегодня</span>
+    <span style="color:var(--hint);font-size:13px">→</span>
+  </button>
+</div>
 </div>
 </div>
 <div id="tt-cal-body" style="display:none">
@@ -1543,109 +1371,67 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 </div>
 
 <!-- ══ PROFILE ══ -->
-<div class="page" id="p-profile" style="overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none">
-
-<!-- Hero Card -->
-<div class="pf-hero" onclick="pushPage('pp-pdata')">
-  <div class="pf-av2" id="pf-av">?</div>
-  <div class="pf-hero-info">
-    <div class="pf-hero-name" id="pf-name">—</div>
-    <div class="pf-hero-meta" id="pf-meta">—</div>
-  </div>
-  <button class="pf-hero-edit" onclick="event.stopPropagation();pushPage('pp-pdata')">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-  </button>
-</div>
-
-<!-- BMI Chips -->
-<div class="pf-bmi-chips" id="pf-bmi-row" style="display:none">
-  <div class="pf-bmi-chip">
-    <div class="pf-bmi-v" style="color:var(--water)" id="pf-bmi">—</div>
-    <div class="pf-bmi-l">ИМТ</div>
-  </div>
-  <div class="pf-bmi-chip">
-    <div class="pf-bmi-v" style="color:var(--green)" id="pf-ideal">—</div>
-    <div class="pf-bmi-l">идеал кг</div>
-  </div>
-  <div class="pf-bmi-chip">
-    <div class="pf-bmi-v" style="color:var(--sun)" id="pf-bmr">—</div>
-    <div class="pf-bmi-l">BMR</div>
-  </div>
-</div>
-
-<!-- Настройки -->
-<div class="pf-sec">настройки</div>
-<div class="pf-group">
-  <div class="pf-row" onclick="pushPage('pp-pdata')">
-    <div class="pf-row-ic" style="background:rgba(255,107,53,.13)">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-    </div>
-    <div class="pf-row-body">
-      <div class="pf-row-lbl">данные профиля</div>
-      <div class="pf-row-val" id="pf-pname">—</div>
-    </div>
-    <div class="pf-row-chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
-  </div>
-  <div class="pf-row" onclick="pushPage('pp-start-weight')">
-    <div class="pf-row-ic" style="background:rgba(82,193,119,.13)">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#52C177" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 7l7-4 7 4"/><path d="M3 17h6a3 3 0 0 0 0-6H3l3 3-3 3zm18 0h-6a3 3 0 0 1 0-6h6l-3 3 3 3z"/></svg>
-    </div>
-    <div class="pf-row-body">
-      <div class="pf-row-lbl">начальный вес и цель</div>
-      <div class="pf-row-val" id="pf-sw">—</div>
-    </div>
-    <div class="pf-row-chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
-  </div>
-  <div class="pf-row" onclick="pushPage('pp-goals')">
-    <div class="pf-row-ic" style="background:rgba(78,174,229,.13)">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#4EAEE5" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg>
-    </div>
-    <div class="pf-row-body">
-      <div class="pf-row-lbl">мои цели</div>
-      <div class="pf-row-val" id="pf-gw">—</div>
-    </div>
-    <div class="pf-row-chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
-  </div>
-  <div class="pf-row" onclick="pushPage('pp-plan-settings')">
-    <div class="pf-row-ic" style="background:rgba(139,127,212,.13)">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#8B7FD4" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/></svg>
-    </div>
-    <div class="pf-row-body">
-      <div class="pf-row-lbl">план по дням</div>
-      <div class="pf-row-val">расписание</div>
-    </div>
-    <div class="pf-row-chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
-  </div>
-</div>
-
-<!-- Персонализация -->
-<div class="pf-sec">персонализация</div>
-<div class="pf-group">
-  <div class="pf-row" onclick="pushPage('pp-design')">
-    <div class="pf-row-ic" style="background:rgba(255,171,64,.13)">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#FFAB40" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".7" fill="#FFAB40"/><circle cx="17.5" cy="10.5" r=".7" fill="#FFAB40"/><circle cx="8.5" cy="7.5" r=".7" fill="#FFAB40"/><circle cx="6.5" cy="12.5" r=".7" fill="#FFAB40"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
-    </div>
-    <div class="pf-row-body">
-      <div class="pf-row-lbl">оформление</div>
-      <div class="pf-row-val" id="pf-design-val">классический</div>
-    </div>
-    <div class="pf-row-chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
-  </div>
-</div>
-
-<!-- Danger -->
-<div class="pf-danger" onclick="resetAllData()">
-  <div class="pf-danger-ic">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F45C5C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-  </div>
+<div class="page" id="p-profile">
+<div style="display:flex;align-items:center;gap:14px;padding:4px 16px 0">
+  <div class="pav" id="pf-av">А</div>
   <div>
-    <div class="pf-danger-lbl">сбросить все данные</div>
-    <div class="pf-danger-sub">удалит все записи и настройки навсегда</div>
+    <div class="t2" id="pf-name">—</div>
+    <div class="t5" id="pf-meta" style="margin-top:2px">—</div>
   </div>
 </div>
-
-<div class="pf-ver">letify · ver 4.3</div>
-<div style="height:calc(var(--page-bot)+8px)"></div>
+<div id="pf-bmi-row" style="margin-top:12px;padding:0 16px;display:none">
+  <div class="sb-row">
+    <div class="sbox"><div class="sv" id="pf-bmi">—</div><div class="sl">ИМТ</div></div>
+    <div class="sbox"><div class="sv" id="pf-ideal">—</div><div class="sl">идеал кг</div></div>
+    <div class="sbox"><div class="sv" id="pf-bmr">—</div><div class="sl">BMR</div></div>
+  </div>
+</div>
+<div class="sec">настройки</div>
+<div class="pad">
+<div class="card">
+  <div class="lt" onclick="pushPage('pp-pdata')">
+    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
+    <span class="lt-lbl">данные профиля</span>
+    <span class="lt-val" id="pf-pname">—</span>
+    <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+  </div>
+  <div class="lt" onclick="pushPage('pp-start-weight')">
+    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 7l7-4 7 4M3 17h6a3 3 0 0 0 0-6H3l3 3-3 3zm18 0h-6a3 3 0 0 1 0-6h6l-3 3 3 3z"/></svg></div>
+    <span class="lt-lbl">начальный вес и цель</span>
+    <span class="lt-val" id="pf-sw">—</span>
+    <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+  </div>
+  <div class="lt" style="padding-bottom:0;border:none" onclick="pushPage('pp-goals')">
+    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg></div>
+    <span class="lt-lbl">мои цели</span>
+    <span class="lt-val"><span id="pf-gw">—</span></span>
+    <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+  </div>
+  <div class="lt" style="padding-bottom:0;border:none" onclick="pushPage('pp-plan-settings')">
+    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/></svg></div>
+    <span class="lt-lbl">план по дням</span>
+    <span class="lt-val">расписание</span>
+    <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+  </div>
+</div>
+</div>
+<div class="sec">персонализация</div>
+<div class="pad">
+<div class="card">
+  <div class="lt" style="padding-bottom:0;border:none" onclick="pushPage('pp-design')">
+    <div class="lt-ic" style="background:rgba(255,107,53,.1)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--sun)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="var(--sun)"/><circle cx="17.5" cy="10.5" r=".5" fill="var(--sun)"/><circle cx="8.5" cy="7.5" r=".5" fill="var(--sun)"/><circle cx="6.5" cy="12.5" r=".5" fill="var(--sun)"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg></div>
+    <span class="lt-lbl">оформление</span>
+    <span class="lt-val" id="pf-design-val">классический</span>
+    <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+  </div>
+</div>
+</div>
+<div class="pad" style="margin-top:10px">
+  <button class="btn btn-danger" style="width:100%;padding:14px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="resetAllData()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> сбросить все данные</button>
+  <div class="clear-hint">удалит все записи и настройки навсегда</div>
+</div>
+<div style="text-align:center;padding:16px 0 8px"><div class="t5">letify · ver 4.3</div></div>
+<div style="height:8px"></div>
 </div>
 
 </div><!-- /pages -->
@@ -2273,32 +2059,15 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 <!-- PP: График веса -->
 <div class="push-page" id="pp-weight-chart">
-  <div class="pp-hdr" style="border-bottom:1px solid var(--brd)">
+  <div class="pp-hdr">
     <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
-    <div class="wterm-ticker-row" style="flex:1">
-      <span class="wterm-ticker">BW/КГ</span>
-      <span class="wterm-price" id="wterm-price">—</span>
-      <span class="wterm-change neutral" id="wterm-change">—</span>
+    <div><div class="pp-title">динамика веса</div><div class="pp-subtitle" id="wc-sub">история</div></div>
+  </div>
+  <div class="pp-body" style="padding:12px 12px calc(var(--sb)+24px)">
+    <div class="wchart-push-wrap" id="wchart-container">
+      <div id="wchart-svg-wrap"></div>
     </div>
-  </div>
-  <div style="flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:calc(var(--sb)+24px)">
-  <div class="wterm-meta-row" id="wterm-meta">— · —</div>
-  <div class="wterm-periods" id="wterm-periods">
-    <button class="wterm-pbtn on" onclick="wtermSetPeriod(this,'7d')">7Д</button>
-    <button class="wterm-pbtn" onclick="wtermSetPeriod(this,'1m')">1М</button>
-    <button class="wterm-pbtn" onclick="wtermSetPeriod(this,'3m')">3М</button>
-    <button class="wterm-pbtn" onclick="wtermSetPeriod(this,'6m')">6М</button>
-    <button class="wterm-pbtn" onclick="wtermSetPeriod(this,'all')">ВСЁ</button>
-  </div>
-  <div class="wterm-chart-wrap">
-    <canvas id="wterm-canvas" height="200" style="width:100%;display:block"></canvas>
-    <div class="wterm-tooltip" id="wterm-tooltip">
-      <div class="wterm-tt-val" id="wterm-tt-val"></div>
-      <div class="wterm-tt-date" id="wterm-tt-date"></div>
-    </div>
-  </div>
-  <div class="wterm-stats" id="wterm-stats"></div>
-  <div class="wterm-log" id="wterm-log"></div>
+    <div style="margin-top:16px" id="wc-stat-list"></div>
   </div>
 </div>
 
@@ -2716,7 +2485,6 @@ async function apiPost(path,body){
 async function reload(){
   await loadData();
   if(_completingMap.size>0)return;
-  // only re-render the currently active tab — others re-render when navigated to
   const rMap={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};
   rMap[curTab]?.();
 }
@@ -2743,19 +2511,10 @@ const totalCal=()=>Object.values(gCD()).reduce((a,b)=>a+b,0);
 const TABS=['home','track','plan','sleep','progress','profile'];
 let curTab='home',trackTab='water',navHidden=false;
 
-// render gate: prevents multiple renders in same animation frame
-let _renderPending={};
-function _scheduleRender(key,fn){
-  if(_renderPending[key])return;
-  _renderPending[key]=true;
-  requestAnimationFrame(()=>{delete _renderPending[key];fn();});
-}
-
 function navTo(tab){
   if(tab===curTab&&!curPushPage)return;
   if(curPushPage)popPage(false);
   curTab=tab;
-  // v11 pattern: swap .active first, then render (render during transition — smooth)
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const pg=document.getElementById('p-'+tab);
   if(pg){pg.scrollTop=0;pg.classList.add('active');}
@@ -2782,33 +2541,31 @@ function pushPage(id){
   document.getElementById('nav')?.classList.add('gone');
   const pp=document.getElementById(id);
   if(pp){
-    // v11 pattern: force layout → add .open immediately → animation starts at 0ms
+    // force layout flush перед добавлением класса чтобы transition сработал чисто
     pp.getBoundingClientRect();
-    pp.classList.remove('closing');
     pp.classList.add('open');
     pp.scrollTop=0;
     const body=pp.querySelector('.pp-body');if(body)body.scrollTop=0;
   }
-  // populate in rAF — content appears during animation, doesn't block first frame
+  // defer populate чтобы не блокировать первый кадр анимации
   requestAnimationFrame(()=>_populatePP(id));
   if(tg?.BackButton){
     tg.BackButton.show();
+    // каждой странице — свой обработчик назад
     const handler=id==='pp-cal'?calBackOrPop:id==='pp-scanner'?scannerBack:popPage;
     tg.BackButton.onClick(handler);
-    tg.BackButton._letifyHandler=handler;
+    tg.BackButton._letifyHandler=handler; // сохраняем чтобы снять в popPage
   }
   tg?.HapticFeedback?.impactOccurred('light');
 }
-
 function popPage(doRender=true){
   if(!curPushPage)return;
   if(curPushPage==='pp-pdata')_saveProfileSilent();
   if(curPushPage==='pp-goals')_saveGoalsSilent();
   if(curPushPage==='pp-scanner')stopScanner(false);  // keep stream alive — no permission dialog
   if(curPushPage==='pp-weight-chart'){
-    const canvas=document.getElementById('wterm-canvas');
-    if(canvas){canvas._wdata=null;canvas._wvals=null;}
-    const tt=document.getElementById('wterm-tooltip');if(tt)tt.style.display='none';
+    const wrap=document.getElementById('wchart-svg-wrap');
+    if(wrap)wrap.innerHTML='';
   }
   const pp=document.getElementById(curPushPage);
   if(pp){
@@ -2828,11 +2585,7 @@ function popPage(doRender=true){
       if(tg.BackButton._letifyHandler){tg.BackButton.offClick(tg.BackButton._letifyHandler);tg.BackButton._letifyHandler=null;}
       tg.BackButton.offClick(popPage);
     }
-    if(doRender&&_completingMap.size===0){
-      const renders={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};
-      // render immediately — underlying page is already visible, content should be fresh
-      renders[curTab]?.();
-    }
+    if(doRender&&_completingMap.size===0){const renders={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};renders[curTab]?.();}
   }
 }
 
@@ -2884,14 +2637,13 @@ function _populatePP(id){
   }
   if(id==='pp-history'){
     const wl=gWL(),wd=gWD(),acts=gActs();
-    // Show all entries, newest first, with correct delta vs previous entry
-    const sorted=[...wl].sort((a,b)=>b.id-a.id).slice(0,50);
+    const l20=[...wl].reverse().slice(0,20);
     const HH=(eid,v)=>{const el=document.getElementById(eid);if(el)el.innerHTML=v;};
     const emptyMsg='<div style="text-align:center;padding:16px;color:var(--hint);font-size:13px;font-weight:600">нет записей</div>';
-    HH('pp-whist',sorted.length?sorted.map((e,i)=>{
-      const prev=sorted[i+1];
-      const diff=prev?+(e.weight-prev.weight).toFixed(1):null;
-      const diffHtml=diff!=null&&diff!==0?('<div class="hr-diff '+(diff<0?'d-neg':'d-pos')+'">'+(diff>0?'+':'')+diff+'</div>'):'<div class="hr-diff" style="color:var(--hint)">—</div>';
+    HH('pp-whist',l20.length?l20.map((e,i)=>{
+      const prev=l20[i+1];
+      const diff=prev?+(e.weight-prev.weight).toFixed(1):0;
+      const diffHtml=diff?('<div class="hr-diff '+(diff<0?'d-neg':'d-pos')+'">'+(diff>0?'+':'')+diff+'</div>'):'<div></div>';
       return '<div class="hr"><div class="hr-d">'+fmtD(e.logged_at)+'</div><div class="hr-v">'+e.weight.toFixed(1)+' кг</div>'+diffHtml+'</div>';
     }).join(''):emptyMsg);
     T('pp-at-t',acts.filter(a=>a.completed).length);
@@ -3461,7 +3213,6 @@ function resetAllData(){
     weight_log:[],sleep_log:[],acts_today:[],products:[]
   };
   _completingMap.clear();
-  // guards in each render fn skip hidden tabs automatically
   renderHome();renderProfile();renderProgress();renderPlan();renderSleep();renderTrack(trackTab);
   toast('все данные сброшены');
   tg?.HapticFeedback?.notificationOccurred('warning');
@@ -3591,278 +3342,109 @@ function fmtRange(a){
 let _tt;
 function toast(msg){/* toasts disabled */}
 
-/* ══ WEIGHT TERMINAL CHART ══ */
-let _wtermAllData=[], _wtermGoal=0, _wtermPeriod='1m';
-
-function _wtermFilterData(all, period){
-  if(!all||!all.length)return[];
-  const sorted=[...all].sort((a,b)=>a.logged_at.localeCompare(b.logged_at));
-  if(period==='all')return sorted;
-  const cutoffs={'7d':7,'1m':31,'3m':92,'6m':183};
-  const days=cutoffs[period]||31;
-  const cut=new Date(Date.now()-days*86400000);
-  const cutStr=cut.toISOString().slice(0,10);
-  const filtered=sorted.filter(d=>d.logged_at>=cutStr);
-  return filtered.length?filtered:sorted.slice(-1); // show at least last point
-}
-
-function drawTerminalWeightChart(canvasId, data, goalVal){
-  const canvas=document.getElementById(canvasId);
-  if(!canvas)return;
-  const ctx=canvas.getContext('2d');
-  const PR=window.devicePixelRatio||1;
-  const W=canvas.parentElement.clientWidth||document.documentElement.clientWidth||360;
-  const H=200;
-  // Only resize canvas if dimensions actually changed (avoids flash)
-  const newW=Math.round(W*PR), newH=Math.round(H*PR);
-  if(canvas.width!==newW||canvas.height!==newH){
-    canvas.width=newW; canvas.height=newH;
-    canvas.style.width=W+'px'; canvas.style.height=H+'px';
-  }
-  ctx.setTransform(PR,0,0,PR,0,0);
-  ctx.clearRect(0,0,W,H);
-
-  const dark=document.body.classList.contains('tg-dark');
-  const gridC=dark?'rgba(255,255,255,.05)':'rgba(0,0,0,.05)';
-  const labelC=dark?'rgba(255,255,255,.22)':'rgba(0,0,0,.28)';
-  const bgC=dark?'#111':'#fff';
-  const GREEN='#52C177';
-
-  const pad={top:18,right:44,bottom:26,left:40};
-  const cw=W-pad.left-pad.right, ch=H-pad.top-pad.bottom;
-
-  const vals=data.map(d=>d.weight||d.v||0).filter(v=>v>0);
-  if(!vals.length){ctx.setLineDash([]);return;}
-  const goalInRange=goalVal&&goalVal>0;
-  let minV=Math.min(...vals,(goalInRange?goalVal:Infinity))-0.5;
-  let maxV=Math.max(...vals,(goalInRange?goalVal:-Infinity))+0.5;
-  if(!isFinite(minV))minV=0;if(!isFinite(maxV))maxV=100;
-  const range=maxV-minV||1;
-  const px=i=>pad.left+(i/(data.length-1||1))*cw;
-  const py=v=>pad.top+(1-(v-minV)/range)*ch;
-
-  // Grid
-  for(let i=0;i<=4;i++){
-    const gv=minV+(range*i/4);
-    const gy=py(gv);
-    ctx.beginPath(); ctx.strokeStyle=gridC; ctx.lineWidth=1; ctx.setLineDash([]);
-    ctx.moveTo(pad.left,gy); ctx.lineTo(W-pad.right,gy); ctx.stroke();
-    ctx.fillStyle=labelC; ctx.font=`700 9px Onest,sans-serif`; ctx.textAlign='right';
-    ctx.fillText(gv.toFixed(1),pad.left-4,gy+3);
-  }
-
-  // Goal dashed line
-  if(goalVal&&goalVal>0){
-    const gy=Math.max(pad.top+2,Math.min(H-pad.bottom-2,py(goalVal)));
-    ctx.beginPath();ctx.strokeStyle='rgba(255,107,53,.4)';ctx.lineWidth=1.5;ctx.setLineDash([5,4]);
-    ctx.moveTo(pad.left,gy);ctx.lineTo(W-pad.right,gy);ctx.stroke();ctx.setLineDash([]);
-    ctx.fillStyle='rgba(255,107,53,.75)';ctx.font=`700 9px Onest`;ctx.textAlign='left';
-    ctx.fillText('цель',W-pad.right+3,gy+3);
-  }
-
-  if(data.length<2){
-    // Single point - draw a dot and horizontal line
-    if(data.length===1){
-      const v=vals[0];
-      const cy=H/2;
-      ctx.beginPath();ctx.strokeStyle='rgba(82,193,119,.15)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
-      ctx.moveTo(pad.left,cy);ctx.lineTo(W-pad.right,cy);ctx.stroke();ctx.setLineDash([]);
-      ctx.beginPath();ctx.arc(pad.left+cw/2,cy,5,0,Math.PI*2);
-      ctx.fillStyle='#52C177';ctx.fill();
-      ctx.beginPath();ctx.arc(pad.left+cw/2,cy,5,0,Math.PI*2);
-      ctx.strokeStyle=bgC;ctx.lineWidth=2;ctx.stroke();
-      ctx.fillStyle='rgba(82,193,119,.85)';ctx.font=`700 9px Onest,sans-serif`;ctx.textAlign='left';
-      ctx.fillText(v.toFixed(1)+' кг',W-pad.right+3,cy+3);
-    }
-    ctx.setLineDash([]);
-    canvas._wdata=data;canvas._wvals=vals;canvas._wpad=pad;canvas._wcw=cw;canvas._wch=ch;canvas._wrange={minV,maxV,range};
+/* ══ WEIGHT CHART ══ */
+function drawWeightChart(data){
+  const wrap=document.getElementById('wchart-svg-wrap');
+  const container=document.getElementById('wchart-container');
+  if(!wrap||!container)return;
+  data=[...data].sort((a,b)=>(a.logged_at||'').localeCompare(b.logged_at||''));
+  if(!data||data.length<2){
+    wrap.innerHTML=`<div style="text-align:center;padding:48px 16px;color:var(--hint);font-size:13px;font-weight:700">нет данных для графика<br><span style="font-size:11px;opacity:.6">запиши хотя бы 2 записи веса</span></div>`;
     return;
   }
-
-  // Area gradient
-  const grad=ctx.createLinearGradient(0,pad.top,0,H-pad.bottom);
-  grad.addColorStop(0,'rgba(82,193,119,.22)'); grad.addColorStop(1,'rgba(82,193,119,.0)');
-  ctx.beginPath();
-  ctx.moveTo(px(0),py(vals[0]));
-  for(let i=1;i<data.length;i++){
-    const x0=px(i-1),y0=py(vals[i-1]),x1=px(i),y1=py(vals[i]),cpx=(x0+x1)/2;
-    ctx.bezierCurveTo(cpx,y0,cpx,y1,x1,y1);
+  const byDate=new Map();
+  data.forEach(d=>byDate.set(d.logged_at,d));
+  data=[...byDate.values()].sort((a,b)=>a.logged_at.localeCompare(b.logged_at));
+  const n=data.length;
+  const containerW=container.clientWidth||320;
+  const minColW=56;
+  const W=Math.max(containerW-4,n*minColW+40);
+  const H=160,PAD={l:36,r:16,t:32,b:28};
+  const chartW=W-PAD.l-PAD.r,chartH=H-PAD.t-PAD.b;
+  const ws=data.map(d=>d.weight);
+  const rawMin=Math.min(...ws),rawMax=Math.max(...ws);
+  const span=rawMax-rawMin||0.5;
+  const mn=rawMin-span*0.2,mx=rawMax+span*0.2,rng=mx-mn;
+  const xStep=n>1?chartW/(n-1):0;
+  const pts=data.map((d,i)=>({x:PAD.l+i*xStep,y:PAD.t+chartH*(1-(d.weight-mn)/rng),w:d.weight,d:d.logged_at}));
+  const dark=document.body.classList.contains('tg-dark');
+  const accent='#FF6B35';
+  const hintC=dark?'rgba(255,255,255,0.3)':'rgba(0,0,0,0.28)';
+  const labelC=dark?'rgba(255,255,255,0.5)':'rgba(0,0,0,0.45)';
+  const bg2C=dark?'#181818':'#ffffff';
+  const gridC=dark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.06)';
+  function makePath(pts){
+    if(pts.length===1)return`M${pts[0].x},${pts[0].y}`;
+    let d=`M${pts[0].x},${pts[0].y}`;
+    for(let i=0;i<pts.length-1;i++){const cx=(pts[i].x+pts[i+1].x)/2;d+=` C${cx},${pts[i].y} ${cx},${pts[i+1].y} ${pts[i+1].x},${pts[i+1].y}`;}
+    return d;
   }
-  ctx.lineTo(px(data.length-1),H-pad.bottom);
-  ctx.lineTo(pad.left,H-pad.bottom);
-  ctx.closePath(); ctx.fillStyle=grad; ctx.fill();
-
-  // Line
-  ctx.beginPath(); ctx.strokeStyle=GREEN; ctx.lineWidth=2.5; ctx.lineJoin='round'; ctx.lineCap='round'; ctx.setLineDash([]);
-  ctx.moveTo(px(0),py(vals[0]));
-  for(let i=1;i<data.length;i++){
-    const x0=px(i-1),y0=py(vals[i-1]),x1=px(i),y1=py(vals[i]),cpx=(x0+x1)/2;
-    ctx.bezierCurveTo(cpx,y0,cpx,y1,x1,y1);
-  }
-  ctx.stroke();
-
-  // Current value horizontal line
-  const lastX=px(data.length-1),lastY=py(vals[vals.length-1]);
-  ctx.beginPath(); ctx.strokeStyle='rgba(82,193,119,.22)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
-  ctx.moveTo(pad.left,lastY); ctx.lineTo(W-pad.right,lastY); ctx.stroke(); ctx.setLineDash([]);
-  ctx.fillStyle='rgba(82,193,119,.85)'; ctx.font=`700 9px Onest,sans-serif`; ctx.textAlign='left';
-  ctx.fillText(vals[vals.length-1].toFixed(1),W-pad.right+3,lastY+3);
-
-  // Dots
-  data.forEach((d,i)=>{
-    const isLast=i===data.length-1;
-    const x=px(i),y=py(vals[i]),r=isLast?5:3;
-    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
-    ctx.fillStyle=isLast?GREEN:GREEN+'90'; ctx.fill();
-    if(isLast){
-      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
-      ctx.strokeStyle=bgC; ctx.lineWidth=2; ctx.stroke();
-    }
-  });
-
-  // X labels
-  ctx.fillStyle=labelC; ctx.font=`600 9px Onest,sans-serif`; ctx.textAlign='center';
-  const step=Math.max(1,Math.floor(data.length/5));
-  data.forEach((d,i)=>{
-    if(i%step===0||i===data.length-1){
-      ctx.fillText(_wtermFmtDate(d.logged_at||d.d||''),px(i),H-pad.bottom+14);
-    }
-  });
-
-  // Store for crosshair
-  canvas._wdata=data; canvas._wvals=vals; canvas._wpad=pad; canvas._wcw=cw; canvas._wch=ch; canvas._wrange={minV,maxV,range};
-}
-
-function _wtermFmtDate(s){
-  if(!s)return'';
-  if(s.includes('-')){const p=s.split('-');return p[2]+'.'+p[1];}
-  return s;
-}
-
-function _wtermInitCrosshair(){
-  const canvas=document.getElementById('wterm-canvas');
-  const tooltip=document.getElementById('wterm-tooltip');
-  if(!canvas||!tooltip)return;
-
-  function handleMove(cx,cy){
-    const d=canvas._wdata;if(!d||!d.length)return;
-    const rect=canvas.getBoundingClientRect();
-    const x=cx-rect.left;
-    const {_wpad:p,_wcw:cw,_wvals:vals}=canvas;
-    if(!p)return;
-    const idx=Math.round((x-p.left)/cw*(d.length-1));
-    const ci=Math.max(0,Math.min(d.length-1,idx));
-    const item=d[ci];
-    document.getElementById('wterm-tt-val').textContent=(vals[ci]||0).toFixed(1)+' кг';
-    document.getElementById('wterm-tt-date').textContent=_wtermFmtDate(item.logged_at||item.d||'');
-    const dotX=p.left+(ci/(d.length-1||1))*cw;
-    const lim=Math.min(Math.max(dotX,60),(canvas.offsetWidth||300)-60);
-    tooltip.style.left=lim+'px';tooltip.style.display='block';
-  }
-
-  canvas.addEventListener('mousemove',e=>handleMove(e.clientX,e.clientY));
-  canvas.addEventListener('touchmove',e=>{e.preventDefault();handleMove(e.touches[0].clientX,e.touches[0].clientY);},{passive:false});
-  canvas.addEventListener('mouseleave',()=>tooltip.style.display='none');
-  canvas.addEventListener('touchend',()=>setTimeout(()=>tooltip.style.display='none',1500));
-}
-
-function wtermSetPeriod(btn,period){
-  if(_wtermPeriod===period)return;
-  document.querySelectorAll('.wterm-pbtn').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  _wtermPeriod=period;
-  const filtered=_wtermFilterData(_wtermAllData,period);
-  requestAnimationFrame(()=>drawTerminalWeightChart('wterm-canvas',filtered,_wtermGoal));
-}
-
-function _wtermRenderLog(all){
-  const logEl=document.getElementById('wterm-log');
-  if(!logEl)return;
-  if(!all||!all.length){logEl.innerHTML='';return;}
-  // Show last 3 deduplicated entries (there's a full history page for more)
-  const sorted=[...all].sort((a,b)=>b.logged_at.localeCompare(a.logged_at));
-  const last3=sorted.slice(0,3);
-  let itemsHtml='';
-  last3.forEach((d,i)=>{
-    const prev=sorted[i+1];
-    const delta=prev?(+(d.weight-prev.weight).toFixed(1)):null;
-    const sign=delta===null?'zero':delta<0?'neg':delta>0?'pos':'zero';
-    const dStr=delta===null?'—':delta===0?'—':(delta>0?'+':'')+delta.toFixed(1);
-    const isToday=d.logged_at===new Date().toISOString().slice(0,10);
-    itemsHtml+=`<div class="wterm-log-item">
-      <span class="wterm-log-date">${_wtermFmtDate(d.logged_at)}<span style="margin-left:4px;font-size:9px;font-weight:800;color:${isToday?'var(--sun)':'transparent'}">${isToday?'сег':''}</span></span>
-      <span class="wterm-log-val">${(d.weight||0).toFixed(1)} кг</span>
-      <span class="wterm-log-d ${sign}">${dStr}</span>
-    </div>`;
-  });
-  const moreCount=all.length-3;
-  const moreHtml=moreCount>0?`<div style="text-align:center;padding:8px 0 2px;font-size:11px;font-weight:700;color:var(--hint)">+${moreCount} в истории →</div>`:'';
-  logEl.innerHTML=`<div class="wterm-log-hdr">ИСТОРИЯ</div><div class="wterm-log-scroll">${itemsHtml}</div>${moreHtml}`;
+  const linePath=makePath(pts);
+  const fillPath=linePath+` L${pts[pts.length-1].x},${H-PAD.b+4} L${pts[0].x},${H-PAD.b+4} Z`;
+  const uid=Math.random().toString(36).slice(2,7);
+  const gradId='g'+uid,glowId='gw'+uid,clipId='cl'+uid;
+  const yLabels=[0.15,0.5,0.85].map(f=>{
+    const gy=PAD.t+chartH*f,val=mx-rng*f;
+    return`<text x="${PAD.l-4}" y="${gy+4}" text-anchor="end" font-family="Onest,sans-serif" font-size="8.5" font-weight="700" fill="${hintC}">${val.toFixed(1)}</text>
+    <line x1="${PAD.l}" y1="${gy}" x2="${W-PAD.r}" y2="${gy}" stroke="${gridC}" stroke-width="1" stroke-dasharray="3,3"/>`;
+  }).join('');
+  const lastIdx=pts.length-1;
+  const dotsHTML=pts.map((p,i)=>{
+    const isLast=i===lastIdx,r=isLast?5.5:3.5;
+    const lbX=Math.max(PAD.l+10,Math.min(W-PAD.r-10,p.x));
+    return`<circle cx="${p.x}" cy="${p.y}" r="${r}" fill="${accent}" opacity="${isLast?1:0.75}"/>
+    <circle cx="${p.x}" cy="${p.y}" r="${r-1.8}" fill="${bg2C}"/>
+    <text x="${lbX}" y="${p.y-9}" text-anchor="middle" font-family="Onest,sans-serif" font-size="${isLast?10:8.5}" font-weight="${isLast?900:700}" fill="${isLast?accent:labelC}">${p.w.toFixed(1)}</text>
+    <text x="${lbX}" y="${H-PAD.b+14}" text-anchor="middle" font-family="Onest,sans-serif" font-size="8" font-weight="600" fill="${hintC}">${fmtMD(p.d)}</text>`;
+  }).join('');
+  const lastPt=pts[lastIdx];
+  wrap.style.width=W+'px';wrap.style.minWidth=W+'px';wrap.style.display='block';
+  wrap.innerHTML=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="display:block;overflow:visible">
+  <defs>
+    <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${accent}" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="${accent}" stop-opacity="0.02"/>
+    </linearGradient>
+    <filter id="${glowId}" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <clipPath id="${clipId}"><rect x="${PAD.l}" y="0" width="${chartW}" height="${H}"/></clipPath>
+  </defs>
+  ${yLabels}
+  <g clip-path="url(#${clipId})">
+    <path d="${fillPath}" fill="url(#${gradId})"/>
+    <path d="${linePath}" fill="none" stroke="${accent}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#${glowId})" opacity="0.5"/>
+    <path d="${linePath}" fill="none" stroke="${accent}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${lastPt.x}" cy="${lastPt.y}" r="14" fill="${accent}" opacity="0.1">
+      <animate attributeName="r" values="10;16;10" dur="2.8s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.1;0.04;0.1" dur="2.8s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  ${dotsHTML}
+</svg>`;
+  setTimeout(()=>{container.scrollLeft=container.scrollWidth;},60);
 }
 
 function _populateWeightChart(){
   const wl=gWL();
-  const u=gU();
-  // Deduplicate by date for chart (keep latest entry per date by id)
-  const byDate=new Map();
-  wl.forEach(d=>{
-    const ex=byDate.get(d.logged_at);
-    if(!ex||(d.id||0)>(ex.id||0))byDate.set(d.logged_at,d);
-  });
-  _wtermAllData=[...byDate.values()].sort((a,b)=>a.logged_at.localeCompare(b.logged_at));
-  _wtermGoal=u.goal_weight||0;
-  _wtermPeriod='7d';
-  // Reset period pills
-  document.querySelectorAll('.wterm-pbtn').forEach((b,i)=>b.classList.toggle('on',i===0));
-
-  // Header: current weight + total delta from first to last
-  const priceEl=document.getElementById('wterm-price');
-  const changeEl=document.getElementById('wterm-change');
-  const metaEl=document.getElementById('wterm-meta');
-
-  if(_wtermAllData.length){
-    const cw=_wtermAllData[_wtermAllData.length-1].weight;
-    const firstW=_wtermAllData[0].weight;
-    const delta=+(cw-firstW).toFixed(1);
-    if(priceEl)priceEl.textContent=cw.toFixed(1);
-    if(changeEl){
-      changeEl.textContent=delta===0?'0.0':(delta<0?'▼ ':delta>0?'▲ ':'')+Math.abs(delta).toFixed(1);
-      changeEl.className='wterm-change '+(delta<0?'up':delta>0?'down':'neutral');
-    }
-    if(metaEl)metaEl.textContent=`${_wtermAllData.length} ЗАПИСЕЙ`;
-  } else {
-    if(priceEl)priceEl.textContent='—';
-    if(changeEl){changeEl.textContent='—';changeEl.className='wterm-change neutral';}
-    if(metaEl)metaEl.textContent='НЕТ ДАННЫХ';
+  const data=wl.length>30?wl.slice(-30):wl;
+  const sub=document.getElementById('wc-sub');
+  if(sub)sub.textContent=data.length+' записей · последние '+Math.min(30,data.length)+' дней';
+  const statEl=document.getElementById('wc-stat-list');
+  if(statEl&&wl.length){
+    const cw=wl[wl.length-1].weight;
+    const sw=Math.max(...wl.map(d=>d.weight));
+    const best=Math.min(...wl.map(d=>d.weight));
+    const gw=gU().goal_weight;
+    statEl.innerHTML=`<div class="sb-row">
+      <div class="sbox"><div class="sv" style="color:var(--sun)">${cw.toFixed(1)}</div><div class="sl">сейчас кг</div></div>
+      <div class="sbox"><div class="sv" style="color:var(--red)">${sw.toFixed(1)}</div><div class="sl">макс кг</div></div>
+      <div class="sbox"><div class="sv" style="color:var(--green)">${best.toFixed(1)}</div><div class="sl">мин кг</div></div>
+      ${gw?`<div class="sbox"><div class="sv" style="color:var(--water)">${gw.toFixed(1)}</div><div class="sl">цель кг</div></div>`:''}
+    </div>`;
   }
-
-  // Stats bar
-  const statsEl=document.getElementById('wterm-stats');
-  if(statsEl&&_wtermAllData.length){
-    const cw=_wtermAllData[_wtermAllData.length-1].weight;
-    const maxW=Math.max(..._wtermAllData.map(d=>d.weight));
-    const minW=Math.min(..._wtermAllData.map(d=>d.weight));
-    const gw=_wtermGoal;
-    statsEl.innerHTML=`
-      <div class="wterm-stat"><div class="wterm-stat-lbl">сейчас</div><div class="wterm-stat-val" style="color:var(--sun)">${cw.toFixed(1)}</div></div>
-      <div class="wterm-stat"><div class="wterm-stat-lbl">макс</div><div class="wterm-stat-val" style="color:var(--red)">${maxW.toFixed(1)}</div></div>
-      <div class="wterm-stat"><div class="wterm-stat-lbl">мин</div><div class="wterm-stat-val" style="color:var(--green)">${minW.toFixed(1)}</div></div>
-      ${gw?`<div class="wterm-stat"><div class="wterm-stat-lbl">цель</div><div class="wterm-stat-val" style="color:var(--water)">${gw.toFixed(1)}</div></div>`:''}
-    `;
-  } else if(statsEl)statsEl.innerHTML='';
-
-  // Log: show last 3 entries
-  _wtermRenderLog(_wtermAllData);
-
-  // Chart: draw after open animation so canvas has correct dimensions
-  const filtered=_wtermFilterData(_wtermAllData,_wtermPeriod);
-  // Use 250ms timeout to draw after the push-page open transition (220ms) completes
-  setTimeout(()=>{
-    requestAnimationFrame(()=>{
-      drawTerminalWeightChart('wterm-canvas',filtered,_wtermGoal);
-      _wtermInitCrosshair();
-    });
-  }, 240);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>drawWeightChart(data)));
 }
 
 /* ══ RENDERS ══ */
@@ -3912,8 +3494,6 @@ function _homeData(){
 }
 
 function renderHome(){
-  // skip if home is not the current tab (will render on navTo)
-  if(curTab!=='home'&&!document.getElementById('p-home')?.classList.contains('active'))return;
   const d=getHomeDesign();
   const pg=$('p-home');
   if(pg){pg.classList.toggle('layout-linear',d==='linear');pg.classList.toggle('layout-bento',d==='bento');}
@@ -4130,19 +3710,12 @@ function renderHomeBento(){
 </div>`;
 }
 
-function renderTrack(tab){
-  if(curTab!=='track'&&!document.getElementById('p-track')?.classList.contains('active'))return;
-  if(tab==='water')renderWater();else renderCal();
-}
+function renderTrack(tab){if(tab==='water')renderWater();else renderCal();}
 function renderWater(){
   const u=gU(),wd=gWD();
-  const wt=wd.total||0,wg=u.water_goal||2000,wp=Math.min(1,wt/wg);
+  const wt=wd.total||0,wg=u.water_goal||2000,wp=Math.min(100,Math.round(wt/wg*100));
   T('w-total',wt);T('w-goal',wg);
-  const CIRC=540.4; // 2*pi*86
-  requestAnimationFrame(()=>{
-    const arc=document.getElementById('wtr-arc');
-    if(arc)arc.style.strokeDashoffset=(CIRC*(1-wp)).toFixed(2);
-  });
+  requestAnimationFrame(()=>{const b=$('w-bar');if(b)b.style.width=wp+'%';});
   const st=gStreak();
   H('w-streak',st>=2?`<div style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,107,53,.1);color:var(--sun);padding:4px 12px;border-radius:99px;font-size:11px;font-weight:800">🔥 ${st} дней подряд</div>`:'');
 }
@@ -4181,7 +3754,6 @@ function renderCal(){
 }
 
 function renderPlan(){
-  if(curTab!=='plan'&&!document.getElementById('p-plan')?.classList.contains('active'))return;
   if(_completingMap.size>0)return;
   const acts=gActs();const now=new Date();
   const mons=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
@@ -4223,7 +3795,6 @@ function renderPlan(){
 setInterval(()=>{if(curTab==='plan'&&_completingMap.size===0)renderPlan();},30000);
 
 function renderSleep(){
-  if(curTab!=='sleep'&&!document.getElementById('p-sleep')?.classList.contains('active'))return;
   const sl=gSL();
   if(sl.length){const last=sl[sl.length-1];T('sl-h',last.hours.toFixed(1));T('sl-qico',qIco(last.quality));H('sl-dots',Array.from({length:5},(_,i)=>`<div class="sqd${i<last.quality?' on':''}"></div>`).join(''));}
   else{T('sl-h','—');T('sl-qico','—');H('sl-dots','');}
@@ -4232,7 +3803,6 @@ function renderSleep(){
 }
 
 function renderProgress(){
-  if(curTab!=='progress'&&!document.getElementById('p-progress')?.classList.contains('active'))return;
   const u=gU(),wl=gWL(),sl=gSL(),wd=gWD();
   if(wl.length){
     const cw=wl[wl.length-1].weight;
@@ -4292,29 +3862,23 @@ function renderProgress(){
 }
 
 function renderProfile(){
-  if(curTab!=='profile'&&!document.getElementById('p-profile')?.classList.contains('active'))return;
   const u=gU(),wl=gWL();
-  // Hero avatar + name
   const av=$('pf-av');if(av)av.textContent=(u.name||'?').charAt(0).toUpperCase();
   T('pf-name',u.name||'—');
-  const meta=[];if(u.height)meta.push(u.height+' см');if(u.age)meta.push(u.age+' лет');if(u.gender)meta.push(u.gender==='male'?'♂':'♀');
-  T('pf-meta',meta.join(' · ')||'заполни профиль →');
-  // Row values
-  T('pf-gw',u.goal_weight?u.goal_weight+' кг · цель':'—');
-  T('pf-pname',u.name||'—');
+  const meta=[];if(u.age)meta.push(u.age+' лет');if(u.height)meta.push(u.height+' см');if(u.gender)meta.push(u.gender==='male'?'♂':'♀');
+  T('pf-meta',meta.join(' · ')||'—');
+  T('pf-gw',u.goal_weight?u.goal_weight+' кг':'—');T('pf-pname',u.name||'—');
   const swLabel=u.start_weight&&u.start_weight>0?(u.start_weight.toFixed(1)+' кг · '+(u.goal_type==='gain'?'набор':'похудение')):'не задан';
   T('pf-sw',swLabel);
   // Design label
   const labels={classic:'классический',linear:'линейный',bento:'бенто'};
   T('pf-design-val',labels[getHomeDesign()]||'классический');
-  // BMI chips
   const bmiRow=$('pf-bmi-row');
   if(u.height&&wl.length){
     const cw=wl[wl.length-1].weight,h2=u.height/100;
-    T('pf-bmi',+(cw/h2/h2).toFixed(1));
-    T('pf-ideal',+((u.height-100)*.9).toFixed(1));
+    T('pf-bmi',+(cw/h2/h2).toFixed(1));T('pf-ideal',+((u.height-100)*.9).toFixed(1));
     T('pf-bmr',Math.round(u.gender==='female'?10*cw+6.25*u.height-5*(u.age||25)-161:10*cw+6.25*u.height-5*(u.age||25)+5));
-    if(bmiRow)bmiRow.style.display='flex';
+    if(bmiRow)bmiRow.style.display='';
   }else if(bmiRow)bmiRow.style.display='none';
 }
 
@@ -4740,17 +4304,6 @@ document.addEventListener('DOMContentLoaded',async()=>{
   });
   // Предзагрузка камеры при первом касании кнопки сканера
   document.querySelector('[onclick*="pp-scanner"]')?.addEventListener('touchstart',_prewarmCamera,{once:true,passive:true});
-  // Redraw terminal weight chart on resize
-  let _wtermResizeTO=0;
-  window.addEventListener('resize',()=>{
-    clearTimeout(_wtermResizeTO);
-    _wtermResizeTO=setTimeout(()=>{
-      if(curPushPage==='pp-weight-chart'){
-        const filtered=_wtermFilterData(_wtermAllData,_wtermPeriod);
-        requestAnimationFrame(()=>drawTerminalWeightChart('wterm-canvas',filtered,_wtermGoal));
-      }
-    },120);
-  });
 });
 </script>
 </body>
