@@ -713,9 +713,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 /* ── Hint chip ── */
 .sc-hint-area{
-  position:absolute;bottom:0;left:0;right:0;
-  padding:22px 12px 14px;
-  background:linear-gradient(to top,rgba(0,0,0,.7),transparent);
+  position:absolute;bottom:14px;left:0;right:0;
   text-align:center;
   transition:opacity .3s ease;
   pointer-events:none;
@@ -945,9 +943,20 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .sc-confirm-name{font-size:17px;font-weight:900;letter-spacing:-.02em;line-height:1.2}
 .sc-confirm-kcal{font-size:13px;font-weight:700;color:var(--cal);margin-top:3px}
 
-/* ── sc-step ── */
-.sc-step{display:none}
-.sc-step.active{display:block}
+/* ── sc-step — плавный переход ── */
+.sc-step{
+  opacity:0;
+  transform:translateY(10px);
+  pointer-events:none;
+  position:absolute;left:0;right:0;
+  transition:opacity .28s ease, transform .28s ease;
+}
+.sc-step.active{
+  opacity:1;
+  transform:translateY(0);
+  pointer-events:all;
+  position:relative;
+}
 
 /* ── Existing items we patch ── */
 .kbzhu-row{display:flex;gap:6px;margin-top:10px}
@@ -3586,11 +3595,32 @@ function startPsLongPress(id,el){
 /* ══ SCANNER ══ */
 let _scanStream=null,_scanInterval=null,_scGrams=100,_scMealType='breakfast';
 let _scFoundProduct=null,_scStep=1;
+// Детектор создаём один раз — убирает задержку инициализации
+const _barcodeDetector='BarcodeDetector' in window
+  ? new BarcodeDetector({formats:['ean_13','ean_8','upc_a','upc_e','code_128','code_39','itf']})
+  : null;
 
 function _setScanStep(n){
+  const prev=_scStep;
   _scStep=n;
+  // убираем активный шаг с анимацией
+  const oldEl=document.getElementById('sc-s'+prev);
+  if(oldEl&&prev!==n){
+    oldEl.style.transition='opacity .2s ease,transform .2s ease';
+    oldEl.style.opacity='0';
+    oldEl.style.transform='translateY(-8px)';
+    setTimeout(()=>{
+      oldEl.classList.remove('active');
+      oldEl.style.transition='';oldEl.style.opacity='';oldEl.style.transform='';
+      // показываем новый
+      const newEl=document.getElementById('sc-s'+n);
+      if(newEl)newEl.classList.add('active');
+    },200);
+  }else{
+    [1,2,3].forEach(i=>document.getElementById('sc-s'+i)?.classList.toggle('active',i===n));
+  }
+  // пипки в хэдере
   [1,2,3].forEach(i=>{
-    document.getElementById('sc-s'+i)?.classList.toggle('active',i===n);
     const pip=document.getElementById('scp'+i);
     if(pip){pip.classList.toggle('on',i===n);pip.classList.toggle('done',i<n);if(i<n)pip.classList.remove('on');}
   });
@@ -3656,15 +3686,15 @@ let _scanRafId=null;
 function _startBarcodeDetect(vid){
   if(_scanInterval){clearInterval(_scanInterval);_scanInterval=null;}
   if(_scanRafId){cancelAnimationFrame(_scanRafId);_scanRafId=null;}
-  if(!('BarcodeDetector' in window)){
+  if(!_barcodeDetector){
     const st=$('scanner-status');if(st)st.textContent='введи штрихкод вручную';
     return;
   }
-  const detector=new BarcodeDetector({formats:['ean_13','ean_8','upc_a','upc_e','code_128','code_39','itf']});
+  const detector=_barcodeDetector;
   let active=true;
   let busy=false;
   let lastMs=0;
-  const THROTTLE=300; // не чаще раза в 300ms
+  const THROTTLE=280;
 
   async function detect(){
     if(!active)return;
