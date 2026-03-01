@@ -2760,7 +2760,9 @@ def start_flask():
                 acts_r  = _rs(c.execute("SELECT * FROM activities WHERE user_id=? AND days_of_week!=''",(uid,)).fetchall())
                 prods   = _rs(c.execute("SELECT id,name,calories,protein,fat,carbs FROM quick_products WHERE user_id=? ORDER BY name",(uid,)).fetchall())
                 s_rows  = c.execute("SELECT date(logged_at) d,SUM(amount) s FROM water_log WHERE user_id=? GROUP BY date(logged_at) ORDER BY date(logged_at) DESC",(uid,)).fetchall()
-            dow = now_msk().weekday()
+            # Convert Python weekday (0=Mon..6=Sun) to JS getDay convention (0=Sun,1=Mon..6=Sat)
+            py_dow = now_msk().weekday()  # 0=Mon..6=Sun
+            dow = (py_dow + 1) % 7        # 0=Sun,1=Mon..6=Sat (matches JS getDay & HTML buttons)
             acts = list(acts1)
             for a in acts_r:
                 days = [int(d) for d in a["days_of_week"].split(",") if d.strip()]
@@ -2900,9 +2902,12 @@ def start_flask():
             dur = d.get("duration",30)
             today = _today()
             scheduled = f"{today}T{time_str}:00"
+            # repeat_days uses JS getDay() convention: 0=Sun,1=Mon,...,6=Sat
+            rep = d.get("repeat_days", [])
+            dow_str = ",".join(str(r) for r in rep) if rep else ""
             with _db() as c:
-                c.execute("INSERT INTO activities (user_id,name,type,scheduled_at,duration,days_of_week) VALUES (?,?,?,?,?,'')",
-                          (uid, name, atype, scheduled, dur))
+                c.execute("INSERT INTO activities (user_id,name,type,scheduled_at,duration,days_of_week) VALUES (?,?,?,?,?,?)",
+                          (uid, name, atype, scheduled, dur, dow_str))
             return jsonify({"ok":True})
 
         # ── Настройки отображения ─────────────────────────────────────
