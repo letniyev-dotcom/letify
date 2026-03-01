@@ -525,16 +525,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   border-radius:0; /* clip идёт от родителя */
 }
 .pav img.pav-img.loaded{opacity:1}
-.pav-cam{
-  position:absolute;inset:0;
-  background:rgba(0,0,0,.42);
-  display:flex;align-items:center;justify-content:center;
-  opacity:0;
-  transition:opacity .18s ease;
-  pointer-events:none;
-  z-index:3;
-}
-.pav:active .pav-cam{opacity:1}
 .pav-spinner{
   position:absolute;inset:0;
   display:flex;align-items:center;justify-content:center;
@@ -547,29 +537,33 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .pav-spinner.show{opacity:1}
 .pav-spinner svg{animation:pav-spin .85s linear infinite}
 @keyframes pav-spin{to{transform:rotate(360deg)}}
-/* long-press delete overlay */
+/* long-press delete overlay — скрыт по умолчанию */
 .pav-del-overlay{
   position:absolute;inset:0;
   display:flex;align-items:center;justify-content:center;
-  background:rgba(0,0,0,.55);
+  background:rgba(0,0,0,.52);
   opacity:0;
   z-index:5;
   pointer-events:none;
   transition:opacity .15s ease;
 }
 .pav-del-overlay.show{opacity:1}
+/* кольцо — скрыто пока не началось удержание */
 .pav-del-ring{
   position:absolute;inset:0;
   display:flex;align-items:center;justify-content:center;
   z-index:6;
   pointer-events:none;
+  opacity:0;
+  transition:opacity .15s ease;
 }
+.pav-del-ring.show{opacity:1}
 .pav-del-ring svg{
   position:absolute;
   transform:rotate(-90deg);
 }
 .pav-del-ring .ring-track{
-  stroke:rgba(255,255,255,.18);
+  stroke:rgba(255,255,255,.15);
   fill:none;
 }
 .pav-del-ring .ring-fill{
@@ -1476,15 +1470,12 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     <div class="pav" id="pf-av">
       <span id="pf-av-letter">А</span>
       <img class="pav-img" id="pf-av-img" alt="" src="">
-      <div class="pav-cam">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-      </div>
       <div class="pav-spinner" id="pf-av-spinner">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="2.5" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
       </div>
-      <!-- long-press delete -->
+      <!-- long-press delete: overlay + ring, скрыты по умолчанию -->
       <div class="pav-del-overlay" id="pf-del-overlay">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F45C5C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(200,200,200,.65)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
       </div>
       <div class="pav-del-ring" id="pf-del-ring">
         <svg width="64" height="64" viewBox="0 0 64 64">
@@ -4098,20 +4089,22 @@ function _pavCancelLongPress(){
   _pavAnimStart=null;
   const overlay=$('pf-del-overlay');
   const ring=$('pf-del-ring-fill');
+  const ringWrap=$('pf-del-ring');
   if(overlay)overlay.classList.remove('show');
+  if(ringWrap)ringWrap.classList.remove('show');
   if(ring){ring.style.transition='';ring.style.strokeDashoffset='188';}
 }
 
 function _pavStartLongPress(e){
-  // Only trigger if avatar is loaded
   const img=$('pf-av-img');
   if(!img||!img.classList.contains('loaded'))return;
-  // Prevent normal click from firing too
   e.preventDefault?.();
   tg?.HapticFeedback?.impactOccurred('light');
   const overlay=$('pf-del-overlay');
   const ring=$('pf-del-ring-fill');
+  const ringWrap=$('pf-del-ring');
   if(overlay)overlay.classList.add('show');
+  if(ringWrap)ringWrap.classList.add('show');
   const circumference=188;
   if(ring){
     ring.style.transition='';
