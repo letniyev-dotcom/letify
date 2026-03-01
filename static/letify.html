@@ -89,19 +89,20 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .push-page{
   position:fixed;inset:0;z-index:60;
   background:var(--bg);
-  overflow:hidden;
+  overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;touch-action:pan-y;
+  scrollbar-width:none;
   opacity:0;
-  transform:translateX(28px);
-  transition:opacity .22s cubic-bezier(.4,0,.2,1), transform .22s cubic-bezier(.4,0,.2,1);
+  transform:translateX(20px);
+  transition:opacity .18s ease, transform .18s ease;
   pointer-events:none;
   display:flex;flex-direction:column;
   backface-visibility:hidden;-webkit-backface-visibility:hidden;
   will-change:opacity,transform;
-  contain:layout style;
+  contain:layout;
 }
 .push-page::-webkit-scrollbar{display:none}
 .push-page.open{opacity:1;transform:translateX(0);pointer-events:all}
-.push-page.closing{opacity:0;transform:translateX(28px);transition:opacity .22s cubic-bezier(.4,0,.2,1),transform .22s cubic-bezier(.4,0,.2,1);}
 .pp-hdr{
   flex-shrink:0;
   padding-top:calc(var(--st) + 10px);padding-bottom:12px;
@@ -2753,22 +2754,15 @@ function _scheduleRender(key,fn){
 function navTo(tab){
   if(tab===curTab&&!curPushPage)return;
   if(curPushPage)popPage(false);
-  const prevTab=curTab;
   curTab=tab;
-  const renders={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};
-  // Step 1: update nav highlights
+  // v11 pattern: swap .active first, then render (render during transition — smooth)
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const pg=document.getElementById('p-'+tab);
+  if(pg){pg.scrollTop=0;pg.classList.add('active');}
   TABS.forEach(t=>{document.getElementById('nt-'+t)?.classList.toggle('on',t===tab);});
-  tg?.HapticFeedback?.selectionChanged();
-  // Step 2: render target content while it's still invisible (opacity:0 from CSS)
+  const renders={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};
   renders[tab]?.();
-  // Step 3: swap active class in next frame — CSS transition plays with content already present
-  requestAnimationFrame(()=>{
-    if(prevTab!==tab){
-      document.getElementById('p-'+prevTab)?.classList.remove('active');
-    }
-    const pg=document.getElementById('p-'+tab);
-    if(pg){pg.scrollTop=0;pg.classList.add('active');}
-  });
+  tg?.HapticFeedback?.selectionChanged();
 }
 function setTTab(t){
   trackTab=t;
@@ -2788,16 +2782,15 @@ function pushPage(id){
   document.getElementById('nav')?.classList.add('gone');
   const pp=document.getElementById(id);
   if(pp){
-    // Step 1: populate while page is opacity:0 (invisible) — no flash, no delay
-    _populatePP(id);
+    // v11 pattern: force layout → add .open immediately → animation starts at 0ms
+    pp.getBoundingClientRect();
+    pp.classList.remove('closing');
+    pp.classList.add('open');
     pp.scrollTop=0;
     const body=pp.querySelector('.pp-body');if(body)body.scrollTop=0;
-    // Step 2: double rAF so browser paints populated content before transition starts
-    requestAnimationFrame(()=>requestAnimationFrame(()=>{
-      pp.classList.remove('closing');
-      pp.classList.add('open');
-    }));
   }
+  // populate in rAF — content appears during animation, doesn't block first frame
+  requestAnimationFrame(()=>_populatePP(id));
   if(tg?.BackButton){
     tg.BackButton.show();
     const handler=id==='pp-cal'?calBackOrPop:id==='pp-scanner'?scannerBack:popPage;
@@ -2806,6 +2799,7 @@ function pushPage(id){
   }
   tg?.HapticFeedback?.impactOccurred('light');
 }
+
 function popPage(doRender=true){
   if(!curPushPage)return;
   if(curPushPage==='pp-pdata')_saveProfileSilent();
@@ -2819,8 +2813,8 @@ function popPage(doRender=true){
   const pp=document.getElementById(curPushPage);
   if(pp){
     pp.style.pointerEvents='none';
-    pp.classList.add('closing');
-    setTimeout(()=>{pp.classList.remove('open','closing');pp.style.pointerEvents='';},230);
+    pp.style.opacity='0';pp.style.transform='translateY(10px) translateZ(0)';
+    setTimeout(()=>{pp.style.transition='none';pp.classList.remove('open');pp.style.opacity='';pp.style.transform='';pp.style.pointerEvents='';setTimeout(()=>{pp.style.transition='';},10);},200);
   }
   const prev=_pageStack.pop()||null;
   curPushPage=prev;
