@@ -214,7 +214,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   transition:color .12s ease,background .12s ease;
 }
 .nt.on{color:var(--sun);background:rgba(255,107,53,.1)}
-.nt:active{transform:scale(.96);transition:transform .08s ease}
+.nt:active{transform:scale(.97);transition:transform .03s ease}
 .nt svg{width:22px;height:22px;flex-shrink:0}
 
 /* ══ TYPOGRAPHY ══ */
@@ -555,7 +555,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   z-index:6;
   pointer-events:none;
   opacity:0;
-  transition:opacity .15s ease;
+  transition:opacity .1s ease;
 }
 .pav-del-ring.show{opacity:1}
 .pav-del-ring svg{
@@ -573,6 +573,10 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   stroke-dasharray:188;
   stroke-dashoffset:188;
   transition:stroke-dashoffset linear;
+}
+@keyframes pav-ring-anim{
+  from{stroke-dashoffset:188;}
+  to{stroke-dashoffset:0;}
 }
 .pav-wrap{position:relative;display:inline-block;flex-shrink:0}
 @keyframes pav-ripple{0%{transform:scale(0);opacity:.4}100%{transform:scale(3);opacity:0}}
@@ -1491,7 +1495,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
 </div>
 <!-- Hidden file input for avatar pick -->
-<input type="file" id="pf-av-input" accept="image/*" style="display:none" onchange="onAvatarPicked(this)">
+<input type="file" id="pf-av-input" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none" onchange="onAvatarPicked(this)">
 <div id="pf-bmi-row" style="margin-top:12px;padding:0 16px;display:none">
   <div class="sb-row">
     <div class="sbox"><div class="sv" id="pf-bmi">—</div><div class="sl">ИМТ</div></div>
@@ -1995,7 +1999,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   <div class="pp-body">
     <div class="m3-sec">история веса</div>
     <div class="m3-card" style="padding:0;overflow:hidden"><div class="hist-scroll" style="padding:10px 12px"><div id="pp-whist" style="padding:2px 0"></div></div></div>
-    <button class="btn btn-danger" style="margin-top:4px" onclick="clearWeightHistory()">🗑 очистить историю веса</button>
+    <button class="btn btn-danger" style="margin-top:4px" onclick="clearWeightHistory()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> очистить историю веса</button>
     <div class="clear-hint">данные будут удалены навсегда</div>
     <div class="m3-sec" style="margin-top:8px">за всё время</div>
     <div class="sb-row">
@@ -2126,7 +2130,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       </div>
       </div>
     </div>
-    <button class="btn btn-danger" style="margin-top:10px" onclick="clearWaterHistory()">🗑 очистить историю воды</button>
+    <button class="btn btn-danger" style="margin-top:10px" onclick="clearWaterHistory()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> очистить историю воды</button>
     <div class="clear-hint">сбросит всю воду за сегодня</div>
   </div>
 </div>
@@ -2145,7 +2149,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       </div>
       </div>
     </div>
-    <button class="btn btn-danger" style="margin-top:10px" onclick="clearSleepHistory()">🗑 очистить историю сна</button>
+    <button class="btn btn-danger" style="margin-top:10px" onclick="clearSleepHistory()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> очистить историю сна</button>
     <div class="clear-hint">данные будут удалены навсегда</div>
     <div class="sec" style="padding-top:16px">среднее за неделю</div>
     <div class="sb-row">
@@ -4114,7 +4118,11 @@ function _pavCancelLongPress(){
   const ringWrap=$('pf-del-ring');
   if(overlay)overlay.classList.remove('show');
   if(ringWrap)ringWrap.classList.remove('show');
-  if(ring){ring.style.transition='';ring.style.strokeDashoffset='188';}
+  if(ring){
+    ring.style.transition='none';
+    ring.style.strokeDashoffset='188';
+    ring.style.animation='';
+  }
 }
 
 function _pavStartLongPress(e){
@@ -4125,23 +4133,21 @@ function _pavStartLongPress(e){
   const overlay=$('pf-del-overlay');
   const ring=$('pf-del-ring-fill');
   const ringWrap=$('pf-del-ring');
+  // Show overlay and ring IMMEDIATELY on press
   if(overlay)overlay.classList.add('show');
   if(ringWrap)ringWrap.classList.add('show');
   const circumference=188;
   if(ring){
-    ring.style.transition='';
+    ring.style.transition='none';
     ring.style.strokeDashoffset=String(circumference);
+    ring.style.animation='none';
+    // force reflow to ensure the reset registers before we start animation
+    void ring.getBoundingClientRect();
+    // Start CSS animation over PAV_HOLD_MS duration
+    ring.style.transition=`stroke-dashoffset ${PAV_HOLD_MS}ms linear`;
+    ring.style.strokeDashoffset='0';
   }
   _pavAnimStart=performance.now();
-  function animateRing(now){
-    const elapsed=now-_pavAnimStart;
-    const progress=Math.min(1,elapsed/PAV_HOLD_MS);
-    if(ring)ring.style.strokeDashoffset=String(circumference*(1-progress));
-    if(progress<1){
-      _pavAnimFrame=requestAnimationFrame(animateRing);
-    }
-  }
-  _pavAnimFrame=requestAnimationFrame(animateRing);
   _pavPressTimer=setTimeout(()=>{
     _pavCancelLongPress();
     _deleteAvatar();
