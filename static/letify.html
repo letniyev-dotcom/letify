@@ -33,9 +33,10 @@ button,a,[onclick]{touch-action:manipulation;}
   --sleep:#8B7FD4;--green:#52C177;--red:#F45C5C;
   --r:14px;--r-lg:18px;
   --st:0px;--sb:0px;
+  /* hero adaptive color */
+  --hc-r:255;--hc-g:107;--hc-b:53;
   --sh:0 1px 8px rgba(0,0,0,.06),0 2px 4px rgba(0,0,0,.04);
   --nav-h:calc(62px + var(--sb));
-  --hc-r:255;--hc-g:107;--hc-b:53;
   --page-bot:calc(var(--nav-h) + 16px);
   --page-top:calc(var(--st) + 16px);
 }
@@ -217,6 +218,120 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .nt.on{color:var(--sun);background:rgba(255,107,53,.1)}
 .nt:active{transform:scale(.97);transition:transform .03s ease}
 .nt svg{width:22px;height:22px;flex-shrink:0}
+
+/* ══ HERO CARD (profile) ══ */
+.hero{
+  background:linear-gradient(140deg,
+    rgba(var(--hc-r),var(--hc-g),var(--hc-b),.17) 0%,
+    rgba(var(--hc-r),var(--hc-g),var(--hc-b),.06) 50%,
+    rgba(var(--hc-r),var(--hc-g),var(--hc-b),.02) 100%);
+  border:1px solid rgba(var(--hc-r),var(--hc-g),var(--hc-b),.22);
+  border-radius:22px;padding:16px;
+  position:relative;overflow:hidden;flex-shrink:0;
+  box-shadow:0 8px 32px rgba(var(--hc-r),var(--hc-g),var(--hc-b),.18);
+  transition:background .7s ease,border-color .7s ease,box-shadow .7s ease;
+  margin:0 16px;
+}
+.hero::before{
+  content:'';position:absolute;top:-55px;right:-45px;
+  width:150px;height:150px;border-radius:50%;
+  background:radial-gradient(circle,rgba(var(--hc-r),var(--hc-g),var(--hc-b),.18),transparent 70%);
+  pointer-events:none;transition:background .7s ease;
+}
+.hero::after{
+  content:'';position:absolute;bottom:-36px;left:0;
+  width:100px;height:100px;border-radius:50%;
+  background:radial-gradient(circle,rgba(var(--hc-r),var(--hc-g),var(--hc-b),.1),transparent 70%);
+  pointer-events:none;transition:background .7s ease;
+}
+.hero-shimmer{
+  position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:linear-gradient(110deg,
+    transparent 20%,
+    rgba(var(--hc-r),var(--hc-g),var(--hc-b),.07) 40%,
+    rgba(255,255,255,.08) 50%,
+    rgba(var(--hc-r),var(--hc-g),var(--hc-b),.05) 60%,
+    transparent 80%);
+  background-size:250% 100%;
+  animation:hero-shimmer 6s ease-in-out infinite;
+  border-radius:22px;
+}
+@keyframes hero-shimmer{
+  0%{background-position:150% 0}
+  60%{background-position:-50% 0}
+  100%{background-position:-50% 0}
+}
+.hero-inner{display:flex;align-items:center;gap:14px;position:relative;z-index:1}
+.hero-edit-btn{
+  position:absolute;top:12px;right:12px;z-index:2;
+  width:30px;height:30px;border-radius:50%;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15);
+  display:flex;align-items:center;justify-content:center;
+  transition:background .12s,transform .1s;backdrop-filter:blur(8px);cursor:pointer;
+}
+.hero-edit-btn:active{background:rgba(255,255,255,.22);transform:scale(.92)}
+
+/* ── Hero Avatar ── */
+.h-av-wrap{position:relative;flex-shrink:0;-webkit-user-select:none;user-select:none;cursor:pointer}
+.h-av{
+  width:72px;height:72px;border-radius:50%;
+  background:linear-gradient(135deg,
+    rgba(var(--hc-r),var(--hc-g),var(--hc-b),1),
+    rgba(var(--hc-r),var(--hc-g),var(--hc-b),.6));
+  display:flex;align-items:center;justify-content:center;
+  position:relative;flex-shrink:0;overflow:hidden;
+  box-shadow:0 4px 18px rgba(var(--hc-r),var(--hc-g),var(--hc-b),.45);
+  transition:box-shadow .5s ease,background .7s ease,filter .2s ease;
+}
+.h-av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;opacity:0;transition:opacity .3s ease;pointer-events:none}
+.h-av img.loaded{opacity:1}
+.h-av-letter{font-size:26px;font-weight:900;color:#fff;transition:opacity .2s;pointer-events:none}
+.h-av.pressing{filter:brightness(.68)}
+
+/* ── Tooltip pill ── */
+.h-av-tip{
+  position:absolute;left:calc(100% + 10px);top:50%;
+  transform:translateY(-50%) scale(.82) translateX(-8px);
+  transform-origin:left center;
+  background:rgba(20,20,22,.97);border:1px solid rgba(255,255,255,.1);
+  border-radius:16px;padding:10px 13px 22px;
+  display:flex;align-items:center;gap:10px;
+  white-space:nowrap;opacity:0;pointer-events:none;
+  transition:opacity .22s ease,transform .25s cubic-bezier(.34,1.38,.64,1);
+  z-index:30;box-shadow:0 8px 32px rgba(0,0,0,.65);
+  backdrop-filter:blur(20px);overflow:hidden;min-width:152px;
+}
+.h-av-tip.show{opacity:1;transform:translateY(-50%) scale(1) translateX(0)}
+.h-tip-ic{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.h-av-tip.cam .h-tip-ic{background:rgba(10,132,255,.2)}
+.h-av-tip.del .h-tip-ic{background:rgba(255,69,58,.18)}
+.h-tip-text{display:flex;flex-direction:column;gap:2px}
+.h-tip-main{font-size:13px;font-weight:700;color:#fff}
+.h-tip-sub{font-size:10.5px;font-weight:500;color:rgba(255,255,255,.38)}
+.h-tip-prog{position:absolute;bottom:7px;left:11px;right:11px;height:3px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
+.h-tip-fill{height:100%;width:0%;border-radius:99px;transition:none}
+.h-av-tip.cam .h-tip-fill{background:linear-gradient(90deg,#0A84FF,rgba(10,132,255,.6))}
+.h-av-tip.del .h-tip-fill{background:linear-gradient(90deg,#FF453A,rgba(255,69,58,.6))}
+
+/* ── Hero info ── */
+.hero-info{flex:1;min-width:0}
+.hero-name{font-size:17px;font-weight:800;letter-spacing:-.3px}
+.hero-meta-txt{font-size:11px;color:rgba(255,255,255,.42);margin-top:2px;font-weight:500}
+.hero-stats{margin-top:9px;display:flex;flex-direction:column;gap:4px}
+.hs{display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,.22);border-radius:10px;padding:5px 10px}
+.hs-l{font-size:9.5px;font-weight:700;color:rgba(255,255,255,.32);text-transform:uppercase;letter-spacing:.05em}
+.hs-v{font-size:12px;font-weight:800}
+
+/* ── nav avatar with hero color ── */
+#nav-av-wrap{
+  width:26px;height:26px;border-radius:50%;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,
+    rgba(var(--hc-r),var(--hc-g),var(--hc-b),1),
+    rgba(var(--hc-r),var(--hc-g),var(--hc-b),.6));
+  flex-shrink:0;transition:background .7s ease;
+}
+#nav-av-img{width:100%;height:100%;object-fit:cover}
 
 /* ══ TYPOGRAPHY ══ */
 .t1{font-size:26px;font-weight:900;line-height:1.1;letter-spacing:-.02em}
@@ -401,88 +516,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .sv{font-size:19px;font-weight:900;margin-bottom:2px}
 .sl{font-size:10px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.06em}
 
-/* ══ PROFILE HERO CARD ══ */
-.pf-hero{
-  background:linear-gradient(140deg,
-    rgba(var(--hc-r),var(--hc-g),var(--hc-b),.11) 0%,
-    rgba(var(--hc-r),var(--hc-g),var(--hc-b),.04) 50%,
-    rgba(var(--hc-r),var(--hc-g),var(--hc-b),.01) 100%);
-  border:1px solid rgba(var(--hc-r),var(--hc-g),var(--hc-b),.18);
-  border-radius:22px;padding:16px;
-  position:relative;overflow:hidden;
-  box-shadow:0 6px 24px rgba(var(--hc-r),var(--hc-g),var(--hc-b),.12);
-  transition:background .7s ease,border-color .7s ease,box-shadow .7s ease;
-}
-.tg-dark .pf-hero{
-  background:linear-gradient(140deg,
-    rgba(var(--hc-r),var(--hc-g),var(--hc-b),.17) 0%,
-    rgba(var(--hc-r),var(--hc-g),var(--hc-b),.06) 50%,
-    rgba(var(--hc-r),var(--hc-g),var(--hc-b),.02) 100%);
-  border-color:rgba(var(--hc-r),var(--hc-g),var(--hc-b),.26);
-  box-shadow:0 8px 32px rgba(var(--hc-r),var(--hc-g),var(--hc-b),.22);
-}
-.pf-hero::before{
-  content:'';position:absolute;top:-55px;right:-45px;
-  width:155px;height:155px;border-radius:50%;
-  background:radial-gradient(circle,rgba(var(--hc-r),var(--hc-g),var(--hc-b),.14),transparent 70%);
-  pointer-events:none;transition:background .7s ease;
-}
-.pf-hero::after{
-  content:'';position:absolute;bottom:-36px;left:0;
-  width:110px;height:110px;border-radius:50%;
-  background:radial-gradient(circle,rgba(var(--hc-r),var(--hc-g),var(--hc-b),.09),transparent 70%);
-  pointer-events:none;transition:background .7s ease;
-}
-.pf-hero-shimmer{
-  position:absolute;inset:0;pointer-events:none;z-index:0;
-  background:linear-gradient(110deg,
-    transparent 20%,rgba(var(--hc-r),var(--hc-g),var(--hc-b),.06) 40%,
-    rgba(255,255,255,.07) 50%,
-    rgba(var(--hc-r),var(--hc-g),var(--hc-b),.04) 60%,transparent 80%);
-  background-size:250% 100%;
-  animation:pf-shimmer 4.2s ease-in-out infinite;
-  border-radius:22px;
-}
-@keyframes pf-shimmer{
-  0%{background-position:150% 0}
-  65%{background-position:-50% 0}
-  100%{background-position:-50% 0}
-}
-.pf-hero-edit{
-  position:absolute;top:12px;right:12px;z-index:2;
-  width:30px;height:30px;border-radius:50%;
-  background:rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.07);
-  display:flex;align-items:center;justify-content:center;
-  transition:background .12s,transform .1s;cursor:pointer;
-}
-.tg-dark .pf-hero-edit{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.14);}
-.pf-hero-edit:active{background:rgba(0,0,0,.18);transform:scale(.92)}
-.tg-dark .pf-hero-edit:active{background:rgba(255,255,255,.22)}
-.pf-hero-inner{display:flex;align-items:center;gap:14px;position:relative;z-index:1}
-/* Round hero avatar */
-.pav.pav-hero{
-  width:72px;height:72px;font-size:28px;
-  border-radius:50%;
-  clip-path:inset(0 round 50%);
-  -webkit-clip-path:inset(0 round 50%);
-  background:linear-gradient(135deg,
-    rgba(var(--hc-r),var(--hc-g),var(--hc-b),1),
-    rgba(var(--hc-r),var(--hc-g),var(--hc-b),.65));
-  box-shadow:0 4px 20px rgba(var(--hc-r),var(--hc-g),var(--hc-b),.45);
-  transition:box-shadow .5s ease,background .7s ease;
-}
-/* Hero stats rows */
-.pf-hs{display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,.07);border-radius:10px;padding:5px 10px}
-.tg-dark .pf-hs{background:rgba(0,0,0,.22)}
-.pf-hs+.pf-hs{margin-top:4px}
-.pf-hs-l{font-size:9.5px;font-weight:700;color:rgba(0,0,0,.36);text-transform:uppercase;letter-spacing:.05em}
-.tg-dark .pf-hs-l{color:rgba(255,255,255,.32)}
-.pf-hs-v{font-size:12px;font-weight:800;color:var(--text)}
-/* Nav avatar: circular */
-#nav-av-wrap{
-  border-radius:50% !important;
-  transition:background .7s ease,box-shadow .4s ease;
-}
 /* ══ BANNER ══ */
 .banner{background:linear-gradient(130deg,#FF6B35,#FFAB40);border-radius:var(--r-lg);padding:16px;color:#fff;position:relative;overflow:hidden}
 .banner::after{content:'';position:absolute;right:-10px;top:-10px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.1);pointer-events:none}
@@ -783,6 +816,11 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 }
 .time-arr-btn:active{transform:scale(.93);opacity:.7;transition:transform .07s ease,opacity .07s ease}
 .tg-dark .time-arr-btn{background:rgba(255,255,255,.08)}
+
+/* ── hero dark mode ok (uses rgba + css vars, looks same in dark) ── */
+.tg-dark .hero{box-shadow:0 8px 32px rgba(var(--hc-r),var(--hc-g),var(--hc-b),.25)}
+.tg-dark .hs{background:rgba(0,0,0,.35)}
+.tg-dark .hero-meta-txt{color:rgba(255,255,255,.38)}
 
 /* ══ DARK OVERRIDES ══ */
 .tg-dark{--bg3:rgba(255,255,255,.07);--brd:rgba(255,255,255,.09);--sh:0 2px 12px rgba(0,0,0,.4)}
@@ -1556,106 +1594,95 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 <!-- Hidden file input for avatar pick -->
 <input type="file" id="pf-av-input" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none" onchange="onAvatarPicked(this)">
 
-<!-- ── Hero Card ── -->
-<div style="padding:14px 16px 0">
-  <div class="pf-hero">
-    <div class="pf-hero-shimmer"></div>
-
-    <!-- Edit button -->
-    <button class="pf-hero-edit" onclick="pushPage('pp-pdata')">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="opacity:.7">
-        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-      </svg>
-    </button>
-
-    <div class="pf-hero-inner">
-      <!-- Avatar (round) -->
-      <div class="pav-wrap" id="pf-av-wrap">
-        <div class="pav pav-hero" id="pf-av">
-          <span id="pf-av-letter">А</span>
-          <img class="pav-img" id="pf-av-img" alt="" src="">
-          <div class="pav-spinner" id="pf-av-spinner">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="2.5" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-          </div>
-          <div class="pav-del-overlay" id="pf-del-overlay">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(200,200,200,.7)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
-          </div>
-          <div class="pav-del-ring" id="pf-del-ring">
-            <svg width="72" height="72" viewBox="0 0 72 72">
-              <circle class="ring-track" cx="36" cy="36" r="34" stroke-width="3"/>
-              <circle class="ring-fill" id="pf-del-ring-fill" cx="36" cy="36" r="34" stroke-width="3"
-                style="stroke-dasharray:214;stroke-dashoffset:214"/>
-            </svg>
-          </div>
-        </div>
+<!-- ── HERO CARD ── -->
+<div class="hero" id="pf-hero">
+  <div class="hero-shimmer"></div>
+  <button class="hero-edit-btn" onclick="pushPage('pp-pdata')">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+    </svg>
+  </button>
+  <div class="hero-inner">
+    <!-- Avatar -->
+    <div class="h-av-wrap" id="h-av-wrap">
+      <div class="h-av" id="h-av">
+        <img id="h-av-img" alt="">
+        <span class="h-av-letter" id="h-av-letter">А</span>
       </div>
-
-      <!-- Name + meta + stats -->
-      <div style="flex:1;min-width:0">
-        <div style="font-size:18px;font-weight:900;letter-spacing:-.02em" id="pf-name">—</div>
-        <div style="font-size:11px;font-weight:600;color:var(--hint);margin-top:2px" id="pf-meta">—</div>
-        <div id="pf-bmi-row" style="margin-top:9px;display:none">
-          <div class="pf-hs"><span class="pf-hs-l">ИМТ</span><span class="pf-hs-v" id="pf-bmi" style="color:var(--sun2)">—</span></div>
-          <div class="pf-hs"><span class="pf-hs-l">Идеал</span><span class="pf-hs-v" id="pf-ideal" style="color:var(--green)">—</span></div>
-          <div class="pf-hs"><span class="pf-hs-l">BMR</span><span class="pf-hs-v" id="pf-bmr" style="color:var(--water)">—</span></div>
+      <!-- Tooltip -->
+      <div class="h-av-tip cam" id="h-av-tip">
+        <div class="h-tip-ic" id="h-tip-ic">
+          <svg id="h-tip-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0A84FF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
         </div>
+        <div class="h-tip-text">
+          <div class="h-tip-main" id="h-tip-main">выбрать фото</div>
+          <div class="h-tip-sub" id="h-tip-sub">отпусти сейчас</div>
+        </div>
+        <div class="h-tip-prog"><div class="h-tip-fill" id="h-tip-fill"></div></div>
+      </div>
+    </div>
+
+    <div class="hero-info">
+      <div class="hero-name" id="pf-name">—</div>
+      <div class="hero-meta-txt" id="pf-meta">—</div>
+      <div class="hero-stats" id="pf-hero-stats" style="display:none">
+        <div class="hs"><span class="hs-l">ИМТ</span><span class="hs-v" id="pf-bmi" style="color:var(--sun2)">—</span></div>
+        <div class="hs"><span class="hs-l">Идеал</span><span class="hs-v" id="pf-ideal" style="color:#30D158">—</span></div>
+        <div class="hs"><span class="hs-l">BMR</span><span class="hs-v" id="pf-bmr" style="color:#0A84FF">—</span></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ── Settings list ── -->
 <div class="sec">настройки</div>
 <div class="pad">
 <div class="card">
   <div class="lt" onclick="pushPage('pp-pdata')">
-    <div class="lt-ic" style="background:rgba(255,107,53,.1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sun)" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
+    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
     <span class="lt-lbl">данные профиля</span>
     <span class="lt-val" id="pf-pname">—</span>
     <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
   </div>
   <div class="lt" onclick="pushPage('pp-start-weight')">
-    <div class="lt-ic" style="background:rgba(255,171,64,.1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sun2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 7l7-4 7 4M3 17h6a3 3 0 0 0 0-6H3l3 3-3 3zm18 0h-6a3 3 0 0 1 0-6h6l-3 3 3 3z"/></svg></div>
+    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 7l7-4 7 4M3 17h6a3 3 0 0 0 0-6H3l3 3-3 3zm18 0h-6a3 3 0 0 1 0-6h6l-3 3 3 3z"/></svg></div>
     <span class="lt-lbl">начальный вес и цель</span>
     <span class="lt-val" id="pf-sw">—</span>
     <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
   </div>
-  <div class="lt" onclick="pushPage('pp-goals')">
-    <div class="lt-ic" style="background:rgba(82,193,119,.1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg></div>
+  <div class="lt" style="padding-bottom:0;border:none" onclick="pushPage('pp-goals')">
+    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg></div>
     <span class="lt-lbl">мои цели</span>
     <span class="lt-val"><span id="pf-gw">—</span></span>
     <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
   </div>
-  <div class="lt" style="border-bottom:none;padding-bottom:0" onclick="pushPage('pp-plan-settings')">
-    <div class="lt-ic" style="background:rgba(78,174,229,.1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--water)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/></svg></div>
+  <div class="lt" style="padding-bottom:0;border:none" onclick="pushPage('pp-plan-settings')">
+    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/></svg></div>
     <span class="lt-lbl">план по дням</span>
     <span class="lt-val">расписание</span>
     <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
   </div>
 </div>
 </div>
-
 <div class="sec">персонализация</div>
 <div class="pad">
 <div class="card">
-  <div class="lt" style="border-bottom:none;padding-bottom:0" onclick="pushPage('pp-design')">
-    <div class="lt-ic" style="background:rgba(191,90,242,.1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#BF5AF2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="#BF5AF2"/><circle cx="17.5" cy="10.5" r=".5" fill="#BF5AF2"/><circle cx="8.5" cy="7.5" r=".5" fill="#BF5AF2"/><circle cx="6.5" cy="12.5" r=".5" fill="#BF5AF2"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg></div>
+  <div class="lt" style="padding-bottom:0;border:none" onclick="pushPage('pp-design')">
+    <div class="lt-ic" style="background:rgba(255,107,53,.1)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--sun)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="var(--sun)"/><circle cx="17.5" cy="10.5" r=".5" fill="var(--sun)"/><circle cx="8.5" cy="7.5" r=".5" fill="var(--sun)"/><circle cx="6.5" cy="12.5" r=".5" fill="var(--sun)"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg></div>
     <span class="lt-lbl">оформление</span>
     <span class="lt-val" id="pf-design-val">классический</span>
     <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
   </div>
 </div>
 </div>
-
 <div class="pad" style="margin-top:10px">
-  <button class="btn btn-danger" style="width:100%;padding:14px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="resetAllData()">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-    сбросить все данные
-  </button>
+  <button class="btn btn-danger" style="width:100%;padding:14px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="resetAllData()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> сбросить все данные</button>
   <div class="clear-hint">удалит все записи и настройки навсегда</div>
 </div>
-<div style="text-align:center;padding:16px 0 8px"><div class="t5">letify · ver 5.0</div></div>
+<div style="text-align:center;padding:16px 0 8px"><div class="t5">letify · ver 4.3</div></div>
 <div style="height:8px"></div>
 </div>
 
@@ -2572,9 +2599,9 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-4 4 4 4-6"/></svg>
   </div>
   <div class="nt" id="nt-profile" onclick="navTo('profile')">
-    <div id="nav-av-wrap" style="width:26px;height:26px;border-radius:9px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--sun),var(--sun2));flex-shrink:0">
-      <img id="nav-av-img" alt="" style="width:100%;height:100%;object-fit:cover;display:none">
-      <svg id="nav-av-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;color:#fff"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    <div id="nav-av-wrap">
+      <img id="nav-av-img" alt="">
+      <svg id="nav-av-svg" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
     </div>
   </div>
 </nav>
@@ -4090,6 +4117,15 @@ function renderProgress(){
 }
 
 /* ══ AVATAR SYSTEM ══ */
+// ══ HERO COLOR ══
+function setHeroColor(r,g,b){
+  const root=document.documentElement;
+  root.style.setProperty('--hc-r',r);
+  root.style.setProperty('--hc-g',g);
+  root.style.setProperty('--hc-b',b);
+}
+function resetHeroColor(){setHeroColor(255,107,53);}
+
 const AV_KEY='lf2_user_avatar';
 const AV_CLR_KEY='lf2_user_avatar_color';
 
@@ -4106,44 +4142,24 @@ function _saveAvatarColor(rgb){
   try{localStorage.setItem(AV_CLR_KEY,rgb);}catch{}
 }
 
-/* ── Adaptive hero color ── */
-function setHeroColor(r,g,b){
-  const root=document.documentElement;
-  root.style.setProperty('--hc-r',r);
-  root.style.setProperty('--hc-g',g);
-  root.style.setProperty('--hc-b',b);
-}
-function resetHeroColor(){setHeroColor(255,107,53);}
-function _applyHeroColorFromRgb(rgb){
-  if(!rgb)return;
-  const parts=rgb.split(',');
-  if(parts.length===3)setHeroColor(parts[0].trim(),parts[1].trim(),parts[2].trim());
-}
-
-// Extract dominant vibrant color from image via canvas sampling
+// Extract dominant vibrant color from canvas
 function _extractDominantColor(canvas){
   const ctx=canvas.getContext('2d');
   const w=canvas.width,h=canvas.height;
-  // Sample a grid of pixels across the image
   const step=Math.max(1,Math.floor(Math.min(w,h)/24));
   let rSum=0,gSum=0,bSum=0,count=0;
-  // We cluster: skip near-white/near-black/near-grey to find the vibrant tone
   const data=ctx.getImageData(0,0,w,h).data;
   for(let y=0;y<h;y+=step){
     for(let x=0;x<w;x+=step){
       const i=(y*w+x)*4;
       const r=data[i],g=data[i+1],b=data[i+2];
-      // Skip near-grey (low saturation) and very dark/light
       const max=Math.max(r,g,b),min=Math.min(r,g,b);
       const sat=max===0?0:(max-min)/max;
-      const lum=(max+min)/510; // 0..1
-      if(sat>0.18&&lum>0.12&&lum<0.88){
-        rSum+=r;gSum+=g;bSum+=b;count++;
-      }
+      const lum=(max+min)/510;
+      if(sat>0.18&&lum>0.12&&lum<0.88){rSum+=r;gSum+=g;bSum+=b;count++;}
     }
   }
   if(count<5){
-    // Fallback: just average everything
     count=0;rSum=0;gSum=0;bSum=0;
     for(let y=0;y<h;y+=step){for(let x=0;x<w;x+=step){const i=(y*w+x)*4;rSum+=data[i];gSum+=data[i+1];bSum+=data[i+2];count++;}}
   }
@@ -4154,72 +4170,51 @@ function _extractDominantColor(canvas){
 function _updateNavAvatar(){
   const img=document.getElementById('nav-av-img');
   const svg=document.getElementById('nav-av-svg');
-  const wrap=document.getElementById('nav-av-wrap');
   const saved=_loadAvatarFromStorage();
   if(saved&&img){
     img.src=saved;img.style.display='block';
     if(svg)svg.style.display='none';
-    if(wrap){wrap.style.background='transparent';wrap.style.border='none';wrap.style.borderRadius='9px';}
-    const sc=_loadAvatarColor();
-    if(sc&&wrap)wrap.style.boxShadow=`0 0 8px rgba(${sc},.4)`;
-    if(sc)_applyHeroColorFromRgb(sc);
   }else if(img){
-    img.style.display='none';if(svg)svg.style.display='';
-    if(wrap){wrap.style.background='linear-gradient(135deg,var(--sun),var(--sun2))';wrap.style.border='';wrap.style.boxShadow='';}
+    img.style.display='none';
+    if(svg)svg.style.display='';
   }
-}
-
-function _applyGlow(rgb,animate){
-  const av=$('pf-av');
-  if(!av)return;
-  // Apply adaptive hero color
-  _applyHeroColorFromRgb(rgb);
-  const shadow=`0 5px 18px rgba(${rgb},.45)`;
-  const shadowActive=`0 2px 8px rgba(${rgb},.2)`;
-  if(animate){
-    av.style.transition='box-shadow .6s cubic-bezier(.4,0,.2,1)';
-  } else {
-    av.style.transition='';
-  }
-  av.style.setProperty('--pav-glow',`rgba(${rgb},.45)`);
-  av.style.boxShadow=shadow;
-  // Override :active shadow via CSS variable trick — set a data attr for CSS
-  av.dataset.glowRgb=rgb;
 }
 
 function _applyAvatar(dataUrl,animate){
-  const letter=$('pf-av-letter');
-  const img=$('pf-av-img');
+  const letter=$('h-av-letter');
+  const img=$('h-av-img');
+  const av=$('h-av');
   if(!img)return;
-  if(animate){
-    const sp=$('pf-av-spinner');
-    if(sp)sp.classList.add('show');
-    setTimeout(()=>{
-      img.onload=()=>{
-        if(sp)sp.classList.remove('show');
-        if(letter)letter.style.display='none';
-        requestAnimationFrame(()=>{img.classList.add('loaded');});
-        // Ripple
-        const av=$('pf-av');
-        if(av){const r=document.createElement('div');r.className='pav-ripple';av.appendChild(r);setTimeout(()=>r.remove(),600);}
-        // Apply saved color with animation
-        const saved=_loadAvatarColor();
-        if(saved)_applyGlow(saved,true);
-        _updateNavAvatar();
-      };
-      img.onerror=()=>{if(sp)sp.classList.remove('show');}
-      img.src=dataUrl;
-    },320);
-  } else {
-    img.onload=()=>{
-      if(letter)letter.style.display='none';
-      img.classList.add('loaded');
-      const saved=_loadAvatarColor();
-      if(saved)_applyGlow(saved,false);
-      _updateNavAvatar();
-    };
-    img.src=dataUrl;
-  }
+  hAv.hasImg=true;
+  if(letter)letter.style.opacity='0';
+  img.onload=()=>{
+    img.classList.add('loaded');
+    // apply hero color from saved
+    const sc=_loadAvatarColor();
+    if(sc){const[r,g,b]=sc.split(',').map(Number);setHeroColor(r,g,b);}
+    if(av&&sc)av.style.boxShadow=`0 4px 18px rgba(${sc},.5)`;
+    if(animate){
+      // Ripple
+      const r2=document.createElement('div');r2.className='pav-ripple';r2.style.cssText='position:absolute;width:72px;height:72px;top:0;left:0;border-radius:50%;background:rgba(255,255,255,.5);animation:pav-ripple .55s ease-out forwards;pointer-events:none;z-index:2';
+      av?.appendChild(r2);setTimeout(()=>r2.remove(),600);
+    }
+    _updateNavAvatar();
+  };
+  img.src=dataUrl;
+}
+
+function _deleteAvatar(){
+  hAvReset();
+  hAv.hasImg=false;
+  const img=$('h-av-img');
+  const letter=$('h-av-letter');
+  if(img){img.src='';img.classList.remove('loaded');}
+  if(letter)letter.style.opacity='1';
+  const av=$('h-av');if(av)av.style.boxShadow='';
+  try{localStorage.removeItem(AV_KEY);localStorage.removeItem(AV_CLR_KEY);}catch{}
+  resetHeroColor();
+  _updateNavAvatar();
+  toast('аватар удалён');
 }
 
 function pickAvatar(){
@@ -4228,120 +4223,96 @@ function pickAvatar(){
   if(inp)inp.click();
 }
 
-/* ── Long-press to delete avatar (5 sec) ── */
-let _pavPressTimer=null;
-let _pavAnimStart=null;
-let _pavAnimFrame=null;
-const PAV_HOLD_MS=5000;
+// ══ AVATAR TOOLTIP STATE MACHINE (from concept) ══
+// Phase 1: silent hold 1.8s
+// Phase 2: camera tooltip — release → pick photo
+// Phase 3: delete tooltip — only if hasImg; timer auto-deletes
+const HAV_P1=1800,HAV_P2=3000,HAV_P3=3000;
+const SVG_CAM=`<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>`;
+const SVG_TRASH=`<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/>`;
+let hAv={phase:0,pressing:false,hasImg:false,timer:null,raf:null,rafStart:null};
 
-function _pavCancelLongPress(){
-  if(_pavPressTimer){clearTimeout(_pavPressTimer);_pavPressTimer=null;}
-  if(_pavAnimFrame){cancelAnimationFrame(_pavAnimFrame);_pavAnimFrame=null;}
-  _pavAnimStart=null;
-  const overlay=$('pf-del-overlay');
-  const ring=$('pf-del-ring-fill');
-  const ringWrap=$('pf-del-ring');
-  if(overlay)overlay.classList.remove('show');
-  if(ringWrap)ringWrap.classList.remove('show');
-  if(ring){
-    ring.style.transition='none';
-    ring.style.strokeDashoffset='214';
-    ring.style.animation='';
+function _hSetTip(phase){
+  const tip=$('h-av-tip');const main=$('h-tip-main');const sub=$('h-tip-sub');const svg=$('h-tip-svg');
+  tip.className='h-av-tip show '+(phase==='cam'?'cam':'del');
+  if(phase==='cam'){
+    main.textContent='выбрать фото';sub.textContent='отпусти сейчас';
+    svg.setAttribute('stroke','#0A84FF');svg.innerHTML=SVG_CAM;
+  } else {
+    main.textContent='удалить фото';sub.textContent='держи до конца';
+    svg.setAttribute('stroke','#FF453A');svg.innerHTML=SVG_TRASH;
   }
 }
 
-function _pavStartLongPress(e){
-  const img=$('pf-av-img');
-  if(!img||!img.classList.contains('loaded'))return;
-  e.preventDefault?.();
-  tg?.HapticFeedback?.impactOccurred('light');
-  const overlay=$('pf-del-overlay');
-  const ring=$('pf-del-ring-fill');
-  const ringWrap=$('pf-del-ring');
-  // Show overlay and ring IMMEDIATELY on press
-  if(overlay)overlay.classList.add('show');
-  if(ringWrap)ringWrap.classList.add('show');
-  const circumference=214;
-  if(ring){
-    ring.style.transition='none';
-    ring.style.strokeDashoffset=String(circumference);
-    // force reflow to ensure the reset registers before we start animation
-    void ring.getBoundingClientRect();
-    // Start CSS animation over PAV_HOLD_MS duration
-    ring.style.transition=`stroke-dashoffset ${PAV_HOLD_MS}ms linear`;
-    ring.style.strokeDashoffset='0';
-  }
-  _pavAnimStart=performance.now();
-  _pavPressTimer=setTimeout(()=>{
-    _pavCancelLongPress();
-    _deleteAvatar();
-  },PAV_HOLD_MS);
+function _hStartBar(dur){
+  const fill=$('h-tip-fill');
+  if(hAv.raf)cancelAnimationFrame(hAv.raf);
+  if(fill)fill.style.width='0%';
+  hAv.rafStart=null;
+  const tick=(ts)=>{
+    if(!hAv.pressing){hAv.raf=null;return;}
+    if(!hAv.rafStart)hAv.rafStart=ts;
+    const pct=Math.min(100,((ts-hAv.rafStart)/dur)*100);
+    if(fill)fill.style.width=pct+'%';
+    if(pct<100)hAv.raf=requestAnimationFrame(tick);
+    else hAv.raf=null;
+  };
+  hAv.raf=requestAnimationFrame(tick);
 }
 
-function _deleteAvatar(){
-  tg?.HapticFeedback?.notificationOccurred('success');
-  const img=$('pf-av-img');
-  const letter=$('pf-av-letter');
-  const av=$('pf-av');
-  // fade out image
-  if(img){
-    img.style.transition='opacity .4s ease';
-    img.style.opacity='0';
-    setTimeout(()=>{
-      img.classList.remove('loaded');
-      img.src='';
-      img.style.transition='';
-      img.style.opacity='';
-    },420);
-  }
-  // restore default glow
-  if(av){
-    av.style.transition='box-shadow .5s ease';
-    av.style.boxShadow='0 5px 18px rgba(255,107,53,.25)';
-  }
-  if(letter){
-    letter.style.display='';
-    const u=gU();
-    letter.textContent=(u.name||'?').charAt(0).toUpperCase();
-  }
-  try{localStorage.removeItem(AV_KEY);localStorage.removeItem(AV_CLR_KEY);}catch{}
-  resetHeroColor();
-  _updateNavAvatar();
+function hAvReset(){
+  clearTimeout(hAv.timer);
+  if(hAv.raf){cancelAnimationFrame(hAv.raf);hAv.raf=null;}
+  hAv.timer=null;hAv.rafStart=null;hAv.pressing=false;hAv.phase=0;
+  const avEl=$('h-av');const tip=$('h-av-tip');const fill=$('h-tip-fill');
+  if(avEl)avEl.classList.remove('pressing');
+  if(tip)tip.classList.remove('show');
+  if(fill)fill.style.width='0%';
 }
 
-function _initAvatarHandlers(){
-  const wrap=$('pf-av-wrap');
-  if(!wrap||wrap._pavInited)return;
-  wrap._pavInited=true;
-  // tap = pick photo (only when no image loaded)
-  // long press = delete (only when image loaded)
-  wrap.addEventListener('touchstart',e=>{
-    _pavPressStart=performance.now();
-    _pavStartLongPress(e);
-  },{passive:false});
-  wrap.addEventListener('touchend',e=>{
-    const held=performance.now()-(_pavPressStart||0);
-    _pavCancelLongPress();
-    if(held<300){
-      // short tap → pick
-      pickAvatar();
-    }
-  },{passive:true});
-  wrap.addEventListener('touchmove',()=>{_pavCancelLongPress();},{passive:true});
-  wrap.addEventListener('touchcancel',()=>{_pavCancelLongPress();},{passive:true});
-  // Mouse fallback for desktop
-  wrap.addEventListener('mousedown',e=>{
-    _pavPressStart=performance.now();
-    _pavStartLongPress(e);
-  });
-  wrap.addEventListener('mouseup',e=>{
-    const held=performance.now()-(_pavPressStart||0);
-    _pavCancelLongPress();
-    if(held<300)pickAvatar();
-  });
-  wrap.addEventListener('mouseleave',()=>{_pavCancelLongPress();});
+function _initHeroAvatarHandlers(){
+  const wrap=$('h-av-wrap');
+  if(!wrap||wrap._hInited)return;
+  wrap._hInited=true;
+
+  function avDown(e){
+    e.preventDefault?.();
+    if(hAv.pressing)return;
+    hAv.pressing=true;hAv.phase=1;
+    const avEl=$('h-av');if(avEl)avEl.classList.add('pressing');
+    hAv.timer=setTimeout(()=>{
+      if(!hAv.pressing)return;
+      try{navigator.vibrate?.(18);}catch{}
+      hAv.phase=2;_hSetTip('cam');_hStartBar(HAV_P2);
+      hAv.timer=setTimeout(()=>{
+        if(!hAv.pressing)return;
+        if(!hAv.hasImg){hAvReset();return;}
+        try{navigator.vibrate?.(32);}catch{}
+        hAv.phase=3;_hSetTip('del');_hStartBar(HAV_P3);
+        hAv.timer=setTimeout(()=>{
+          if(!hAv.pressing)return;
+          try{navigator.vibrate?.(50);}catch{}
+          _deleteAvatar();
+        },HAV_P3);
+      },HAV_P2);
+    },HAV_P1);
+  }
+
+  function avUp(e){
+    e.preventDefault?.();
+    if(!hAv.pressing)return;
+    const phase=hAv.phase;hAvReset();
+    if(phase===2){pickAvatar();}
+  }
+
+  wrap.addEventListener('touchstart',avDown,{passive:false});
+  wrap.addEventListener('touchend',avUp,{passive:false});
+  wrap.addEventListener('touchmove',()=>{if(hAv.pressing)hAvReset();},{passive:true});
+  wrap.addEventListener('touchcancel',()=>{if(hAv.pressing)hAvReset();},{passive:true});
+  wrap.addEventListener('mousedown',avDown);
+  wrap.addEventListener('mouseup',avUp);
+  wrap.addEventListener('mouseleave',()=>{if(hAv.pressing)hAvReset();});
 }
-let _pavPressStart=0;
 
 function onAvatarPicked(input){
   const file=input.files&&input.files[0];
@@ -4360,11 +4331,11 @@ function onAvatarPicked(input){
       const ctx=canvas.getContext('2d');
       ctx.drawImage(image,0,0,canvas.width,canvas.height);
       const compressed=canvas.toDataURL('image/jpeg',0.82);
-      // Extract color before saving
       const rgb=_extractDominantColor(canvas);
-      if(rgb){_saveAvatarColor(rgb);}
+      if(rgb){_saveAvatarColor(rgb);const[r,g,b]=rgb.split(',').map(Number);setHeroColor(r,g,b);}
       _saveAvatarToStorage(compressed);
       _applyAvatar(compressed,true);
+      toast('аватар обновлён ✓');
     };
     image.src=raw;
   };
@@ -4372,22 +4343,31 @@ function onAvatarPicked(input){
   input.value='';
 }
 
+
 function renderProfile(){
   const u=gU(),wl=gWL();
-  // Init touch/click handlers once
-  _initAvatarHandlers();
+  // Init hero avatar handlers once
+  _initHeroAvatarHandlers();
   // Avatar
-  const letter=$('pf-av-letter');
-  const img=$('pf-av-img');
+  const letter=$('h-av-letter');
+  const img=$('h-av-img');
   const saved=_loadAvatarFromStorage();
   if(saved&&img){
+    hAv.hasImg=true;
     if(!img.classList.contains('loaded')){
       _applyAvatar(saved,false);
     }
   } else {
-    if(letter)letter.style.display='';
+    hAv.hasImg=false;
+    if(letter)letter.style.opacity='1';
     if(img){img.classList.remove('loaded');img.src='';}
     if(letter)letter.textContent=(u.name||'?').charAt(0).toUpperCase();
+    resetHeroColor();
+  }
+  // Restore hero color on load
+  if(saved){
+    const sc=_loadAvatarColor();
+    if(sc){const[r,g,b]=sc.split(',').map(Number);setHeroColor(r,g,b);}
   }
   T('pf-name',u.name||'—');
   const meta=[];if(u.age)meta.push(u.age+' лет');if(u.height)meta.push(u.height+' см');if(u.gender)meta.push(u.gender==='male'?'♂':'♀');
@@ -4398,13 +4378,15 @@ function renderProfile(){
   // Design label
   const labels={classic:'классический',linear:'линейный',bento:'бенто'};
   T('pf-design-val',labels[getHomeDesign()]||'классический');
-  const bmiRow=$('pf-bmi-row');
-  if(u.height&&wl.length){
+  // Hero stats
+  const statsRow=$('pf-hero-stats');
+  if(u.height&&wl&&wl.length){
     const cw=wl[wl.length-1].weight,h2=u.height/100;
-    T('pf-bmi',+(cw/h2/h2).toFixed(1));T('pf-ideal',+((u.height-100)*.9).toFixed(1));
-    T('pf-bmr',Math.round(u.gender==='female'?10*cw+6.25*u.height-5*(u.age||25)-161:10*cw+6.25*u.height-5*(u.age||25)+5));
-    if(bmiRow)bmiRow.style.display='';
-  }else if(bmiRow)bmiRow.style.display='none';
+    T('pf-bmi',+(cw/h2/h2).toFixed(1));
+    T('pf-ideal',+((u.height-100)*.9).toFixed(1)+' кг');
+    T('pf-bmr',Math.round(u.gender==='female'?10*cw+6.25*u.height-5*(u.age||25)-161:10*cw+6.25*u.height-5*(u.age||25)+5)+' ккал');
+    if(statsRow)statsRow.style.display='';
+  } else if(statsRow)statsRow.style.display='none';
 }
 
 /* ══ PLAN SETTINGS ══ */
@@ -4815,7 +4797,8 @@ document.addEventListener('DOMContentLoaded',async()=>{
   ['classic','linear','bento'].forEach(k=>{const el=document.getElementById('dp-'+k);if(el)el.classList.toggle('selected',k===d);});
   await loadData();
   renderHome();
-  _updateNavAvatar(); // restore nav avatar from storage on startup
+  _updateNavAvatar(); // restore nav avatar + hero color on startup
+  const _initSc=_loadAvatarColor();if(_initSc){const[r,g,b]=_initSc.split(',').map(Number);setHeroColor(r,g,b);}
   setTimeout(()=>{
     const sp=document.getElementById('splash');
     if(sp){sp.classList.add('hiding');setTimeout(()=>sp.remove(),520);}
