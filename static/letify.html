@@ -37,7 +37,7 @@ button,a,[onclick]{touch-action:manipulation;}
   --nav-h:calc(62px + var(--sb));
   --page-bot:calc(var(--nav-h) + 16px);
   --page-top:calc(var(--st) + 16px);
-  /* adaptive hero color — default orange */
+  /* Adaptive hero color vars — default orange */
   --hc-r:255;--hc-g:107;--hc-b:53;
 }
 .pre-dark{
@@ -496,20 +496,20 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 /* ══ AVATAR ══ */
 .pav{
   width:64px;height:64px;border-radius:20px;
-  background:linear-gradient(135deg,var(--sun),var(--sun2));
+  background:linear-gradient(135deg,
+    rgba(var(--hc-r),var(--hc-g),var(--hc-b),1),
+    rgba(var(--hc-r),var(--hc-g),var(--hc-b),.6));
   display:flex;align-items:center;justify-content:center;
   font-size:26px;font-weight:900;color:#fff;
-  box-shadow:0 5px 18px rgba(255,107,53,.25);
+  box-shadow:0 5px 18px rgba(var(--hc-r),var(--hc-g),var(--hc-b),.35);
   flex-shrink:0;
-  /* clip-path + overflow:hidden для надёжного клипа на мобиле */
   overflow:hidden;
   clip-path:inset(0 round 20px);
   -webkit-clip-path:inset(0 round 20px);
   position:relative;
   cursor:pointer;
   -webkit-tap-highlight-color:transparent;
-  transition:transform .15s ease, box-shadow .6s cubic-bezier(.4,0,.2,1);
-  /* форсируем аппаратное ускорение */
+  transition:transform .15s ease, box-shadow .6s cubic-bezier(.4,0,.2,1), background .7s ease;
   transform:translateZ(0);
   -webkit-transform:translateZ(0);
 }
@@ -543,43 +543,15 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .pav-del-overlay{
   position:absolute;inset:0;
   display:flex;align-items:center;justify-content:center;
-  background:rgba(0,0,0,.52);
+  background:rgba(0,0,0,.32);
   opacity:0;
   z-index:5;
   pointer-events:none;
-  transition:opacity .15s ease;
+  transition:opacity .18s ease;
 }
 .pav-del-overlay.show{opacity:1}
-/* кольцо — скрыто пока не началось удержание */
-.pav-del-ring{
-  position:absolute;inset:0;
-  display:flex;align-items:center;justify-content:center;
-  z-index:6;
-  pointer-events:none;
-  opacity:0;
-  transition:opacity .1s ease;
-}
-.pav-del-ring.show{opacity:1}
-.pav-del-ring svg{
-  position:absolute;
-  transform:rotate(-90deg);
-}
-.pav-del-ring .ring-track{
-  stroke:rgba(255,255,255,.15);
-  fill:none;
-}
-.pav-del-ring .ring-fill{
-  fill:none;
-  stroke:#F45C5C;
-  stroke-linecap:round;
-  stroke-dasharray:188;
-  stroke-dashoffset:188;
-  transition:stroke-dashoffset linear;
-}
-@keyframes pav-ring-anim{
-  from{stroke-dashoffset:188;}
-  to{stroke-dashoffset:0;}
-}
+/* кольцо скрыто навсегда — используем только overlay */
+.pav-del-ring{display:none!important}
 .pav-wrap{position:relative;display:inline-block;flex-shrink:0}
 @keyframes pav-ripple{0%{transform:scale(0);opacity:.4}100%{transform:scale(3);opacity:0}}
 .pav-ripple{
@@ -593,8 +565,86 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   z-index:2;
 }
 
-/* ══ TOAST ══ */
-/* toast removed */
+/* ══ NEW PROFILE HERO ══ */
+/* circular avatar override inside hero */
+#p-profile .pav{
+  width:74px;height:74px;border-radius:50%!important;
+  clip-path:none!important;-webkit-clip-path:none!important;
+  box-shadow:0 4px 18px rgba(var(--hc-r),var(--hc-g),var(--hc-b),.45);
+  transition:box-shadow .6s cubic-bezier(.4,0,.2,1),background .7s ease;
+}
+#p-profile .pav img.pav-img{border-radius:50%}
+.pf-hero{
+  margin:6px 14px 0;
+  background:linear-gradient(140deg,
+    rgba(var(--hc-r),var(--hc-g),var(--hc-b),.17) 0%,
+    rgba(var(--hc-r),var(--hc-g),var(--hc-b),.06) 50%,
+    rgba(var(--hc-r),var(--hc-g),var(--hc-b),.02) 100%);
+  border:1px solid rgba(var(--hc-r),var(--hc-g),var(--hc-b),.22);
+  border-radius:22px;padding:14px;
+  position:relative;overflow:hidden;
+  box-shadow:0 8px 32px rgba(var(--hc-r),var(--hc-g),var(--hc-b),.18);
+  transition:background .7s ease,border-color .7s ease,box-shadow .7s ease;
+}
+.pf-hero::before{
+  content:'';position:absolute;top:-55px;right:-45px;width:150px;height:150px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(var(--hc-r),var(--hc-g),var(--hc-b),.18),transparent 70%);
+  pointer-events:none;transition:background .7s ease;
+}
+.pf-hero::after{
+  content:'';position:absolute;bottom:-36px;left:0;width:100px;height:100px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(var(--hc-r),var(--hc-g),var(--hc-b),.1),transparent 70%);
+  pointer-events:none;transition:background .7s ease;
+}
+/* shimmer sweep */
+.pf-hero-shimmer{
+  position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:linear-gradient(
+    110deg,
+    transparent 20%,
+    rgba(var(--hc-r),var(--hc-g),var(--hc-b),.07) 40%,
+    rgba(255,255,255,.08) 50%,
+    rgba(var(--hc-r),var(--hc-g),var(--hc-b),.05) 60%,
+    transparent 80%
+  );
+  background-size:250% 100%;
+  animation:shimmer 4s ease-in-out infinite;
+  border-radius:22px;
+}
+.pf-hero-row{display:flex;align-items:center;gap:14px;position:relative;z-index:1}
+.pf-edit-btn{
+  position:absolute;top:12px;right:12px;z-index:2;
+  width:30px;height:30px;border-radius:50%;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:background .12s,transform .1s;
+  backdrop-filter:blur(8px);
+}
+.pf-edit-btn:active{background:rgba(255,255,255,.2);transform:scale(.9)}
+.pf-info{flex:1;min-width:0}
+.pf-name-lg{font-size:17px;font-weight:800;letter-spacing:-.3px}
+.pf-meta-sm{font-size:11px;color:rgba(255,255,255,.42);margin-top:2px;font-weight:500}
+.pf-stats{margin-top:9px;display:flex;flex-direction:column;gap:4px}
+.pf-hs{display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,.22);border-radius:10px;padding:5px 10px}
+.pf-hs-l{font-size:9.5px;font-weight:700;color:rgba(255,255,255,.32);text-transform:uppercase;letter-spacing:.05em}
+.pf-hs-v{font-size:12px;font-weight:800}
+/* new-style list card */
+.pf-lcard{margin:0 14px;background:var(--bg2);border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,.05)}
+.tg-dark .pf-lcard{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.09)}
+.pf-li{display:flex;align-items:center;gap:12px;padding:11px 13px;cursor:pointer;position:relative;transition:opacity .1s}
+.pf-li:not(:last-child)::after{content:'';position:absolute;bottom:0;left:52px;right:0;height:.5px;background:rgba(255,255,255,.06)}
+.pf-li:active{opacity:.6}
+.pf-li-ic{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pf-li-body{flex:1;min-width:0}
+.pf-li-lbl{font-size:14px;font-weight:600}
+.pf-li-val{font-size:11.5px;color:var(--hint);margin-top:1px;font-weight:500}
+.pf-li-ch{opacity:.22;flex-shrink:0}
+.pf-li-badge{background:rgba(10,132,255,.18);color:var(--blue,#0A84FF);font-size:11px;font-weight:700;padding:3px 8px;border-radius:7px;flex-shrink:0}
+/* sec header for new profile */
+.pf-sec{font-size:11px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.1em;padding:12px 16px 6px}
+
 
 /* ══ TYPE GRID ══ */
 .type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
@@ -703,7 +753,119 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .time-arr-btn:active{transform:scale(.93);opacity:.7;transition:transform .07s ease,opacity .07s ease}
 .tg-dark .time-arr-btn{background:rgba(255,255,255,.08)}
 
-/* ══ DARK OVERRIDES ══ */
+/* ══ SHIMMER ANIMATION ══ */
+@keyframes shimmer{
+  0%{background-position:150% 0}
+  60%{background-position:-50% 0}
+  100%{background-position:-50% 0}
+}
+
+/* ══ ADAPTIVE PROFILE BG ══ */
+#p-profile{
+  background:radial-gradient(ellipse 120% 32% at 50% 0%,rgba(var(--hc-r),var(--hc-g),var(--hc-b),.09),transparent 55%);
+  transition:background .8s ease;
+}
+.tg-dark #p-profile{
+  background:radial-gradient(ellipse 120% 32% at 50% 0%,rgba(var(--hc-r),var(--hc-g),var(--hc-b),.13),transparent 55%);
+}
+
+/* ══ TOAST ══ */
+#toast{
+  position:fixed;bottom:96px;left:50%;
+  transform:translateX(-50%) translateY(12px);
+  background:rgba(30,30,32,.97);
+  color:#fff;padding:10px 20px;
+  border-radius:22px;font-size:13px;font-weight:600;
+  white-space:nowrap;z-index:9000;opacity:0;
+  transition:all .22s cubic-bezier(.34,1.38,.64,1);
+  pointer-events:none;backdrop-filter:blur(18px);
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 8px 28px rgba(0,0,0,.45);
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ══ CROP SCREEN ══ */
+#crop-scr{
+  position:fixed;inset:0;z-index:8000;
+  background:#111;opacity:0;pointer-events:none;
+  transform:translateY(20px);
+  transition:opacity .28s ease,transform .28s cubic-bezier(.32,1.2,.64,1);
+  display:flex;flex-direction:column;
+}
+#crop-scr.show{opacity:1;pointer-events:all;transform:translateY(0)}
+.c-hdr{
+  position:absolute;top:0;left:0;right:0;z-index:10;
+  padding:max(env(safe-area-inset-top,20px),20px) 16px 14px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(to bottom,rgba(0,0,0,.9),transparent);
+}
+.c-btn{
+  padding:9px 20px;border-radius:22px;
+  font-family:'Onest',sans-serif;font-size:14px;font-weight:700;
+  transition:opacity .12s,transform .1s;
+  border:none;cursor:pointer;
+}
+.c-btn:active{opacity:.7;transform:scale(.96)}
+.c-cancel{background:rgba(255,255,255,.1);color:rgba(255,255,255,.85)}
+.c-apply{background:linear-gradient(135deg,var(--sun),var(--sun2));color:#fff;box-shadow:0 4px 18px rgba(255,107,53,.45)}
+.c-ttl{font-size:15px;font-weight:700;color:rgba(255,255,255,.75)}
+.c-area{flex:1;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#c-canvas{position:absolute;touch-action:none;will-change:contents}
+.c-frame{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  border-radius:50%;
+  box-shadow:0 0 0 9999px rgba(0,0,0,.72);
+  border:2px solid rgba(255,255,255,.55);
+  pointer-events:none;
+  animation:pb 2s ease-in-out infinite;
+}
+@keyframes pb{0%,100%{border-color:rgba(255,255,255,.5)}50%{border-color:rgba(255,255,255,.9)}}
+.c-hint-bar{
+  position:absolute;bottom:0;left:0;right:0;z-index:10;
+  padding:12px 24px max(env(safe-area-inset-bottom,24px),24px);
+  background:linear-gradient(to top,rgba(0,0,0,.9),transparent);
+  text-align:center;
+}
+.c-hint-txt{font-size:12px;color:rgba(255,255,255,.38);font-weight:600;letter-spacing:.03em}
+.c-zoom{
+  position:absolute;
+  bottom:calc(max(env(safe-area-inset-bottom,24px),24px) + 36px);
+  left:50%;transform:translateX(-50%);
+  background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.12);
+  backdrop-filter:blur(12px);border-radius:20px;padding:5px 14px;
+  z-index:11;font-size:11px;font-weight:700;color:rgba(255,255,255,.55);
+  pointer-events:none;white-space:nowrap;opacity:0;transition:opacity .2s;
+}
+.c-zoom.visible{opacity:1}
+
+/* ══ AVATAR TOOLTIP PILL ══ */
+.av-tip{
+  position:absolute;
+  left:calc(100% + 10px);top:50%;
+  transform:translateY(-50%) scale(.82) translateX(-8px);
+  transform-origin:left center;
+  background:rgba(20,20,22,.97);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:16px;
+  padding:10px 13px 22px;
+  display:flex;align-items:center;gap:10px;
+  white-space:nowrap;opacity:0;pointer-events:none;
+  transition:opacity .22s ease,transform .25s cubic-bezier(.34,1.38,.64,1);
+  z-index:30;box-shadow:0 8px 32px rgba(0,0,0,.65);
+  backdrop-filter:blur(20px);
+  overflow:hidden;min-width:152px;
+}
+.av-tip.show{opacity:1;transform:translateY(-50%) scale(1) translateX(0)}
+.tip-ic{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
+.av-tip.cam .tip-ic{background:rgba(10,132,255,.2)}
+.av-tip.del .tip-ic{background:rgba(255,69,58,.18)}
+.tip-text{display:flex;flex-direction:column;gap:2px}
+.tip-main{font-size:13px;font-weight:700;color:#fff}
+.tip-sub{font-size:10.5px;font-weight:500;color:rgba(255,255,255,.38)}
+.tip-prog{position:absolute;bottom:7px;left:11px;right:11px;height:3px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
+.tip-prog-fill{height:100%;width:0%;border-radius:99px;transition:none}
+.av-tip.cam .tip-prog-fill{background:linear-gradient(90deg,#0A84FF,rgba(10,132,255,.6))}
+.av-tip.del .tip-prog-fill{background:linear-gradient(90deg,var(--red),rgba(244,92,92,.6))}
 .tg-dark{--bg3:rgba(255,255,255,.07);--brd:rgba(255,255,255,.09);--sh:0 2px 12px rgba(0,0,0,.4)}
 .tg-dark .push-page,.tg-dark .pp-hdr{background:var(--bg)}
 .tg-dark .t5{color:rgba(255,255,255,.4)}
@@ -717,185 +879,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 /* ══ CLEAR BTN HINT ══ */
 .clear-hint{font-size:10px;font-weight:600;color:var(--hint);text-align:center;margin-top:6px;padding:0 4px}
-
-/* ══ HERO CARD (concept) — always dark ══ */
-.hero{
-  background:
-    linear-gradient(140deg,
-      rgba(var(--hc-r),var(--hc-g),var(--hc-b),.22) 0%,
-      rgba(var(--hc-r),var(--hc-g),var(--hc-b),.08) 55%,
-      rgba(var(--hc-r),var(--hc-g),var(--hc-b),.03) 100%),
-    #171210;
-  border:1px solid rgba(var(--hc-r),var(--hc-g),var(--hc-b),.26);
-  border-radius:22px;padding:15px;
-  position:relative;overflow:hidden;
-  box-shadow:0 8px 32px rgba(var(--hc-r),var(--hc-g),var(--hc-b),.22);
-  transition:border-color .7s ease,box-shadow .7s ease;
-}
-.hero::before{
-  content:'';position:absolute;top:-55px;right:-45px;
-  width:150px;height:150px;border-radius:50%;
-  background:radial-gradient(circle,rgba(var(--hc-r),var(--hc-g),var(--hc-b),.2),transparent 70%);
-  pointer-events:none;
-}
-.hero::after{
-  content:'';position:absolute;bottom:-36px;left:0;
-  width:100px;height:100px;border-radius:50%;
-  background:radial-gradient(circle,rgba(var(--hc-r),var(--hc-g),var(--hc-b),.12),transparent 70%);
-  pointer-events:none;
-}
-
-/* Shimmer — GPU via translateX, NO background-position repaint */
-.hero-shimmer{
-  position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;border-radius:22px;
-}
-.hero-shimmer::after{
-  content:'';
-  position:absolute;top:0;left:0;bottom:0;
-  width:55%;
-  background:linear-gradient(
-    105deg,
-    transparent 0%,
-    rgba(var(--hc-r),var(--hc-g),var(--hc-b),.06) 30%,
-    rgba(255,255,255,.11) 50%,
-    rgba(var(--hc-r),var(--hc-g),var(--hc-b),.05) 70%,
-    transparent 100%
-  );
-  transform:translateX(-200%);
-  animation:hero-sh 6s cubic-bezier(.4,0,.6,1) infinite;
-  will-change:transform;
-}
-@keyframes hero-sh{
-  0%,35%{transform:translateX(-200%)}
-  62%,100%{transform:translateX(350%)}
-}
-.hero-edit-btn{
-  position:absolute;top:12px;right:12px;z-index:2;
-  width:30px;height:30px;border-radius:50%;
-  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);
-  display:flex;align-items:center;justify-content:center;
-  transition:background .12s,transform .1s;backdrop-filter:blur(8px);
-  cursor:pointer;
-}
-.hero-edit-btn:active{background:rgba(255,255,255,.2);transform:scale(.92)}
-.hero-inner{display:flex;align-items:center;gap:14px;position:relative;z-index:1}
-
-/* ── HERO AVATAR ── */
-.av-wrap{position:relative;flex-shrink:0;cursor:pointer;-webkit-user-select:none;user-select:none}
-.av{
-  width:72px;height:72px;border-radius:50%;
-  background:linear-gradient(135deg,rgba(var(--hc-r),var(--hc-g),var(--hc-b),1),rgba(var(--hc-r),var(--hc-g),var(--hc-b),.6));
-  display:flex;align-items:center;justify-content:center;
-  position:relative;flex-shrink:0;overflow:hidden;
-  box-shadow:0 4px 18px rgba(var(--hc-r),var(--hc-g),var(--hc-b),.45);
-  transition:box-shadow .5s ease,background .7s ease,filter .2s ease;
-}
-.av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;opacity:0;transition:opacity .3s ease}
-.av img.loaded{opacity:1}
-.av-letter{font-size:26px;font-weight:900;color:#fff;transition:opacity .2s;pointer-events:none;z-index:1;position:relative}
-.av.pressing{filter:brightness(.68)}
-
-/* ── TOOLTIP PILL ── */
-.av-tip{
-  position:absolute;left:calc(100% + 10px);top:50%;
-  transform:translateY(-50%) scale(.82) translateX(-8px);
-  transform-origin:left center;
-  background:rgba(20,20,22,.97);
-  border:1px solid rgba(255,255,255,.1);border-radius:16px;
-  padding:10px 13px 22px;
-  display:flex;align-items:center;gap:10px;
-  white-space:nowrap;opacity:0;pointer-events:none;
-  transition:opacity .22s ease,transform .25s cubic-bezier(.34,1.38,.64,1);
-  z-index:30;box-shadow:0 8px 32px rgba(0,0,0,.65);backdrop-filter:blur(20px);
-  overflow:hidden;min-width:152px;
-}
-.av-tip.show{opacity:1;transform:translateY(-50%) scale(1) translateX(0)}
-.tip-ic{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
-.av-tip.cam .tip-ic{background:rgba(10,132,255,.2)}
-.av-tip.del .tip-ic{background:rgba(255,69,58,.18)}
-.tip-text{display:flex;flex-direction:column;gap:2px}
-.tip-main{font-size:13px;font-weight:700;color:#fff}
-.tip-sub{font-size:10.5px;font-weight:500;color:rgba(255,255,255,.38)}
-.tip-prog{position:absolute;bottom:7px;left:11px;right:11px;height:3px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
-.tip-prog-fill{height:100%;width:0%;border-radius:99px;transition:none}
-.av-tip.cam .tip-prog-fill{background:linear-gradient(90deg,var(--blue,#0A84FF),rgba(10,132,255,.6))}
-.av-tip.del .tip-prog-fill{background:linear-gradient(90deg,var(--red),rgba(255,69,58,.6))}
-
-/* ── HERO INFO / STATS ── */
-.hero-info{flex:1;min-width:0}
-.hero-name{font-size:17px;font-weight:800;letter-spacing:-.3px;color:#fff}
-.hero-meta{font-size:11px;color:rgba(255,255,255,.42);margin-top:2px;font-weight:500}
-.hero-stats{margin-top:9px;display:flex;flex-direction:column;gap:4px}
-.hs{display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,.22);border-radius:10px;padding:5px 10px}
-.hs-l{font-size:9.5px;font-weight:700;color:rgba(255,255,255,.32);text-transform:uppercase;letter-spacing:.05em}
-.hs-v{font-size:12px;font-weight:800}
-
-/* ── LIST CARD (concept style) ── */
-.lcard{background:var(--bg2);border-radius:var(--r-lg);overflow:hidden;border:1px solid rgba(255,255,255,.05);flex-shrink:0}
-.tg-dark .lcard{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.07)}
-.li{display:flex;align-items:center;gap:12px;padding:11px 13px;cursor:pointer;position:relative;transition:background .1s}
-.li:not(:last-child)::after{content:'';position:absolute;bottom:0;left:52px;right:0;height:.5px;background:rgba(0,0,0,.06)}
-.tg-dark .li:not(:last-child)::after{background:rgba(255,255,255,.06)}
-.li:active{background:rgba(0,0,0,.04)}
-.tg-dark .li:active{background:rgba(255,255,255,.06)}
-.li-ic{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.li-body{flex:1;min-width:0}
-.li-lbl{font-size:14px;font-weight:600;color:var(--text)}
-.li-val{font-size:11.5px;color:var(--hint);margin-top:1px;font-weight:500}
-.li-ch{opacity:.22;flex-shrink:0;color:var(--text)}
-
-/* ── PROFILE PAGE ADAPTIVE BG ── */
-#p-profile{
-  background:linear-gradient(180deg,
-    rgba(var(--hc-r),var(--hc-g),var(--hc-b),.07) 0%,
-    transparent 220px),var(--bg);
-  transition:background .7s ease;
-}
-
-/* ── PROFILE SAVE BTN ── */
-.ps-save{
-  padding:9px 20px;border-radius:22px;
-  background:linear-gradient(135deg,var(--sun),var(--sun2));
-  color:#fff;font-size:13px;font-weight:700;font-family:inherit;
-  box-shadow:0 4px 16px rgba(255,107,53,.38);
-  transition:opacity .12s,transform .1s;
-}
-.ps-save:active{opacity:.85;transform:scale(.96)}
-
-/* ── CROP SCREEN ── */
-#crop-scr{
-  position:fixed;inset:0;z-index:200;
-  background:#111;opacity:0;pointer-events:none;
-  transform:translateY(20px);
-  transition:opacity .28s ease,transform .28s cubic-bezier(.32,1.2,.64,1);
-  display:flex;flex-direction:column;
-}
-#crop-scr.show{opacity:1;pointer-events:all;transform:translateY(0)}
-.c-hdr{
-  position:absolute;top:0;left:0;right:0;z-index:10;
-  padding:max(env(safe-area-inset-top,20px),20px) 16px 14px;
-  display:flex;align-items:center;justify-content:space-between;
-  background:linear-gradient(to bottom,rgba(0,0,0,.9),transparent);
-}
-.c-btn{padding:9px 20px;border-radius:22px;font-family:'Onest',sans-serif;font-size:14px;font-weight:700;transition:opacity .12s,transform .1s;cursor:pointer}
-.c-btn:active{opacity:.7;transform:scale(.96)}
-.c-cancel{background:rgba(255,255,255,.1);color:rgba(255,255,255,.85)}
-.c-apply{background:linear-gradient(135deg,var(--sun),var(--sun2));color:#fff;box-shadow:0 4px 18px rgba(255,107,53,.45)}
-.c-ttl{font-size:15px;font-weight:700;color:rgba(255,255,255,.75)}
-.c-area{flex:1;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
-#c-canvas{position:absolute;touch-action:none;will-change:contents}
-.c-frame{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  border-radius:50%;
-  box-shadow:0 0 0 9999px rgba(0,0,0,.72);
-  border:2px solid rgba(255,255,255,.55);
-  pointer-events:none;animation:cpb 2s ease-in-out infinite;
-}
-@keyframes cpb{0%,100%{border-color:rgba(255,255,255,.5)}50%{border-color:rgba(255,255,255,.9)}}
-.c-hint-bar{position:absolute;bottom:0;left:0;right:0;z-index:10;padding:12px 24px max(env(safe-area-inset-bottom,24px),24px);background:linear-gradient(to top,rgba(0,0,0,.9),transparent);text-align:center}
-.c-hint-txt{font-size:12px;color:rgba(255,255,255,.38);font-weight:600;letter-spacing:.03em}
-.c-zoom{position:absolute;bottom:calc(max(env(safe-area-inset-bottom,24px),24px) + 36px);left:50%;transform:translateX(-50%);background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(12px);border-radius:20px;padding:5px 14px;z-index:11;font-size:11px;font-weight:700;color:rgba(255,255,255,.55);pointer-events:none;white-space:nowrap;opacity:0;transition:opacity .2s}
-.c-zoom.visible{opacity:1}
 
 /* ══ HISTORY SCROLL CONTAINER ══ */
 .hist-scroll{
@@ -1652,109 +1635,130 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 <div class="page" id="p-profile">
 
 <!-- Hero Card -->
-<div style="padding:14px 16px 0">
-  <div class="hero" id="pf-hero">
-    <div class="hero-shimmer"></div>
-    <button class="hero-edit-btn" onclick="pushPage('pp-pdata')">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-      </svg>
-    </button>
-    <div class="hero-inner">
-      <!-- Avatar with tooltip -->
-      <div class="av-wrap" id="pf-av-wrap">
-        <div class="av" id="pf-av">
-          <img id="pf-av-img" alt="">
-          <span class="av-letter" id="pf-av-letter">А</span>
+<div class="pf-hero" id="pf-hero-card">
+  <div class="pf-hero-shimmer"></div>
+  <!-- Edit pencil → opens pp-pdata -->
+  <button class="pf-edit-btn" onclick="pushPage('pp-pdata')">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+    </svg>
+  </button>
+  <div class="pf-hero-row">
+    <!-- Avatar (circular) -->
+    <div class="pav-wrap" id="pf-av-wrap">
+      <div class="pav" id="pf-av">
+        <span id="pf-av-letter">А</span>
+        <img class="pav-img" id="pf-av-img" alt="" src="">
+        <div class="pav-spinner" id="pf-av-spinner">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="2.5" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
         </div>
-        <!-- Tooltip pill -->
-        <div class="av-tip cam" id="av-tip">
-          <div class="tip-ic" id="tip-ic">
-            <svg id="tip-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0A84FF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-              <circle cx="12" cy="13" r="4"/>
-            </svg>
-          </div>
-          <div class="tip-text">
-            <div class="tip-main" id="tip-main">выбрать фото</div>
-            <div class="tip-sub" id="tip-sub">отпусти сейчас</div>
-          </div>
-          <div class="tip-prog"><div class="tip-prog-fill" id="tip-fill"></div></div>
+        <div class="pav-del-overlay" id="pf-del-overlay"></div>
+        <div class="pav-del-ring" id="pf-del-ring" style="display:none">
+          <svg width="64" height="64" viewBox="0 0 64 64">
+            <circle class="ring-track" cx="32" cy="32" r="30" stroke-width="3"/>
+            <circle class="ring-fill" id="pf-del-ring-fill" cx="32" cy="32" r="30" stroke-width="3"/>
+          </svg>
         </div>
       </div>
-
-      <!-- Info -->
-      <div class="hero-info">
-        <div class="hero-name" id="pf-name">—</div>
-        <div class="hero-meta" id="pf-meta">—</div>
-        <div class="hero-stats">
-          <div class="hs"><span class="hs-l">ИМТ</span><span class="hs-v" id="pf-bmi" style="color:var(--sun2)">—</span></div>
-          <div class="hs"><span class="hs-l">Идеал</span><span class="hs-v" id="pf-ideal" style="color:#30D158">—</span></div>
-          <div class="hs"><span class="hs-l">BMR</span><span class="hs-v" id="pf-bmr" style="color:#0A84FF">—</span></div>
+      <!-- Tooltip pill -->
+      <div class="av-tip cam" id="pf-av-tip">
+        <div class="tip-ic" id="pf-tip-ic">
+          <svg id="pf-tip-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0A84FF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
         </div>
+        <div class="tip-text">
+          <div class="tip-main" id="pf-tip-main">выбрать фото</div>
+          <div class="tip-sub" id="pf-tip-sub">отпусти сейчас</div>
+        </div>
+        <div class="tip-prog"><div class="tip-prog-fill" id="pf-tip-fill"></div></div>
+      </div>
+    </div>
+    <!-- Info -->
+    <div class="pf-info">
+      <div class="pf-name-lg" id="pf-name">—</div>
+      <div class="pf-meta-sm" id="pf-meta">—</div>
+      <div class="pf-stats" id="pf-bmi-row" style="display:none">
+        <div class="pf-hs"><span class="pf-hs-l">ИМТ</span><span class="pf-hs-v" id="pf-bmi" style="color:#FFAB40">—</span></div>
+        <div class="pf-hs"><span class="pf-hs-l">Идеал</span><span class="pf-hs-v" id="pf-ideal" style="color:#30D158">—</span></div>
+        <div class="pf-hs"><span class="pf-hs-l">BMR</span><span class="pf-hs-v" id="pf-bmr" style="color:#0A84FF">—</span></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Hidden file input -->
+<!-- Hidden file input for avatar pick -->
 <input type="file" id="pf-av-input" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none" onchange="onAvatarPicked(this)">
 
-<div class="sec">настройки</div>
-<div class="pad">
-<div class="lcard">
-  <div class="li" onclick="pushPage('pp-pdata')">
-    <div class="li-ic" style="background:rgba(255,107,53,.14)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--sun)" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
-    <div class="li-body"><div class="li-lbl">данные профиля</div><div class="li-val" id="pf-pname">—</div></div>
-    <svg class="li-ch" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+<div class="pf-sec">настройки</div>
+<div class="pf-lcard">
+  <div class="pf-li" onclick="pushPage('pp-start-weight')">
+    <div class="pf-li-ic" style="background:rgba(255,107,53,.14)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--sun)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 7l7-4 7 4"/><path d="M3 17h6a3 3 0 0 0 0-6H3l3 3-3 3zm18 0h-6a3 3 0 0 1 0-6h6l-3 3 3 3z"/></svg></div>
+    <div class="pf-li-body"><div class="pf-li-lbl">начальный вес и цель</div><div class="pf-li-val" id="pf-sw">—</div></div>
+    <svg class="pf-li-ch" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
   </div>
-  <div class="li" onclick="pushPage('pp-start-weight')">
-    <div class="li-ic" style="background:rgba(255,107,53,.14)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--sun)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 7l7-4 7 4M3 17h6a3 3 0 0 0 0-6H3l3 3-3 3zm18 0h-6a3 3 0 0 1 0-6h6l-3 3 3 3z"/></svg></div>
-    <div class="li-body"><div class="li-lbl">начальный вес и цель</div><div class="li-val" id="pf-sw">—</div></div>
-    <svg class="li-ch" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+  <div class="pf-li" onclick="pushPage('pp-goals')">
+    <div class="pf-li-ic" style="background:rgba(48,209,88,.14)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green,#30D158)" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg></div>
+    <div class="pf-li-body"><div class="pf-li-lbl">мои цели</div><div class="pf-li-val"><span id="pf-gw">—</span></div></div>
+    <svg class="pf-li-ch" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
   </div>
-  <div class="li" onclick="pushPage('pp-goals')">
-    <div class="li-ic" style="background:rgba(48,209,88,.14)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#30D158" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg></div>
-    <div class="li-body"><div class="li-lbl">мои цели</div><div class="li-val"><span id="pf-gw">—</span></div></div>
-    <svg class="li-ch" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+  <div class="pf-li" onclick="pushPage('pp-plan-settings')">
+    <div class="pf-li-ic" style="background:rgba(191,90,242,.14)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#BF5AF2" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/></svg></div>
+    <div class="pf-li-body"><div class="pf-li-lbl">план по дням</div><div class="pf-li-val">расписание</div></div>
+    <svg class="pf-li-ch" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
   </div>
-  <div class="li" onclick="pushPage('pp-plan-settings')">
-    <div class="li-ic" style="background:rgba(191,90,242,.14)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#BF5AF2" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/></svg></div>
-    <div class="li-body"><div class="li-lbl">план по дням</div><div class="li-val">расписание</div></div>
-    <svg class="li-ch" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
-  </div>
-</div>
 </div>
 
-<div class="sec">персонализация</div>
-<div class="pad">
-<div class="lcard">
-  <div class="li" onclick="pushPage('pp-design')">
-    <div class="li-ic" style="background:rgba(255,107,53,.14)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--sun)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="1.5" fill="var(--sun)"/><circle cx="17.5" cy="10.5" r="1.5" fill="var(--sun)"/><circle cx="8.5" cy="7.5" r="1.5" fill="var(--sun)"/><circle cx="6.5" cy="12.5" r="1.5" fill="var(--sun)"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg></div>
-    <div class="li-body"><div class="li-lbl">оформление</div><div class="li-val" id="pf-design-val">классический</div></div>
-    <svg class="li-ch" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+<div class="pf-sec">персонализация</div>
+<div class="pf-lcard">
+  <div class="pf-li" onclick="pushPage('pp-design')">
+    <div class="pf-li-ic" style="background:rgba(255,107,53,.14)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--sun)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="1.5" fill="var(--sun)"/><circle cx="17.5" cy="10.5" r="1.5" fill="var(--sun)"/><circle cx="8.5" cy="7.5" r="1.5" fill="var(--sun)"/><circle cx="6.5" cy="12.5" r="1.5" fill="var(--sun)"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg></div>
+    <div class="pf-li-body"><div class="pf-li-lbl">оформление</div><div class="pf-li-val" id="pf-design-val">классический</div></div>
+    <span class="pf-li-badge" id="pf-design-badge">классический</span>
   </div>
 </div>
-</div>
 
-<div class="sec">другое</div>
-<div class="pad">
-<div class="lcard">
-  <div class="li" onclick="resetAllData()" style="">
-    <div class="li-ic" style="background:rgba(255,69,58,.14)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF453A" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div>
-    <div class="li-body"><div class="li-lbl" style="color:#FF453A">сбросить все данные</div><div class="li-val" style="color:rgba(255,69,58,.55)">удалит все записи и настройки навсегда</div></div>
+<div class="pf-sec">другое</div>
+<div class="pf-lcard">
+  <div class="pf-li" onclick="pushPage('pp-other')">
+    <div class="pf-li-ic" style="background:rgba(99,99,102,.18)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></div>
+    <div class="pf-li-body"><div class="pf-li-lbl">другое</div><div class="pf-li-val">дополнительные настройки</div></div>
+    <svg class="pf-li-ch" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
   </div>
 </div>
-</div>
 
-<div style="text-align:center;padding:16px 0 8px"><div class="t5">letify · ver 5.0</div></div>
-<div style="height:8px"></div>
+<div style="height:16px"></div>
 </div>
 
 </div><!-- /pages -->
 
 <!-- ══════ PUSH PAGES ══════ -->
+
+<!-- PP: Другое -->
+<div class="push-page" id="pp-other">
+  <div class="pp-hdr">
+    <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <div><div class="pp-title">другое</div><div class="pp-subtitle">дополнительные настройки</div></div>
+  </div>
+  <div class="pp-body">
+    <div class="card">
+      <div class="lt" style="padding-bottom:0;border:none;opacity:.55;pointer-events:none">
+        <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div>
+        <span class="lt-lbl">скоро будет больше</span>
+        <span class="lt-val">следи за обновлениями</span>
+      </div>
+    </div>
+    <div style="margin-top:16px">
+      <button class="btn btn-danger" style="width:100%;padding:14px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="resetAllData()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        сбросить все данные
+      </button>
+      <div class="clear-hint">удалит все записи и настройки навсегда</div>
+    </div>
+  </div>
+</div>
 
 <!-- PP: Начальный вес и цель -->
 <div class="push-page" id="pp-start-weight">
@@ -2058,45 +2062,14 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 <div class="push-page" id="pp-pdata">
   <div class="pp-hdr">
     <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
-    <div style="flex:1"><div class="pp-title">данные профиля</div></div>
-    <button class="ps-save" onclick="savePdataAndPop()">сохранить</button>
+    <div><div class="pp-title">данные профиля</div></div>
   </div>
   <div class="pp-body">
-    <!-- Avatar preview like in concept -->
-    <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:22px">
-      <div id="pp-av-preview" style="width:72px;height:72px;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,rgba(var(--hc-r),var(--hc-g),var(--hc-b),1),rgba(var(--hc-r),var(--hc-g),var(--hc-b),.6));display:flex;align-items:center;justify-content:center;box-shadow:0 4px 22px rgba(var(--hc-r),var(--hc-g),var(--hc-b),.4);position:relative;flex-shrink:0;cursor:pointer" onclick="pickAvatar()">
-        <img id="pp-av-preview-img" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;opacity:0;transition:opacity .3s" alt="">
-        <span id="pp-av-preview-letter" style="font-size:26px;font-weight:900;color:#fff">А</span>
-      </div>
-      <div style="font-size:11.5px;color:var(--hint);font-weight:600;text-align:center">удержи аватар чтобы изменить фото</div>
+    <div class="m3-card">
+      <div class="m3-field"><div class="m3-label">имя</div><input class="m3-input" id="inp-pname" type="text" placeholder="данечка"></div>
+      <div class="m3-field"><div class="m3-label">рост, см</div><input class="m3-input num" id="inp-height" type="number" inputmode="numeric" min="100" max="250" placeholder="175"></div>
+      <div class="m3-field"><div class="m3-label">возраст</div><input class="m3-input num" id="inp-age" type="number" inputmode="numeric" min="10" max="100" placeholder="25"></div>
     </div>
-
-    <div class="m3-sec">имя</div>
-    <div class="m3-card" style="padding:10px 12px;margin-bottom:14px">
-      <div class="m3-field" style="margin-bottom:0">
-        <div class="m3-label">имя</div>
-        <input class="m3-input" id="inp-pname" type="text" placeholder="данечка" autocomplete="off" autocorrect="off" spellcheck="false">
-      </div>
-    </div>
-
-    <div class="m3-sec">параметры</div>
-    <div style="display:flex;gap:8px;margin-bottom:14px">
-      <div class="m3-card" style="flex:1;padding:10px 12px;margin-bottom:0">
-        <div class="m3-field" style="margin-bottom:0">
-          <div class="m3-label">возраст</div>
-          <input class="m3-input num" id="inp-age" type="number" inputmode="numeric" min="10" max="100" placeholder="25">
-          <span style="position:absolute;right:12px;bottom:9px;font-size:12px;font-weight:600;color:var(--hint);pointer-events:none">лет</span>
-        </div>
-      </div>
-      <div class="m3-card" style="flex:1;padding:10px 12px;margin-bottom:0">
-        <div class="m3-field" style="margin-bottom:0">
-          <div class="m3-label">рост</div>
-          <input class="m3-input num" id="inp-height" type="number" inputmode="numeric" min="100" max="250" placeholder="175">
-          <span style="position:absolute;right:12px;bottom:9px;font-size:12px;font-weight:600;color:var(--hint);pointer-events:none">см</span>
-        </div>
-      </div>
-    </div>
-
     <div class="m3-sec">пол</div>
     <div class="m3-seg" id="seg-gender">
       <button class="m3-seg-btn on" onclick="setGender('male')" data-g="male">♂ мужской</button>
@@ -2708,9 +2681,9 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 <!-- ══ CROP SCREEN ══ -->
 <div id="crop-scr">
   <div class="c-hdr">
-    <button class="c-btn c-cancel" onclick="closeCrop()">отмена</button>
+    <button class="c-btn c-cancel" id="c-cancel">отмена</button>
     <span class="c-ttl">обрезка фото</span>
-    <button class="c-btn c-apply" onclick="applyCrop()">готово</button>
+    <button class="c-btn c-apply" id="c-apply">готово</button>
   </div>
   <div class="c-area">
     <canvas id="c-canvas"></canvas>
@@ -2721,6 +2694,9 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   <div class="c-zoom" id="c-zoom">100%</div>
   <div class="c-hint-bar"><div class="c-hint-txt">перетаскивай · щипок для масштаба</div></div>
 </div>
+
+<input type="file" id="av-file-crop" accept="image/*" style="position:fixed;opacity:0;pointer-events:none;top:-999px;left:-999px">
+<div id="toast"></div>
 
 <script>
 /* ══ TG INIT ══ */
@@ -2998,7 +2974,6 @@ function _populatePP(id){
     const ai=document.getElementById('inp-age');if(ai)ai.value=u.age||'';
     _gender=u.gender||'male';
     document.querySelectorAll('#seg-gender .m3-seg-btn').forEach(b=>b.classList.toggle('on',b.dataset.g===_gender));
-    _syncPpAvPreview();
   }
   if(id==='pp-goals'){
     const gi=document.getElementById('inp-gw');if(gi)gi.value=u.goal_weight||'';
@@ -3710,7 +3685,24 @@ function fmtRange(a){
 }
 
 let _tt;
-function toast(msg){/* toasts disabled */}
+function toast(msg){
+  const t=document.getElementById('toast');
+  if(!t)return;
+  t.textContent=msg;t.classList.add('show');
+  if(_tt)clearTimeout(_tt);
+  _tt=setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+/* ══ ADAPTIVE COLOR HELPER ══ */
+function setHeroColor(r,g,b){
+  const root=document.documentElement;
+  root.style.setProperty('--hc-r',r);
+  root.style.setProperty('--hc-g',g);
+  root.style.setProperty('--hc-b',b);
+}
+function resetHeroColor(){
+  setHeroColor(255,107,53);
+}
 
 /* ══ WEIGHT CHART ══ */
 function drawWeightChart(data){
@@ -4248,17 +4240,6 @@ function _saveAvatarColor(rgb){
   try{localStorage.setItem(AV_CLR_KEY,rgb);}catch{}
 }
 
-// ══ ADAPTIVE HERO COLOR ══
-function setHeroColor(r,g,b){
-  const root=document.documentElement;
-  root.style.setProperty('--hc-r',r);
-  root.style.setProperty('--hc-g',g);
-  root.style.setProperty('--hc-b',b);
-}
-function resetHeroColor(){
-  setHeroColor(255,107,53);
-}
-
 // Extract dominant vibrant color from image via canvas sampling
 function _extractDominantColor(canvas){
   const ctx=canvas.getContext('2d');
@@ -4273,7 +4254,9 @@ function _extractDominantColor(canvas){
       const max=Math.max(r,g,b),min=Math.min(r,g,b);
       const sat=max===0?0:(max-min)/max;
       const lum=(max+min)/510;
-      if(sat>0.15&&lum>0.08&&lum<0.90){rSum+=r;gSum+=g;bSum+=b;count++;}
+      if(sat>0.18&&lum>0.12&&lum<0.88){
+        rSum+=r;gSum+=g;bSum+=b;count++;
+      }
     }
   }
   if(count<5){
@@ -4284,110 +4267,430 @@ function _extractDominantColor(canvas){
   return `${Math.round(rSum/count)},${Math.round(gSum/count)},${Math.round(bSum/count)}`;
 }
 
-// ══ AVATAR STATE MACHINE (concept) ══
+function _updateNavAvatar(){
+  const img=document.getElementById('nav-av-img');
+  const svg=document.getElementById('nav-av-svg');
+  const wrap=document.getElementById('nav-av-wrap');
+  const saved=_loadAvatarFromStorage();
+  if(saved&&img){
+    img.src=saved;img.style.display='block';
+    if(svg)svg.style.display='none';
+    if(wrap){
+      wrap.style.background='transparent';
+      wrap.style.borderRadius='50%';
+    }
+    const sc=_loadAvatarColor();
+    if(sc&&wrap)wrap.style.boxShadow=`0 0 8px rgba(${sc},.5)`;
+  }else if(img){
+    img.style.display='none';if(svg)svg.style.display='';
+    if(wrap){
+      wrap.style.background='linear-gradient(135deg,rgba(var(--hc-r),var(--hc-g),var(--hc-b),1),rgba(var(--hc-r),var(--hc-g),var(--hc-b),.6))';
+      wrap.style.boxShadow='';
+    }
+  }
+}
+
+function _applyGlow(rgb,animate){
+  const av=$('pf-av');
+  if(!av)return;
+  const shadow=`0 5px 18px rgba(${rgb},.45)`;
+  if(animate){av.style.transition='box-shadow .6s cubic-bezier(.4,0,.2,1)';}
+  else{av.style.transition='';}
+  av.style.boxShadow=shadow;
+  av.dataset.glowRgb=rgb;
+  // Update hero card via --hc-r/g/b vars
+  const parts=rgb.split(',').map(Number);
+  if(parts.length===3)setHeroColor(parts[0],parts[1],parts[2]);
+}
+
+function _applyAvatar(dataUrl,animate){
+  const letter=$('pf-av-letter');
+  const img=$('pf-av-img');
+  if(!img)return;
+  if(animate){
+    const sp=$('pf-av-spinner');
+    if(sp)sp.classList.add('show');
+    setTimeout(()=>{
+      img.onload=()=>{
+        if(sp)sp.classList.remove('show');
+        if(letter)letter.style.display='none';
+        requestAnimationFrame(()=>{img.classList.add('loaded');});
+        // Ripple
+        const av=$('pf-av');
+        if(av){const r=document.createElement('div');r.className='pav-ripple';av.appendChild(r);setTimeout(()=>r.remove(),600);}
+        // Apply saved color with animation
+        const saved=_loadAvatarColor();
+        if(saved)_applyGlow(saved,true);
+        _updateNavAvatar();
+        // Update avatar state machine
+        pfAv.hasImg=true;
+      };
+      img.onerror=()=>{if(sp)sp.classList.remove('show');}
+      img.src=dataUrl;
+    },320);
+  } else {
+    img.onload=()=>{
+      if(letter)letter.style.display='none';
+      img.classList.add('loaded');
+      const saved=_loadAvatarColor();
+      if(saved)_applyGlow(saved,false);
+      _updateNavAvatar();
+      pfAv.hasImg=true;
+    };
+    img.src=dataUrl;
+  }
+}
+
+// ══ 3-PHASE AVATAR STATE MACHINE ══
 // Phase 1: silent hold (1.8s)
 // Phase 2: camera tooltip — RELEASE → pick photo
-// Phase 3: delete tooltip — RELEASE → nothing; only timer deletes
-const P1=1800,P2=3000,P3=3000;
-let _av={phase:0,pressing:false,hasImg:false,timer:null,raf:null,rafStart:null};
+// Phase 3: delete tooltip — RELEASE → nothing; only auto-timer deletes
+// Phase 3 only shown when hasImg===true
+const PAV_P1=1800,PAV_P2=3000,PAV_P3=3000;
+let pfAv={phase:0,pressing:false,hasImg:false,timer:null,raf:null,rafStart:null};
 
-function _avTip(){return document.getElementById('av-tip');}
-function _avEl(){return document.getElementById('pf-av');}
-function _tipMain(){return document.getElementById('tip-main');}
-function _tipSub(){return document.getElementById('tip-sub');}
-function _tipFill(){return document.getElementById('tip-fill');}
-function _tipSvg(){return document.getElementById('tip-svg');}
-function _tipIc(){return document.getElementById('tip-ic');}
+const SVG_CAM_HTML=`<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>`;
+const SVG_TRASH_HTML=`<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/>`;
 
-const SVG_CAM=`<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>`;
-const SVG_TRASH=`<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/>`;
-
-function _setTip(phase){
-  const tip=_avTip();if(!tip)return;
-  tip.className='av-tip show '+(phase==='cam'?'cam':'del');
-  const m=_tipMain(),s=_tipSub(),sv=_tipSvg(),ic=_tipIc();
+function _pfSetTip(phase){
+  const avTip=$('pf-av-tip');
+  const tipMain=$('pf-tip-main');
+  const tipSub=$('pf-tip-sub');
+  const tipSvg=$('pf-tip-svg');
+  if(!avTip)return;
+  avTip.className='av-tip show '+(phase==='cam'?'cam':'del');
   if(phase==='cam'){
-    if(m)m.textContent='выбрать фото';
-    if(s)s.textContent='отпусти сейчас';
-    if(sv){sv.setAttribute('stroke','#0A84FF');sv.innerHTML=SVG_CAM;}
-    if(ic)ic.style.background='rgba(10,132,255,.2)';
-  }else{
-    if(m)m.textContent='удалить фото';
-    if(s)s.textContent='держи до конца';
-    if(sv){sv.setAttribute('stroke','#FF453A');sv.innerHTML=SVG_TRASH;}
-    if(ic)ic.style.background='rgba(255,69,58,.18)';
+    if(tipMain)tipMain.textContent='выбрать фото';
+    if(tipSub)tipSub.textContent='отпусти сейчас';
+    if(tipSvg){tipSvg.setAttribute('stroke','#0A84FF');tipSvg.innerHTML=SVG_CAM_HTML;}
+  } else {
+    if(tipMain)tipMain.textContent='удалить фото';
+    if(tipSub)tipSub.textContent='держи до конца';
+    if(tipSvg){tipSvg.setAttribute('stroke','var(--red)');tipSvg.innerHTML=SVG_TRASH_HTML;}
   }
 }
 
-function _startBar(dur){
-  const fill=_tipFill();if(!fill)return;
-  if(_av.raf)cancelAnimationFrame(_av.raf);
-  fill.style.width='0%';
-  _av.rafStart=null;
+function _pfStartBar(dur){
+  const tipFill=$('pf-tip-fill');
+  if(!tipFill)return;
+  if(pfAv.raf)cancelAnimationFrame(pfAv.raf);
+  tipFill.style.width='0%';
+  pfAv.rafStart=null;
   const tick=(ts)=>{
-    if(!_av.pressing){_av.raf=null;return;}
-    if(!_av.rafStart)_av.rafStart=ts;
-    const pct=Math.min(100,((ts-_av.rafStart)/dur)*100);
-    fill.style.width=pct+'%';
-    if(pct<100)_av.raf=requestAnimationFrame(tick);
-    else _av.raf=null;
+    if(!pfAv.pressing){pfAv.raf=null;return;}
+    if(!pfAv.rafStart)pfAv.rafStart=ts;
+    const pct=Math.min(100,((ts-pfAv.rafStart)/dur)*100);
+    tipFill.style.width=pct+'%';
+    if(pct<100)pfAv.raf=requestAnimationFrame(tick);
+    else pfAv.raf=null;
   };
-  _av.raf=requestAnimationFrame(tick);
+  pfAv.raf=requestAnimationFrame(tick);
 }
 
-function _avReset(){
-  clearTimeout(_av.timer);
-  if(_av.raf){cancelAnimationFrame(_av.raf);_av.raf=null;}
-  _av.timer=null;_av.rafStart=null;
-  _av.pressing=false;_av.phase=0;
-  const el=_avEl();if(el)el.classList.remove('pressing');
-  const tip=_avTip();if(tip)tip.classList.remove('show');
-  const fill=_tipFill();if(fill)fill.style.width='0%';
+function _pfAvReset(){
+  clearTimeout(pfAv.timer);
+  if(pfAv.raf){cancelAnimationFrame(pfAv.raf);pfAv.raf=null;}
+  pfAv.timer=null;pfAv.rafStart=null;
+  pfAv.pressing=false;pfAv.phase=0;
+  const avEl=$('pf-av');
+  const avTip=$('pf-av-tip');
+  const tipFill=$('pf-tip-fill');
+  if(avEl)avEl.style.filter='';
+  if(avTip)avTip.classList.remove('show');
+  if(tipFill)tipFill.style.width='0%';
 }
 
-function avDown(e){
-  e.preventDefault();
-  if(_av.pressing)return;
-  _av.pressing=true;_av.phase=1;
-  const el=_avEl();if(el)el.classList.add('pressing');
-
-  _av.timer=setTimeout(()=>{
-    if(!_av.pressing)return;
-    try{navigator.vibrate?.(18);}catch{}
-    tg?.HapticFeedback?.impactOccurred('medium');
-    _av.phase=2;
-    _setTip('cam');
-    _startBar(P2);
-
-    _av.timer=setTimeout(()=>{
-      if(!_av.pressing)return;
-      if(!_av.hasImg){_avReset();return;}
-      try{navigator.vibrate?.(32);}catch{}
-      tg?.HapticFeedback?.impactOccurred('heavy');
-      _av.phase=3;
-      _setTip('del');
-      _startBar(P3);
-      _av.timer=setTimeout(()=>{
-        if(!_av.pressing)return;
-        try{navigator.vibrate?.(50);}catch{}
-        _deleteAvatar();
-      },P3);
-    },P2);
-  },P1);
-}
-
-function avUp(e){
+function _pfAvDown(e){
   e.preventDefault?.();
-  if(!_av.pressing)return;
-  const phase=_av.phase;
-  _avReset();
+  if(pfAv.pressing)return;
+  pfAv.pressing=true;pfAv.phase=1;
+  const avEl=$('pf-av');
+  if(avEl)avEl.style.filter='brightness(.82)';
+
+  pfAv.timer=setTimeout(()=>{
+    if(!pfAv.pressing)return;
+    try{navigator.vibrate?.(18);}catch{}
+    pfAv.phase=2;
+    _pfSetTip('cam');
+    _pfStartBar(PAV_P2);
+
+    pfAv.timer=setTimeout(()=>{
+      if(!pfAv.pressing)return;
+      // only go to delete phase if image exists
+      if(!pfAv.hasImg){_pfAvReset();return;}
+      try{navigator.vibrate?.(32);}catch{}
+      pfAv.phase=3;
+      _pfSetTip('del');
+      _pfStartBar(PAV_P3);
+      // deletion happens only when timer expires
+      pfAv.timer=setTimeout(()=>{
+        if(!pfAv.pressing)return;
+        try{navigator.vibrate?.(50);}catch{}
+        _pfDoDelete();
+      },PAV_P3);
+    },PAV_P2);
+  },PAV_P1);
+}
+
+function _pfAvUp(e){
+  e.preventDefault?.();
+  if(!pfAv.pressing)return;
+  const phase=pfAv.phase;
+  _pfAvReset();
+  // phase 2 → pick photo
   if(phase===2){
-    // Pick photo → open crop
-    const inp=document.getElementById('pf-av-input');
+    const inp=$('av-file-crop');
     if(inp)inp.click();
   }
+  // phase 3 → releasing does nothing (deletion only via timer)
 }
-function avCancel(){if(_av.pressing)_avReset();}
+function _pfAvCancel(){if(pfAv.pressing)_pfAvReset();}
+
+function _pfDoDelete(){
+  _pfAvReset();
+  pfAv.hasImg=false;
+  const img=$('pf-av-img');
+  const letter=$('pf-av-letter');
+  if(img){
+    img.style.transition='opacity .4s ease';
+    img.style.opacity='0';
+    setTimeout(()=>{img.classList.remove('loaded');img.src='';img.style.transition='';img.style.opacity='';},420);
+  }
+  if(letter){letter.style.display='';const u=gU();letter.textContent=(u.name||'?').charAt(0).toUpperCase();}
+  const nImg=$('nav-av-img');
+  if(nImg){nImg.src='';nImg.style.display='none';}
+  const nSvg=$('nav-av-svg');if(nSvg)nSvg.style.display='';
+  try{localStorage.removeItem(AV_KEY);localStorage.removeItem(AV_CLR_KEY);}catch{}
+  resetHeroColor();
+  _updateNavAvatar();
+  toast('аватар удалён');
+}
+
+function pickAvatar(){
+  tg?.HapticFeedback?.impactOccurred('light');
+  const inp=$('av-file-crop');
+  if(inp)inp.click();
+}
+
+function _initAvatarHandlers(){
+  const wrap=$('pf-av-wrap');
+  if(!wrap||wrap._pfInited)return;
+  wrap._pfInited=true;
+  wrap.addEventListener('touchstart',e=>{_pfAvDown(e);},{passive:false});
+  wrap.addEventListener('touchend',e=>{_pfAvUp(e);},{passive:false});
+  wrap.addEventListener('touchmove',()=>{_pfAvCancel();},{passive:true});
+  wrap.addEventListener('touchcancel',()=>{_pfAvCancel();},{passive:true});
+  wrap.addEventListener('mousedown',e=>{_pfAvDown(e);});
+  wrap.addEventListener('mouseup',e=>{_pfAvUp(e);});
+  wrap.addEventListener('mouseleave',()=>{_pfAvCancel();});
+}
+
+// File → Crop engine
+document.addEventListener('DOMContentLoaded',()=>{
+  const cropInput=document.getElementById('av-file-crop');
+  if(cropInput){
+    cropInput.addEventListener('change',function(){
+      const f=this.files[0];if(!f)return;this.value='';
+      const r=new FileReader();
+      r.onload=e=>openCrop(e.target.result);
+      r.readAsDataURL(f);
+    });
+  }
+});
+
+// ══ CROP ENGINE ══
+let ci=null,cs=1,csMin=1,cx=0,cy=0,cSz=240;
+let cDrag=null,cPinch=null,cRafId=null,_zoomTm=null;
+const cc=document.getElementById('c-canvas');
+let cctx=null;
+
+function _initCropCanvas(){
+  if(cctx||!cc)return;
+  cctx=cc.getContext('2d',{alpha:false,willReadFrequently:false});
+  const W=window.innerWidth,H=window.innerHeight;
+  const dpr=window.devicePixelRatio||1;
+  cc.width=Math.round(W*dpr);cc.height=Math.round(H*dpr);
+  cc.style.width=W+'px';cc.style.height=H+'px';
+  cctx.scale(dpr,dpr);
+  cctx.fillStyle='#111';
+  cctx.fillRect(0,0,W,H);
+}
+
+function openCrop(src){
+  _initCropCanvas();
+  ci=new Image();
+  ci.onload=()=>{
+    document.getElementById('crop-scr').classList.add('show');
+    const W=window.innerWidth,H=window.innerHeight;
+    const dpr=window.devicePixelRatio||1;
+    const needW=Math.round(W*dpr),needH=Math.round(H*dpr);
+    if(cc.width!==needW||cc.height!==needH){
+      cctx.setTransform(1,0,0,1,0,0);
+      cc.width=needW;cc.height=needH;
+      cc.style.width=W+'px';cc.style.height=H+'px';
+      cctx.scale(dpr,dpr);
+    }
+    cSz=Math.min(W*.78,H*.52,300);
+    const fr=document.getElementById('c-frame');
+    if(fr){fr.style.width=cSz+'px';fr.style.height=cSz+'px';}
+    csMin=Math.max(cSz/ci.width,cSz/ci.height);
+    cs=csMin;cx=W/2;cy=H/2;
+    cctx.imageSmoothingEnabled=true;
+    cctx.imageSmoothingQuality='high';
+    _scheduleDraw();
+  };
+  ci.src=src;
+}
+
+let _gestureActive=false;
+function _scheduleDraw(){
+  if(cRafId)return;
+  cRafId=requestAnimationFrame(()=>{cRafId=null;_drawCrop();});
+}
+function _drawCrop(){
+  if(!ci||!cctx)return;
+  const W=parseInt(cc.style.width),H=parseInt(cc.style.height);
+  cctx.fillStyle='#111';cctx.fillRect(0,0,W,H);
+  const iw=ci.width*cs,ih=ci.height*cs;
+  const ix=cx-iw/2,iy=cy-ih/2;
+  const rad=Math.min(iw,ih)*0.1;
+  cctx.save();
+  cctx.beginPath();
+  cctx.moveTo(ix+rad,iy);cctx.lineTo(ix+iw-rad,iy);
+  cctx.arcTo(ix+iw,iy,ix+iw,iy+rad,rad);
+  cctx.lineTo(ix+iw,iy+ih-rad);
+  cctx.arcTo(ix+iw,iy+ih,ix+iw-rad,iy+ih,rad);
+  cctx.lineTo(ix+rad,iy+ih);
+  cctx.arcTo(ix,iy+ih,ix,iy+ih-rad,rad);
+  cctx.lineTo(ix,iy+rad);
+  cctx.arcTo(ix,iy,ix+rad,iy,rad);
+  cctx.closePath();cctx.clip();
+  cctx.drawImage(ci,ix,iy,iw,ih);
+  cctx.restore();
+}
+function _clampCrop(){
+  if(!ci)return;
+  const W=parseInt(cc.style.width),H=parseInt(cc.style.height),h=cSz/2;
+  const iw=ci.width*cs,ih=ci.height*cs;
+  cx=Math.max(W/2+h-iw/2,Math.min(W/2-h+iw/2,cx));
+  cy=Math.max(H/2+h-ih/2,Math.min(H/2-h+ih/2,cy));
+}
+function _showZoom(){
+  const z=document.getElementById('c-zoom');
+  if(!z)return;
+  z.textContent=Math.round(cs/csMin*100)+'%';
+  z.classList.add('visible');
+  if(_zoomTm)clearTimeout(_zoomTm);
+  _zoomTm=setTimeout(()=>z.classList.remove('visible'),900);
+}
+function _gestureStart(){
+  if(!_gestureActive){_gestureActive=true;if(cctx)cctx.imageSmoothingEnabled=false;}
+}
+let _gestureEndTm=null;
+function _gestureEnd(){
+  if(_gestureEndTm)clearTimeout(_gestureEndTm);
+  _gestureEndTm=setTimeout(()=>{
+    _gestureActive=false;
+    if(cctx){cctx.imageSmoothingEnabled=true;cctx.imageSmoothingQuality='high';}
+    _scheduleDraw();
+  },120);
+}
+
+// Attach crop canvas events after DOM is ready
+document.addEventListener('DOMContentLoaded',()=>{
+  const cc2=document.getElementById('c-canvas');
+  if(!cc2)return;
+  cc2.addEventListener('touchstart',e=>{
+    e.preventDefault();
+    if(e.touches.length===1){cDrag={ox:e.touches[0].clientX-cx,oy:e.touches[0].clientY-cy};cPinch=null;_gestureStart();}
+    else if(e.touches.length>=2){const dx=e.touches[1].clientX-e.touches[0].clientX;const dy=e.touches[1].clientY-e.touches[0].clientY;cPinch={d:Math.hypot(dx,dy),cs};cDrag=null;_gestureStart();}
+  },{passive:false});
+  cc2.addEventListener('touchmove',e=>{
+    e.preventDefault();
+    if(e.touches.length===1&&cDrag){cx=e.touches[0].clientX-cDrag.ox;cy=e.touches[0].clientY-cDrag.oy;_clampCrop();_scheduleDraw();}
+    else if(e.touches.length>=2&&cPinch){const dx=e.touches[1].clientX-e.touches[0].clientX;const dy=e.touches[1].clientY-e.touches[0].clientY;cs=Math.max(csMin,Math.min(csMin*5,cPinch.cs*(Math.hypot(dx,dy)/cPinch.d)));_clampCrop();_scheduleDraw();_showZoom();}
+  },{passive:false});
+  cc2.addEventListener('touchend',()=>{cDrag=null;cPinch=null;_gestureEnd();});
+  cc2.addEventListener('mousedown',e=>{cDrag={ox:e.clientX-cx,oy:e.clientY-cy};_gestureStart();});
+  cc2.addEventListener('mousemove',e=>{if(!cDrag)return;cx=e.clientX-cDrag.ox;cy=e.clientY-cDrag.oy;_clampCrop();_scheduleDraw();});
+  cc2.addEventListener('mouseup',()=>{cDrag=null;_gestureEnd();});
+  cc2.addEventListener('wheel',e=>{
+    e.preventDefault();_gestureStart();
+    cs=Math.max(csMin,Math.min(csMin*5,cs*(e.deltaY<0?1.09:.92)));
+    _clampCrop();_scheduleDraw();_showZoom();_gestureEnd();
+  },{passive:false});
+
+  document.getElementById('c-cancel')?.addEventListener('click',()=>{
+    document.getElementById('crop-scr').classList.remove('show');ci=null;
+  });
+  document.getElementById('c-apply')?.addEventListener('click',()=>{
+    if(!ci)return;
+    const W=parseInt(cc2.style.width),H=parseInt(cc2.style.height);
+    const sz=Math.round(cSz);
+    const out=document.createElement('canvas');out.width=sz;out.height=sz;
+    const oc=out.getContext('2d');
+    oc.save();oc.beginPath();oc.arc(sz/2,sz/2,sz/2,0,Math.PI*2);oc.clip();
+    const srcX=cx-ci.width*cs/2,srcY=cy-ci.height*cs/2;
+    const cropL=(W/2-cSz/2)-srcX,cropT=(H/2-cSz/2)-srcY;
+    oc.drawImage(ci,cropL/cs,cropT/cs,cSz/cs,cSz/cs,0,0,sz,sz);
+    oc.restore();
+    // Extract dominant color
+    const rgb=_extractDominantColor(out);
+    if(rgb){_saveAvatarColor(rgb);}else{
+      // sample failed, use orange default
+    }
+    const url=out.toDataURL('image/jpeg',.92);
+    _saveAvatarToStorage(url);
+    _applyAvatar(url,true);
+    document.getElementById('crop-scr').classList.remove('show');ci=null;
+    toast('аватар обновлён ✓');
+    tg?.HapticFeedback?.notificationOccurred('success');
+  });
+});
+
+function _loadAvatarFromStorage(){
+  try{return localStorage.getItem(AV_KEY)||null;}catch{return null;}
+}
+function _saveAvatarToStorage(dataUrl){
+  try{localStorage.setItem(AV_KEY,dataUrl);}catch{}
+}
+function _loadAvatarColor(){
+  try{return localStorage.getItem(AV_CLR_KEY)||null;}catch{return null;}
+}
+function _saveAvatarColor(rgb){
+  try{localStorage.setItem(AV_CLR_KEY,rgb);}catch{}
+}
+
+// Extract dominant vibrant color from image via canvas sampling
+function _extractDominantColor(canvas){
+  const ctx=canvas.getContext('2d');
+  const w=canvas.width,h=canvas.height;
+  // Sample a grid of pixels across the image
+  const step=Math.max(1,Math.floor(Math.min(w,h)/24));
+  let rSum=0,gSum=0,bSum=0,count=0;
+  // We cluster: skip near-white/near-black/near-grey to find the vibrant tone
+  const data=ctx.getImageData(0,0,w,h).data;
+  for(let y=0;y<h;y+=step){
+    for(let x=0;x<w;x+=step){
+      const i=(y*w+x)*4;
+      const r=data[i],g=data[i+1],b=data[i+2];
+      // Skip near-grey (low saturation) and very dark/light
+      const max=Math.max(r,g,b),min=Math.min(r,g,b);
+      const sat=max===0?0:(max-min)/max;
+      const lum=(max+min)/510; // 0..1
+      if(sat>0.18&&lum>0.12&&lum<0.88){
+        rSum+=r;gSum+=g;bSum+=b;count++;
+      }
+    }
+  }
+  if(count<5){
+    // Fallback: just average everything
+    count=0;rSum=0;gSum=0;bSum=0;
+    for(let y=0;y<h;y+=step){for(let x=0;x<w;x+=step){const i=(y*w+x)*4;rSum+=data[i];gSum+=data[i+1];bSum+=data[i+2];count++;}}
+  }
+  if(count===0)return null;
+  return `${Math.round(rSum/count)},${Math.round(gSum/count)},${Math.round(bSum/count)}`;
+}
 
 function _updateNavAvatar(){
   const img=document.getElementById('nav-av-img');
@@ -4397,97 +4700,191 @@ function _updateNavAvatar(){
   if(saved&&img){
     img.src=saved;img.style.display='block';
     if(svg)svg.style.display='none';
-    if(wrap){wrap.style.background='transparent';}
+    if(wrap){wrap.style.background='transparent';wrap.style.border='none';wrap.style.borderRadius='9px';}
+    const sc=_loadAvatarColor();
+    if(sc&&wrap)wrap.style.boxShadow=`0 0 8px rgba(${sc},.4)`;
   }else if(img){
     img.style.display='none';if(svg)svg.style.display='';
-    if(wrap){wrap.style.background=`linear-gradient(135deg,rgba(var(--hc-r),var(--hc-g),var(--hc-b),1),rgba(var(--hc-r),var(--hc-g),var(--hc-b),.6))`;}
+    if(wrap){wrap.style.background='linear-gradient(135deg,var(--sun),var(--sun2))';wrap.style.border='';wrap.style.boxShadow='';}
   }
-  // sync preview in pp-pdata if open
-  if(document.getElementById('pp-pdata')?.classList.contains('open'))_syncPpAvPreview();
 }
 
 function _applyGlow(rgb,animate){
-  const av=document.getElementById('pf-av');
+  const av=$('pf-av');
   if(!av)return;
-  // Parse rgb string "r,g,b" and also update hero color
-  const parts=rgb.split(',').map(Number);
-  if(parts.length===3&&!parts.some(isNaN)){
-    setHeroColor(parts[0],parts[1],parts[2]);
-    _saveAvatarColor(rgb);
+  const shadow=`0 5px 18px rgba(${rgb},.45)`;
+  if(animate){
+    av.style.transition='box-shadow .6s cubic-bezier(.4,0,.2,1)';
+  } else {
+    av.style.transition='';
+  }
+  av.style.setProperty('--pav-glow',`rgba(${rgb},.45)`);
+  av.style.boxShadow=shadow;
+  av.dataset.glowRgb=rgb;
+  // Update hero card glow
+  const hero=$('pf-hero-card');
+  if(hero){
+    hero.style.setProperty('--pf-glow',`rgba(${rgb},.2)`);
+    hero.style.borderColor=`rgba(${rgb},.28)`;
   }
 }
 
 function _applyAvatar(dataUrl,animate){
-  const letter=document.getElementById('pf-av-letter');
-  const img=document.getElementById('pf-av-img');
+  const letter=$('pf-av-letter');
+  const img=$('pf-av-img');
   if(!img)return;
-
-  const onLoaded=()=>{
-    if(letter)letter.style.opacity='0';
-    img.classList.add('loaded');
-    // Extract and apply color
-    try{
-      const tmp=document.createElement('canvas');tmp.width=8;tmp.height=8;
-      const tc=tmp.getContext('2d');tc.drawImage(img,0,0,8,8);
-      const d=tc.getImageData(0,0,8,8).data;
-      let r=0,g=0,b=0,n=0;
-      for(let i=0;i<d.length;i+=4){
-        const mx=Math.max(d[i],d[i+1],d[i+2]);
-        const mn=Math.min(d[i],d[i+1],d[i+2]);
-        const sat=(mx-mn)/(mx||1);
-        const lum=(mx+mn)/510;
-        if(sat>.12&&lum>.06&&lum<.92){r+=d[i];g+=d[i+1];b+=d[i+2];n++;}
-      }
-      if(n>0){setHeroColor(Math.round(r/n),Math.round(g/n),Math.round(b/n));}
-    }catch{}
-    _av.hasImg=true;
-    _updateNavAvatar();
-  };
-
   if(animate){
-    const sp=document.getElementById('pf-av-spinner');
+    const sp=$('pf-av-spinner');
     if(sp)sp.classList.add('show');
     setTimeout(()=>{
-      img.onload=()=>{if(sp)sp.classList.remove('show');onLoaded();};
+      img.onload=()=>{
+        if(sp)sp.classList.remove('show');
+        if(letter)letter.style.display='none';
+        requestAnimationFrame(()=>{img.classList.add('loaded');});
+        // Ripple
+        const av=$('pf-av');
+        if(av){const r=document.createElement('div');r.className='pav-ripple';av.appendChild(r);setTimeout(()=>r.remove(),600);}
+        // Apply saved color with animation
+        const saved=_loadAvatarColor();
+        if(saved)_applyGlow(saved,true);
+        _updateNavAvatar();
+      };
       img.onerror=()=>{if(sp)sp.classList.remove('show');}
       img.src=dataUrl;
-    },200);
-  }else{
-    img.onload=onLoaded;
+    },320);
+  } else {
+    img.onload=()=>{
+      if(letter)letter.style.display='none';
+      img.classList.add('loaded');
+      const saved=_loadAvatarColor();
+      if(saved)_applyGlow(saved,false);
+      _updateNavAvatar();
+    };
     img.src=dataUrl;
   }
 }
 
 function pickAvatar(){
   tg?.HapticFeedback?.impactOccurred('light');
-  const inp=document.getElementById('pf-av-input');
+  const inp=$('pf-av-input');
   if(inp)inp.click();
 }
 
+/* ── Long-press to delete avatar (5 sec) ── */
+let _pavPressTimer=null;
+let _pavAnimStart=null;
+let _pavAnimFrame=null;
+const PAV_HOLD_MS=5000;
+
+function _pavCancelLongPress(){
+  if(_pavPressTimer){clearTimeout(_pavPressTimer);_pavPressTimer=null;}
+  if(_pavAnimFrame){cancelAnimationFrame(_pavAnimFrame);_pavAnimFrame=null;}
+  _pavAnimStart=null;
+  const overlay=$('pf-del-overlay');
+  const ring=$('pf-del-ring-fill');
+  const ringWrap=$('pf-del-ring');
+  if(overlay)overlay.classList.remove('show');
+  if(ringWrap)ringWrap.classList.remove('show');
+  if(ring){
+    ring.style.transition='none';
+    ring.style.strokeDashoffset='188';
+    ring.style.animation='';
+  }
+}
+
+function _pavStartLongPress(e){
+  const img=$('pf-av-img');
+  if(!img||!img.classList.contains('loaded'))return;
+  e.preventDefault?.();
+  tg?.HapticFeedback?.impactOccurred('light');
+  const overlay=$('pf-del-overlay');
+  const ring=$('pf-del-ring-fill');
+  const ringWrap=$('pf-del-ring');
+  // Show overlay and ring IMMEDIATELY on press
+  if(overlay)overlay.classList.add('show');
+  if(ringWrap)ringWrap.classList.add('show');
+  const circumference=188;
+  if(ring){
+    ring.style.transition='none';
+    ring.style.strokeDashoffset=String(circumference);
+    ring.style.animation='none';
+    // force reflow to ensure the reset registers before we start animation
+    void ring.getBoundingClientRect();
+    // Start CSS animation over PAV_HOLD_MS duration
+    ring.style.transition=`stroke-dashoffset ${PAV_HOLD_MS}ms linear`;
+    ring.style.strokeDashoffset='0';
+  }
+  _pavAnimStart=performance.now();
+  _pavPressTimer=setTimeout(()=>{
+    _pavCancelLongPress();
+    _deleteAvatar();
+  },PAV_HOLD_MS);
+}
+
 function _deleteAvatar(){
-  _avReset();
-  _av.hasImg=false;
-  const img=document.getElementById('pf-av-img');
-  const letter=document.getElementById('pf-av-letter');
-  if(img){img.classList.remove('loaded');img.src='';}
-  if(letter)letter.style.opacity='1';
-  resetHeroColor();
+  tg?.HapticFeedback?.notificationOccurred('success');
+  const img=$('pf-av-img');
+  const letter=$('pf-av-letter');
+  const av=$('pf-av');
+  // fade out image
+  if(img){
+    img.style.transition='opacity .4s ease';
+    img.style.opacity='0';
+    setTimeout(()=>{
+      img.classList.remove('loaded');
+      img.src='';
+      img.style.transition='';
+      img.style.opacity='';
+    },420);
+  }
+  // restore default glow
+  if(av){
+    av.style.transition='box-shadow .5s ease';
+    av.style.boxShadow='0 5px 18px rgba(255,107,53,.25)';
+  }
+  // reset hero card glow
+  const hero=$('pf-hero-card');
+  if(hero){hero.style.removeProperty('--pf-glow');hero.style.borderColor='';}
+  if(letter){
+    letter.style.display='';
+    const u=gU();
+    letter.textContent=(u.name||'?').charAt(0).toUpperCase();
+  }
   try{localStorage.removeItem(AV_KEY);localStorage.removeItem(AV_CLR_KEY);}catch{}
   _updateNavAvatar();
-  tg?.HapticFeedback?.notificationOccurred('success');
 }
 
 function _initAvatarHandlers(){
-  const wrap=document.getElementById('pf-av-wrap');
-  if(!wrap||wrap._avInited)return;
-  wrap._avInited=true;
-  wrap.addEventListener('touchstart',e=>{avDown(e);},{passive:false});
-  wrap.addEventListener('touchend',e=>{avUp(e);},{passive:false});
-  wrap.addEventListener('touchcancel',()=>{avCancel();},{passive:true});
-  wrap.addEventListener('touchmove',()=>{avCancel();},{passive:true});
-  wrap.addEventListener('mousedown',e=>{avDown(e);});
-  wrap.addEventListener('mouseup',e=>{avUp(e);});
-  wrap.addEventListener('mouseleave',()=>{avCancel();});
+  const wrap=$('pf-av-wrap');
+  if(!wrap||wrap._pavInited)return;
+  wrap._pavInited=true;
+  // tap = pick photo (only when no image loaded)
+  // long press = delete (only when image loaded)
+  wrap.addEventListener('touchstart',e=>{
+    _pavPressStart=performance.now();
+    _pavStartLongPress(e);
+  },{passive:false});
+  wrap.addEventListener('touchend',e=>{
+    const held=performance.now()-(_pavPressStart||0);
+    _pavCancelLongPress();
+    if(held<300){
+      // short tap → pick
+      pickAvatar();
+    }
+  },{passive:true});
+  wrap.addEventListener('touchmove',()=>{_pavCancelLongPress();},{passive:true});
+  wrap.addEventListener('touchcancel',()=>{_pavCancelLongPress();},{passive:true});
+  // Mouse fallback for desktop
+  wrap.addEventListener('mousedown',e=>{
+    _pavPressStart=performance.now();
+    _pavStartLongPress(e);
+  });
+  wrap.addEventListener('mouseup',e=>{
+    const held=performance.now()-(_pavPressStart||0);
+    _pavCancelLongPress();
+    if(held<300)pickAvatar();
+  });
+  wrap.addEventListener('mouseleave',()=>{_pavCancelLongPress();});
 }
 let _pavPressStart=0;
 
@@ -4496,87 +4893,66 @@ function onAvatarPicked(input){
   if(!file)return;
   tg?.HapticFeedback?.impactOccurred('medium');
   const reader=new FileReader();
-  reader.onload=e=>{openCrop(e.target.result);};
+  reader.onload=e=>{
+    const raw=e.target.result;
+    const image=new Image();
+    image.onload=()=>{
+      const MAX=256;
+      const canvas=document.createElement('canvas');
+      const ratio=Math.min(MAX/image.width,MAX/image.height,1);
+      canvas.width=Math.round(image.width*ratio);
+      canvas.height=Math.round(image.height*ratio);
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(image,0,0,canvas.width,canvas.height);
+      const compressed=canvas.toDataURL('image/jpeg',0.82);
+      // Extract color before saving
+      const rgb=_extractDominantColor(canvas);
+      if(rgb){_saveAvatarColor(rgb);}
+      _saveAvatarToStorage(compressed);
+      _applyAvatar(compressed,true);
+    };
+    image.src=raw;
+  };
   reader.readAsDataURL(file);
   input.value='';
 }
 
 function renderProfile(){
   const u=gU(),wl=gWL();
+  // Init touch/click handlers once
   _initAvatarHandlers();
   // Avatar
-  const letter=document.getElementById('pf-av-letter');
-  const img=document.getElementById('pf-av-img');
+  const letter=$('pf-av-letter');
+  const img=$('pf-av-img');
   const saved=_loadAvatarFromStorage();
   if(saved&&img){
     if(!img.classList.contains('loaded')){
       _applyAvatar(saved,false);
     }
-    _av.hasImg=true;
-  }else{
-    _av.hasImg=false;
-    if(img){img.classList.remove('loaded');img.src='';}
-    if(letter){letter.style.opacity='1';letter.textContent=(u.name||'?').charAt(0).toUpperCase();}
-  }
-  // Name/meta
-  const meta=[];
-  if(u.age)meta.push(u.age+' лет');
-  if(u.height)meta.push(u.height+' см');
-  if(u.gender==='male'||u.gender==='m')meta.push('♂');
-  else if(u.gender==='female'||u.gender==='f')meta.push('♀');
-  T('pf-name',u.name||'—');
-  T('pf-meta',meta.join(' · ')||'—');
-  T('pf-pname',u.name||'—');
-  // Stats
-  const h=u.height||0,age=u.age||0,w=wl.length?wl[wl.length-1].weight:u.start_weight||0;
-  const isMale=u.gender==='male'||u.gender==='m';
-  if(h>0&&w>0){
-    const bmi=+(w/(h/100)**2).toFixed(1);
-    const idealW=isMale?22*(h/100)**2:21*(h/100)**2;
-    const bmr=isMale
-      ?Math.round(88.36+13.4*w+4.8*h-5.7*age)
-      :Math.round(447.6+9.25*w+3.1*h-4.33*age);
-    T('pf-bmi',bmi);
-    T('pf-ideal',idealW.toFixed(1)+' кг');
-    T('pf-bmr',bmr+' ккал');
-  }else{
-    T('pf-bmi','—');T('pf-ideal','—');T('pf-bmr','—');
-  }
-  // Goals
-  const gw=u.goal_weight;
-  T('pf-gw',gw?(gw+' кг'):'—');
-  T('pf-sw',u.start_weight?(u.start_weight+' кг → '+(u.goal_weight||'?')+' кг'):'—');
-  // Design label
-  const d=getHomeDesign();
-  const dLabels={classic:'классический',linear:'линейный',bento:'бенто'};
-  T('pf-design-val',dLabels[d]||d);
-}
-
-
-
-function savePdataAndPop(){
-  // same as existing saveProfile()
-  saveProfile();
-}
-
-// Sync pp-pdata avatar preview with main avatar
-function _syncPpAvPreview(){
-  const saved=_loadAvatarFromStorage();
-  const img=document.getElementById('pp-av-preview-img');
-  const letter=document.getElementById('pp-av-preview-letter');
-  if(saved&&img){
-    img.onload=()=>{img.style.opacity='1';if(letter)letter.style.display='none';};
-    img.src=saved;
   } else {
-    if(img){img.style.opacity='0';img.src='';}
-    if(letter){letter.style.display='';const u=gU();letter.textContent=(u.name||'?').charAt(0).toUpperCase();}
+    if(letter)letter.style.display='';
+    if(img){img.classList.remove('loaded');img.src='';}
+    if(letter)letter.textContent=(u.name||'?').charAt(0).toUpperCase();
   }
-  // sync hero color gradient
-  const preview=document.getElementById('pp-av-preview');
-  if(preview){
-    preview.style.background=`linear-gradient(135deg,rgba(var(--hc-r),var(--hc-g),var(--hc-b),1),rgba(var(--hc-r),var(--hc-g),var(--hc-b),.6))`;
-    preview.style.boxShadow=`0 4px 22px rgba(var(--hc-r),var(--hc-g),var(--hc-b),.4)`;
-  }
+  T('pf-name',u.name||'—');
+  const meta=[];if(u.age)meta.push(u.age+' лет');if(u.height)meta.push(u.height+' см');if(u.gender)meta.push(u.gender==='male'?'♂':'♀');
+  T('pf-meta',meta.join(' · ')||'—');
+  T('pf-gw',u.goal_weight?u.goal_weight+' кг':'—');T('pf-pname',u.name||'—');
+  const swLabel=u.start_weight&&u.start_weight>0?(u.start_weight.toFixed(1)+' кг · '+(u.goal_type==='gain'?'набор':'похудение')):'не задан';
+  T('pf-sw',swLabel);
+  // Design label + badge
+  const labels={classic:'классический',linear:'линейный',bento:'бенто'};
+  const dl=labels[getHomeDesign()]||'классический';
+  T('pf-design-val',dl);
+  const badge=$('pf-design-badge');if(badge)badge.textContent=dl;
+  // BMI row inside hero stats
+  const bmiRow=$('pf-bmi-row');
+  if(u.height&&wl.length){
+    const cw=wl[wl.length-1].weight,h2=u.height/100;
+    T('pf-bmi',+(cw/h2/h2).toFixed(1));T('pf-ideal',+((u.height-100)*.9).toFixed(1));
+    T('pf-bmr',Math.round(u.gender==='female'?10*cw+6.25*u.height-5*(u.age||25)-161:10*cw+6.25*u.height-5*(u.age||25)+5));
+    if(bmiRow)bmiRow.style.display='';
+  }else if(bmiRow)bmiRow.style.display='none';
 }
 
 /* ══ PLAN SETTINGS ══ */
@@ -4974,127 +5350,6 @@ async function submitScanned(){
   await reload();
 }
 
-/* ══ CROP ENGINE (concept) ══ */
-let _ci=null,_cs=1,_csMin=1,_cx=0,_cy=0,_cSz=240;
-let _cDrag=null,_cPinch=null,_cRafId=null,_zoomTm=null;
-let _gestureActive=false;
-const _cc=()=>document.getElementById('c-canvas');
-
-function openCrop(src){
-  const scr=document.getElementById('crop-scr');
-  if(!scr)return;
-  _ci=new Image();
-  _ci.onload=()=>{
-    scr.classList.add('show');
-    const W=window.innerWidth,H=window.innerHeight;
-    const dpr=window.devicePixelRatio||1;
-    const cc=_cc();if(!cc)return;
-    const cctx=cc.getContext('2d',{alpha:false});
-    cc.width=Math.round(W*dpr);cc.height=Math.round(H*dpr);
-    cc.style.width=W+'px';cc.style.height=H+'px';
-    cctx.setTransform(dpr,0,0,dpr,0,0);
-    _cSz=Math.min(W*.78,H*.52,300);
-    const fr=document.getElementById('c-frame');
-    if(fr){fr.style.width=_cSz+'px';fr.style.height=_cSz+'px';}
-    _csMin=Math.max(_cSz/_ci.width,_cSz/_ci.height);
-    _cs=_csMin;_cx=W/2;_cy=H/2;
-    cctx.imageSmoothingEnabled=true;cctx.imageSmoothingQuality='high';
-    _cScheduleDraw();
-    // attach events once
-    if(!cc._cropEvt){
-      cc._cropEvt=true;
-      cc.addEventListener('touchstart',_cTouchStart,{passive:false});
-      cc.addEventListener('touchmove',_cTouchMove,{passive:false});
-      cc.addEventListener('touchend',_cTouchEnd,{passive:true});
-      cc.addEventListener('mousedown',e=>{_cDrag={ox:e.clientX-_cx,oy:e.clientY-_cy};});
-      cc.addEventListener('mousemove',e=>{if(!_cDrag)return;_cx=e.clientX-_cDrag.ox;_cy=e.clientY-_cDrag.oy;_cClamp();_cScheduleDraw();});
-      cc.addEventListener('mouseup',()=>{_cDrag=null;});
-      cc.addEventListener('wheel',e=>{e.preventDefault();_cs=Math.max(_csMin,Math.min(_csMin*5,_cs*(e.deltaY<0?1.09:.92)));_cClamp();_cScheduleDraw();_cShowZoom();},{passive:false});
-    }
-  };
-  _ci.src=src;
-}
-
-function closeCrop(){
-  const scr=document.getElementById('crop-scr');
-  if(scr)scr.classList.remove('show');
-  _ci=null;
-}
-
-function applyCrop(){
-  if(!_ci)return;
-  const W=window.innerWidth,H=window.innerHeight;
-  const sz=Math.round(_cSz);
-  const out=document.createElement('canvas');out.width=sz;out.height=sz;
-  const oc=out.getContext('2d');
-  oc.save();oc.beginPath();oc.arc(sz/2,sz/2,sz/2,0,Math.PI*2);oc.clip();
-  const srcX=_cx-_ci.width*_cs/2,srcY=_cy-_ci.height*_cs/2;
-  const cropL=(W/2-_cSz/2)-srcX,cropT=(H/2-_cSz/2)-srcY;
-  oc.drawImage(_ci,cropL/_cs,cropT/_cs,_cSz/_cs,_cSz/_cs,0,0,sz,sz);
-  oc.restore();
-  const url=out.toDataURL('image/jpeg',.92);
-  _saveAvatarToStorage(url);
-  _applyAvatar(url,true);
-  closeCrop();
-  tg?.HapticFeedback?.notificationOccurred('success');
-}
-
-function _cScheduleDraw(){
-  if(_cRafId)return;
-  _cRafId=requestAnimationFrame(()=>{_cRafId=null;_cDraw();});
-}
-function _cClamp(){
-  if(!_ci)return;
-  const W=window.innerWidth,H=window.innerHeight,h=_cSz/2;
-  const iw=_ci.width*_cs,ih=_ci.height*_cs;
-  _cx=Math.max(W/2+h-iw/2,Math.min(W/2-h+iw/2,_cx));
-  _cy=Math.max(H/2+h-ih/2,Math.min(H/2-h+ih/2,_cy));
-}
-function _cDraw(){
-  const cc=_cc();if(!cc||!_ci)return;
-  const W=parseInt(cc.style.width),H=parseInt(cc.style.height);
-  const cctx=cc.getContext('2d',{alpha:false});
-  cctx.fillStyle='#111';cctx.fillRect(0,0,W,H);
-  const iw=_ci.width*_cs,ih=_ci.height*_cs;
-  const ix=_cx-iw/2,iy=_cy-ih/2;
-  const rad=Math.min(iw,ih)*.1;
-  cctx.save();
-  cctx.beginPath();
-  cctx.moveTo(ix+rad,iy);cctx.lineTo(ix+iw-rad,iy);cctx.arcTo(ix+iw,iy,ix+iw,iy+rad,rad);
-  cctx.lineTo(ix+iw,iy+ih-rad);cctx.arcTo(ix+iw,iy+ih,ix+iw-rad,iy+ih,rad);
-  cctx.lineTo(ix+rad,iy+ih);cctx.arcTo(ix,iy+ih,ix,iy+ih-rad,rad);
-  cctx.lineTo(ix,iy+rad);cctx.arcTo(ix,iy,ix+rad,iy,rad);
-  cctx.closePath();cctx.clip();
-  cctx.drawImage(_ci,ix,iy,iw,ih);
-  cctx.restore();
-}
-function _cShowZoom(){
-  const z=document.getElementById('c-zoom');
-  if(!z)return;
-  z.textContent=Math.round(_cs/_csMin*100)+'%';
-  z.classList.add('visible');
-  if(_zoomTm)clearTimeout(_zoomTm);
-  _zoomTm=setTimeout(()=>z.classList.remove('visible'),900);
-}
-function _cTouchStart(e){
-  e.preventDefault();
-  if(e.touches.length===1){_cDrag={ox:e.touches[0].clientX-_cx,oy:e.touches[0].clientY-_cy};_cPinch=null;}
-  else if(e.touches.length>=2){
-    const dx=e.touches[1].clientX-e.touches[0].clientX,dy=e.touches[1].clientY-e.touches[0].clientY;
-    _cPinch={d:Math.hypot(dx,dy),cs:_cs};_cDrag=null;
-  }
-}
-function _cTouchMove(e){
-  e.preventDefault();
-  if(e.touches.length===1&&_cDrag){_cx=e.touches[0].clientX-_cDrag.ox;_cy=e.touches[0].clientY-_cDrag.oy;_cClamp();_cScheduleDraw();}
-  else if(e.touches.length>=2&&_cPinch){
-    const dx=e.touches[1].clientX-e.touches[0].clientX,dy=e.touches[1].clientY-e.touches[0].clientY;
-    _cs=Math.max(_csMin,Math.min(_csMin*5,_cPinch.cs*(Math.hypot(dx,dy)/_cPinch.d)));
-    _cClamp();_cScheduleDraw();_cShowZoom();
-  }
-}
-function _cTouchEnd(){_cDrag=null;_cPinch=null;}
-
 /* ══ INIT ══ */
 document.addEventListener('DOMContentLoaded',async()=>{
   document.getElementById('pre-theme')?.remove();
@@ -5109,28 +5364,6 @@ document.addEventListener('DOMContentLoaded',async()=>{
   await loadData();
   renderHome();
   _updateNavAvatar(); // restore nav avatar from storage on startup
-  // Restore hero color from saved avatar
-  (()=>{
-    const saved=_loadAvatarFromStorage();
-    if(saved){
-      const img=new Image();
-      img.onload=()=>{
-        try{
-          const tmp=document.createElement('canvas');tmp.width=8;tmp.height=8;
-          const tc=tmp.getContext('2d');tc.drawImage(img,0,0,8,8);
-          const d=tc.getImageData(0,0,8,8).data;
-          let r=0,g=0,b=0,n=0;
-          for(let i=0;i<d.length;i+=4){
-            const mx=Math.max(d[i],d[i+1],d[i+2]),mn=Math.min(d[i],d[i+1],d[i+2]);
-            const sat=(mx-mn)/(mx||1),lum=(mx+mn)/510;
-            if(sat>.12&&lum>.06&&lum<.92){r+=d[i];g+=d[i+1];b+=d[i+2];n++;}
-          }
-          if(n>0)setHeroColor(Math.round(r/n),Math.round(g/n),Math.round(b/n));
-        }catch{}
-      };
-      img.src=saved;
-    }
-  })();
   setTimeout(()=>{
     const sp=document.getElementById('splash');
     if(sp){sp.classList.add('hiding');setTimeout(()=>sp.remove(),520);}
