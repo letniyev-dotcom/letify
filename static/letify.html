@@ -1311,15 +1311,8 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   pointer-events:none;
   transition:background .6s ease;
 }
-/* Shimmer sweep */
-.pf-hero-shimmer{
-  position:absolute;inset:0;pointer-events:none;z-index:0;border-radius:22px;
-  background:linear-gradient(110deg,transparent 20%,rgba(var(--pf-r),var(--pf-g),var(--pf-b),.06) 40%,rgba(255,255,255,.07) 50%,transparent 80%);
-  background-size:250% 100%;
-  animation:pf-shimmer 8s ease-in-out infinite;
-  transition:opacity .6s ease;
-}
-@keyframes pf-shimmer{0%{background-position:150% 0}20%{background-position:-50% 0}21%,100%{background-position:-50% 0}}
+/* Shimmer sweep — disabled */
+.pf-hero-shimmer{display:none}
 .pf-hero-right{flex:1;min-width:0;position:relative;z-index:1}
 .pf-hero-name{font-size:18px;font-weight:900;color:var(--text);letter-spacing:-.02em;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tg-dark .pf-hero-name{color:#fff}
@@ -1535,7 +1528,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 <div style="position:sticky;top:0;background:var(--bg);z-index:10;padding:calc(var(--st)+12px) 16px 10px">
   <div class="ttabs">
     <button class="ttab on" id="tt-water" onclick="setTTab('water')">вода</button>
-    <button class="ttab" id="tt-cal" onclick="setTTab('cal')">калории</button>
+    <button class="ttab" id="tt-cal" onclick="setTTab('cal')">питание</button>
   </div>
 </div>
 <div id="tt-water-body">
@@ -3958,17 +3951,7 @@ function renderHomeClassic(){
 </div></div>
 <div class="pad gap"><div class="card" style="padding:16px 6px 12px">
   <div style="display:flex;justify-content:space-around;align-items:center">
-    <div style="text-align:center;cursor:pointer" onclick="navTo('track')">
-      <div class="aw"><svg width="68" height="68" viewBox="0 0 68 68"><circle cx="34" cy="34" r="26" fill="none" stroke="rgba(78,174,229,.15)" stroke-width="5"/><circle cx="34" cy="34" r="26" fill="none" stroke="var(--water)" stroke-width="5" stroke-linecap="round" stroke-dasharray="163.4" stroke-dashoffset="${arcW}" transform="rotate(-90 34 34)" style="transition:stroke-dashoffset .8s cubic-bezier(.25,.46,.45,.94)"/></svg>
-      <div class="ai"><div style="font-size:13px;font-weight:900;color:var(--water)">${Math.round(wp*100)}%</div></div></div>
-      <div style="font-size:11px;font-weight:900;margin-top:4px">${wt}</div><div class="t5" style="font-size:10px">мл</div>
-    </div>
-    <div style="text-align:center;cursor:pointer" onclick="navTo('track')">
-      <div class="aw"><svg width="82" height="82" viewBox="0 0 82 82"><circle cx="41" cy="41" r="33" fill="none" stroke="rgba(244,129,74,.15)" stroke-width="6"/><circle cx="41" cy="41" r="33" fill="none" stroke="var(--cal)" stroke-width="6" stroke-linecap="round" stroke-dasharray="207.3" stroke-dashoffset="${arcC}" transform="rotate(-90 41 41)" style="transition:stroke-dashoffset .8s cubic-bezier(.25,.46,.45,.94)"/></svg>
-      <div class="ai"><div style="font-size:15px;font-weight:900;color:var(--cal)">${Math.round(cp*100)}%</div></div></div>
-      <div style="font-size:13px;font-weight:900;margin-top:4px">${ct}</div><div class="t5" style="font-size:10px">ккал</div>
-      <div style="margin-top:4px;display:flex;gap:4px;justify-content:center">${macHtml}</div>
-    </div>
+    <div style="text-align:center;cursor:pointer" onclick="navTo('track');setTTab('water')">\n      <div class="aw"><svg width="68" height="68" viewBox="0 0 68 68"><circle cx="34" cy="34" r="26" fill="none" stroke="rgba(78,174,229,.15)" stroke-width="5"/><circle cx="34" cy="34" r="26" fill="none" stroke="var(--water)" stroke-width="5" stroke-linecap="round" stroke-dasharray="163.4" stroke-dashoffset="${arcW}" transform="rotate(-90 34 34)" style="transition:stroke-dashoffset .8s cubic-bezier(.25,.46,.45,.94)"/></svg>\n      <div class="ai"><div style="font-size:13px;font-weight:900;color:var(--water)">${Math.round(wp*100)}%</div></div></div>\n      <div style="font-size:11px;font-weight:900;margin-top:4px">${wt}</div><div class="t5" style="font-size:10px">мл</div>\n    </div>\n    <div style="text-align:center;cursor:pointer" onclick="navTo('track');setTTab('cal')">\n      <div class="aw"><svg width="82" height="82" viewBox="0 0 82 82"><circle cx="41" cy="41" r="33" fill="none" stroke="rgba(244,129,74,.15)" stroke-width="6"/><circle cx="41" cy="41" r="33" fill="none" stroke="var(--cal)" stroke-width="6" stroke-linecap="round" stroke-dasharray="207.3" stroke-dashoffset="${arcC}" transform="rotate(-90 41 41)" style="transition:stroke-dashoffset .8s cubic-bezier(.25,.46,.45,.94)"/></svg>\n      <div class="ai"><div style="font-size:15px;font-weight:900;color:var(--cal)">${Math.round(cp*100)}%</div></div></div>\n      <div style="font-size:13px;font-weight:900;margin-top:4px">${ct}</div><div class="t5" style="font-size:10px">ккал</div>\n      <div style="margin-top:4px;display:flex;gap:4px;justify-content:center">${macHtml}</div>\n    </div>
     <div style="text-align:center;cursor:pointer" onclick="navTo('sleep')">
       <div class="aw"><svg width="68" height="68" viewBox="0 0 68 68"><circle cx="34" cy="34" r="26" fill="none" stroke="rgba(139,127,212,.15)" stroke-width="5"/><circle cx="34" cy="34" r="26" fill="none" stroke="var(--sleep)" stroke-width="5" stroke-linecap="round" stroke-dasharray="163.4" stroke-dashoffset="${arcS}" transform="rotate(-90 34 34)" style="transition:stroke-dashoffset .8s cubic-bezier(.25,.46,.45,.94)"/></svg>
       <div class="ai"><div style="font-size:13px;font-weight:900;color:var(--sleep)">${sleepH}</div></div></div>
@@ -4015,15 +3998,15 @@ function renderHomeLinear(){
     <iconify-icon icon="solar:running-bold" width="32" style="color:rgba(255,255,255,.3);z-index:1;flex-shrink:0"></iconify-icon>
   </div>
   <div class="hl-metrics"><div class="hl-card">
-    <div class="hl-metric" onclick="navTo('track')">
+    <div class="hl-metric" onclick="navTo('track');setTTab('cal')">
       <div class="hl-metric-top">
-        <div class="hl-metric-left"><div class="hl-metric-ico" style="background:rgba(244,129,74,.12)"><iconify-icon icon="solar:fire-bold" width="14" style="color:var(--cal)"></iconify-icon></div><span class="hl-metric-name">калории</span></div>
+        <div class="hl-metric-left"><div class="hl-metric-ico" style="background:rgba(244,129,74,.12)"><iconify-icon icon="solar:fire-bold" width="14" style="color:var(--cal)"></iconify-icon></div><span class="hl-metric-name">питание</span></div>
         <div><span class="hl-metric-val" style="color:var(--cal)">${ct}</span><span class="hl-metric-of">/ ${cg} ккал</span></div>
       </div>
       <div class="hl-bar"><div class="hl-bar-fill" style="width:${Math.round(cp*100)}%;background:linear-gradient(90deg,var(--cal),var(--sun2))"></div></div>
       <div class="hl-metric-footer"><div class="hl-macros">${macHtml}</div><span style="font-size:10px;font-weight:800;color:var(--cal)">${Math.round(cp*100)}%</span></div>
     </div>
-    <div class="hl-metric" onclick="navTo('track')">
+    <div class="hl-metric" onclick="navTo('track');setTTab('water')">
       <div class="hl-metric-top">
         <div class="hl-metric-left"><div class="hl-metric-ico" style="background:rgba(78,174,229,.12)"><iconify-icon icon="solar:waterdrops-bold" width="14" style="color:var(--water)"></iconify-icon></div><span class="hl-metric-name">вода</span></div>
         <div><span class="hl-metric-val" style="color:var(--water)">${wt}</span><span class="hl-metric-of">/ ${wg} мл</span></div>
@@ -4082,8 +4065,8 @@ function renderHomeBento(){
       <iconify-icon icon="solar:sun-bold" width="28" style="color:rgba(255,255,255,.4);z-index:1"></iconify-icon>
     </div>
     <!-- Calories -->
-    <div class="hb-card" onclick="navTo('track')">
-      <div class="hb-card-lbl"><iconify-icon icon="solar:fire-bold" width="11"></iconify-icon>калории</div>
+    <div class="hb-card" onclick="navTo('track');setTTab('cal')">
+      <div class="hb-card-lbl"><iconify-icon icon="solar:fire-bold" width="11"></iconify-icon>питание</div>
       <div class="hb-card-val" style="color:var(--cal)">${ct}</div>
       <div class="hb-card-sub">из ${cg} ккал</div>
       ${macHtml}
@@ -4092,7 +4075,7 @@ function renderHomeBento(){
     </div>
     <!-- Right: water + sleep -->
     <div class="hb-right-col">
-      <div class="hb-card" style="flex:1" onclick="navTo('track')">
+      <div class="hb-card" style="flex:1" onclick="navTo('track');setTTab('water')">
         <div class="hb-card-lbl"><iconify-icon icon="solar:waterdrops-bold" width="11"></iconify-icon>вода</div>
         <div class="hb-card-val" style="color:var(--water);font-size:22px">${wt}</div>
         <div class="hb-card-sub">из ${wg} мл</div>
