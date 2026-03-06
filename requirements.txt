@@ -1,5 +1,2 @@
-aiogram>=3.0.0
-apscheduler>=3.10.0
-flask>=3.0.0
-flask-cors>=4.0.0
-tzdata
+aiogram>=3.0
+aiohttp>=3.9
