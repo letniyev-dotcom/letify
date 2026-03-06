@@ -854,7 +854,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   flex:1;
   overflow:hidden;
   display:flex;flex-direction:column;
-  margin:0 14px var(--page-bot);
+  margin:0 14px calc(var(--page-bot) - 10px);
 }
 #pl-tasks-container{
   flex:1;
@@ -864,8 +864,8 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   overflow:hidden;
   display:flex;flex-direction:column;
 }
-.tg-dark #pl-tasks-container{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1)}
-.tg-dark #ps-tasks-outer-wrap{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1)}
+.tg-dark #pl-tasks-container{background:rgba(255,255,255,.025);border-color:rgba(255,255,255,.07)}
+.tg-dark #ps-tasks-outer-wrap{background:rgba(255,255,255,.025);border-color:rgba(255,255,255,.07)}
 #pl-tasks-scroll{
   flex:1;overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;scrollbar-width:none;
@@ -2508,11 +2508,11 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     </div>
     <div style="font-size:11px;font-weight:700;color:var(--hint);margin-bottom:8px;letter-spacing:.04em" id="ps-day-label">задачи на понедельник</div>
     <div id="ps-tasks-outer-wrap" style="background:var(--bg2);border-radius:20px;border:1px solid var(--brd);overflow:hidden;margin-bottom:4px">
-      <div id="ps-tasks-list" style="max-height:64vh;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:10px 12px 14px">
+      <div id="ps-tasks-list" style="max-height:52vh;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:10px 12px 12px">
         <div style="text-align:center;padding:24px;color:var(--hint);font-size:13px;font-weight:600">нет задач</div>
       </div>
     </div>
-    <button class="btn btn-p" style="margin-top:24px" onclick="popPage();pushPage('pp-act')">+ добавить активность</button>
+    <button class="btn btn-p" style="margin-top:12px" onclick="popPage();pushPage('pp-act')">+ добавить активность</button>
   </div>
 </div>
 
@@ -3490,6 +3490,10 @@ function startLongPress(id,el){
 function cancelLongPress(){
   if(_lpTimer){clearTimeout(_lpTimer);_lpTimer=null;}
   _lpEl=null;
+}
+function cancelPsLongPress(){
+  if(_psLpTimer){clearTimeout(_psLpTimer);_psLpTimer=null;}
+  _psLpEl=null;
 }
 
 /* ══ DELETE ══ */
@@ -4801,19 +4805,20 @@ function _renderPsTasksList(){
   el.innerHTML = filtered.map(a=>{
     const ico=ACT_ICO[a.type]||'✨',col=ACT_COL[a.type]||'#FF9800';
     const time=(a.scheduled_at||'').slice(11,16)||'00:00';
-    return`<div class="ac" style="margin-bottom:8px" ontouchstart="startPsLongPress(${a.id},this)" ontouchend="cancelLongPress()" ontouchmove="cancelLongPress()" oncontextmenu="event.preventDefault()">
+    return`<div class="ac" style="margin-bottom:8px" ontouchstart="startPsLongPress(${a.id},this)" ontouchend="cancelPsLongPress()" ontouchmove="cancelPsLongPress()" oncontextmenu="event.preventDefault()">
       <div class="ac-ico" style="background:${col}18">${ico}</div>
       <div class="ac-body">
         <div class="ac-name">${a.name}</div>
         <div class="ac-sub">${time} · ${a.duration||30} мин</div>
       </div>
+      <div style="flex-shrink:0;font-size:10px;color:var(--hint);font-weight:700">удержи<br>чтобы<br>удалить</div>
     </div>`;
   }).join('');
 }
 
 let _psLpTimer=null,_psLpEl=null;
 function startPsLongPress(id,el){
-  if(_psLpEl)cancelLongPress();
+  if(_psLpEl)cancelPsLongPress();
   _psLpEl=el;
   _psLpTimer=setTimeout(()=>{
     _psLpTimer=null; const saved=_psLpEl; _psLpEl=null;
