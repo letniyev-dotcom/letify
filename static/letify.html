@@ -93,16 +93,15 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   -webkit-overflow-scrolling:touch;touch-action:pan-y;
   scrollbar-width:none;
   opacity:0;
-  transform:translateX(20px);
-  transition:opacity .18s ease, transform .18s ease;
+  transform:translateY(6px);
+  transition:opacity .2s ease,transform .2s ease;
   pointer-events:none;
   display:flex;flex-direction:column;
-  backface-visibility:hidden;-webkit-backface-visibility:hidden;
   will-change:opacity,transform;
   contain:layout;
 }
 .push-page::-webkit-scrollbar{display:none}
-.push-page.open{opacity:1;transform:translateX(0);pointer-events:all}
+.push-page.open{opacity:1;transform:none;pointer-events:all}
 .pp-hdr{
   flex-shrink:0;
   padding-top:calc(var(--st) + 10px);padding-bottom:12px;
@@ -2867,27 +2866,28 @@ async function loadData(){
 }
 
 function _demo(){
-  // Устанавливаем дефолтный профиль только если ещё не был настроен
-  if(!lsGet('user')){
-    lsSet('user',{
-      name:tgUser?.first_name||'',
-      height:0,age:0,
-      start_weight:0,goal_weight:0,
-      water_goal:2000,cal_goal:2000,
-      gender:'male',goal_type:'lose'
-    });
+  if(!lsGet('ds')){
+    lsSet('user',{name:tgUser?.first_name||'данечка',height:175,age:27,start_weight:85,goal_weight:75,water_goal:2500,cal_goal:2000,gender:'male',goal_type:'lose'});
+    const now=new Date(),wl=[],sl=[];
+    for(let i=13;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);wl.push({weight:+(85-((13-i)*.25)+(Math.random()-.5)*.3).toFixed(1),logged_at:d.toLocaleDateString('en-CA')});}
+    for(let i=6;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);sl.push({hours:+(6.5+Math.random()*2).toFixed(1),quality:3+Math.floor(Math.random()*3),logged_at:d.toLocaleDateString('en-CA')});}
+    lsSet('wlog',wl);lsSet('slog',sl);
+    lsSet('wd_'+TODAY,{total:1350,entries:[250,200,150,250,200,150,150]});
+    lsSet('cd_'+TODAY,{breakfast:420,lunch:680,dinner:0,snack:185,other:0});lsSet('streak',7);
+    lsSet('acts_'+TODAY,[
+      {id:1,name:'пробежка',type:'run',scheduled_at:'2024-01-01T07:00',duration:30,completed:0},
+      {id:2,name:'зал',type:'gym',scheduled_at:'2024-01-01T18:30',duration:60,completed:0},
+      {id:3,name:'йога',type:'yoga',scheduled_at:'2024-01-01T21:00',duration:25,completed:0}
+    ]);lsSet('ds',1);
   }
   const u=lsGet('user')||{};
   const wd=lsGet('wd_'+TODAY)||{total:0,entries:[]};
   const cd=lsGet('cd_'+TODAY)||{};
-  C.user={...{name:'',height:0,age:0,start_weight:0,goal_weight:0,water_goal:2000,cal_goal:2000,gender:'male',goal_type:'lose'},...u};
+  C.user={...{name:'данечка',height:0,age:0,start_weight:0,goal_weight:0,water_goal:2000,cal_goal:2000,gender:'male',goal_type:'lose'},...u};
+  // user_sw is the authoritative source for start_weight (survives reloads & server overwrites)
   const sw=lsGet('user_sw');
   if(sw?.start_weight>0)C.user.start_weight=sw.start_weight;
   if(sw?.goal_type)C.user.goal_type=sw.goal_type;
-  const localGw=lsGet('user_gw');
-  if(localGw?.goal_weight>0)C.user.goal_weight=localGw.goal_weight;
-  if(localGw?.water_goal>0)C.user.water_goal=localGw.water_goal;
-  if(localGw?.cal_goal>0)C.user.cal_goal=localGw.cal_goal;
   C.settings={show_weight:1,show_water:1,show_calories:1,show_sleep:1};
   C.water={total:wd.total||0,entries:wd.entries||[],streak:lsGet('streak')||0};
   C.calories=cd;
@@ -2989,8 +2989,8 @@ function popPage(doRender=true){
   const pp=document.getElementById(curPushPage);
   if(pp){
     pp.style.pointerEvents='none';
-    pp.style.opacity='0';pp.style.transform='translateY(10px) translateZ(0)';
-    setTimeout(()=>{pp.style.transition='none';pp.classList.remove('open');pp.style.opacity='';pp.style.transform='';pp.style.pointerEvents='';setTimeout(()=>{pp.style.transition='';},10);},200);
+    pp.classList.remove('open');
+    setTimeout(()=>{pp.style.pointerEvents='';},220);
   }
   const prev=_pageStack.pop()||null;
   curPushPage=prev;
