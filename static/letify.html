@@ -440,6 +440,147 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   pointer-events:none;
 }
 
+/* ══ PLAN FOCUS CARDS ══ */
+#pl-zone{
+  flex:1;overflow:hidden;
+  padding:0 14px calc(var(--page-bot) - 10px);
+  display:flex;flex-direction:column;gap:9px;
+}
+/* ── HERO ── */
+.pl-hero{
+  flex-shrink:0;
+  border-radius:22px;
+  padding:16px 16px 15px;
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;gap:11px;
+  border:1px solid rgba(0,0,0,.06);
+  transition:transform .12s,opacity .12s;
+}
+.tg-dark .pl-hero{border-color:rgba(255,255,255,.07)}
+.pl-hero:active{transform:scale(.988);transition:transform .08s ease}
+.pl-hero-glow{
+  position:absolute;top:-40px;right:-40px;
+  width:160px;height:160px;border-radius:50%;
+  pointer-events:none;filter:blur(44px);opacity:.2;
+}
+.pl-hero-row1{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}
+.pl-pill{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 10px;border-radius:99px;
+  font-size:10px;font-weight:800;letter-spacing:.02em;
+}
+.pl-pill-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.pl-dur{font-size:11px;font-weight:700;color:var(--hint)}
+.pl-hero-row2{display:flex;align-items:center;gap:13px;position:relative;z-index:1}
+.pl-hero-ico{
+  width:54px;height:54px;border-radius:17px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:27px;flex-shrink:0;
+}
+.pl-hero-name{font-size:21px;font-weight:900;letter-spacing:-.035em;line-height:1.15}
+.pl-hero-sub{font-size:12px;font-weight:600;color:var(--hint);margin-top:3px}
+.pl-hero-row3{display:flex;align-items:center;gap:10px;position:relative;z-index:1}
+.pl-prog-track{flex:1;height:4px;background:rgba(0,0,0,.08);border-radius:99px;overflow:hidden}
+.tg-dark .pl-prog-track{background:rgba(255,255,255,.1)}
+.pl-prog-fill{height:100%;border-radius:99px;transition:width .7s cubic-bezier(.25,.46,.45,.94)}
+.pl-btn-done{
+  display:flex;align-items:center;gap:6px;
+  padding:10px 17px;border-radius:14px;
+  border:none;color:#fff;font-family:inherit;
+  font-size:13px;font-weight:800;letter-spacing:.01em;
+  cursor:pointer;flex-shrink:0;
+  transition:transform .14s cubic-bezier(.34,1.56,.64,1),opacity .1s;
+}
+.pl-btn-done:active{transform:scale(.92);opacity:.85}
+/* ── MINI GRID ── */
+.pl-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:9px;flex-shrink:0;
+}
+.pl-grid.pl-solo{grid-template-columns:1fr}
+.pl-mini{
+  background:var(--bg2);border-radius:18px;
+  border:1px solid var(--brd);
+  padding:12px 12px 11px;
+  display:flex;flex-direction:column;gap:7px;
+  cursor:pointer;position:relative;overflow:hidden;
+  transition:transform .13s,opacity .13s;
+  min-height:88px;
+}
+.tg-dark .pl-mini{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.08)}
+.pl-mini:active{transform:scale(.965);opacity:.82}
+.pl-mini-strip{
+  position:absolute;top:0;left:0;right:0;height:2.5px;
+  border-radius:18px 18px 0 0;opacity:.7;
+}
+.pl-mini-top{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}
+.pl-mini-ico{width:33px;height:33px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.pl-mini-st{font-size:9px;font-weight:800;padding:3px 7px;border-radius:99px}
+.pl-mini-name{font-size:13px;font-weight:800;letter-spacing:-.01em;line-height:1.2;position:relative;z-index:1}
+.pl-mini-time{font-size:10px;font-weight:600;color:var(--hint);margin-top:-1px;position:relative;z-index:1}
+/* ── DONE OVERLAY ── */
+.pl-done-ov{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  font-size:15px;font-weight:900;color:#fff;
+  opacity:0;pointer-events:none;
+  transition:opacity .22s ease;z-index:20;
+}
+.pl-done-ov-ico{
+  width:42px;height:42px;border-radius:50%;
+  background:rgba(255,255,255,.22);
+  display:flex;align-items:center;justify-content:center;
+  transform:scale(0);
+  transition:transform .36s cubic-bezier(.34,1.56,.64,1) .04s;
+}
+.pl-card-completing .pl-done-ov{opacity:1;pointer-events:all}
+.pl-card-completing .pl-done-ov-ico{transform:scale(1)}
+.pl-card-completing{pointer-events:none}
+/* ── MORE CARD ── */
+.pl-more{
+  border-radius:18px;
+  border:1.5px dashed rgba(255,107,53,.28);
+  background:rgba(255,107,53,.04);
+  padding:13px 14px;
+  display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;
+  transition:background .15s,border-color .15s,transform .12s;
+}
+.tg-dark .pl-more{background:rgba(255,107,53,.04)}
+.pl-more:active{background:rgba(255,107,53,.1);border-color:rgba(255,107,53,.45);transform:scale(.985)}
+.pl-more-l{display:flex;align-items:center;gap:10px}
+.pl-more-badge{width:36px;height:36px;border-radius:11px;background:rgba(255,107,53,.12);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:var(--sun)}
+.pl-more-main{font-size:13px;font-weight:800;color:var(--sun)}
+.pl-more-sub{font-size:10px;font-weight:600;color:rgba(255,107,53,.5);margin-top:1px}
+/* ── LP ring ── */
+.pl-lp-svg{position:absolute;top:8px;right:8px;opacity:0;pointer-events:none;z-index:30;transition:opacity .1s}
+.pl-lp-svg.show{opacity:1}
+/* ── CARD ENTER / EXIT ── */
+@keyframes pl-enter{
+  from{opacity:0;transform:translateY(12px) scale(.95)}
+  to  {opacity:1;transform:translateY(0)    scale(1)}
+}
+@keyframes pl-exit{
+  from{opacity:1;transform:scale(1)}
+  to  {opacity:0;transform:scale(.88) translateY(-8px)}
+}
+.pl-card-in{animation:pl-enter .38s cubic-bezier(.34,1.4,.64,1) both}
+.pl-card-out{animation:pl-exit .28s cubic-bezier(.4,0,1,1) both;pointer-events:none}
+.pl-d0{animation-delay:0ms}
+.pl-d1{animation-delay:55ms}
+.pl-d2{animation-delay:110ms}
+.pl-d3{animation-delay:165ms}
+/* ── ALL DONE STATE ── */
+.pl-alldone{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:8px;padding:24px;text-align:center;
+}
+@keyframes pl-bounce{from{transform:scale(0);opacity:0}60%{transform:scale(1.12)}to{transform:scale(1);opacity:1}}
+.pl-alldone-e{font-size:56px;line-height:1;margin-bottom:6px;animation:pl-bounce .55s cubic-bezier(.34,1.56,.64,1) both}
+.pl-alldone-t{font-size:22px;font-weight:900;letter-spacing:-.03em}
+.pl-alldone-s{font-size:13px;font-weight:600;color:var(--hint);line-height:1.5;margin-top:3px}
+
 /* ══ SLEEP DOTS ══ */
 .sq{display:flex;gap:3px}
 .sqd{width:14px;height:4px;border-radius:99px;background:rgba(0,0,0,.07)}
@@ -690,19 +831,75 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tg-dark .day-btn-daily{background:rgba(255,255,255,.07)}
 .tg-dark .day-btn-daily.on{background:rgba(255,107,53,.18)}
 
-/* ══ TIME PICKER ══ */
-.time-picker-row{display:flex;align-items:center;justify-content:center;gap:0}
-.time-col{display:flex;flex-direction:column;align-items:center;gap:2px;flex:1}
-.time-digit{font-size:42px;font-weight:800;letter-spacing:-.02em;color:var(--text);line-height:1.1;min-width:70px;text-align:center;padding:4px 0}
-.time-sep{font-size:38px;font-weight:800;color:var(--text);padding:0 2px;line-height:1;opacity:.4;align-self:center}
-.time-arr-btn{
-  width:100%;padding:9px 0;background:transparent;border:none;border-radius:9px;
-  font-size:20px;color:var(--sun);cursor:pointer;font-family:inherit;
-  display:flex;align-items:center;justify-content:center;
-  -webkit-tap-highlight-color:transparent;font-weight:800;line-height:1;
+/* ══ DRUM TIME PICKER ══ */
+.drum-wrap{
+  display:flex;align-items:stretch;
+  height:210px;
+  border-radius:20px;
+  overflow:hidden;
+  background:var(--bg3);
+  position:relative;
 }
-.time-arr-btn:active{transform:scale(.93);opacity:.7;transition:transform .07s ease,opacity .07s ease}
-.tg-dark .time-arr-btn{background:rgba(255,255,255,.08)}
+.tg-dark .drum-wrap{background:rgba(255,255,255,.06)}
+/* selection highlight stripe */
+.drum-hl{
+  position:absolute;left:0;right:0;
+  top:50%;transform:translateY(-50%);
+  height:58px;
+  background:rgba(255,107,53,.1);
+  border-radius:14px;
+  pointer-events:none;z-index:10;
+  margin:0 10px;
+}
+.tg-dark .drum-hl{background:rgba(255,107,53,.13)}
+/* top/bottom fade mask */
+.drum-wrap::before,.drum-wrap::after{
+  content:'';position:absolute;left:0;right:0;height:72px;z-index:20;pointer-events:none;
+}
+.drum-wrap::before{top:0;background:linear-gradient(to bottom,var(--bg),transparent)}
+.drum-wrap::after{bottom:0;background:linear-gradient(to top,var(--bg),transparent)}
+.tg-dark .drum-wrap::before{background:linear-gradient(to bottom,var(--bg),transparent)}
+.tg-dark .drum-wrap::after{background:linear-gradient(to top,var(--bg),transparent)}
+.drum-col{
+  flex:1;
+  overflow-y:scroll;
+  scroll-snap-type:y mandatory;
+  scrollbar-width:none;
+  padding:76px 0;
+  -webkit-overflow-scrolling:touch;
+}
+.drum-col::-webkit-scrollbar{display:none}
+.drum-item{
+  height:58px;
+  display:flex;align-items:center;justify-content:center;
+  scroll-snap-align:center;
+  font-size:38px;font-weight:800;letter-spacing:-.03em;
+  color:var(--text);
+  transition:opacity .15s,transform .15s;
+  cursor:pointer;
+}
+.drum-sep{
+  display:flex;align-items:center;justify-content:center;
+  font-size:36px;font-weight:900;
+  color:var(--text);opacity:.35;
+  padding:0 2px;flex-shrink:0;z-index:15;
+  position:relative;
+}
+.drum-lbl{
+  position:absolute;bottom:8px;left:0;right:0;
+  text-align:center;font-size:9px;font-weight:700;
+  color:var(--hint);letter-spacing:.06em;text-transform:uppercase;
+  z-index:25;pointer-events:none;
+}
+/* dur display */
+.drum-dur-row{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-top:10px;padding:10px 14px;border-radius:14px;
+  background:var(--bg3);
+}
+.tg-dark .drum-dur-row{background:rgba(255,255,255,.06)}
+.drum-dur-val{font-size:16px;font-weight:800;color:var(--sun)}
+.drum-dur-lbl{font-size:12px;font-weight:600;color:var(--hint)}
 
 /* ══ DARK OVERRIDES ══ */
 .tg-dark{--bg3:rgba(255,255,255,.07);--brd:rgba(255,255,255,.09);--sh:0 2px 12px rgba(0,0,0,.4)}
@@ -850,29 +1047,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 #p-plan .plan-hdr{
   flex-shrink:0;padding:0 16px 10px;
 }
-#pl-tasks-outer{
-  flex:1;
-  overflow:hidden;
-  display:flex;flex-direction:column;
-  margin:0 14px calc(var(--page-bot) - 10px);
-}
-#pl-tasks-container{
-  flex:1;
-  background:var(--bg2);
-  border-radius:20px;
-  border:1px solid var(--brd);
-  overflow:hidden;
-  display:flex;flex-direction:column;
-}
-.tg-dark #pl-tasks-container{background:rgba(255,255,255,.025);border-color:rgba(255,255,255,.07)}
-.tg-dark #ps-tasks-outer-wrap{background:rgba(255,255,255,.025);border-color:rgba(255,255,255,.07)}
-#pl-tasks-scroll{
-  flex:1;overflow-y:auto;overflow-x:hidden;
-  -webkit-overflow-scrolling:touch;scrollbar-width:none;
-  padding:10px 12px 14px;
-}
-#pl-tasks-scroll::-webkit-scrollbar{display:none}
-#ps-tasks-list::-webkit-scrollbar{display:none}
 .pl-empty{
   flex:1;display:flex;flex-direction:column;
   align-items:center;justify-content:center;
@@ -1625,19 +1799,9 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       </svg>
     </div>
   </div>
-  <div style="font-size:9px;font-weight:700;color:var(--hint);text-align:center;letter-spacing:.04em;opacity:.7;padding-bottom:8px">удержи карточку чтобы удалить</div>
+  <div style="font-size:9px;font-weight:700;color:var(--hint);text-align:center;letter-spacing:.04em;opacity:.7;padding-bottom:8px" id="pl-hint">удержи карточку чтобы удалить</div>
 </div>
-<div id="pl-tasks-outer">
-  <div id="pl-tasks-container">
-    <div id="pl-tasks-scroll">
-      <div id="pl-list"></div>
-      <div id="pl-empty" style="display:none" class="pl-empty">
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/></svg>
-        <div style="font-size:13px;font-weight:700">нет задач на сегодня</div>
-      </div>
-    </div>
-  </div>
-</div>
+<div id="pl-zone"></div>
 </div>
 
 <!-- ══ SLEEP ══ -->
@@ -2226,39 +2390,27 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     <div class="act-step" id="act-s2">
       <div class="act-hint">выбери время начала и конца</div>
       <div style="margin-bottom:8px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--hint)">время начала</div>
-      <div class="m3-card" style="padding:6px 8px;background:var(--bg3) !important;box-shadow:none">
-        <div class="time-picker-row">
-          <div class="time-col">
-            <button class="time-arr-btn" onclick="stepTime('sh',-1)">▲</button>
-            <div class="time-digit" id="time-h-disp">08</div>
-            <button class="time-arr-btn" onclick="stepTime('sh',1)">▼</button>
-          </div>
-          <div class="time-sep">:</div>
-          <div class="time-col">
-            <button class="time-arr-btn" onclick="stepTime('sm',-1)">▲</button>
-            <div class="time-digit" id="time-m-disp">00</div>
-            <button class="time-arr-btn" onclick="stepTime('sm',1)">▼</button>
-          </div>
-        </div>
+      <div class="drum-wrap" id="drum-start">
+        <div class="drum-hl"></div>
+        <div class="drum-col" id="ds-h" onscroll="onDrumScroll('start','h')"></div>
+        <div class="drum-sep">:</div>
+        <div class="drum-col" id="ds-m" onscroll="onDrumScroll('start','m')"></div>
+        <div class="drum-lbl">начало</div>
       </div>
       <input type="hidden" id="inp-atime" value="08:00">
       <div style="margin:14px 0 8px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--hint)">время конца</div>
-      <div class="m3-card" style="padding:6px 8px;background:var(--bg3) !important;box-shadow:none">
-        <div class="time-picker-row">
-          <div class="time-col">
-            <button class="time-arr-btn" onclick="stepTime('eh',-1)">▲</button>
-            <div class="time-digit" id="time-eh-disp">09</div>
-            <button class="time-arr-btn" onclick="stepTime('eh',1)">▼</button>
-          </div>
-          <div class="time-sep">:</div>
-          <div class="time-col">
-            <button class="time-arr-btn" onclick="stepTime('em',-1)">▲</button>
-            <div class="time-digit" id="time-em-disp">00</div>
-            <button class="time-arr-btn" onclick="stepTime('em',1)">▼</button>
-          </div>
-        </div>
+      <div class="drum-wrap" id="drum-end">
+        <div class="drum-hl"></div>
+        <div class="drum-col" id="de-h" onscroll="onDrumScroll('end','h')"></div>
+        <div class="drum-sep">:</div>
+        <div class="drum-col" id="de-m" onscroll="onDrumScroll('end','m')"></div>
+        <div class="drum-lbl">конец</div>
       </div>
-      <div id="act-dur-display" style="text-align:center;margin-top:10px;font-size:13px;font-weight:700;color:var(--hint)">длительность: 60 мин</div>
+      <div class="drum-dur-row" id="act-dur-display">
+        <iconify-icon icon="solar:clock-circle-bold" width="16" style="color:var(--sun)"></iconify-icon>
+        <span class="drum-dur-val" id="dur-val-txt">60 мин</span>
+        <span class="drum-dur-lbl">длительность</span>
+      </div>
     </div>
     <div class="act-step" id="act-s3">
       <div class="act-hint">в какие дни повторять?</div>
@@ -3101,6 +3253,9 @@ function _populatePP(id){
   if(id==='pp-act'){
     actStep=1;_actType='run';_actDur=45;_timeH=8;_timeM=0;_timeEH=9;_timeEM=0;_actDays=[];
     const ni=document.getElementById('inp-aname');if(ni)ni.value='пробежка';
+    _drumReady=false;
+    setTimeout(()=>initDrums(),50);
+    const ni=document.getElementById('inp-aname');if(ni)ni.value='пробежка';
     document.querySelectorAll('#act-quick .type-card').forEach((c,i)=>c.classList.toggle('on',i===0));
     document.getElementById('day-btn-daily')?.classList.add('on');
     document.querySelectorAll('#days-grid .day-btn').forEach(b=>b.classList.remove('on'));
@@ -3391,17 +3546,14 @@ function clearMealEntries(){
   tg?.HapticFeedback?.notificationOccurred('success');
 }
 function _updateTimeDisplay(){
+  /* legacy stub – drum picker handles its own display */
   const pad=v=>String(v).padStart(2,'0');
-  const hd=document.getElementById('time-h-disp'),md=document.getElementById('time-m-disp');
-  const ehd=document.getElementById('time-eh-disp'),emd=document.getElementById('time-em-disp');
-  if(hd)hd.textContent=pad(_timeH);if(md)md.textContent=pad(_timeM);
-  if(ehd)ehd.textContent=pad(_timeEH);if(emd)emd.textContent=pad(_timeEM);
   const inp=document.getElementById('inp-atime');if(inp)inp.value=pad(_timeH)+':'+pad(_timeM);
   const startMin=_timeH*60+_timeM,endMin=_timeEH*60+_timeEM;
   let dur=endMin-startMin;if(dur<=0)dur+=24*60;
-  const dd=document.getElementById('act-dur-display');
-  if(dd){if(dur>=60){const h=Math.floor(dur/60),m=dur%60;dd.textContent='длительность: '+(h>0?h+' ч ':'')+(m>0?m+' мин':'');}else{dd.textContent='длительность: '+dur+' мин';}}
   _actDur=dur;
+  const dv=document.getElementById('dur-val-txt');
+  if(dv){if(dur>=60){const h=Math.floor(dur/60),m=dur%60;dv.textContent=(h>0?h+'ч ':'')+(m>0?m+' мин':'');}else{dv.textContent=dur+' мин';}}
 }
 function stepTime(part,dir){
   if(part==='sh')_timeH=(_timeH+dir+24)%24;
@@ -3409,6 +3561,63 @@ function stepTime(part,dir){
   else if(part==='eh')_timeEH=(_timeEH+dir+24)%24;
   else if(part==='em')_timeEM=(_timeEM+dir*5+60)%60;
   _updateTimeDisplay();tg?.HapticFeedback?.selectionChanged();
+}
+
+/* ══ DRUM PICKER ══ */
+const DRUM_H=58; /* item height px */
+let _drumReady=false;
+let _drumScrollTimer={};
+
+function _buildDrumCol(el,values,selected){
+  if(!el)return;
+  el.innerHTML=values.map(v=>`<div class="drum-item">${String(v).padStart(2,'0')}</div>`).join('');
+  /* scroll to selected without animation */
+  const idx=values.indexOf(selected);
+  if(idx>=0){
+    el.style.scrollBehavior='auto';
+    el.scrollTop=idx*DRUM_H;
+    requestAnimationFrame(()=>el.style.scrollBehavior='smooth');
+  }
+}
+
+function initDrums(){
+  const hours=Array.from({length:24},(_,i)=>i);
+  const mins=[0,5,10,15,20,25,30,35,40,45,50,55];
+  _buildDrumCol(document.getElementById('ds-h'),hours,_timeH);
+  _buildDrumCol(document.getElementById('ds-m'),mins,_timeM);
+  _buildDrumCol(document.getElementById('de-h'),hours,_timeEH);
+  _buildDrumCol(document.getElementById('de-m'),mins,_timeEM);
+  _drumReady=true;
+}
+
+function onDrumScroll(picker,part){
+  if(!_drumReady)return;
+  const key=picker+part;
+  clearTimeout(_drumScrollTimer[key]);
+  _drumScrollTimer[key]=setTimeout(()=>{
+    const colId=(picker==='start'?(part==='h'?'ds-h':'ds-m'):(part==='h'?'de-h':'de-m'));
+    const col=document.getElementById(colId);
+    if(!col)return;
+    const idx=Math.round(col.scrollTop/DRUM_H);
+    const snapped=idx*DRUM_H;
+    /* snap */
+    if(Math.abs(col.scrollTop-snapped)>1){
+      col.style.scrollBehavior='smooth';
+      col.scrollTop=snapped;
+    }
+    /* update values */
+    const hours=Array.from({length:24},(_,i)=>i);
+    const mins=[0,5,10,15,20,25,30,35,40,45,50,55];
+    if(picker==='start'){
+      if(part==='h')_timeH=hours[Math.min(idx,23)];
+      else _timeM=mins[Math.min(idx,11)];
+    }else{
+      if(part==='h')_timeEH=hours[Math.min(idx,23)];
+      else _timeEM=mins[Math.min(idx,11)];
+    }
+    _updateTimeDisplay();
+    tg?.HapticFeedback?.selectionChanged();
+  },80);
 }
 
 /* ══ OTHER SETTERS ══ */
@@ -3449,7 +3658,7 @@ function _renderActStep(){
 }
 function actBackOrPop(){if(actStep>1){actStep--;_renderActStep();}else popPage();}
 function actStepNext(){
-  if(actStep===1){if(!(document.getElementById('inp-aname')?.value?.trim())){toast('введи название');return;}actStep=2;_renderActStep();}
+  if(actStep===1){if(!(document.getElementById('inp-aname')?.value?.trim())){toast('введи название');return;}actStep=2;_renderActStep();_drumReady=false;setTimeout(()=>initDrums(),60);}
   else if(actStep===2){actStep=3;_renderActStep();}
   else if(actStep===3){actStep=4;_renderActStep();}
   else submitAct();
@@ -3509,6 +3718,7 @@ async function deleteActDirectly(id,cardEl){
     T('pl-cnt',total?`${done}/${total}`:'0/0');
     requestAnimationFrame(()=>{const r=$('pl-ring');if(r)r.setAttribute('stroke-dashoffset',125.7*(1-(total?done/total:0)));});
     renderHome();
+    renderPlan();
   }
 
   toast('удалено');
@@ -3532,30 +3742,83 @@ async function deleteActDirectly(id,cardEl){
   await apiPost('/api/activity/delete',{act_id:id});
 }
 
-/* ══ COMPLETING MAP ══ */
+/* ══ PLAN LONG PRESS (new cards) ══ */
 const _completingMap=new Map();
+const _plLpTimers={};
+const PL_LP=650;
+function plLpStart(id,el){
+  plLpEnd(id);
+  const svg=document.getElementById('pllp-'+id);
+  const circ=document.getElementById('pllpc-'+id);
+  if(svg)svg.classList.add('show');
+  let t0=null;
+  function frame(ts){
+    if(!_plLpTimers[id])return;
+    if(!t0)t0=ts;
+    const p=Math.min((ts-t0)/PL_LP,1);
+    if(circ)circ.setAttribute('stroke-dashoffset',(50.3*(1-p)).toFixed(2));
+    if(p<1){_plLpTimers[id]=requestAnimationFrame(frame);}
+    else{
+      delete _plLpTimers[id];
+      if(svg)svg.classList.remove('show');
+      if(circ)circ.setAttribute('stroke-dashoffset','50.3');
+      deleteActDirectly(id,el);
+    }
+  }
+  _plLpTimers[id]=requestAnimationFrame(frame);
+}
+function plLpEnd(id){
+  if(_plLpTimers[id]){cancelAnimationFrame(_plLpTimers[id]);delete _plLpTimers[id];}
+  const svg=document.getElementById('pllp-'+id);
+  const circ=document.getElementById('pllpc-'+id);
+  if(svg)svg.classList.remove('show');
+  if(circ)circ.setAttribute('stroke-dashoffset','50.3');
+}
 
-/* ══ COMPLETE ACT ══ */
+/* ══ MORE PAGE (plan) ══ */
+function openPlMore(){
+  const acts=gActs();
+  const active=acts.filter(a=>!a.completed);
+  const rest=active.slice(1);
+  const hidden=rest.length>3?rest.slice(2):[];
+  if(!hidden.length)return;
+  pushPage('pp-done-acts');
+  const el=document.getElementById('done-acts-list');
+  if(!el)return;
+  const mons=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+  const now=new Date();
+  function hexRgb(hex){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return`${r},${g},${b}`;}
+  el.innerHTML=`<div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--hint);padding:4px 2px 10px">остальные задачи</div>`+
+    hidden.map(a=>{
+      const c=ACT_COL[a.type]||'#FF6B35';
+      const ic=ACT_ICO[a.type]||'✨';
+      const st=actStatus(a);
+      const pc=`p-${st.s==='done'?'ok':st.s}`;
+      const cr=hexRgb(c);
+      return`<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--brd)">
+        <div style="width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;background:rgba(${cr},.12)">${ic}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:800;letter-spacing:-.01em">${a.name}</div>
+          <div style="font-size:11px;font-weight:600;color:var(--hint);margin-top:2px">${fmtRange(a)} · ${a.duration} мин</div>
+        </div>
+        <span class="pill ${pc}">${st.l}</span>
+        <button class="btn btn-g" style="padding:8px 11px;font-size:12px;border-radius:10px;flex-shrink:0" onclick="completeAct(${a.id});popPage()">✓</button>
+      </div>`;
+    }).join('');
+}
+
+/* ══ COMPLETE ACT (updated for new card design) ══ */
 async function completeAct(id){
   const act=C.acts_today.find(x=>x.id===id);
   if(!act)return;
 
-  // Undo
+  /* UNDO path */
   if(_completingMap.has(id)){
     const{hideTimer}=_completingMap.get(id);
     clearTimeout(hideTimer);_completingMap.delete(id);
     C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:0}:x);
     lsSet('acts_'+TODAY,C.acts_today);
-    const cardEl=document.querySelector(`#pl-list .ac[data-id="${id}"]`);
-    if(cardEl){
-      cardEl.classList.remove('done');
-      const nameEl=cardEl.querySelector('.ac-name');if(nameEl)nameEl.classList.remove('done-text');
-      const pill=cardEl.querySelector('.pill');if(pill){pill.className='pill p-later';pill.innerHTML='запланировано';}
-      const btn=cardEl.querySelector('.complete-btn-js');
-      if(btn){btn.innerHTML='✓';btn.style.background='';btn.style.color='';btn.onclick=()=>completeAct(id);}
-      const tb=cardEl.querySelector('.ac-timer-bar');if(tb)tb.remove();
-      cardEl.style.transition='height .25s ease';cardEl.style.height='';cardEl.style.overflow='';
-    }
+    renderPlan();
     _updatePlanCounters();
     toast('отменено');tg?.HapticFeedback?.notificationOccurred('warning');
     apiPost('/api/activity/uncomplete',{act_id:id});
@@ -3571,43 +3834,19 @@ async function completeAct(id){
   tg?.HapticFeedback?.notificationOccurred('success');
   toast('выполнено 🎉');
 
-  const cardEl=document.querySelector(`#pl-list .ac[data-id="${id}"]`);
+  const cardEl=document.querySelector(`[data-id="${id}"]`);
   if(cardEl){
-    cardEl.classList.add('done');
-    const nameEl=cardEl.querySelector('.ac-name');if(nameEl)nameEl.classList.add('done-text');
-    const pill=cardEl.querySelector('.pill');if(pill){pill.className='pill p-ok';pill.innerHTML='✓ выполнено';}
-    const btn=cardEl.querySelector('.complete-btn-js');
-    if(btn){btn.innerHTML='↩';btn.style.background='rgba(82,193,119,.12)';btn.style.color='var(--green)';btn.onclick=(e)=>{e.stopPropagation();completeAct(id);};}
-
-    const timerBar=document.createElement('div');
-    timerBar.className='ac-timer-bar';timerBar.style.width='100%';
-    cardEl.appendChild(timerBar);
-    requestAnimationFrame(()=>requestAnimationFrame(()=>{timerBar.style.width='0%';}));
+    /* Phase 1: show done overlay */
+    cardEl.classList.add('pl-card-completing');
 
     const hideTimer=setTimeout(()=>{
       _completingMap.delete(id);
-      requestAnimationFrame(()=>{
-        // Fade + slide right ONLY — no height collapse, button never jumps
-        cardEl.style.transition='opacity .35s ease, transform .35s cubic-bezier(.4,0,.2,1)';
-        cardEl.style.opacity='0';
-        cardEl.style.transform='translateX(72px)';
-        // After fade done — collapse silently with no transition so it snaps away
-        setTimeout(()=>{
-          cardEl.style.transition='none';
-          cardEl.style.height='0';
-          cardEl.style.marginBottom='0';
-          cardEl.style.paddingTop='0';
-          cardEl.style.paddingBottom='0';
-          cardEl.style.overflow='hidden';
-          // Remove from DOM next frame so layout settles without animation
-          requestAnimationFrame(()=>{
-            if(cardEl.parentNode)cardEl.remove();
-            if(_completingMap.size===0){renderPlan();renderHome();}
-          });
-        },360);
-      });
-    },3600);
-
+      /* Phase 2: fade out */
+      cardEl.classList.add('pl-card-out');
+      setTimeout(()=>{
+        if(_completingMap.size===0){renderPlan();renderHome();}
+      },300);
+    },700);
     _completingMap.set(id,{hideTimer});
     await apiPost('/api/activity/complete',{act_id:id});
   }else{
@@ -4215,35 +4454,152 @@ function renderPlan(){
   const done=acts.filter(a=>a.completed).length,total=acts.length;
   T('pl-cnt',total?`${done}/${total}`:'0/0');
   requestAnimationFrame(()=>{const r=$('pl-ring');if(r)r.setAttribute('stroke-dashoffset',125.7*(1-(total?done/total:0)));});
-  const list=$('pl-list');
-  const empty=$('pl-empty');
-  const activeTasks=acts.filter(a=>!a.completed);
-  if(!list)return;
-  if(!activeTasks.length){
-    list.innerHTML='';
-    if(empty)empty.style.display='flex';
+
+  const zone=$('pl-zone');
+  if(!zone)return;
+  const hint=$('pl-hint');
+  const active=acts.filter(a=>!a.completed);
+
+  /* helper */
+  function hexRgb(hex){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return`${r},${g},${b}`;}
+  function plural(n){if(n%10===1&&n%100!==11)return'задача';if(n%10>=2&&n%10<=4&&!(n%100>=11&&n%100<=14))return'задачи';return'задач';}
+
+  /* all done */
+  if(active.length===0&&total>0){
+    if(hint)hint.textContent='';
+    zone.innerHTML=`<div class="pl-alldone pl-card-in pl-d0">
+      <div class="pl-alldone-e">🎉</div>
+      <div class="pl-alldone-t">всё выполнено!</div>
+      <div class="pl-alldone-s">отличная работа —<br>все ${total} задач закрыты сегодня</div>
+    </div>`;
     return;
   }
-  if(empty)empty.style.display='none';
-  list.innerHTML=activeTasks.map(a=>{
-    const ico=ACT_ICO[a.type]||'✨',col=ACT_COL[a.type]||'#FF9800';
-    const st=actStatus(a);
-    const pc={done:'p-ok',now:'p-now',soon:'p-soon',late:'p-late',later:'p-later'}[st.s]||'p-later';
-    const pct=st.s==='now'?Math.round((st.p||0)*100):0;
-    const bar=['now','soon'].includes(st.s);
-    return`<div class="ac" data-id="${a.id}" oncontextmenu="event.preventDefault()" ontouchstart="startLongPress(${a.id},this)" ontouchend="cancelLongPress()" ontouchmove="cancelLongPress()">
-      <div class="ac-ico" style="background:${col}18">${ico}</div>
-      <div class="ac-body">
-        <div class="ac-name">${a.name}</div>
-        <div class="ac-sub">${fmtRange(a)} · ${a.duration} мин</div>
-        <span class="pill ${pc}">${st.l}</span>
-        ${bar?`<div class="ac-bar"><div class="ac-barf" style="width:${st.s==='soon'?70:pct}%;background:${st.s==='now'?'var(--water)':'rgba(255,107,53,.35)'}"></div></div>`:''}
-      </div>
-      <div style="flex-shrink:0">
-        <button class="btn btn-g complete-btn-js" style="padding:7px 11px;font-size:12px;border-radius:9px" onclick="completeAct(${a.id})">✓</button>
-      </div>
+
+  /* empty */
+  if(active.length===0){
+    if(hint)hint.textContent='';
+    zone.innerHTML=`<div class="pl-empty" style="display:flex">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/></svg>
+      <div style="font-size:13px;font-weight:700">нет задач на сегодня</div>
     </div>`;
-  }).join('');
+    return;
+  }
+
+  if(hint)hint.textContent='удержи карточку чтобы удалить';
+
+  /* layout: hero + up to 2 minis + more */
+  const hero=active[0];
+  const rest=active.slice(1);
+  const showMore=rest.length>3;
+  const minis=showMore?rest.slice(0,2):rest.slice(0,3);
+  const hidden=showMore?rest.slice(2):[];
+
+  const hc=ACT_COL[hero.type]||'#FF6B35';
+  const hi=ACT_ICO[hero.type]||'✨';
+  const hs=actStatus(hero);
+  const heroPc=`p-${hs.s==='done'?'ok':hs.s}`;
+  const showBar=hs.s==='now'||hs.s==='soon';
+  const heroProg=hs.s==='now'?Math.round((hs.p||0)*100):65;
+  const hrgb=hexRgb(hc);
+  const isDark=document.documentElement.classList.contains('pre-dark')||document.body.classList.contains('tg-dark');
+  const heroBg=isDark
+    ?`linear-gradient(145deg,rgba(${hrgb},.14) 0%,rgba(26,26,26,1) 60%)`
+    :`linear-gradient(145deg,rgba(${hrgb},.1) 0%,rgba(255,255,255,1) 60%)`;
+
+  let html=`
+  <div class="pl-hero pl-card-in pl-d0" data-id="${hero.id}"
+    style="background:${heroBg}"
+    ontouchstart="plLpStart(${hero.id},this)"
+    ontouchend="plLpEnd(${hero.id})"
+    ontouchmove="plLpEnd(${hero.id})"
+    oncontextmenu="event.preventDefault()">
+    <div class="pl-hero-glow" style="background:${hc}"></div>
+    <svg class="pl-lp-svg" id="pllp-${hero.id}" width="22" height="22" viewBox="0 0 22 22">
+      <circle cx="11" cy="11" r="8" fill="none" stroke="rgba(244,92,92,.2)" stroke-width="2.5"/>
+      <circle id="pllpc-${hero.id}" cx="11" cy="11" r="8" fill="none" stroke="var(--red)"
+        stroke-width="2.5" stroke-linecap="round"
+        stroke-dasharray="50.3" stroke-dashoffset="50.3"
+        transform="rotate(-90 11 11)"/>
+    </svg>
+    <div class="pl-hero-row1">
+      <div class="pl-pill ${heroPc}"><span class="pl-pill-dot"></span>${hs.l}</div>
+      <span class="pl-dur">${hero.duration} мин</span>
+    </div>
+    <div class="pl-hero-row2">
+      <div class="pl-hero-ico" style="background:rgba(${hrgb},.14)">${hi}</div>
+      <div>
+        <div class="pl-hero-name">${hero.name}</div>
+        <div class="pl-hero-sub">${fmtRange(hero)}</div>
+      </div>
+    </div>
+    <div class="pl-hero-row3">
+      ${showBar?`<div class="pl-prog-track"><div class="pl-prog-fill" style="width:${heroProg}%;background:linear-gradient(90deg,${hc},rgba(${hrgb},.55))"></div></div>`:'<div style="flex:1"></div>'}
+      <button class="pl-btn-done"
+        style="background:linear-gradient(135deg,${hc},rgba(${hrgb},.65));box-shadow:0 4px 12px rgba(${hrgb},.28)"
+        onclick="event.stopPropagation();completeAct(${hero.id})">
+        <iconify-icon icon="solar:check-bold" width="13"></iconify-icon>
+        выполнить
+      </button>
+    </div>
+    <div class="pl-done-ov" style="background:rgba(${hrgb},.94);border-radius:22px">
+      <div class="pl-done-ov-ico"><iconify-icon icon="solar:check-circle-bold" width="22" style="color:#fff"></iconify-icon></div>
+      <span>отлично!</span>
+    </div>
+  </div>`;
+
+  if(minis.length>0||showMore){
+    const soloClass=(minis.length===1&&!showMore)?'pl-solo':'';
+    html+=`<div class="pl-grid ${soloClass}">`;
+    minis.forEach((a,i)=>{
+      const c=ACT_COL[a.type]||'#FF6B35';
+      const ic=ACT_ICO[a.type]||'✨';
+      const st=actStatus(a);
+      const pc=`p-${st.s==='done'?'ok':st.s}`;
+      const cr=hexRgb(c);
+      html+=`
+      <div class="pl-mini pl-card-in pl-d${i+1}" data-id="${a.id}"
+        ontouchstart="plLpStart(${a.id},this)"
+        ontouchend="plLpEnd(${a.id})"
+        ontouchmove="plLpEnd(${a.id})"
+        oncontextmenu="event.preventDefault()"
+        onclick="completeAct(${a.id})">
+        <div class="pl-mini-strip" style="background:${c}"></div>
+        <svg class="pl-lp-svg" id="pllp-${a.id}" width="18" height="18" viewBox="0 0 22 22">
+          <circle cx="11" cy="11" r="8" fill="none" stroke="rgba(244,92,92,.18)" stroke-width="2.5"/>
+          <circle id="pllpc-${a.id}" cx="11" cy="11" r="8" fill="none" stroke="var(--red)"
+            stroke-width="2.5" stroke-linecap="round"
+            stroke-dasharray="50.3" stroke-dashoffset="50.3"
+            transform="rotate(-90 11 11)"/>
+        </svg>
+        <div class="pl-mini-top">
+          <div class="pl-mini-ico" style="background:rgba(${cr},.13)">${ic}</div>
+          <div class="pl-mini-st ${pc}">${st.l}</div>
+        </div>
+        <div class="pl-mini-name">${a.name}</div>
+        <div class="pl-mini-time">${fmtRange(a)} · ${a.duration} мин</div>
+        <div class="pl-done-ov" style="background:rgba(${cr},.92);border-radius:18px">
+          <div class="pl-done-ov-ico"><iconify-icon icon="solar:check-circle-bold" width="18" style="color:#fff"></iconify-icon></div>
+        </div>
+      </div>`;
+    });
+    if(showMore){
+      const mc=hidden.length;
+      html+=`
+      <div class="pl-more pl-card-in pl-d${minis.length+1}" onclick="openPlMore()">
+        <div class="pl-more-l">
+          <div class="pl-more-badge">+${mc}</div>
+          <div>
+            <div class="pl-more-main">ещё ${mc} ${plural(mc)}</div>
+            <div class="pl-more-sub">нажми чтобы открыть</div>
+          </div>
+        </div>
+        <iconify-icon icon="solar:alt-arrow-right-bold" width="14" style="color:rgba(255,107,53,.4)"></iconify-icon>
+      </div>`;
+    }
+    html+=`</div>`;
+  }
+
+  zone.innerHTML=html;
 }
 
 setInterval(()=>{if(curTab==='plan'&&_completingMap.size===0)renderPlan();},30000);
