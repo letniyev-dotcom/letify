@@ -53,22 +53,84 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   position:fixed;inset:0;z-index:99999;
   background:var(--bg);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:0;
-  transition:opacity .5s ease,transform .5s ease;
-  will-change:opacity,transform;
   overflow:hidden;
+  transition:opacity .55s ease;
+  will-change:opacity;
 }
+/* light mode glow */
 #splash::before{
   content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse 45% 30% at 50% 40%, rgba(255,107,53,.10) 0%, transparent 70%);
-  pointer-events:none;
+  background:radial-gradient(ellipse 60% 42% at 50% 50%, rgba(255,107,53,.11) 0%, transparent 70%);
+  pointer-events:none;opacity:0;
+  animation:sp-bg-in .9s .15s ease forwards;
 }
-#splash.hiding{opacity:0;transform:scale(1.04);}
-.sp-dots{display:flex;gap:8px;}
-.sp-dot{width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,var(--sun),var(--sun2));animation:sp-bounce 1.5s ease-in-out infinite;}
-.sp-dot:nth-child(2){animation-delay:.18s;opacity:.65;}
-.sp-dot:nth-child(3){animation-delay:.36s;opacity:.35;}
-@keyframes sp-bounce{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(-5px);opacity:1}}
+/* dark mode — glow ярче и теплее */
+.pre-dark #splash::before,
+.tg-dark #splash::before{
+  background:radial-gradient(ellipse 60% 42% at 50% 50%, rgba(255,107,53,.22) 0%, rgba(255,171,64,.06) 55%, transparent 75%);
+}
+@keyframes sp-bg-in{to{opacity:1}}
+#splash.hiding{opacity:0;}
+
+/* eyebrow */
+.sp-eyebrow{
+  font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+  color:rgba(255,107,53,.5);
+  margin-bottom:14px;
+  opacity:0;transform:translateY(5px);
+  animation:sp-eyebrow-in .5s .25s ease forwards;
+}
+/* dark: eyebrow чуть ярче */
+.pre-dark .sp-eyebrow,
+.tg-dark .sp-eyebrow{color:rgba(255,130,60,.65);}
+@keyframes sp-eyebrow-in{to{opacity:1;transform:translateY(0)}}
+
+.sp-words{display:flex;align-items:baseline;gap:14px;}
+
+/* буква — цвет из темы */
+.sp-letter{
+  font-size:54px;font-weight:900;letter-spacing:-.04em;line-height:1;
+  color:var(--text);
+  display:inline-block;
+  opacity:0;transform:translateY(60%);
+  will-change:opacity,transform;
+}
+/* оранжевые буквы «лето» */
+.sp-letter.sun{
+  background:linear-gradient(105deg,#FF6B35,#FFAB40);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+/* dark: «лето» немного насыщеннее */
+.pre-dark .sp-letter.sun,
+.tg-dark .sp-letter.sun{
+  background:linear-gradient(105deg,#FF7A45,#FFB850);
+  -webkit-background-clip:text;background-clip:text;
+}
+
+/* подпись */
+.sp-sub{
+  margin-top:12px;
+  font-size:13px;font-weight:500;
+  color:var(--hint);
+  opacity:0;transform:translateY(6px);
+}
+
+/* dots */
+.sp-dots{display:flex;gap:7px;margin-top:26px;opacity:0;}
+.sp-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:linear-gradient(135deg,var(--sun),var(--sun2));
+  animation:sp-bounce 1.4s ease-in-out infinite;
+}
+.sp-dot:nth-child(2){animation-delay:.16s;opacity:.65}
+.sp-dot:nth-child(3){animation-delay:.32s;opacity:.35}
+@keyframes sp-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes sp-letter-exit{
+  0%{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}
+  100%{opacity:0;transform:translateY(-18px) scale(.93);filter:blur(5px)}
+}
+@keyframes sp-fade-exit{to{opacity:0;transform:translateY(-4px)}}
 
 /* ══ MAIN PAGES ══ */
 .page{
@@ -521,7 +583,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   display:block;
   opacity:0;
   z-index:1;
-  transition:opacity .5s cubic-bezier(.4,0,.2,1);
+  transition:opacity .65s cubic-bezier(.4,0,.2,1);
   pointer-events:none;
   border-radius:0; /* clip идёт от родителя */
 }
@@ -546,7 +608,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   opacity:0;
   z-index:5;
   pointer-events:none;
-  transition:opacity .15s ease;
+  transition:opacity .4s ease;
 }
 .pav-del-overlay.show{opacity:1}
 /* кольцо — скрыто пока не началось удержание */
@@ -581,8 +643,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 }
 .pav-wrap{position:relative;display:inline-block;flex-shrink:0}
 /* Only the avatar dims on press — never the whole card */
-.pav.pressing{filter:brightness(.55);transition:filter .35s ease}
-.pav:not(.pressing){transition:filter .35s ease}
+.pav.pressing{filter:brightness(.62);transition:filter .45s ease}
 
 /* ══ AVATAR LOAD ANIMATION ══ */
 /* glow pulse — behind everything */
@@ -1598,7 +1659,13 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 <!-- ══ SPLASH ══ -->
 <div id="splash">
-  <div class="sp-dots">
+  <div class="sp-eyebrow">летифай</div>
+  <div class="sp-words">
+    <div class="sp-word" id="sp-w1"></div>
+    <div class="sp-word" id="sp-w2"></div>
+  </div>
+  <div class="sp-sub" id="sp-sub">твоё лето начинается здесь</div>
+  <div class="sp-dots" id="sp-dots">
     <div class="sp-dot"></div>
     <div class="sp-dot"></div>
     <div class="sp-dot"></div>
@@ -4409,6 +4476,7 @@ function _updateNavAvatar(){
 */
 const P1=2000,P2=2500,P3=2500;
 let av={phase:0,pressing:false,hasImg:false,timer:null,raf:null,rafStart:null};
+let _avLoaderShowTime=0;
 
 const SVG_CAM=`<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>`;
 const SVG_TRASH=`<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/>`;
@@ -4724,19 +4792,22 @@ function _lcDOMInit(){
 }
 
 /* ── AVATAR LOAD ANIMATION ── */
-let _avLoadStart=0;
 function _avShowLoader(){
-  _avLoadStart=Date.now();
+  _avLoaderShowTime=Date.now();
   document.getElementById('pav-load-glow')?.classList.add('show');
   document.getElementById('pav-load-ring')?.classList.add('show');
   document.getElementById('pav-load-shimmer')?.classList.add('show');
   document.getElementById('pf-av')?.classList.add('loading');
 }
 function _avHideLoader(){
-  document.getElementById('pav-load-glow')?.classList.remove('show');
-  document.getElementById('pav-load-ring')?.classList.remove('show');
-  document.getElementById('pav-load-shimmer')?.classList.remove('show');
-  document.getElementById('pf-av')?.classList.remove('loading');
+  const elapsed=Date.now()-(_avLoaderShowTime||0);
+  const delay=Math.max(0,3000-elapsed);
+  setTimeout(()=>{
+    document.getElementById('pav-load-glow')?.classList.remove('show');
+    document.getElementById('pav-load-ring')?.classList.remove('show');
+    document.getElementById('pav-load-shimmer')?.classList.remove('show');
+    document.getElementById('pf-av')?.classList.remove('loading');
+  },delay);
 }
 
 function _setPfHeroColor(rgb){
@@ -4758,43 +4829,36 @@ function _applyAvatarFull(dataUrl,animate){
     const alreadyLoaded=img.classList.contains('loaded');
     const applyNew=()=>{
       img.onload=()=>{
-        // ── enforce 3-second minimum loader ──
-        // The spinner always runs for at least 3 s so the animation
-        // feels deliberate; then the loader fades out (CSS .35s), and
-        // only after that does the avatar cross-fade in (.5s).
-        const MIN_LOAD_MS=3000;
-        const elapsed=Date.now()-_avLoadStart;
-        const remaining=Math.max(0,MIN_LOAD_MS-elapsed);
+        const elapsed2=Date.now()-(_avLoaderShowTime||0);
+        const fadeDelay=Math.max(0,3000-elapsed2);
         setTimeout(()=>{
-          // 1) fade out spinner / ring / glow
-          _avHideLoader();
-          // 2) after loader transition, reveal avatar
-          setTimeout(()=>{
-            img.classList.add('loaded');
-            if(letter)letter.style.display='none';
-            let sc=_loadAvatarColor();
-            if(!sc){
-              try{
-                const tmp=document.createElement('canvas');tmp.width=8;tmp.height=8;
-                const tc=tmp.getContext('2d');tc.drawImage(img,0,0,8,8);
-                const d=tc.getImageData(0,0,8,8).data;
-                let r=0,g=0,b=0,n=0;
-                for(let i=0;i<d.length;i+=4){
-                  const mx=Math.max(d[i],d[i+1],d[i+2]),mn=Math.min(d[i],d[i+1],d[i+2]);
-                  const sat=(mx-mn)/(mx||1),lum=(mx+mn)/510;
-                  if(sat>.12&&lum>.06&&lum<.92){r+=d[i];g+=d[i+1];b+=d[i+2];n++;}
-                }
-                if(n>0){sc=`${Math.round(r/n)},${Math.round(g/n)},${Math.round(b/n)}`;_saveAvatarColor(sc);}
-              }catch{}
+          img.classList.add('loaded');
+          if(letter)letter.style.display='none';
+        },fadeDelay);
+        let sc=_loadAvatarColor();
+        // Fallback: sample dominant color directly from image if not saved
+        if(!sc){
+          try{
+            const tmp=document.createElement('canvas');tmp.width=8;tmp.height=8;
+            const tc=tmp.getContext('2d');tc.drawImage(img,0,0,8,8);
+            const d=tc.getImageData(0,0,8,8).data;
+            let r=0,g=0,b=0,n=0;
+            for(let i=0;i<d.length;i+=4){
+              const mx=Math.max(d[i],d[i+1],d[i+2]),mn=Math.min(d[i],d[i+1],d[i+2]);
+              const sat=(mx-mn)/(mx||1),lum=(mx+mn)/510;
+              if(sat>.12&&lum>.06&&lum<.92){r+=d[i];g+=d[i+1];b+=d[i+2];n++;}
             }
-            if(sc&&avEl){
-              avEl.style.transition='box-shadow .65s ease';
-              avEl.style.boxShadow=`0 5px 18px rgba(${sc},.45)`;
-            }
-            _setPfHeroColor(sc);
-            _updateNavAvatar();
-          },320); // matches loader CSS fade-out (.35s) + small buffer
-        },remaining);
+            if(n>0){sc=`${Math.round(r/n)},${Math.round(g/n)},${Math.round(b/n)}`;_saveAvatarColor(sc);}
+          }catch{}
+        }
+        if(sc&&avEl){
+          avEl.style.transition='box-shadow .65s ease';
+          avEl.style.boxShadow=`0 5px 18px rgba(${sc},.45)`;
+        }
+        _setPfHeroColor(sc);
+        _updateNavAvatar();
+        // ← hide load animation once image is fully rendered
+        _avHideLoader();
       };
       img.onerror=()=>{_avHideLoader();};
       img.src=dataUrl;
@@ -5267,10 +5331,73 @@ document.addEventListener('DOMContentLoaded',async()=>{
   await loadData();
   renderHome();
   _updateNavAvatar(); // restore nav avatar from storage on startup
-  setTimeout(()=>{
-    const sp=document.getElementById('splash');
-    if(sp){sp.classList.add('hiding');setTimeout(()=>sp.remove(),520);}
-  },1200);
+
+  // ══ SPLASH ANIMATION — Variant A ══
+  (function(){
+    const w1=document.getElementById('sp-w1');
+    const w2=document.getElementById('sp-w2');
+    const sub=document.getElementById('sp-sub');
+    const dots=document.getElementById('sp-dots');
+    if(!w1||!w2)return;
+
+    // build letters
+    const L1='скоро'.split('');
+    const L2='лето'.split('');
+    L1.forEach(l=>{
+      const s=document.createElement('span');
+      s.className='sp-letter';s.textContent=l;w1.appendChild(s);
+    });
+    L2.forEach(l=>{
+      const s=document.createElement('span');
+      s.className='sp-letter sun';s.textContent=l;w2.appendChild(s);
+    });
+
+    const all=[...w1.querySelectorAll('.sp-letter'),...w2.querySelectorAll('.sp-letter')];
+
+    // stagger letter reveals
+    all.forEach((el,i)=>{
+      setTimeout(()=>{
+        el.style.transition='opacity .38s ease, transform .5s cubic-bezier(.16,1,.3,1)';
+        el.style.opacity='1';el.style.transform='translateY(0)';
+      },280+i*58);
+    });
+
+    // subtitle
+    setTimeout(()=>{
+      sub.style.transition='opacity .5s ease, transform .5s ease';
+      sub.style.opacity='1';sub.style.transform='translateY(0)';
+    },900);
+
+    // dots
+    setTimeout(()=>{
+      dots.style.transition='opacity .4s ease';
+      dots.style.opacity='1';
+    },1050);
+
+    // shimmer flash on "лето"
+    setTimeout(()=>{
+      w2.querySelectorAll('.sp-letter').forEach((el,i)=>{
+        setTimeout(()=>{
+          el.style.filter='brightness(1.5) saturate(1.3)';
+          setTimeout(()=>{el.style.filter='';},320);
+        },i*55);
+      });
+    },1700);
+
+    // EXIT — letters fly up with blur, then fade whole splash
+    setTimeout(()=>{
+      all.forEach((el,i)=>{
+        el.style.transition='';
+        el.style.animation=`sp-letter-exit .52s ${i*28}ms cubic-bezier(.4,0,.6,1) forwards`;
+      });
+      if(sub){sub.style.transition='';sub.style.animation='sp-fade-exit .35s ease forwards';}
+      if(dots){dots.style.transition='';dots.style.animation='sp-fade-exit .3s ease forwards';}
+      setTimeout(()=>{
+        const sp=document.getElementById('splash');
+        if(sp){sp.classList.add('hiding');setTimeout(()=>sp.remove(),580);}
+      },380);
+    },2600);
+  })();
   setInterval(async()=>{if(curTab==='home'&&_completingMap.size===0){await loadData();renderHome();}},30000);
   // освобождаем камеру только при сворачивании приложения
   document.addEventListener('visibilitychange',()=>{
