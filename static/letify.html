@@ -546,9 +546,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   opacity:0;
   z-index:5;
   pointer-events:none;
-  transition:opacity .15s ease;
-}
-.pav-del-overlay.show{opacity:1}
+  transition:opacity .35s ease;
 /* кольцо — скрыто пока не началось удержание */
 .pav-del-ring{
   position:absolute;inset:0;
@@ -581,7 +579,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 }
 .pav-wrap{position:relative;display:inline-block;flex-shrink:0}
 /* Only the avatar dims on press — never the whole card */
-.pav.pressing{filter:brightness(.62);transition:filter .15s ease}
+.pav.pressing{filter:brightness(.62);transition:filter .4s ease}
 
 /* ══ AVATAR LOAD ANIMATION ══ */
 /* glow pulse — behind everything */
@@ -4724,6 +4722,7 @@ function _lcDOMInit(){
 
 /* ── AVATAR LOAD ANIMATION ── */
 function _avShowLoader(){
+  _avShowLoader._t = Date.now();
   document.getElementById('pav-load-glow')?.classList.add('show');
   document.getElementById('pav-load-ring')?.classList.add('show');
   document.getElementById('pav-load-shimmer')?.classList.add('show');
@@ -4755,7 +4754,6 @@ function _applyAvatarFull(dataUrl,animate){
     const alreadyLoaded=img.classList.contains('loaded');
     const applyNew=()=>{
       img.onload=()=>{
-        img.classList.add('loaded');
         if(letter)letter.style.display='none';
         let sc=_loadAvatarColor();
         // Fallback: sample dominant color directly from image if not saved
@@ -4779,8 +4777,14 @@ function _applyAvatarFull(dataUrl,animate){
         }
         _setPfHeroColor(sc);
         _updateNavAvatar();
-        // ← hide load animation once image is fully rendered
-        _avHideLoader();
+        // Ensure loader is visible for at least 3s, then simultaneously
+        // fade out loader and fade in the avatar smoothly
+        const elapsed=Date.now()-(_avShowLoader._t||0);
+        const wait=Math.max(0,3000-elapsed);
+        setTimeout(()=>{
+          _avHideLoader();
+          requestAnimationFrame(()=>img.classList.add('loaded'));
+        },wait);
       };
       img.onerror=()=>{_avHideLoader();};
       img.src=dataUrl;
