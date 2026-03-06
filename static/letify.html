@@ -1317,10 +1317,10 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   position:absolute;inset:0;pointer-events:none;z-index:0;border-radius:22px;
   background:linear-gradient(110deg,transparent 20%,rgba(var(--pf-r),var(--pf-g),var(--pf-b),.06) 40%,rgba(255,255,255,.07) 50%,transparent 80%);
   background-size:250% 100%;
-  animation:pf-shimmer 4s ease-in-out infinite;
+  animation:pf-shimmer 8s ease-in-out infinite;
   transition:opacity .6s ease;
 }
-@keyframes pf-shimmer{0%{background-position:150% 0}60%{background-position:-50% 0}100%{background-position:-50% 0}}
+@keyframes pf-shimmer{0%{background-position:150% 0}20%{background-position:-50% 0}21%,100%{background-position:-50% 0}}
 .pf-hero-right{flex:1;min-width:0;position:relative;z-index:1}
 .pf-hero-name{font-size:18px;font-weight:900;color:var(--text);letter-spacing:-.02em;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tg-dark .pf-hero-name{color:#fff}
@@ -4424,41 +4424,52 @@ function _doDeleteAvatar(){
 }
 
 /* ── FILE → CROP ── */
-(function(){
+function _lcInitFileInput(){
   const fi=document.getElementById('lf-av-file');
-  if(fi)fi.addEventListener('change',function(){
+  if(!fi)return;
+  fi.addEventListener('change',function(){
     const f=this.files[0];if(!f)return;this.value='';
     const r=new FileReader();
     r.onload=e=>_lcOpenCrop(e.target.result);
     r.readAsDataURL(f);
   });
-})();
+}
 
 /* ── CROP ENGINE ── */
 let _lcImg=null,_lcS=1,_lcSMin=1,_lcX=0,_lcY=0,_lcSz=240;
 let _lcDrag=null,_lcPinch=null,_lcRafId=null,_lcZoomTm=null,_lcGesture=false;
-const _lcCanvas=document.getElementById('lc-canvas');
-const _lcCtx=_lcCanvas?_lcCanvas.getContext('2d',{alpha:false}):null;
+/* Canvas elements queried lazily after DOM ready */
+let _lcCanvas=null,_lcCtx=null;
 
-(function _lcPreInit(){
-  if(!_lcCanvas||!_lcCtx)return;
+function _lcGetCanvas(){
+  if(!_lcCanvas){
+    _lcCanvas=document.getElementById('lc-canvas');
+    _lcCtx=_lcCanvas?_lcCanvas.getContext('2d',{alpha:false}):null;
+  }
+  return _lcCanvas;
+}
+
+function _lcPreInit(){
+  const c=_lcGetCanvas();
+  if(!c||!_lcCtx)return;
   const W=window.innerWidth,H=window.innerHeight,dpr=window.devicePixelRatio||1;
-  _lcCanvas.width=Math.round(W*dpr);_lcCanvas.height=Math.round(H*dpr);
-  _lcCanvas.style.width=W+'px';_lcCanvas.style.height=H+'px';
+  c.width=Math.round(W*dpr);c.height=Math.round(H*dpr);
+  c.style.width=W+'px';c.style.height=H+'px';
   _lcCtx.scale(dpr,dpr);
   _lcCtx.fillStyle='#111';_lcCtx.fillRect(0,0,W,H);
-})();
+}
 
 function _lcOpenCrop(src){
+  const c=_lcGetCanvas();if(!c||!_lcCtx)return;
   _lcImg=new Image();
   _lcImg.onload=()=>{
     document.getElementById('lf-crop-scr').classList.add('show');
     const W=window.innerWidth,H=window.innerHeight,dpr=window.devicePixelRatio||1;
     const nW=Math.round(W*dpr),nH=Math.round(H*dpr);
-    if(_lcCanvas.width!==nW||_lcCanvas.height!==nH){
+    if(c.width!==nW||c.height!==nH){
       _lcCtx.setTransform(1,0,0,1,0,0);
-      _lcCanvas.width=nW;_lcCanvas.height=nH;
-      _lcCanvas.style.width=W+'px';_lcCanvas.style.height=H+'px';
+      c.width=nW;c.height=nH;
+      c.style.width=W+'px';c.style.height=H+'px';
       _lcCtx.scale(dpr,dpr);
     }
     _lcSz=Math.min(W*.78,H*.52,300);
@@ -4475,8 +4486,9 @@ function _lcOpenCrop(src){
 function _lcScheduleDraw(){if(_lcRafId)return;_lcRafId=requestAnimationFrame(()=>{_lcRafId=null;_lcDraw();});}
 
 function _lcDraw(){
-  if(!_lcImg)return;
-  const W=parseInt(_lcCanvas.style.width),H=parseInt(_lcCanvas.style.height);
+  if(!_lcImg||!_lcCtx)return;
+  const c=_lcCanvas;if(!c)return;
+  const W=parseInt(c.style.width),H=parseInt(c.style.height);
   _lcCtx.fillStyle='#111';_lcCtx.fillRect(0,0,W,H);
   const iw=_lcImg.width*_lcS,ih=_lcImg.height*_lcS;
   const ix=_lcX-iw/2,iy=_lcY-ih/2;
@@ -4494,7 +4506,7 @@ function _lcDraw(){
 }
 
 function _lcClamp(){
-  if(!_lcImg)return;
+  if(!_lcImg||!_lcCanvas)return;
   const W=parseInt(_lcCanvas.style.width),H=parseInt(_lcCanvas.style.height),h=_lcSz/2;
   const iw=_lcImg.width*_lcS,ih=_lcImg.height*_lcS;
   _lcX=Math.max(W/2+h-iw/2,Math.min(W/2-h+iw/2,_lcX));
@@ -4516,7 +4528,15 @@ function _lcGestureEnd(){
   _lcGestureEndTm=setTimeout(()=>{_lcGesture=false;if(_lcCtx){_lcCtx.imageSmoothingEnabled=true;_lcCtx.imageSmoothingQuality='high';}  _lcScheduleDraw();},120);
 }
 
-if(_lcCanvas){
+/* All crop DOM initialization deferred to DOMContentLoaded */
+function _lcDOMInit(){
+  _lcGetCanvas();
+  if(!_lcCanvas)return;
+
+  /* Pre-warm canvas */
+  _lcPreInit();
+
+  /* Touch / mouse events on canvas */
   _lcCanvas.addEventListener('touchstart',e=>{
     e.preventDefault();
     if(e.touches.length===1){_lcDrag={ox:e.touches[0].clientX-_lcX,oy:e.touches[0].clientY-_lcY};_lcPinch=null;_lcGestureStart();}
@@ -4532,9 +4552,8 @@ if(_lcCanvas){
   _lcCanvas.addEventListener('mousemove',e=>{if(!_lcDrag)return;_lcX=e.clientX-_lcDrag.ox;_lcY=e.clientY-_lcDrag.oy;_lcClamp();_lcScheduleDraw();});
   _lcCanvas.addEventListener('mouseup',()=>{_lcDrag=null;_lcGestureEnd();});
   _lcCanvas.addEventListener('wheel',e=>{e.preventDefault();_lcGestureStart();_lcS=Math.max(_lcSMin,Math.min(_lcSMin*5,_lcS*(e.deltaY<0?1.09:.92)));_lcClamp();_lcScheduleDraw();_lcShowZoom();_lcGestureEnd();},{passive:false});
-}
 
-(function _lcButtons(){
+  /* Cancel / Apply buttons */
   const cancel=document.getElementById('lc-cancel');
   const apply=document.getElementById('lc-apply');
   if(cancel)cancel.addEventListener('click',()=>{document.getElementById('lf-crop-scr').classList.remove('show');_lcImg=null;});
@@ -4550,7 +4569,6 @@ if(_lcCanvas){
     oc.drawImage(_lcImg,cropL/_lcS,cropT/_lcS,_lcSz/_lcS,_lcSz/_lcS,0,0,sz,sz);
     oc.restore();
     const url=out.toDataURL('image/jpeg',.92);
-    // Extract dominant color
     try{
       const tmp=document.createElement('canvas');tmp.width=8;tmp.height=8;
       const tc=tmp.getContext('2d');tc.drawImage(out,0,0,8,8);
@@ -4570,7 +4588,7 @@ if(_lcCanvas){
     _lcImg=null;
     toast('аватар обновлён ✓');
   });
-})();
+}
 
 function _setPfHeroColor(rgb){
   // rgb = "r,g,b" string or null to reset
@@ -5054,6 +5072,9 @@ document.addEventListener('DOMContentLoaded',async()=>{
   const dark=tg?.colorScheme==='dark'||window.matchMedia?.('(prefers-color-scheme:dark)').matches;
   if(dark)document.body.classList.add('tg-dark');
   tg?.onEvent('themeChanged',()=>{document.body.classList.toggle('tg-dark',tg?.colorScheme==='dark');applyTheme();});
+  // Init crop engine (elements are after script block, must be deferred)
+  _lcDOMInit();
+  _lcInitFileInput();
   // Init design state
   const d=getHomeDesign();
   const pg=document.getElementById('p-home');
