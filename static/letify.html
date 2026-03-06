@@ -546,7 +546,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   opacity:0;
   z-index:5;
   pointer-events:none;
-  transition:opacity .4s ease;
+  transition:opacity .15s ease;
 }
 .pav-del-overlay.show{opacity:1}
 /* кольцо — скрыто пока не началось удержание */
@@ -581,7 +581,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 }
 .pav-wrap{position:relative;display:inline-block;flex-shrink:0}
 /* Only the avatar dims on press — never the whole card */
-.pav.pressing{filter:brightness(.62);transition:filter .4s ease}
+.pav.pressing{filter:brightness(.62);transition:filter .55s ease}
 
 /* ══ AVATAR LOAD ANIMATION ══ */
 /* glow pulse — behind everything */
@@ -4378,6 +4378,7 @@ function renderProgress(){
 /* ══ AVATAR SYSTEM ══ */
 const AV_KEY='lf2_user_avatar';
 const AV_CLR_KEY='lf2_user_avatar_color';
+let _avLoaderStartTime=0;
 
 function _loadAvatarFromStorage(){try{return localStorage.getItem(AV_KEY)||null;}catch{return null;}}
 function _saveAvatarToStorage(v){try{localStorage.setItem(AV_KEY,v);}catch{}}
@@ -4723,9 +4724,8 @@ function _lcDOMInit(){
 }
 
 /* ── AVATAR LOAD ANIMATION ── */
-let _avLoadStartTime=0;
 function _avShowLoader(){
-  _avLoadStartTime=Date.now();
+  _avLoaderStartTime=Date.now();
   document.getElementById('pav-load-glow')?.classList.add('show');
   document.getElementById('pav-load-ring')?.classList.add('show');
   document.getElementById('pav-load-shimmer')?.classList.add('show');
@@ -4756,46 +4756,44 @@ function _applyAvatarFull(dataUrl,animate){
   const doApply=()=>{
     const alreadyLoaded=img.classList.contains('loaded');
     const applyNew=()=>{
-      // Temporarily hide img while it loads
       img.onload=()=>{
-        // Compute how much time remains to hit 3-second minimum
-        const elapsed=Date.now()-(_avLoadStartTime||Date.now());
-        const remaining=Math.max(0,3000-elapsed);
+        // process color immediately (non-visual work)
+        let sc=_loadAvatarColor();
+        // Fallback: sample dominant color directly from image if not saved
+        if(!sc){
+          try{
+            const tmp=document.createElement('canvas');tmp.width=8;tmp.height=8;
+            const tc=tmp.getContext('2d');tc.drawImage(img,0,0,8,8);
+            const d=tc.getImageData(0,0,8,8).data;
+            let r=0,g=0,b=0,n=0;
+            for(let i=0;i<d.length;i+=4){
+              const mx=Math.max(d[i],d[i+1],d[i+2]),mn=Math.min(d[i],d[i+1],d[i+2]);
+              const sat=(mx-mn)/(mx||1),lum=(mx+mn)/510;
+              if(sat>.12&&lum>.06&&lum<.92){r+=d[i];g+=d[i+1];b+=d[i+2];n++;}
+            }
+            if(n>0){sc=`${Math.round(r/n)},${Math.round(g/n)},${Math.round(b/n)}`;_saveAvatarColor(sc);}
+          }catch{}
+        }
+        if(sc&&avEl){
+          avEl.style.transition='box-shadow .65s ease';
+          avEl.style.boxShadow=`0 5px 18px rgba(${sc},.45)`;
+        }
+        _setPfHeroColor(sc);
+        _updateNavAvatar();
+        // wait for 3s total animation, then smoothly reveal avatar
+        const elapsed=Date.now()-_avLoaderStartTime;
+        const wait=Math.max(0,3000-elapsed);
         setTimeout(()=>{
-          // Hide loader first (smooth opacity out)
-          _avHideLoader();
-          // Then reveal avatar with its own opacity transition (.5s cubic)
-          requestAnimationFrame(()=>{
-            img.classList.add('loaded');
-            if(letter)letter.style.display='none';
-            let sc=_loadAvatarColor();
-            if(!sc){
-              try{
-                const tmp=document.createElement('canvas');tmp.width=8;tmp.height=8;
-                const tc=tmp.getContext('2d');tc.drawImage(img,0,0,8,8);
-                const d=tc.getImageData(0,0,8,8).data;
-                let r=0,g=0,b=0,n=0;
-                for(let i=0;i<d.length;i+=4){
-                  const mx=Math.max(d[i],d[i+1],d[i+2]),mn=Math.min(d[i],d[i+1],d[i+2]);
-                  const sat=(mx-mn)/(mx||1),lum=(mx+mn)/510;
-                  if(sat>.12&&lum>.06&&lum<.92){r+=d[i];g+=d[i+1];b+=d[i+2];n++;}
-                }
-                if(n>0){sc=`${Math.round(r/n)},${Math.round(g/n)},${Math.round(b/n)}`;_saveAvatarColor(sc);}
-              }catch{}
-            }
-            if(sc&&avEl){
-              avEl.style.transition='box-shadow .65s ease';
-              avEl.style.boxShadow=`0 5px 18px rgba(${sc},.45)`;
-            }
-            _setPfHeroColor(sc);
-            _updateNavAvatar();
-          });
-        },remaining);
+          img.classList.add('loaded');       // CSS opacity .5s transition kicks in
+          if(letter)letter.style.display='none';
+          setTimeout(_avHideLoader,540);     // hide loader after fade completes
+        },wait);
       };
-      img.onerror=()=>{_avHideLoader();};
+      img.onerror=()=>{img.classList.add('loaded');if(letter)letter.style.display='none';_avHideLoader();};
       img.src=dataUrl;
     };
     if(alreadyLoaded&&animate){
+      // fade out, then swap
       img.classList.remove('loaded');
       setTimeout(applyNew,250);
     } else {
