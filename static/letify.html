@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -493,7 +493,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 /* ══ AVATAR ══ */
 .pav{
-  width:64px;height:64px;border-radius:20px;
+  width:64px;height:64px;border-radius:50%;
   background:linear-gradient(135deg,var(--sun),var(--sun2));
   display:flex;align-items:center;justify-content:center;
   font-size:26px;font-weight:900;color:#fff;
@@ -501,12 +501,12 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   flex-shrink:0;
   /* clip-path + overflow:hidden для надёжного клипа на мобиле */
   overflow:hidden;
-  clip-path:inset(0 round 20px);
-  -webkit-clip-path:inset(0 round 20px);
+  clip-path:circle(50%);
+  -webkit-clip-path:circle(50%);
   position:relative;
   cursor:pointer;
   -webkit-tap-highlight-color:transparent;
-  transition:transform .15s ease, box-shadow .6s cubic-bezier(.4,0,.2,1);
+  transition:transform .15s ease, box-shadow .6s cubic-bezier(.4,0,.2,1), filter .15s ease;
   /* форсируем аппаратное ускорение */
   transform:translateZ(0);
   -webkit-transform:translateZ(0);
@@ -1406,6 +1406,71 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 }
 .pf-danger-btn:active{background:rgba(244,92,92,.14)}
 .pf-ver{font-size:10px;font-weight:600;color:var(--hint);text-align:center;padding:5px 0 0;flex-shrink:0}
+
+/* ══ AVATAR TOOLTIP PILL ══ */
+.av-tip{
+  position:absolute;
+  left:calc(100% + 10px);top:50%;
+  transform:translateY(-50%) scale(.82) translateX(-8px);
+  transform-origin:left center;
+  background:rgba(20,20,22,.97);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:16px;
+  padding:10px 13px 22px;
+  display:flex;align-items:center;gap:10px;
+  white-space:nowrap;opacity:0;pointer-events:none;
+  transition:opacity .22s ease,transform .25s cubic-bezier(.34,1.38,.64,1);
+  z-index:30;box-shadow:0 8px 32px rgba(0,0,0,.65);
+  backdrop-filter:blur(20px);
+  overflow:hidden;min-width:152px;
+}
+.av-tip.show{opacity:1;transform:translateY(-50%) scale(1) translateX(0)}
+.tip-ic{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
+.av-tip.cam .tip-ic{background:rgba(10,132,255,.2)}
+.av-tip.del .tip-ic{background:rgba(255,69,58,.18)}
+.tip-text{display:flex;flex-direction:column;gap:2px}
+.tip-main{font-size:13px;font-weight:700;color:#fff}
+.tip-sub{font-size:10.5px;font-weight:500;color:rgba(255,255,255,.38)}
+.tip-prog{position:absolute;bottom:7px;left:11px;right:11px;height:3px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
+.tip-prog-fill{height:100%;width:0%;border-radius:99px;transition:none}
+.av-tip.cam .tip-prog-fill{background:linear-gradient(90deg,#0A84FF,rgba(10,132,255,.6))}
+.av-tip.del .tip-prog-fill{background:linear-gradient(90deg,#FF453A,rgba(255,69,58,.6))}
+
+/* ══ CROP SCREEN ══ */
+#lf-crop-scr{
+  position:fixed;inset:0;z-index:10000;
+  background:#111;opacity:0;pointer-events:none;
+  transform:translateY(20px);
+  transition:opacity .28s ease,transform .28s cubic-bezier(.32,1.2,.64,1);
+  display:flex;flex-direction:column;
+}
+#lf-crop-scr.show{opacity:1;pointer-events:all;transform:translateY(0)}
+.lc-hdr{
+  position:absolute;top:0;left:0;right:0;z-index:10;
+  padding:max(env(safe-area-inset-top,20px),20px) 16px 14px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(to bottom,rgba(0,0,0,.9),transparent);
+}
+.lc-btn{padding:9px 20px;border-radius:22px;font-family:'Onest',sans-serif;font-size:14px;font-weight:700;transition:opacity .12s,transform .1s;cursor:pointer;border:none}
+.lc-btn:active{opacity:.7;transform:scale(.96)}
+.lc-cancel{background:rgba(255,255,255,.1);color:rgba(255,255,255,.85)}
+.lc-apply{background:linear-gradient(135deg,var(--sun),var(--sun2));color:#fff;box-shadow:0 4px 18px rgba(255,107,53,.45)}
+.lc-ttl{font-size:15px;font-weight:700;color:rgba(255,255,255,.75)}
+.lc-area{flex:1;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#lc-canvas{position:absolute;touch-action:none;will-change:contents}
+.lc-frame{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  border-radius:50%;
+  box-shadow:0 0 0 9999px rgba(0,0,0,.72);
+  border:2px solid rgba(255,255,255,.55);
+  pointer-events:none;
+  animation:lc-pulse 2s ease-in-out infinite;
+}
+@keyframes lc-pulse{0%,100%{border-color:rgba(255,255,255,.5)}50%{border-color:rgba(255,255,255,.9)}}
+.lc-hint{position:absolute;bottom:0;left:0;right:0;z-index:10;padding:12px 24px max(env(safe-area-inset-bottom,24px),24px);background:linear-gradient(to top,rgba(0,0,0,.9),transparent);text-align:center;pointer-events:none}
+.lc-hint-txt{font-size:12px;color:rgba(255,255,255,.38);font-weight:600;letter-spacing:.03em}
+.lc-zoom{position:absolute;bottom:calc(max(env(safe-area-inset-bottom,24px),24px) + 36px);left:50%;transform:translateX(-50%);background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(12px);border-radius:20px;padding:5px 14px;z-index:11;font-size:11px;font-weight:700;color:rgba(255,255,255,.55);pointer-events:none;white-space:nowrap;opacity:0;transition:opacity .2s}
+.lc-zoom.visible{opacity:1}
 </style>
 </head>
 <body>
@@ -1622,23 +1687,26 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 <div class="pf-dash">
 
   <!-- ── HERO CARD ── -->
-  <div class="pf-hero" onclick="pickAvatar()">
-    <div class="pav-wrap" id="pf-av-wrap">
+  <div class="pf-hero">
+    <div class="pav-wrap" id="pf-av-wrap"
+      ontouchstart="avDown(event)" ontouchend="avUp(event)" ontouchcancel="avCancel()"
+      onmousedown="avDown(event)" onmouseup="avUp(event)" onmouseleave="avCancel()">
       <div class="pav" id="pf-av">
         <span id="pf-av-letter">А</span>
         <img class="pav-img" id="pf-av-img" alt="" src="">
-        <div class="pav-spinner" id="pf-av-spinner">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="2.5" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-        </div>
-        <div class="pav-del-overlay" id="pf-del-overlay">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(200,200,200,.65)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
-        </div>
-        <div class="pav-del-ring" id="pf-del-ring">
-          <svg width="64" height="64" viewBox="0 0 64 64">
-            <circle class="ring-track" cx="32" cy="32" r="30" stroke-width="3"/>
-            <circle class="ring-fill" id="pf-del-ring-fill" cx="32" cy="32" r="30" stroke-width="3"/>
+      </div>
+      <!-- Tooltip pill -->
+      <div class="av-tip cam" id="av-tip">
+        <div class="tip-ic" id="tip-ic">
+          <svg id="tip-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0A84FF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>
           </svg>
         </div>
+        <div class="tip-text">
+          <div class="tip-main" id="tip-main">выбрать фото</div>
+          <div class="tip-sub" id="tip-sub">отпусти сейчас</div>
+        </div>
+        <div class="tip-prog"><div class="tip-prog-fill" id="tip-fill"></div></div>
       </div>
     </div>
     <div class="pf-hero-right">
@@ -1717,13 +1785,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       <span class="pf-list-row-val" id="pf-design-val">классический</span>
       <iconify-icon icon="solar:alt-arrow-right-bold" class="pf-list-row-chev" style="font-size:13px"></iconify-icon>
     </div>
-    <div class="pf-list-row" style="cursor:default">
-      <div class="pf-list-row-ic">
-        <iconify-icon icon="solar:moon-stars-bold" style="font-size:15px;color:var(--hint)"></iconify-icon>
-      </div>
-      <span class="pf-list-row-lbl">Тема</span>
-      <span class="pf-list-row-val">авто</span>
-    </div>
+
     <div class="pf-list-row" style="border-bottom:none;cursor:default">
       <div class="pf-list-row-ic">
         <iconify-icon icon="solar:bell-bold" style="font-size:15px;color:#FFAB40"></iconify-icon>
@@ -2656,7 +2718,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-4 4 4 4-6"/></svg>
   </div>
   <div class="nt" id="nt-profile" onclick="navTo('profile')">
-    <div id="nav-av-wrap" style="width:26px;height:26px;border-radius:9px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--sun),var(--sun2));flex-shrink:0">
+    <div id="nav-av-wrap" style="width:26px;height:26px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--sun),var(--sun2));flex-shrink:0">
       <img id="nav-av-img" alt="" style="width:100%;height:100%;object-fit:cover;display:none">
       <svg id="nav-av-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;color:#fff"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
     </div>
@@ -4177,49 +4239,10 @@ function renderProgress(){
 const AV_KEY='lf2_user_avatar';
 const AV_CLR_KEY='lf2_user_avatar_color';
 
-function _loadAvatarFromStorage(){
-  try{return localStorage.getItem(AV_KEY)||null;}catch{return null;}
-}
-function _saveAvatarToStorage(dataUrl){
-  try{localStorage.setItem(AV_KEY,dataUrl);}catch{}
-}
-function _loadAvatarColor(){
-  try{return localStorage.getItem(AV_CLR_KEY)||null;}catch{return null;}
-}
-function _saveAvatarColor(rgb){
-  try{localStorage.setItem(AV_CLR_KEY,rgb);}catch{}
-}
-
-// Extract dominant vibrant color from image via canvas sampling
-function _extractDominantColor(canvas){
-  const ctx=canvas.getContext('2d');
-  const w=canvas.width,h=canvas.height;
-  // Sample a grid of pixels across the image
-  const step=Math.max(1,Math.floor(Math.min(w,h)/24));
-  let rSum=0,gSum=0,bSum=0,count=0;
-  // We cluster: skip near-white/near-black/near-grey to find the vibrant tone
-  const data=ctx.getImageData(0,0,w,h).data;
-  for(let y=0;y<h;y+=step){
-    for(let x=0;x<w;x+=step){
-      const i=(y*w+x)*4;
-      const r=data[i],g=data[i+1],b=data[i+2];
-      // Skip near-grey (low saturation) and very dark/light
-      const max=Math.max(r,g,b),min=Math.min(r,g,b);
-      const sat=max===0?0:(max-min)/max;
-      const lum=(max+min)/510; // 0..1
-      if(sat>0.18&&lum>0.12&&lum<0.88){
-        rSum+=r;gSum+=g;bSum+=b;count++;
-      }
-    }
-  }
-  if(count<5){
-    // Fallback: just average everything
-    count=0;rSum=0;gSum=0;bSum=0;
-    for(let y=0;y<h;y+=step){for(let x=0;x<w;x+=step){const i=(y*w+x)*4;rSum+=data[i];gSum+=data[i+1];bSum+=data[i+2];count++;}}
-  }
-  if(count===0)return null;
-  return `${Math.round(rSum/count)},${Math.round(gSum/count)},${Math.round(bSum/count)}`;
-}
+function _loadAvatarFromStorage(){try{return localStorage.getItem(AV_KEY)||null;}catch{return null;}}
+function _saveAvatarToStorage(v){try{localStorage.setItem(AV_KEY,v);}catch{}}
+function _loadAvatarColor(){try{return localStorage.getItem(AV_CLR_KEY)||null;}catch{return null;}}
+function _saveAvatarColor(v){try{localStorage.setItem(AV_CLR_KEY,v);}catch{}}
 
 function _updateNavAvatar(){
   const img=document.getElementById('nav-av-img');
@@ -4229,232 +4252,318 @@ function _updateNavAvatar(){
   if(saved&&img){
     img.src=saved;img.style.display='block';
     if(svg)svg.style.display='none';
-    if(wrap){wrap.style.background='transparent';wrap.style.border='none';wrap.style.borderRadius='9px';}
+    if(wrap){wrap.style.background='transparent';wrap.style.borderRadius='50%';}
     const sc=_loadAvatarColor();
     if(sc&&wrap)wrap.style.boxShadow=`0 0 8px rgba(${sc},.4)`;
   }else if(img){
     img.style.display='none';if(svg)svg.style.display='';
-    if(wrap){wrap.style.background='linear-gradient(135deg,var(--sun),var(--sun2))';wrap.style.border='';wrap.style.boxShadow='';}
+    if(wrap){wrap.style.background='linear-gradient(135deg,var(--sun),var(--sun2))';wrap.style.boxShadow='';}
   }
 }
 
-function _applyGlow(rgb,animate){
-  const av=$('pf-av');
-  if(!av)return;
-  const shadow=`0 5px 18px rgba(${rgb},.45)`;
-  const shadowActive=`0 2px 8px rgba(${rgb},.2)`;
-  if(animate){
-    av.style.transition='box-shadow .6s cubic-bezier(.4,0,.2,1)';
-  } else {
-    av.style.transition='';
-  }
-  av.style.setProperty('--pav-glow',`rgba(${rgb},.45)`);
-  av.style.boxShadow=shadow;
-  // Override :active shadow via CSS variable trick — set a data attr for CSS
-  av.dataset.glowRgb=rgb;
-}
+/* ── STATE MACHINE ──
+   P1 = 1800ms silent hold
+   P2 = 3000ms → camera tooltip, release = pick photo
+   P3 = 3000ms → delete tooltip (only if hasImg), auto-timer deletes
+*/
+const P1=1800,P2=3000,P3=3000;
+let av={phase:0,pressing:false,hasImg:false,timer:null,raf:null,rafStart:null};
 
-function _applyAvatar(dataUrl,animate){
-  const letter=$('pf-av-letter');
-  const img=$('pf-av-img');
-  if(!img)return;
-  if(animate){
-    const sp=$('pf-av-spinner');
-    if(sp)sp.classList.add('show');
-    setTimeout(()=>{
-      img.onload=()=>{
-        if(sp)sp.classList.remove('show');
-        if(letter)letter.style.display='none';
-        requestAnimationFrame(()=>{img.classList.add('loaded');});
-        // Ripple
-        const av=$('pf-av');
-        if(av){const r=document.createElement('div');r.className='pav-ripple';av.appendChild(r);setTimeout(()=>r.remove(),600);}
-        // Apply saved color with animation
-        const saved=_loadAvatarColor();
-        if(saved)_applyGlow(saved,true);
-        _updateNavAvatar();
-      };
-      img.onerror=()=>{if(sp)sp.classList.remove('show');}
-      img.src=dataUrl;
-    },320);
-  } else {
-    img.onload=()=>{
-      if(letter)letter.style.display='none';
-      img.classList.add('loaded');
-      const saved=_loadAvatarColor();
-      if(saved)_applyGlow(saved,false);
-      _updateNavAvatar();
-    };
-    img.src=dataUrl;
+const SVG_CAM=`<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>`;
+const SVG_TRASH=`<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/>`;
+
+function _avTip(){return document.getElementById('av-tip');}
+function _avFill(){return document.getElementById('tip-fill');}
+function _avEl(){return document.getElementById('pf-av');}
+
+function _setTip(phase){
+  const tip=_avTip();if(!tip)return;
+  tip.className='av-tip show '+(phase==='cam'?'cam':'del');
+  const tipMain=document.getElementById('tip-main');
+  const tipSub=document.getElementById('tip-sub');
+  const tipSvg=document.getElementById('tip-svg');
+  const tipIc=document.getElementById('tip-ic');
+  if(phase==='cam'){
+    if(tipMain)tipMain.textContent='выбрать фото';
+    if(tipSub)tipSub.textContent='отпусти сейчас';
+    if(tipSvg){tipSvg.setAttribute('stroke','#0A84FF');tipSvg.innerHTML=SVG_CAM;}
+  }else{
+    if(tipMain)tipMain.textContent='удалить фото';
+    if(tipSub)tipSub.textContent='держи до конца';
+    if(tipSvg){tipSvg.setAttribute('stroke','#FF453A');tipSvg.innerHTML=SVG_TRASH;}
   }
 }
 
-function pickAvatar(){
-  tg?.HapticFeedback?.impactOccurred('light');
-  const inp=$('pf-av-input');
-  if(inp)inp.click();
+function _startBar(dur){
+  const fill=_avFill();if(!fill)return;
+  if(av.raf)cancelAnimationFrame(av.raf);
+  fill.style.width='0%';
+  av.rafStart=null;
+  const tick=(ts)=>{
+    if(!av.pressing){av.raf=null;return;}
+    if(!av.rafStart)av.rafStart=ts;
+    const pct=Math.min(100,((ts-av.rafStart)/dur)*100);
+    fill.style.width=pct+'%';
+    if(pct<100)av.raf=requestAnimationFrame(tick);
+    else av.raf=null;
+  };
+  av.raf=requestAnimationFrame(tick);
 }
 
-/* ── Long-press to delete avatar (5 sec) ── */
-let _pavPressTimer=null;
-let _pavAnimStart=null;
-let _pavAnimFrame=null;
-const PAV_HOLD_MS=5000;
-
-function _pavCancelLongPress(){
-  if(_pavPressTimer){clearTimeout(_pavPressTimer);_pavPressTimer=null;}
-  if(_pavAnimFrame){cancelAnimationFrame(_pavAnimFrame);_pavAnimFrame=null;}
-  _pavAnimStart=null;
-  const overlay=$('pf-del-overlay');
-  const ring=$('pf-del-ring-fill');
-  const ringWrap=$('pf-del-ring');
-  if(overlay)overlay.classList.remove('show');
-  if(ringWrap)ringWrap.classList.remove('show');
-  if(ring){
-    ring.style.transition='none';
-    ring.style.strokeDashoffset='188';
-    ring.style.animation='';
-  }
+function _avReset(){
+  clearTimeout(av.timer);
+  if(av.raf){cancelAnimationFrame(av.raf);av.raf=null;}
+  av.timer=null;av.rafStart=null;
+  av.pressing=false;av.phase=0;
+  const avEl=_avEl();if(avEl)avEl.classList.remove('pressing');
+  const tip=_avTip();if(tip)tip.classList.remove('show');
+  const fill=_avFill();if(fill)fill.style.width='0%';
 }
 
-function _pavStartLongPress(e){
-  const img=$('pf-av-img');
-  if(!img||!img.classList.contains('loaded'))return;
+function avDown(e){
+  e.preventDefault();
+  if(av.pressing)return;
+  av.pressing=true;av.phase=1;
+  const avEl=_avEl();if(avEl)avEl.classList.add('pressing');
+
+  av.timer=setTimeout(()=>{
+    if(!av.pressing)return;
+    try{navigator.vibrate?.(18);}catch{}
+    av.phase=2;
+    _setTip('cam');
+    _startBar(P2);
+
+    av.timer=setTimeout(()=>{
+      if(!av.pressing)return;
+      if(!av.hasImg){_avReset();return;}
+      try{navigator.vibrate?.(32);}catch{}
+      av.phase=3;
+      _setTip('del');
+      _startBar(P3);
+      av.timer=setTimeout(()=>{
+        if(!av.pressing)return;
+        try{navigator.vibrate?.(50);}catch{}
+        _doDeleteAvatar();
+      },P3);
+    },P2);
+  },P1);
+}
+
+function avUp(e){
   e.preventDefault?.();
-  tg?.HapticFeedback?.impactOccurred('light');
-  const overlay=$('pf-del-overlay');
-  const ring=$('pf-del-ring-fill');
-  const ringWrap=$('pf-del-ring');
-  // Show overlay and ring IMMEDIATELY on press
-  if(overlay)overlay.classList.add('show');
-  if(ringWrap)ringWrap.classList.add('show');
-  const circumference=188;
-  if(ring){
-    ring.style.transition='none';
-    ring.style.strokeDashoffset=String(circumference);
-    ring.style.animation='none';
-    // force reflow to ensure the reset registers before we start animation
-    void ring.getBoundingClientRect();
-    // Start CSS animation over PAV_HOLD_MS duration
-    ring.style.transition=`stroke-dashoffset ${PAV_HOLD_MS}ms linear`;
-    ring.style.strokeDashoffset='0';
+  if(!av.pressing)return;
+  const phase=av.phase;
+  _avReset();
+  if(phase===2){
+    // release during cam phase → pick photo
+    tg?.HapticFeedback?.impactOccurred('light');
+    document.getElementById('lf-av-file').click();
   }
-  _pavAnimStart=performance.now();
-  _pavPressTimer=setTimeout(()=>{
-    _pavCancelLongPress();
-    _deleteAvatar();
-  },PAV_HOLD_MS);
 }
+function avCancel(){if(av.pressing)_avReset();}
 
-function _deleteAvatar(){
+function _doDeleteAvatar(){
+  _avReset();
+  av.hasImg=false;
   tg?.HapticFeedback?.notificationOccurred('success');
-  const img=$('pf-av-img');
-  const letter=$('pf-av-letter');
-  const av=$('pf-av');
-  // fade out image
-  if(img){
-    img.style.transition='opacity .4s ease';
-    img.style.opacity='0';
-    setTimeout(()=>{
-      img.classList.remove('loaded');
-      img.src='';
-      img.style.transition='';
-      img.style.opacity='';
-    },420);
-  }
-  // restore default glow
-  if(av){
-    av.style.transition='box-shadow .5s ease';
-    av.style.boxShadow='0 5px 18px rgba(255,107,53,.25)';
-  }
-  if(letter){
-    letter.style.display='';
-    const u=gU();
-    letter.textContent=(u.name||'?').charAt(0).toUpperCase();
-  }
+  const img=document.getElementById('pf-av-img');
+  const letter=document.getElementById('pf-av-letter');
+  if(img){img.style.transition='opacity .4s ease';img.style.opacity='0';setTimeout(()=>{img.classList.remove('loaded');img.src='';img.style.transition='';img.style.opacity='';},420);}
+  if(letter){letter.style.display='';const u=gU();letter.textContent=(u.name||'?').charAt(0).toUpperCase();}
+  const avEl=_avEl();if(avEl){avEl.style.transition='box-shadow .5s ease';avEl.style.boxShadow='0 5px 18px rgba(255,107,53,.25)';}
   try{localStorage.removeItem(AV_KEY);localStorage.removeItem(AV_CLR_KEY);}catch{}
   _updateNavAvatar();
+  toast('аватар удалён');
 }
 
-function _initAvatarHandlers(){
-  const wrap=$('pf-av-wrap');
-  if(!wrap||wrap._pavInited)return;
-  wrap._pavInited=true;
-  // tap = pick photo (only when no image loaded)
-  // long press = delete (only when image loaded)
-  wrap.addEventListener('touchstart',e=>{
-    _pavPressStart=performance.now();
-    _pavStartLongPress(e);
-  },{passive:false});
-  wrap.addEventListener('touchend',e=>{
-    const held=performance.now()-(_pavPressStart||0);
-    _pavCancelLongPress();
-    if(held<300){
-      // short tap → pick
-      pickAvatar();
+/* ── FILE → CROP ── */
+(function(){
+  const fi=document.getElementById('lf-av-file');
+  if(fi)fi.addEventListener('change',function(){
+    const f=this.files[0];if(!f)return;this.value='';
+    const r=new FileReader();
+    r.onload=e=>_lcOpenCrop(e.target.result);
+    r.readAsDataURL(f);
+  });
+})();
+
+/* ── CROP ENGINE ── */
+let _lcImg=null,_lcS=1,_lcSMin=1,_lcX=0,_lcY=0,_lcSz=240;
+let _lcDrag=null,_lcPinch=null,_lcRafId=null,_lcZoomTm=null,_lcGesture=false;
+const _lcCanvas=document.getElementById('lc-canvas');
+const _lcCtx=_lcCanvas?_lcCanvas.getContext('2d',{alpha:false}):null;
+
+(function _lcPreInit(){
+  if(!_lcCanvas||!_lcCtx)return;
+  const W=window.innerWidth,H=window.innerHeight,dpr=window.devicePixelRatio||1;
+  _lcCanvas.width=Math.round(W*dpr);_lcCanvas.height=Math.round(H*dpr);
+  _lcCanvas.style.width=W+'px';_lcCanvas.style.height=H+'px';
+  _lcCtx.scale(dpr,dpr);
+  _lcCtx.fillStyle='#111';_lcCtx.fillRect(0,0,W,H);
+})();
+
+function _lcOpenCrop(src){
+  _lcImg=new Image();
+  _lcImg.onload=()=>{
+    document.getElementById('lf-crop-scr').classList.add('show');
+    const W=window.innerWidth,H=window.innerHeight,dpr=window.devicePixelRatio||1;
+    const nW=Math.round(W*dpr),nH=Math.round(H*dpr);
+    if(_lcCanvas.width!==nW||_lcCanvas.height!==nH){
+      _lcCtx.setTransform(1,0,0,1,0,0);
+      _lcCanvas.width=nW;_lcCanvas.height=nH;
+      _lcCanvas.style.width=W+'px';_lcCanvas.style.height=H+'px';
+      _lcCtx.scale(dpr,dpr);
     }
-  },{passive:true});
-  wrap.addEventListener('touchmove',()=>{_pavCancelLongPress();},{passive:true});
-  wrap.addEventListener('touchcancel',()=>{_pavCancelLongPress();},{passive:true});
-  // Mouse fallback for desktop
-  wrap.addEventListener('mousedown',e=>{
-    _pavPressStart=performance.now();
-    _pavStartLongPress(e);
-  });
-  wrap.addEventListener('mouseup',e=>{
-    const held=performance.now()-(_pavPressStart||0);
-    _pavCancelLongPress();
-    if(held<300)pickAvatar();
-  });
-  wrap.addEventListener('mouseleave',()=>{_pavCancelLongPress();});
-}
-let _pavPressStart=0;
-
-function onAvatarPicked(input){
-  const file=input.files&&input.files[0];
-  if(!file)return;
-  tg?.HapticFeedback?.impactOccurred('medium');
-  const reader=new FileReader();
-  reader.onload=e=>{
-    const raw=e.target.result;
-    const image=new Image();
-    image.onload=()=>{
-      const MAX=256;
-      const canvas=document.createElement('canvas');
-      const ratio=Math.min(MAX/image.width,MAX/image.height,1);
-      canvas.width=Math.round(image.width*ratio);
-      canvas.height=Math.round(image.height*ratio);
-      const ctx=canvas.getContext('2d');
-      ctx.drawImage(image,0,0,canvas.width,canvas.height);
-      const compressed=canvas.toDataURL('image/jpeg',0.82);
-      // Extract color before saving
-      const rgb=_extractDominantColor(canvas);
-      if(rgb){_saveAvatarColor(rgb);}
-      _saveAvatarToStorage(compressed);
-      _applyAvatar(compressed,true);
-    };
-    image.src=raw;
+    _lcSz=Math.min(W*.78,H*.52,300);
+    const fr=document.getElementById('lc-frame');
+    if(fr){fr.style.width=_lcSz+'px';fr.style.height=_lcSz+'px';}
+    _lcSMin=Math.max(_lcSz/_lcImg.width,_lcSz/_lcImg.height);
+    _lcS=_lcSMin;_lcX=W/2;_lcY=H/2;
+    _lcCtx.imageSmoothingEnabled=true;_lcCtx.imageSmoothingQuality='high';
+    _lcScheduleDraw();
   };
-  reader.readAsDataURL(file);
-  input.value='';
+  _lcImg.src=src;
 }
+
+function _lcScheduleDraw(){if(_lcRafId)return;_lcRafId=requestAnimationFrame(()=>{_lcRafId=null;_lcDraw();});}
+
+function _lcDraw(){
+  if(!_lcImg)return;
+  const W=parseInt(_lcCanvas.style.width),H=parseInt(_lcCanvas.style.height);
+  _lcCtx.fillStyle='#111';_lcCtx.fillRect(0,0,W,H);
+  const iw=_lcImg.width*_lcS,ih=_lcImg.height*_lcS;
+  const ix=_lcX-iw/2,iy=_lcY-ih/2;
+  const rad=Math.min(iw,ih)*.1;
+  _lcCtx.save();
+  _lcCtx.beginPath();
+  _lcCtx.moveTo(ix+rad,iy);
+  _lcCtx.lineTo(ix+iw-rad,iy);_lcCtx.arcTo(ix+iw,iy,ix+iw,iy+rad,rad);
+  _lcCtx.lineTo(ix+iw,iy+ih-rad);_lcCtx.arcTo(ix+iw,iy+ih,ix+iw-rad,iy+ih,rad);
+  _lcCtx.lineTo(ix+rad,iy+ih);_lcCtx.arcTo(ix,iy+ih,ix,iy+ih-rad,rad);
+  _lcCtx.lineTo(ix,iy+rad);_lcCtx.arcTo(ix,iy,ix+rad,iy,rad);
+  _lcCtx.closePath();_lcCtx.clip();
+  _lcCtx.drawImage(_lcImg,ix,iy,iw,ih);
+  _lcCtx.restore();
+}
+
+function _lcClamp(){
+  if(!_lcImg)return;
+  const W=parseInt(_lcCanvas.style.width),H=parseInt(_lcCanvas.style.height),h=_lcSz/2;
+  const iw=_lcImg.width*_lcS,ih=_lcImg.height*_lcS;
+  _lcX=Math.max(W/2+h-iw/2,Math.min(W/2-h+iw/2,_lcX));
+  _lcY=Math.max(H/2+h-ih/2,Math.min(H/2-h+ih/2,_lcY));
+}
+
+function _lcShowZoom(){
+  const z=document.getElementById('lc-zoom');if(!z)return;
+  z.textContent=Math.round(_lcS/_lcSMin*100)+'%';
+  z.classList.add('visible');
+  if(_lcZoomTm)clearTimeout(_lcZoomTm);
+  _lcZoomTm=setTimeout(()=>z.classList.remove('visible'),900);
+}
+
+function _lcGestureStart(){if(!_lcGesture){_lcGesture=true;if(_lcCtx)_lcCtx.imageSmoothingEnabled=false;}}
+let _lcGestureEndTm=null;
+function _lcGestureEnd(){
+  if(_lcGestureEndTm)clearTimeout(_lcGestureEndTm);
+  _lcGestureEndTm=setTimeout(()=>{_lcGesture=false;if(_lcCtx){_lcCtx.imageSmoothingEnabled=true;_lcCtx.imageSmoothingQuality='high';}  _lcScheduleDraw();},120);
+}
+
+if(_lcCanvas){
+  _lcCanvas.addEventListener('touchstart',e=>{
+    e.preventDefault();
+    if(e.touches.length===1){_lcDrag={ox:e.touches[0].clientX-_lcX,oy:e.touches[0].clientY-_lcY};_lcPinch=null;_lcGestureStart();}
+    else if(e.touches.length>=2){const dx=e.touches[1].clientX-e.touches[0].clientX,dy=e.touches[1].clientY-e.touches[0].clientY;_lcPinch={d:Math.hypot(dx,dy),s:_lcS};_lcDrag=null;_lcGestureStart();}
+  },{passive:false});
+  _lcCanvas.addEventListener('touchmove',e=>{
+    e.preventDefault();
+    if(e.touches.length===1&&_lcDrag){_lcX=e.touches[0].clientX-_lcDrag.ox;_lcY=e.touches[0].clientY-_lcDrag.oy;_lcClamp();_lcScheduleDraw();}
+    else if(e.touches.length>=2&&_lcPinch){const dx=e.touches[1].clientX-e.touches[0].clientX,dy=e.touches[1].clientY-e.touches[0].clientY;_lcS=Math.max(_lcSMin,Math.min(_lcSMin*5,_lcPinch.s*(Math.hypot(dx,dy)/_lcPinch.d)));_lcClamp();_lcScheduleDraw();_lcShowZoom();}
+  },{passive:false});
+  _lcCanvas.addEventListener('touchend',()=>{_lcDrag=null;_lcPinch=null;_lcGestureEnd();});
+  _lcCanvas.addEventListener('mousedown',e=>{_lcDrag={ox:e.clientX-_lcX,oy:e.clientY-_lcY};_lcGestureStart();});
+  _lcCanvas.addEventListener('mousemove',e=>{if(!_lcDrag)return;_lcX=e.clientX-_lcDrag.ox;_lcY=e.clientY-_lcDrag.oy;_lcClamp();_lcScheduleDraw();});
+  _lcCanvas.addEventListener('mouseup',()=>{_lcDrag=null;_lcGestureEnd();});
+  _lcCanvas.addEventListener('wheel',e=>{e.preventDefault();_lcGestureStart();_lcS=Math.max(_lcSMin,Math.min(_lcSMin*5,_lcS*(e.deltaY<0?1.09:.92)));_lcClamp();_lcScheduleDraw();_lcShowZoom();_lcGestureEnd();},{passive:false});
+}
+
+(function _lcButtons(){
+  const cancel=document.getElementById('lc-cancel');
+  const apply=document.getElementById('lc-apply');
+  if(cancel)cancel.addEventListener('click',()=>{document.getElementById('lf-crop-scr').classList.remove('show');_lcImg=null;});
+  if(apply)apply.addEventListener('click',()=>{
+    if(!_lcImg)return;
+    const W=parseInt(_lcCanvas.style.width),H=parseInt(_lcCanvas.style.height);
+    const sz=Math.round(_lcSz);
+    const out=document.createElement('canvas');out.width=sz;out.height=sz;
+    const oc=out.getContext('2d');
+    oc.save();oc.beginPath();oc.arc(sz/2,sz/2,sz/2,0,Math.PI*2);oc.clip();
+    const srcX=_lcX-_lcImg.width*_lcS/2,srcY=_lcY-_lcImg.height*_lcS/2;
+    const cropL=(W/2-_lcSz/2)-srcX,cropT=(H/2-_lcSz/2)-srcY;
+    oc.drawImage(_lcImg,cropL/_lcS,cropT/_lcS,_lcSz/_lcS,_lcSz/_lcS,0,0,sz,sz);
+    oc.restore();
+    const url=out.toDataURL('image/jpeg',.92);
+    // Extract dominant color
+    try{
+      const tmp=document.createElement('canvas');tmp.width=8;tmp.height=8;
+      const tc=tmp.getContext('2d');tc.drawImage(out,0,0,8,8);
+      const d=tc.getImageData(0,0,8,8).data;
+      let r=0,g=0,b=0,n=0;
+      for(let i=0;i<d.length;i+=4){
+        const mx=Math.max(d[i],d[i+1],d[i+2]),mn=Math.min(d[i],d[i+1],d[i+2]);
+        const sat=(mx-mn)/(mx||1),lum=(mx+mn)/510;
+        if(sat>.12&&lum>.06&&lum<.92){r+=d[i];g+=d[i+1];b+=d[i+2];n++;}
+      }
+      const rgb=n>0?`${Math.round(r/n)},${Math.round(g/n)},${Math.round(b/n)}`:null;
+      if(rgb)_saveAvatarColor(rgb);
+    }catch{}
+    _saveAvatarToStorage(url);
+    _applyAvatarFull(url,true);
+    document.getElementById('lf-crop-scr').classList.remove('show');
+    _lcImg=null;
+    toast('аватар обновлён ✓');
+  });
+})();
+
+function _applyAvatarFull(dataUrl,animate){
+  av.hasImg=true;
+  const img=document.getElementById('pf-av-img');
+  const letter=document.getElementById('pf-av-letter');
+  const avEl=_avEl();
+  if(!img)return;
+  const doApply=()=>{
+    img.onload=()=>{
+      img.classList.add('loaded');
+      if(letter)letter.style.display='none';
+      // glow
+      const sc=_loadAvatarColor();
+      if(sc&&avEl){
+        avEl.style.transition='box-shadow .6s cubic-bezier(.4,0,.2,1)';
+        avEl.style.boxShadow=`0 5px 18px rgba(${sc},.45)`;
+      }
+      _updateNavAvatar();
+    };
+    img.onerror=()=>{};
+    img.src=dataUrl;
+  };
+  if(animate){setTimeout(doApply,80);}
+  else{doApply();}
+}
+
+// Legacy alias used in renderProfile
+function _applyAvatar(dataUrl,animate){_applyAvatarFull(dataUrl,animate);}
+function pickAvatar(){document.getElementById('lf-av-file').click();}
+
+// Load saved avatar on boot
+(function(){try{const s=_loadAvatarFromStorage();if(s){_applyAvatarFull(s,false);}}catch{}})();
 
 function renderProfile(){
   const u=gU(),wl=gWL();
-  // Init touch/click handlers once
-  _initAvatarHandlers();
-  // Avatar
+  // Update letter if no avatar
   const letter=$('pf-av-letter');
   const img=$('pf-av-img');
-  const saved=_loadAvatarFromStorage();
-  if(saved&&img){
-    if(!img.classList.contains('loaded')){
-      _applyAvatar(saved,false);
-    }
-  } else {
-    if(letter)letter.style.display='';
-    if(img){img.classList.remove('loaded');img.src='';}
-    if(letter)letter.textContent=(u.name||'?').charAt(0).toUpperCase();
+  if(!av.hasImg){
+    if(letter){letter.style.display='';letter.textContent=(u.name||'?').charAt(0).toUpperCase();}
   }
   T('pf-name',u.name||'—');
   const meta=[];if(u.age)meta.push(u.age+' лет');if(u.height)meta.push(u.height+' см');if(u.gender)meta.push(u.gender==='male'?'♂':'♀');
@@ -4910,5 +5019,24 @@ document.addEventListener('DOMContentLoaded',async()=>{
   document.querySelector('[onclick*="pp-scanner"]')?.addEventListener('touchstart',_prewarmCamera,{once:true,passive:true});
 });
 </script>
+
+<!-- ── AVATAR CROP SCREEN ── -->
+<div id="lf-crop-scr">
+  <div class="lc-hdr">
+    <button class="lc-btn lc-cancel" id="lc-cancel">отмена</button>
+    <span class="lc-ttl">обрезка фото</span>
+    <button class="lc-btn lc-apply" id="lc-apply">готово</button>
+  </div>
+  <div class="lc-area">
+    <canvas id="lc-canvas"></canvas>
+    <div style="position:absolute;inset:0;pointer-events:none;z-index:5">
+      <div class="lc-frame" id="lc-frame"></div>
+    </div>
+  </div>
+  <div class="lc-zoom" id="lc-zoom">100%</div>
+  <div class="lc-hint"><div class="lc-hint-txt">перетаскивай · щипок для масштаба</div></div>
+</div>
+<input type="file" id="lf-av-file" accept="image/*" style="position:fixed;opacity:0;pointer-events:none;top:-999px;left:-999px">
+
 </body>
 </html>
