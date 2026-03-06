@@ -5320,6 +5320,62 @@ document.addEventListener('DOMContentLoaded',async()=>{
   const dark=tg?.colorScheme==='dark'||window.matchMedia?.('(prefers-color-scheme:dark)').matches;
   if(dark)document.body.classList.add('tg-dark');
   tg?.onEvent('themeChanged',()=>{document.body.classList.toggle('tg-dark',tg?.colorScheme==='dark');applyTheme();});
+
+  // ══ SPLASH ANIMATION — запускаем СРАЗУ, до загрузки данных ══
+  let _splashDone=false;
+  (function(){
+    const w1=document.getElementById('sp-w1');
+    const w2=document.getElementById('sp-w2');
+    const sub=document.getElementById('sp-sub');
+    const dots=document.getElementById('sp-dots');
+    if(!w1||!w2)return;
+    const L1='скоро'.split('');
+    const L2='лето'.split('');
+    L1.forEach(l=>{const s=document.createElement('span');s.className='sp-letter';s.textContent=l;w1.appendChild(s);});
+    L2.forEach(l=>{const s=document.createElement('span');s.className='sp-letter sun';s.textContent=l;w2.appendChild(s);});
+    const all=[...w1.querySelectorAll('.sp-letter'),...w2.querySelectorAll('.sp-letter')];
+    // stagger reveal
+    all.forEach((el,i)=>{
+      setTimeout(()=>{
+        el.style.transition='opacity .38s ease, transform .5s cubic-bezier(.16,1,.3,1)';
+        el.style.opacity='1';el.style.transform='translateY(0)';
+      },260+i*55);
+    });
+    // subtitle
+    setTimeout(()=>{
+      sub.style.transition='opacity .5s ease, transform .5s ease';
+      sub.style.opacity='1';sub.style.transform='translateY(0)';
+    },880);
+    // dots
+    setTimeout(()=>{dots.style.transition='opacity .4s ease';dots.style.opacity='1';},1030);
+    // shimmer flash on «лето»
+    setTimeout(()=>{
+      w2.querySelectorAll('.sp-letter').forEach((el,i)=>{
+        setTimeout(()=>{el.style.filter='brightness(1.55) saturate(1.3)';setTimeout(()=>{el.style.filter='';},320);},i*55);
+      });
+    },1650);
+    // функция выхода — вызывается когда данные готовы (но не раньше 2.4с)
+    const _MIN_SPLASH=2400;
+    const _splashStart=Date.now();
+    window._hideSplash=function(){
+      if(_splashDone)return;
+      _splashDone=true;
+      const wait=Math.max(0,_MIN_SPLASH-(Date.now()-_splashStart));
+      setTimeout(()=>{
+        all.forEach((el,i)=>{
+          el.style.transition='';
+          el.style.animation=`sp-letter-exit .52s ${i*26}ms cubic-bezier(.4,0,.6,1) forwards`;
+        });
+        if(sub){sub.style.transition='';sub.style.animation='sp-fade-exit .35s ease forwards';}
+        if(dots){dots.style.transition='';dots.style.animation='sp-fade-exit .3s ease forwards';}
+        setTimeout(()=>{
+          const sp=document.getElementById('splash');
+          if(sp){sp.classList.add('hiding');setTimeout(()=>sp.remove(),560);}
+        },360);
+      },wait);
+    };
+  })();
+
   // Init crop engine (elements are after script block, must be deferred)
   _lcDOMInit();
   _lcInitFileInput();
@@ -5330,74 +5386,10 @@ document.addEventListener('DOMContentLoaded',async()=>{
   ['classic','linear','bento'].forEach(k=>{const el=document.getElementById('dp-'+k);if(el)el.classList.toggle('selected',k===d);});
   await loadData();
   renderHome();
-  _updateNavAvatar(); // restore nav avatar from storage on startup
+  _updateNavAvatar();
+  // данные готовы — скрываем сплэш (с учётом минимального времени)
+  window._hideSplash?.();
 
-  // ══ SPLASH ANIMATION — Variant A ══
-  (function(){
-    const w1=document.getElementById('sp-w1');
-    const w2=document.getElementById('sp-w2');
-    const sub=document.getElementById('sp-sub');
-    const dots=document.getElementById('sp-dots');
-    if(!w1||!w2)return;
-
-    // build letters
-    const L1='скоро'.split('');
-    const L2='лето'.split('');
-    L1.forEach(l=>{
-      const s=document.createElement('span');
-      s.className='sp-letter';s.textContent=l;w1.appendChild(s);
-    });
-    L2.forEach(l=>{
-      const s=document.createElement('span');
-      s.className='sp-letter sun';s.textContent=l;w2.appendChild(s);
-    });
-
-    const all=[...w1.querySelectorAll('.sp-letter'),...w2.querySelectorAll('.sp-letter')];
-
-    // stagger letter reveals
-    all.forEach((el,i)=>{
-      setTimeout(()=>{
-        el.style.transition='opacity .38s ease, transform .5s cubic-bezier(.16,1,.3,1)';
-        el.style.opacity='1';el.style.transform='translateY(0)';
-      },280+i*58);
-    });
-
-    // subtitle
-    setTimeout(()=>{
-      sub.style.transition='opacity .5s ease, transform .5s ease';
-      sub.style.opacity='1';sub.style.transform='translateY(0)';
-    },900);
-
-    // dots
-    setTimeout(()=>{
-      dots.style.transition='opacity .4s ease';
-      dots.style.opacity='1';
-    },1050);
-
-    // shimmer flash on "лето"
-    setTimeout(()=>{
-      w2.querySelectorAll('.sp-letter').forEach((el,i)=>{
-        setTimeout(()=>{
-          el.style.filter='brightness(1.5) saturate(1.3)';
-          setTimeout(()=>{el.style.filter='';},320);
-        },i*55);
-      });
-    },1700);
-
-    // EXIT — letters fly up with blur, then fade whole splash
-    setTimeout(()=>{
-      all.forEach((el,i)=>{
-        el.style.transition='';
-        el.style.animation=`sp-letter-exit .52s ${i*28}ms cubic-bezier(.4,0,.6,1) forwards`;
-      });
-      if(sub){sub.style.transition='';sub.style.animation='sp-fade-exit .35s ease forwards';}
-      if(dots){dots.style.transition='';dots.style.animation='sp-fade-exit .3s ease forwards';}
-      setTimeout(()=>{
-        const sp=document.getElementById('splash');
-        if(sp){sp.classList.add('hiding');setTimeout(()=>sp.remove(),580);}
-      },380);
-    },2600);
-  })();
   setInterval(async()=>{if(curTab==='home'&&_completingMap.size===0){await loadData();renderHome();}},30000);
   // освобождаем камеру только при сворачивании приложения
   document.addEventListener('visibilitychange',()=>{
