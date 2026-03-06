@@ -497,17 +497,14 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   background:linear-gradient(135deg,var(--sun),var(--sun2));
   display:flex;align-items:center;justify-content:center;
   font-size:26px;font-weight:900;color:#fff;
-  box-shadow:0 5px 18px rgba(255,107,53,.25);
   flex-shrink:0;
-  /* clip-path + overflow:hidden для надёжного клипа на мобиле */
   overflow:hidden;
   clip-path:circle(50%);
   -webkit-clip-path:circle(50%);
   position:relative;
   cursor:pointer;
   -webkit-tap-highlight-color:transparent;
-  transition:transform .15s ease, box-shadow .6s cubic-bezier(.4,0,.2,1), filter .15s ease;
-  /* форсируем аппаратное ускорение */
+  transition:transform .15s ease, filter .15s ease;
   transform:translateZ(0);
   -webkit-transform:translateZ(0);
 }
@@ -1313,14 +1310,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   transition:background .6s ease;
 }
 /* Shimmer sweep */
-.pf-hero-shimmer{
-  position:absolute;inset:0;pointer-events:none;z-index:0;border-radius:22px;
-  background:linear-gradient(110deg,transparent 20%,rgba(var(--pf-r),var(--pf-g),var(--pf-b),.06) 40%,rgba(255,255,255,.07) 50%,transparent 80%);
-  background-size:250% 100%;
-  animation:pf-shimmer 8s ease-in-out infinite;
-  transition:opacity .6s ease;
-}
-@keyframes pf-shimmer{0%{background-position:150% 0}20%{background-position:-50% 0}21%,100%{background-position:-50% 0}}
+
 .pf-hero-right{flex:1;min-width:0;position:relative;z-index:1}
 .pf-hero-name{font-size:18px;font-weight:900;color:var(--text);letter-spacing:-.02em;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tg-dark .pf-hero-name{color:#fff}
@@ -1478,40 +1468,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .av-tip.del .tip-prog-fill{background:linear-gradient(90deg,#FF453A,rgba(255,69,58,.6))}
 
 /* ══ CROP SCREEN ══ */
-#lf-crop-scr{
-  position:fixed;inset:0;z-index:10000;
-  background:#111;opacity:0;pointer-events:none;
-  transform:translateY(20px);
-  transition:opacity .28s ease,transform .28s cubic-bezier(.32,1.2,.64,1);
-  display:flex;flex-direction:column;
-}
-#lf-crop-scr.show{opacity:1;pointer-events:all;transform:translateY(0)}
-.lc-hdr{
-  position:absolute;top:0;left:0;right:0;z-index:10;
-  padding:max(env(safe-area-inset-top,52px),52px) 16px 14px;
-  display:flex;align-items:center;justify-content:space-between;
-  background:linear-gradient(to bottom,rgba(0,0,0,.9),transparent);
-}
-.lc-btn{padding:9px 20px;border-radius:22px;font-family:'Onest',sans-serif;font-size:14px;font-weight:700;transition:opacity .12s,transform .1s;cursor:pointer;border:none}
-.lc-btn:active{opacity:.7;transform:scale(.96)}
-.lc-cancel{background:rgba(255,255,255,.1);color:rgba(255,255,255,.85)}
-.lc-apply{background:linear-gradient(135deg,var(--sun),var(--sun2));color:#fff;box-shadow:0 4px 18px rgba(255,107,53,.45)}
-.lc-ttl{font-size:15px;font-weight:700;color:rgba(255,255,255,.75)}
-.lc-area{flex:1;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
-#lc-canvas{position:absolute;touch-action:none;will-change:contents}
-.lc-frame{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  border-radius:50%;
-  box-shadow:0 0 0 9999px rgba(0,0,0,.72);
-  border:2px solid rgba(255,255,255,.55);
-  pointer-events:none;
-  animation:lc-pulse 2s ease-in-out infinite;
-}
-@keyframes lc-pulse{0%,100%{border-color:rgba(255,255,255,.5)}50%{border-color:rgba(255,255,255,.9)}}
-.lc-hint{position:absolute;bottom:0;left:0;right:0;z-index:10;padding:12px 24px max(env(safe-area-inset-bottom,24px),24px);background:linear-gradient(to top,rgba(0,0,0,.9),transparent);text-align:center;pointer-events:none}
-.lc-hint-txt{font-size:12px;color:rgba(255,255,255,.38);font-weight:600;letter-spacing:.03em}
-.lc-zoom{position:absolute;bottom:calc(max(env(safe-area-inset-bottom,24px),24px) + 36px);left:50%;transform:translateX(-50%);background:rgba(0,0,0,.75);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:5px 14px;z-index:11;font-size:11px;font-weight:700;color:rgba(255,255,255,.55);pointer-events:none;white-space:nowrap;opacity:0;transition:opacity .2s}
-.lc-zoom.visible{opacity:1}
+
 </style>
 </head>
 <body>
@@ -1729,7 +1686,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
   <!-- ── HERO CARD ── -->
   <div class="pf-hero" id="pf-hero-card">
-    <div class="pf-hero-shimmer"></div>
+
     <!-- Edit pencil -->
     <button class="pf-hero-edit" onclick="pushPage('pp-pdata')" title="редактировать">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -4416,194 +4373,57 @@ function _doDeleteAvatar(){
   const letter=document.getElementById('pf-av-letter');
   if(img){img.style.transition='opacity .4s ease';img.style.opacity='0';setTimeout(()=>{img.classList.remove('loaded');img.src='';img.style.transition='';img.style.opacity='';},420);}
   if(letter){letter.style.display='';const u=gU();letter.textContent=(u.name||'?').charAt(0).toUpperCase();}
-  const avEl=_avEl();if(avEl){avEl.style.transition='box-shadow .5s ease';avEl.style.boxShadow='0 5px 18px rgba(255,107,53,.25)';}
+  const avEl=_avEl();if(avEl){avEl.style.boxShadow='none';}
   try{localStorage.removeItem(AV_KEY);localStorage.removeItem(AV_CLR_KEY);}catch{}
   _setPfHeroColor(null); // reset to orange
   _updateNavAvatar();
   toast('аватар удалён');
 }
 
-/* ── FILE → CROP ── */
+/* ── FILE → AVATAR (без редактора, сразу применяем) ── */
 function _lcInitFileInput(){
   const fi=document.getElementById('lf-av-file');
   if(!fi)return;
   fi.addEventListener('change',function(){
     const f=this.files[0];if(!f)return;this.value='';
     const r=new FileReader();
-    r.onload=e=>_lcOpenCrop(e.target.result);
+    r.onload=e=>{
+      // Ресайз до 400px — достаточно для аватара, зато быстро
+      const src=e.target.result;
+      const tmp=new Image();
+      tmp.onload=()=>{
+        const SZ=400;
+        const sw=tmp.naturalWidth||tmp.width,sh=tmp.naturalHeight||tmp.height;
+        const ratio=Math.min(SZ/sw,SZ/sh,1);
+        const oc=document.createElement('canvas');
+        oc.width=Math.round(sw*ratio);oc.height=Math.round(sh*ratio);
+        const ox=oc.getContext('2d');
+        ox.imageSmoothingEnabled=true;ox.imageSmoothingQuality='high';
+        ox.drawImage(tmp,0,0,oc.width,oc.height);
+        // извлекаем доминирующий цвет для карточки
+        try{
+          const tiny=document.createElement('canvas');tiny.width=8;tiny.height=8;
+          const tc=tiny.getContext('2d');tc.drawImage(tmp,0,0,8,8);
+          const d=tc.getImageData(0,0,8,8).data;
+          let rv=0,gv=0,bv=0,n=0;
+          for(let i=0;i<d.length;i+=4){
+            const mx=Math.max(d[i],d[i+1],d[i+2]),mn=Math.min(d[i],d[i+1],d[i+2]);
+            const sat=(mx-mn)/(mx||1),lum=(mx+mn)/510;
+            if(sat>.12&&lum>.06&&lum<.92){rv+=d[i];gv+=d[i+1];bv+=d[i+2];n++;}
+          }
+          if(n>0)_saveAvatarColor(`${Math.round(rv/n)},${Math.round(gv/n)},${Math.round(bv/n)}`);
+        }catch{}
+        const url=oc.toDataURL('image/jpeg',.92);
+        _saveAvatarToStorage(url);
+        _applyAvatarFull(url,true);
+        toast('аватар обновлён ✓');
+      };
+      tmp.src=src;
+    };
     r.readAsDataURL(f);
   });
 }
 
-/* ── CROP ENGINE ── */
-let _lcImg=null,_lcThumb=null; // _lcImg=оригинал для экспорта, _lcThumb=уменьшенная копия для рисования
-let _lcThumbScale=1; // коэффициент уменьшения _lcThumb относительно оригинала
-let _lcS=1,_lcSMin=1,_lcX=0,_lcY=0,_lcSz=240;
-let _lcW=0,_lcH=0; // кэш размеров canvas в CSS-пикселях (избегаем parseInt из DOM каждый кадр)
-let _lcDrag=null,_lcPinch=null,_lcRafId=null,_lcZoomTm=null;
-let _lcCanvas=null,_lcCtx=null;
-
-function _lcGetCanvas(){
-  if(!_lcCanvas){
-    _lcCanvas=document.getElementById('lc-canvas');
-    /* desynchronized=true убирает синхронизацию с DOM — рисуем строго через RAF */
-    _lcCtx=_lcCanvas?_lcCanvas.getContext('2d',{alpha:false,desynchronized:true}):null;
-  }
-  return _lcCanvas;
-}
-
-function _lcPreInit(){
-  const c=_lcGetCanvas();if(!c||!_lcCtx)return;
-  _lcW=window.innerWidth;_lcH=window.innerHeight;
-  const dpr=window.devicePixelRatio||1;
-  c.width=Math.round(_lcW*dpr);c.height=Math.round(_lcH*dpr);
-  c.style.width=_lcW+'px';c.style.height=_lcH+'px';
-  _lcCtx.setTransform(dpr,0,0,dpr,0,0);
-  _lcCtx.fillStyle='#111';_lcCtx.fillRect(0,0,_lcW,_lcH);
-}
-
-/* Создаём уменьшенную копию изображения для плавного рисования в реальном времени.
-   Телефонные фото бывают 4000×3000px — рисовать их каждый кадр очень дорого.
-   Уменьшаем до MAX_DRAW по длинной стороне, это даёт 10–30× ускорение. */
-function _lcMakeThumb(img){
-  const MAX_DRAW=900;
-  const sw=img.naturalWidth||img.width,sh=img.naturalHeight||img.height;
-  if(sw<=MAX_DRAW&&sh<=MAX_DRAW){_lcThumb=img;_lcThumbScale=1;return;}
-  const ratio=MAX_DRAW/Math.max(sw,sh);
-  const tw=Math.round(sw*ratio),th=Math.round(sh*ratio);
-  const oc=document.createElement('canvas');oc.width=tw;oc.height=th;
-  const ox=oc.getContext('2d');
-  ox.imageSmoothingEnabled=true;ox.imageSmoothingQuality='high';
-  ox.drawImage(img,0,0,tw,th);
-  _lcThumb=oc;_lcThumbScale=ratio;
-}
-
-function _lcOpenCrop(src){
-  const c=_lcGetCanvas();if(!c||!_lcCtx)return;
-  _lcImg=new Image();
-  _lcImg.onload=()=>{
-    _lcMakeThumb(_lcImg); // создаём быструю копию для рисования
-    document.getElementById('lf-crop-scr').classList.add('show');
-    _lcW=window.innerWidth;_lcH=window.innerHeight;
-    const dpr=window.devicePixelRatio||1;
-    const nW=Math.round(_lcW*dpr),nH=Math.round(_lcH*dpr);
-    if(c.width!==nW||c.height!==nH){
-      c.width=nW;c.height=nH;
-      c.style.width=_lcW+'px';c.style.height=_lcH+'px';
-      _lcCtx.setTransform(dpr,0,0,dpr,0,0);
-    }
-    _lcSz=Math.min(_lcW*.78,_lcH*.52,300);
-    const fr=document.getElementById('lc-frame');
-    if(fr){fr.style.width=_lcSz+'px';fr.style.height=_lcSz+'px';}
-    // _lcSMin считаем по оригиналу
-    _lcSMin=Math.max(_lcSz/(_lcImg.naturalWidth||_lcImg.width),_lcSz/(_lcImg.naturalHeight||_lcImg.height));
-    _lcS=_lcSMin;_lcX=_lcW/2;_lcY=_lcH/2;
-    _lcCtx.imageSmoothingEnabled=true;_lcCtx.imageSmoothingQuality='high';
-    _lcScheduleDraw();
-  };
-  _lcImg.src=src;
-}
-
-function _lcScheduleDraw(){
-  if(_lcRafId)return; // уже запланирован — пропускаем дублирующий запрос
-  _lcRafId=requestAnimationFrame(()=>{_lcRafId=null;_lcDraw();});
-}
-
-function _lcDraw(){
-  if(!_lcThumb||!_lcCtx)return;
-  /* Рисуем уменьшенную копию (_lcThumb), а не оригинал — в 10–30× быстрее.
-     _lcS — масштаб относительно оригинала, поэтому для thumb делим на _lcThumbScale */
-  const ts=_lcS/_lcThumbScale; // масштаб для thumb
-  const tw=(_lcThumb.width||_lcThumb.naturalWidth)*ts;
-  const th=(_lcThumb.height||_lcThumb.naturalHeight)*ts;
-  const ix=_lcX-tw/2,iy=_lcY-th/2;
-  _lcCtx.fillStyle='#111';_lcCtx.fillRect(0,0,_lcW,_lcH);
-  _lcCtx.drawImage(_lcThumb,ix,iy,tw,th);
-}
-
-function _lcClamp(){
-  if(!_lcImg)return;
-  const iw=(_lcImg.naturalWidth||_lcImg.width)*_lcS;
-  const ih=(_lcImg.naturalHeight||_lcImg.height)*_lcS;
-  const h=_lcSz/2;
-  _lcX=Math.max(_lcW/2+h-iw/2,Math.min(_lcW/2-h+iw/2,_lcX));
-  _lcY=Math.max(_lcH/2+h-ih/2,Math.min(_lcH/2-h+ih/2,_lcY));
-}
-
-function _lcShowZoom(){
-  const z=document.getElementById('lc-zoom');if(!z)return;
-  z.textContent=Math.round(_lcS/_lcSMin*100)+'%';
-  z.classList.add('visible');
-  if(_lcZoomTm)clearTimeout(_lcZoomTm);
-  _lcZoomTm=setTimeout(()=>z.classList.remove('visible'),900);
-}
-
-// Убрали _lcGestureStart/End — они только добавляли overhead и не нужны
-// после замены drawImage на thumb (всегда быстро)
-
-/* All crop DOM initialization deferred to DOMContentLoaded */
-function _lcDOMInit(){
-  _lcGetCanvas();
-  if(!_lcCanvas)return;
-
-  /* Pre-warm canvas */
-  _lcPreInit();
-
-  /* Touch / mouse events on canvas */
-  _lcCanvas.addEventListener('touchstart',e=>{
-    e.preventDefault();
-    if(e.touches.length===1){_lcDrag={ox:e.touches[0].clientX-_lcX,oy:e.touches[0].clientY-_lcY};_lcPinch=null;}
-    else if(e.touches.length>=2){const dx=e.touches[1].clientX-e.touches[0].clientX,dy=e.touches[1].clientY-e.touches[0].clientY;_lcPinch={d:Math.hypot(dx,dy),s:_lcS};_lcDrag=null;}
-  },{passive:false});
-  _lcCanvas.addEventListener('touchmove',e=>{
-    e.preventDefault();
-    if(e.touches.length===1&&_lcDrag){_lcX=e.touches[0].clientX-_lcDrag.ox;_lcY=e.touches[0].clientY-_lcDrag.oy;_lcClamp();_lcScheduleDraw();}
-    else if(e.touches.length>=2&&_lcPinch){const dx=e.touches[1].clientX-e.touches[0].clientX,dy=e.touches[1].clientY-e.touches[0].clientY;_lcS=Math.max(_lcSMin,Math.min(_lcSMin*5,_lcPinch.s*(Math.hypot(dx,dy)/_lcPinch.d)));_lcClamp();_lcScheduleDraw();_lcShowZoom();}
-  },{passive:false});
-  _lcCanvas.addEventListener('touchend',()=>{_lcDrag=null;_lcPinch=null;});
-  _lcCanvas.addEventListener('mousedown',e=>{_lcDrag={ox:e.clientX-_lcX,oy:e.clientY-_lcY};});
-  _lcCanvas.addEventListener('mousemove',e=>{if(!_lcDrag)return;_lcX=e.clientX-_lcDrag.ox;_lcY=e.clientY-_lcDrag.oy;_lcClamp();_lcScheduleDraw();});
-  _lcCanvas.addEventListener('mouseup',()=>{_lcDrag=null;});
-  _lcCanvas.addEventListener('wheel',e=>{e.preventDefault();_lcS=Math.max(_lcSMin,Math.min(_lcSMin*5,_lcS*(e.deltaY<0?1.09:.92)));_lcClamp();_lcScheduleDraw();_lcShowZoom();},{passive:false});
-
-  /* Cancel / Apply buttons */
-  const cancel=document.getElementById('lc-cancel');
-  const apply=document.getElementById('lc-apply');
-  if(cancel)cancel.addEventListener('click',()=>{document.getElementById('lf-crop-scr').classList.remove('show');_lcImg=null;_lcThumb=null;});
-  if(apply)apply.addEventListener('click',()=>{
-    if(!_lcImg)return;
-    const W=_lcW,H=_lcH; // используем кэшированные размеры
-    const iw=_lcImg.naturalWidth||_lcImg.width,ih=_lcImg.naturalHeight||_lcImg.height;
-    const sz=Math.round(_lcSz);
-    const out=document.createElement('canvas');out.width=sz;out.height=sz;
-    const oc=out.getContext('2d');
-    oc.imageSmoothingEnabled=true;oc.imageSmoothingQuality='high';
-    oc.save();oc.beginPath();oc.arc(sz/2,sz/2,sz/2,0,Math.PI*2);oc.clip();
-    const srcX=_lcX-iw*_lcS/2,srcY=_lcY-ih*_lcS/2;
-    const cropL=(W/2-_lcSz/2)-srcX,cropT=(H/2-_lcSz/2)-srcY;
-    oc.drawImage(_lcImg,cropL/_lcS,cropT/_lcS,_lcSz/_lcS,_lcSz/_lcS,0,0,sz,sz);
-    oc.restore();
-    const url=out.toDataURL('image/jpeg',.92);
-    try{
-      const tmp=document.createElement('canvas');tmp.width=8;tmp.height=8;
-      const tc=tmp.getContext('2d');tc.drawImage(out,0,0,8,8);
-      const d=tc.getImageData(0,0,8,8).data;
-      let r=0,g=0,b=0,n=0;
-      for(let i=0;i<d.length;i+=4){
-        const mx=Math.max(d[i],d[i+1],d[i+2]),mn=Math.min(d[i],d[i+1],d[i+2]);
-        const sat=(mx-mn)/(mx||1),lum=(mx+mn)/510;
-        if(sat>.12&&lum>.06&&lum<.92){r+=d[i];g+=d[i+1];b+=d[i+2];n++;}
-      }
-      const rgb=n>0?`${Math.round(r/n)},${Math.round(g/n)},${Math.round(b/n)}`:null;
-      if(rgb)_saveAvatarColor(rgb);
-    }catch{}
-    _saveAvatarToStorage(url);
-    _applyAvatarFull(url,true);
-    document.getElementById('lf-crop-scr').classList.remove('show');
-    _lcImg=null;
-    toast('аватар обновлён ✓');
-  });
-}
 
 function _setPfHeroColor(rgb){
   // rgb = "r,g,b" string or null to reset
@@ -4625,13 +4445,8 @@ function _applyAvatarFull(dataUrl,animate){
     img.onload=()=>{
       img.classList.add('loaded');
       if(letter)letter.style.display='none';
-      // glow on avatar circle
-      const sc=_loadAvatarColor();
-      if(sc&&avEl){
-        avEl.style.transition='box-shadow .6s cubic-bezier(.4,0,.2,1)';
-        avEl.style.boxShadow=`0 5px 18px rgba(${sc},.45)`;
-      }
       // Update profile hero adaptive color
+      const sc=_loadAvatarColor();
       _setPfHeroColor(sc);
       _updateNavAvatar();
     };
@@ -5087,8 +4902,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   const dark=tg?.colorScheme==='dark'||window.matchMedia?.('(prefers-color-scheme:dark)').matches;
   if(dark)document.body.classList.add('tg-dark');
   tg?.onEvent('themeChanged',()=>{document.body.classList.toggle('tg-dark',tg?.colorScheme==='dark');applyTheme();});
-  // Init crop engine (elements are after script block, must be deferred)
-  _lcDOMInit();
+  // Init avatar file picker
   _lcInitFileInput();
   // Init design state
   const d=getHomeDesign();
@@ -5116,22 +4930,8 @@ document.addEventListener('DOMContentLoaded',async()=>{
 </script>
 
 <!-- ── AVATAR CROP SCREEN ── -->
-<div id="lf-crop-scr">
-  <div class="lc-hdr">
-    <button class="lc-btn lc-cancel" id="lc-cancel">отмена</button>
-    <span class="lc-ttl">обрезка фото</span>
-    <button class="lc-btn lc-apply" id="lc-apply">готово</button>
-  </div>
-  <div class="lc-area">
-    <canvas id="lc-canvas"></canvas>
-    <div style="position:absolute;inset:0;pointer-events:none;z-index:5">
-      <div class="lc-frame" id="lc-frame"></div>
-    </div>
-  </div>
-  <div class="lc-zoom" id="lc-zoom">100%</div>
-  <div class="lc-hint"><div class="lc-hint-txt">перетаскивай · щипок для масштаба</div></div>
-</div>
+
 <input type="file" id="lf-av-file" accept="image/*" style="position:fixed;opacity:0;pointer-events:none;top:-999px;left:-999px">
 
 </body>
-</html> 
+</html>
