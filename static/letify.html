@@ -582,6 +582,90 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .pav-wrap{position:relative;display:inline-block;flex-shrink:0}
 /* Only the avatar dims on press — never the whole card */
 .pav.pressing{filter:brightness(.62);transition:filter .15s ease}
+
+/* ══ AVATAR LOAD ANIMATION ══ */
+/* glow pulse — behind everything */
+.pav-load-glow{
+  position:absolute;
+  top:50%;left:50%;
+  width:96px;height:96px;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(var(--pf-r),var(--pf-g),var(--pf-b),.32) 0%,transparent 70%);
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .35s ease;
+  animation:pav-glow-pulse 1.5s ease-in-out infinite;
+  will-change:transform,opacity;
+}
+.pav-load-glow.show{opacity:1}
+@keyframes pav-glow-pulse{
+  0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.5}
+  50%{transform:translate(-50%,-50%) scale(1.18);opacity:1}
+}
+/* arc ring — SVG outside .pav */
+.pav-load-ring{
+  position:absolute;
+  top:50%;left:50%;
+  width:78px;height:78px;
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .35s ease;
+  will-change:opacity;
+  z-index:3;
+}
+.pav-load-ring.show{opacity:1}
+.pav-load-ring .arc-track{
+  fill:none;
+  stroke:rgba(var(--pf-r),var(--pf-g),var(--pf-b),.16);
+  stroke-width:2.8;
+}
+.pav-load-ring .arc-spin{
+  fill:none;
+  stroke:url(#pavArcGrad);
+  stroke-width:2.8;
+  stroke-linecap:round;
+  stroke-dasharray:6 196;
+  stroke-dashoffset:0;
+  transform-origin:center;
+  animation:pav-arc-spin 1.15s cubic-bezier(.5,0,.5,1) infinite;
+}
+@keyframes pav-arc-spin{
+  0%  {stroke-dashoffset:0;   stroke-dasharray:5 197}
+  30% {stroke-dasharray:100 102}
+  70% {stroke-dasharray:100 102}
+  100%{stroke-dashoffset:-202;stroke-dasharray:5 197}
+}
+/* shimmer sweep inside .pav */
+.pav-load-shimmer{
+  position:absolute;inset:0;
+  border-radius:50%;
+  background:linear-gradient(
+    115deg,
+    transparent 25%,
+    rgba(255,255,255,.22) 48%,
+    rgba(255,255,255,.08) 54%,
+    transparent 75%
+  );
+  background-size:220% 100%;
+  background-position:150% 0;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .35s ease;
+  z-index:2;
+  animation:pav-shimmer 1.5s ease-in-out infinite;
+}
+.pav-load-shimmer.show{opacity:1}
+@keyframes pav-shimmer{
+  0%  {background-position:150% 0}
+  100%{background-position:-60% 0}
+}
+/* avatar dims while loading */
+.pav.loading{
+  filter:brightness(.58);
+  transition:filter .3s ease;
+}
 @keyframes pav-ripple{0%{transform:scale(0);opacity:.4}100%{transform:scale(3);opacity:0}}
 .pav-ripple{
   position:absolute;
@@ -1731,7 +1815,22 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     <div class="pav-wrap" id="pf-av-wrap"
       ontouchstart="avDown(event)" ontouchend="avUp(event)" ontouchcancel="avCancel()"
       onmousedown="avDown(event)" onmouseup="avUp(event)" onmouseleave="avCancel()">
+      <!-- Load glow (behind avatar) -->
+      <div class="pav-load-glow" id="pav-load-glow"></div>
+      <!-- Load arc ring (outside avatar, not clipped) -->
+      <svg class="pav-load-ring" id="pav-load-ring" viewBox="0 0 78 78">
+        <defs>
+          <linearGradient id="pavArcGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="rgb(var(--pf-r),var(--pf-g),var(--pf-b))" stop-opacity="1"/>
+            <stop offset="100%" stop-color="rgb(var(--pf-r),var(--pf-g),var(--pf-b))" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <circle class="arc-track" cx="39" cy="39" r="36"/>
+        <circle class="arc-spin" cx="39" cy="39" r="36" transform="rotate(-90 39 39)"/>
+      </svg>
       <div class="pav" id="pf-av">
+        <!-- Shimmer inside avatar -->
+        <div class="pav-load-shimmer" id="pav-load-shimmer"></div>
         <span id="pf-av-letter">А</span>
         <img class="pav-img" id="pf-av-img" alt="" src="">
       </div>
@@ -4427,6 +4526,7 @@ function _lcInitFileInput(){
   if(!fi)return;
   fi.addEventListener('change',function(){
     const f=this.files[0];if(!f)return;this.value='';
+    _avShowLoader(); // ← show spinner as soon as file is picked
     const r=new FileReader();
     r.onload=e=>{
       const src=e.target.result;
@@ -4614,11 +4714,26 @@ function _lcDOMInit(){
       if(rgb)_saveAvatarColor(rgb);
     }catch{}
     _saveAvatarToStorage(url);
+    _avShowLoader(); // ← show spinner while avatar image applies
     _applyAvatarFull(url,true);
     document.getElementById('lf-crop-scr').classList.remove('show');
     _lcImg=null;
     toast('аватар обновлён ✓');
   });
+}
+
+/* ── AVATAR LOAD ANIMATION ── */
+function _avShowLoader(){
+  document.getElementById('pav-load-glow')?.classList.add('show');
+  document.getElementById('pav-load-ring')?.classList.add('show');
+  document.getElementById('pav-load-shimmer')?.classList.add('show');
+  document.getElementById('pf-av')?.classList.add('loading');
+}
+function _avHideLoader(){
+  document.getElementById('pav-load-glow')?.classList.remove('show');
+  document.getElementById('pav-load-ring')?.classList.remove('show');
+  document.getElementById('pav-load-shimmer')?.classList.remove('show');
+  document.getElementById('pf-av')?.classList.remove('loading');
 }
 
 function _setPfHeroColor(rgb){
@@ -4664,8 +4779,10 @@ function _applyAvatarFull(dataUrl,animate){
         }
         _setPfHeroColor(sc);
         _updateNavAvatar();
+        // ← hide load animation once image is fully rendered
+        _avHideLoader();
       };
-      img.onerror=()=>{};
+      img.onerror=()=>{_avHideLoader();};
       img.src=dataUrl;
     };
     if(alreadyLoaded&&animate){
