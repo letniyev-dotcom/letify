@@ -37,6 +37,8 @@ button,a,[onclick]{touch-action:manipulation;}
   --nav-h:calc(62px + var(--sb));
   --page-bot:calc(var(--nav-h) + 16px);
   --page-top:calc(var(--st) + 16px);
+  /* adaptive hero color — default orange, overridden by _setPfHeroColor() */
+  --pf-r:255;--pf-g:107;--pf-b:53;
 }
 .pre-dark{
   --bg:#111111;--bg2:#111111;--bg3:rgba(255,255,255,.07);
@@ -493,12 +495,10 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 /* ══ AVATAR ══ */
 .pav{
   width:64px;height:64px;border-radius:50%;
-  background:linear-gradient(135deg,
-    rgba(var(--pf-r),var(--pf-g),var(--pf-b),1),
-    rgba(var(--pf-r),var(--pf-g),var(--pf-b),.62));
+  background:linear-gradient(135deg,rgba(var(--pf-r),var(--pf-g),var(--pf-b),1),rgba(var(--pf-r),var(--pf-g),var(--pf-b),.65));
   display:flex;align-items:center;justify-content:center;
   font-size:26px;font-weight:900;color:#fff;
-  box-shadow:0 5px 18px rgba(var(--pf-r),var(--pf-g),var(--pf-b),.38);
+  box-shadow:0 5px 18px rgba(var(--pf-r),var(--pf-g),var(--pf-b),.32);
   flex-shrink:0;
   /* clip-path + overflow:hidden для надёжного клипа на мобиле */
   overflow:hidden;
@@ -507,7 +507,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   position:relative;
   cursor:pointer;
   -webkit-tap-highlight-color:transparent;
-  transition:transform .15s ease, box-shadow .6s cubic-bezier(.4,0,.2,1), background .7s ease, filter .15s ease;
+  transition:transform .15s ease, background .65s ease, box-shadow .65s ease, filter .15s ease;
   /* форсируем аппаратное ускорение */
   transform:translateZ(0);
   -webkit-transform:translateZ(0);
@@ -529,9 +529,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .pav-spinner{
   position:absolute;inset:0;
   display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(135deg,
-    rgba(var(--pf-r),var(--pf-g),var(--pf-b),1),
-    rgba(var(--pf-r),var(--pf-g),var(--pf-b),.65));
+  background:linear-gradient(135deg,var(--sun),var(--sun2));
   z-index:4;
   opacity:0;
   transition:opacity .2s ease;
@@ -1267,7 +1265,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .cal-meal-pbar-f{height:100%;border-radius:99px;transition:width .7s cubic-bezier(.25,.46,.45,.94);will-change:width}
 
 /* ══ PROFILE DASHBOARD ══ */
-#p-profile{overflow:hidden !important;--pf-r:255;--pf-g:107;--pf-b:53;}
+#p-profile{overflow:hidden !important;}
 .pf-dash{
   display:flex;flex-direction:column;
   /* generous padding-top so hero card box-shadow isn't clipped */
@@ -2760,7 +2758,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-4 4 4 4-6"/></svg>
   </div>
   <div class="nt" id="nt-profile" onclick="navTo('profile')">
-    <div id="nav-av-wrap" style="width:26px;height:26px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--sun),var(--sun2));flex-shrink:0">
+    <div id="nav-av-wrap" style="width:26px;height:26px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(var(--pf-r),var(--pf-g),var(--pf-b),1),rgba(var(--pf-r),var(--pf-g),var(--pf-b),.65));flex-shrink:0;transition:background .65s ease,box-shadow .65s ease">
       <img id="nav-av-img" alt="" style="width:100%;height:100%;object-fit:cover;display:none">
       <svg id="nav-av-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;color:#fff"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
     </div>
@@ -4292,19 +4290,15 @@ function _updateNavAvatar(){
   const svg=document.getElementById('nav-av-svg');
   const wrap=document.getElementById('nav-av-wrap');
   const saved=_loadAvatarFromStorage();
-  const sc=_loadAvatarColor();
   if(saved&&img){
     img.src=saved;img.style.display='block';
     if(svg)svg.style.display='none';
     if(wrap){wrap.style.background='transparent';wrap.style.borderRadius='50%';}
-    if(sc&&wrap)wrap.style.boxShadow=`0 0 8px rgba(${sc},.45)`;
+    const sc=_loadAvatarColor();
+    if(sc&&wrap)wrap.style.boxShadow=`0 0 8px rgba(${sc},.4)`;
   }else if(img){
     img.style.display='none';if(svg)svg.style.display='';
-    if(wrap){
-      const c=sc?`rgba(${sc},1),rgba(${sc},.62)`:`var(--sun),var(--sun2)`;
-      wrap.style.background=`linear-gradient(135deg,${c})`;
-      wrap.style.boxShadow='';
-    }
+    if(wrap){wrap.style.background='';wrap.style.boxShadow='';}
   }
 }
 
@@ -4417,8 +4411,9 @@ function _doDeleteAvatar(){
   const letter=document.getElementById('pf-av-letter');
   if(img){img.style.transition='opacity .4s ease';img.style.opacity='0';setTimeout(()=>{img.classList.remove('loaded');img.src='';img.style.transition='';img.style.opacity='';},420);}
   if(letter){letter.style.display='';const u=gU();letter.textContent=(u.name||'?').charAt(0).toUpperCase();}
+  const avEl=_avEl();if(avEl){avEl.style.transition='box-shadow .65s ease';avEl.style.boxShadow='';}
   try{localStorage.removeItem(AV_KEY);localStorage.removeItem(AV_CLR_KEY);}catch{}
-  _setPfHeroColor(null); // reset to orange
+  _setPfHeroColor(null); // reset to orange (default --pf-r/g/b)
   _updateNavAvatar();
   toast('аватар удалён');
 }
@@ -4625,12 +4620,11 @@ function _lcDOMInit(){
 
 function _setPfHeroColor(rgb){
   // rgb = "r,g,b" string or null to reset
-  const el=document.getElementById('p-profile');
-  if(!el)return;
   const parts=rgb?rgb.split(',').map(Number):[255,107,53];
-  el.style.setProperty('--pf-r',parts[0]);
-  el.style.setProperty('--pf-g',parts[1]);
-  el.style.setProperty('--pf-b',parts[2]);
+  const root=document.documentElement;
+  root.style.setProperty('--pf-r',parts[0]);
+  root.style.setProperty('--pf-g',parts[1]);
+  root.style.setProperty('--pf-b',parts[2]);
 }
 
 function _applyAvatarFull(dataUrl,animate){
@@ -4645,7 +4639,26 @@ function _applyAvatarFull(dataUrl,animate){
       img.onload=()=>{
         img.classList.add('loaded');
         if(letter)letter.style.display='none';
-        const sc=_loadAvatarColor();
+        let sc=_loadAvatarColor();
+        // Fallback: sample dominant color directly from image if not saved
+        if(!sc){
+          try{
+            const tmp=document.createElement('canvas');tmp.width=8;tmp.height=8;
+            const tc=tmp.getContext('2d');tc.drawImage(img,0,0,8,8);
+            const d=tc.getImageData(0,0,8,8).data;
+            let r=0,g=0,b=0,n=0;
+            for(let i=0;i<d.length;i+=4){
+              const mx=Math.max(d[i],d[i+1],d[i+2]),mn=Math.min(d[i],d[i+1],d[i+2]);
+              const sat=(mx-mn)/(mx||1),lum=(mx+mn)/510;
+              if(sat>.12&&lum>.06&&lum<.92){r+=d[i];g+=d[i+1];b+=d[i+2];n++;}
+            }
+            if(n>0){sc=`${Math.round(r/n)},${Math.round(g/n)},${Math.round(b/n)}`;_saveAvatarColor(sc);}
+          }catch{}
+        }
+        if(sc&&avEl){
+          avEl.style.transition='box-shadow .65s ease';
+          avEl.style.boxShadow=`0 5px 18px rgba(${sc},.45)`;
+        }
         _setPfHeroColor(sc);
         _updateNavAvatar();
       };
