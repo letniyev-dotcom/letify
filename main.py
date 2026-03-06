@@ -11,7 +11,7 @@ from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, W
 from aiohttp import web
 
 TOKEN   = os.environ.get("BOT_TOKEN")
-APP_URL = os.environ.get("APP_URL", "https://your-app-url.com")
+APP_URL = os.environ.get("APP_URL", "https://letify-production.up.railway.app")
 PORT    = int(os.environ.get("PORT", 8080))
 
 HTML_FILE = Path(__file__).parent / "static" / "letify.html"
