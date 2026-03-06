@@ -215,6 +215,24 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .nt.on{color:var(--sun);background:rgba(255,107,53,.1)}
 .nt:active{transform:scale(.97);transition:transform .03s ease}
 .nt svg{width:22px;height:22px;flex-shrink:0}
+/* liquid glass icon wrap inside active nav item */
+.nt.on .nt-glass{
+  background:linear-gradient(145deg,rgba(255,107,53,.32),rgba(255,107,53,.14));
+  border:1px solid rgba(255,107,53,.35);
+  box-shadow:0 2px 0 rgba(255,255,255,.18) inset, 0 6px 14px rgba(255,107,53,.25);
+}
+.nt-glass{
+  width:36px;height:36px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  background:transparent;border:1px solid transparent;
+  transition:background .15s ease,border-color .15s ease,box-shadow .15s ease;
+  position:relative;overflow:hidden;
+}
+.nt-glass::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:50%;
+  background:linear-gradient(180deg,rgba(255,255,255,.14),transparent);
+  border-radius:inherit;pointer-events:none;
+}
 
 /* ══ TYPOGRAPHY ══ */
 .t1{font-size:26px;font-weight:900;line-height:1.1;letter-spacing:-.02em}
@@ -646,12 +664,44 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tg-dark .m3-tog-row{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08)}
 
 /* ══ WEIGHT CHART push page ══ */
+/* ══ WEIGHT HERO ══ */
+.wc-hero{
+  background:linear-gradient(145deg,rgba(255,107,53,.18) 0%,rgba(255,171,64,.07) 55%,transparent 100%);
+  border:1px solid rgba(255,107,53,.2);
+  border-radius:22px;padding:18px 16px 14px;
+  position:relative;overflow:hidden;
+}
+.wc-hero::before{
+  content:'';position:absolute;top:-50px;right:-40px;
+  width:180px;height:180px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,171,64,.15),transparent 70%);
+  pointer-events:none;
+}
+.wc-hero-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;position:relative;z-index:1;}
+.wc-hero-lbl{font-size:10px;font-weight:800;color:rgba(255,107,53,.6);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px;}
+.wc-hero-val{font-size:40px;font-weight:900;letter-spacing:-.05em;line-height:1;color:var(--sun);}
+.wc-hero-val span{font-size:17px;font-weight:700;opacity:.5;margin-left:3px;}
+.wc-badge{display:inline-flex;align-items:center;gap:4px;padding:6px 11px;border-radius:20px;font-size:12px;font-weight:800;flex-shrink:0;margin-top:6px;}
+.wc-badge-down{background:rgba(82,193,119,.15);border:1px solid rgba(82,193,119,.22);color:#52C177;}
+.wc-badge-up{background:rgba(244,92,92,.12);border:1px solid rgba(244,92,92,.2);color:#F45C5C;}
+.wc-badge-flat{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:var(--hint);}
+.wc-minis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.wc-mini{background:var(--bg2);border-radius:18px;border:1px solid var(--brd);padding:13px 10px;text-align:center;}
+.wc-mini-val{font-size:20px;font-weight:900;letter-spacing:-.04em;line-height:1;margin-bottom:4px;}
+.wc-mini-lbl{font-size:9px;font-weight:800;color:var(--hint);letter-spacing:.07em;text-transform:uppercase;}
+.wc-goal{background:var(--bg2);border-radius:18px;border:1px solid var(--brd);padding:14px 16px;display:flex;align-items:center;gap:14px;}
+.wc-goal-ring{position:relative;width:50px;height:50px;flex-shrink:0;}
+.wc-goal-ring svg{position:absolute;inset:0;width:100%;height:100%;}
+.wc-goal-ring-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:#4EAEE5;}
+.wc-goal-title{font-size:13px;font-weight:800;margin-bottom:3px;}
+.wc-goal-sub{font-size:11px;color:var(--hint);font-weight:500;}
+/* scrollable chart */
 .wchart-push-wrap{
   width:100%;
   overflow-x:auto;
   -webkit-overflow-scrolling:touch;
   scrollbar-width:none;
-  padding-bottom:4px;
+  padding-bottom:2px;
   isolation:isolate;
   transform:translateZ(0);
   -webkit-transform:translateZ(0);
@@ -2479,11 +2529,21 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
     <div><div class="pp-title">динамика веса</div><div class="pp-subtitle" id="wc-sub">история</div></div>
   </div>
-  <div class="pp-body" style="padding:12px 12px calc(var(--sb)+24px)">
-    <div class="wchart-push-wrap" id="wchart-container">
-      <div id="wchart-svg-wrap"></div>
+  <div class="pp-body" style="padding:12px 14px calc(var(--sb)+32px);display:flex;flex-direction:column;gap:12px;">
+    <div class="wc-hero">
+      <div class="wc-hero-top">
+        <div>
+          <div class="wc-hero-lbl">текущий вес</div>
+          <div class="wc-hero-val" id="wc-cur-val">—<span>кг</span></div>
+        </div>
+        <div id="wc-delta" class="wc-badge wc-badge-flat"></div>
+      </div>
+      <div class="wchart-push-wrap" id="wchart-container" style="margin:0 -2px;">
+        <div id="wchart-svg-wrap"></div>
+      </div>
     </div>
-    <div style="margin-top:16px" id="wc-stat-list"></div>
+    <div class="wc-minis" id="wc-minis"></div>
+    <div class="wc-goal" id="wc-goal" style="display:none"></div>
   </div>
 </div>
 
@@ -2748,24 +2808,24 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 <!-- NAV — no dots, icon centered -->
 <nav id="nav">
   <div class="nt on" id="nt-home" onclick="navTo('home')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
+    <div class="nt-glass"><iconify-icon icon="solar:home-smile-bold" width="22" height="22"></iconify-icon></div>
   </div>
   <div class="nt" id="nt-track" onclick="navTo('track')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>
+    <div class="nt-glass"><iconify-icon icon="solar:clipboard-list-bold" width="22" height="22"></iconify-icon></div>
   </div>
   <div class="nt" id="nt-plan" onclick="navTo('plan')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/></svg>
+    <div class="nt-glass"><iconify-icon icon="solar:calendar-mark-bold" width="22" height="22"></iconify-icon></div>
   </div>
   <div class="nt" id="nt-sleep" onclick="navTo('sleep')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    <div class="nt-glass"><iconify-icon icon="solar:moon-stars-bold" width="22" height="22"></iconify-icon></div>
   </div>
   <div class="nt" id="nt-progress" onclick="navTo('progress')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-4 4 4 4-6"/></svg>
+    <div class="nt-glass"><iconify-icon icon="solar:graph-new-up-bold" width="22" height="22"></iconify-icon></div>
   </div>
   <div class="nt" id="nt-profile" onclick="navTo('profile')">
-    <div id="nav-av-wrap" style="width:26px;height:26px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--sun),var(--sun2));flex-shrink:0">
+    <div id="nav-av-wrap" style="width:28px;height:28px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--sun),var(--sun2));flex-shrink:0;box-shadow:0 2px 8px rgba(255,107,53,.35);">
       <img id="nav-av-img" alt="" style="width:100%;height:100%;object-fit:cover;display:none">
-      <svg id="nav-av-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;color:#fff"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      <iconify-icon id="nav-av-svg" icon="solar:user-bold" width="15" height="15" style="color:#fff"></iconify-icon>
     </div>
   </div>
 </nav>
@@ -3850,18 +3910,44 @@ function _populateWeightChart(){
   const data=wl.length>30?wl.slice(-30):wl;
   const sub=document.getElementById('wc-sub');
   if(sub)sub.textContent=data.length+' записей · последние '+Math.min(30,data.length)+' дней';
-  const statEl=document.getElementById('wc-stat-list');
-  if(statEl&&wl.length){
-    const cw=wl[wl.length-1].weight;
-    const sw=Math.max(...wl.map(d=>d.weight));
-    const best=Math.min(...wl.map(d=>d.weight));
+  if(wl.length){
+    const sorted=[...wl].sort((a,b)=>a.logged_at.localeCompare(b.logged_at));
+    const cw=sorted[sorted.length-1].weight;
+    const first=sorted[0].weight;
+    const maxW=Math.max(...sorted.map(d=>d.weight));
+    const minW=Math.min(...sorted.map(d=>d.weight));
+    const delta=+(cw-first).toFixed(1);
     const gw=gU().goal_weight;
-    statEl.innerHTML=`<div class="sb-row">
-      <div class="sbox"><div class="sv" style="color:var(--sun)">${cw.toFixed(1)}</div><div class="sl">сейчас кг</div></div>
-      <div class="sbox"><div class="sv" style="color:var(--red)">${sw.toFixed(1)}</div><div class="sl">макс кг</div></div>
-      <div class="sbox"><div class="sv" style="color:var(--green)">${best.toFixed(1)}</div><div class="sl">мин кг</div></div>
-      ${gw?`<div class="sbox"><div class="sv" style="color:var(--water)">${gw.toFixed(1)}</div><div class="sl">цель кг</div></div>`:''}
-    </div>`;
+    // hero value
+    const curEl=document.getElementById('wc-cur-val');
+    if(curEl)curEl.innerHTML=cw.toFixed(1)+'<span>кг</span>';
+    // delta badge
+    const bd=document.getElementById('wc-delta');
+    if(bd){
+      if(Math.abs(delta)<0.05){bd.className='wc-badge wc-badge-flat';bd.textContent='→ без изменений';}
+      else if(delta<0){bd.className='wc-badge wc-badge-down';bd.innerHTML='↓ −'+Math.abs(delta).toFixed(1)+' кг';}
+      else{bd.className='wc-badge wc-badge-up';bd.innerHTML='↑ +'+delta.toFixed(1)+' кг';}
+    }
+    // mini stats
+    const minis=document.getElementById('wc-minis');
+    if(minis)minis.innerHTML=
+      `<div class="wc-mini"><div class="wc-mini-val" style="color:var(--red)">${maxW.toFixed(1)}</div><div class="wc-mini-lbl">макс кг</div></div>`+
+      `<div class="wc-mini"><div class="wc-mini-val" style="color:var(--green)">${minW.toFixed(1)}</div><div class="wc-mini-lbl">мин кг</div></div>`+
+      `<div class="wc-mini"><div class="wc-mini-val" style="color:var(--hint)">${wl.length}</div><div class="wc-mini-lbl">записей</div></div>`;
+    // goal ring
+    const goalEl=document.getElementById('wc-goal');
+    if(goalEl&&gw&&gw>0){
+      const total=Math.abs(first-gw);
+      const done=Math.abs(first-cw);
+      const pct=total>0?Math.min(100,Math.round(done/total*100)):0;
+      const left=Math.abs(cw-gw).toFixed(1);
+      const circ=2*Math.PI*18;
+      const offset=(circ*(1-pct/100)).toFixed(1);
+      goalEl.style.display='flex';
+      goalEl.innerHTML=
+        `<div class="wc-goal-ring"><svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="18" fill="none" stroke="rgba(78,174,229,.12)" stroke-width="5"/><circle cx="25" cy="25" r="18" fill="none" stroke="#4EAEE5" stroke-width="5" stroke-linecap="round" stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${offset}" transform="rotate(-90 25 25)"/></svg><div class="wc-goal-ring-num">${pct}%</div></div>`+
+        `<div><div class="wc-goal-title">осталось ${left} кг до цели</div><div class="wc-goal-sub">цель · ${gw.toFixed(1)} кг · старт ${first.toFixed(1)}</div></div>`;
+    } else if(goalEl) goalEl.style.display='none';
   }
   requestAnimationFrame(()=>requestAnimationFrame(()=>drawWeightChart(data)));
 }
