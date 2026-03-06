@@ -1488,7 +1488,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 #lf-crop-scr.show{opacity:1;pointer-events:all;transform:translateY(0)}
 .lc-hdr{
   position:absolute;top:0;left:0;right:0;z-index:10;
-  padding:max(env(safe-area-inset-top,20px),20px) 16px 14px;
+  padding:max(env(safe-area-inset-top,52px),52px) 16px 14px;
   display:flex;align-items:center;justify-content:space-between;
   background:linear-gradient(to bottom,rgba(0,0,0,.9),transparent);
 }
@@ -4436,81 +4436,98 @@ function _lcInitFileInput(){
 }
 
 /* ── CROP ENGINE ── */
-let _lcImg=null,_lcS=1,_lcSMin=1,_lcX=0,_lcY=0,_lcSz=240;
-let _lcDrag=null,_lcPinch=null,_lcRafId=null,_lcZoomTm=null,_lcGesture=false;
-/* Canvas elements queried lazily after DOM ready */
+let _lcImg=null,_lcThumb=null; // _lcImg=оригинал для экспорта, _lcThumb=уменьшенная копия для рисования
+let _lcThumbScale=1; // коэффициент уменьшения _lcThumb относительно оригинала
+let _lcS=1,_lcSMin=1,_lcX=0,_lcY=0,_lcSz=240;
+let _lcW=0,_lcH=0; // кэш размеров canvas в CSS-пикселях (избегаем parseInt из DOM каждый кадр)
+let _lcDrag=null,_lcPinch=null,_lcRafId=null,_lcZoomTm=null;
 let _lcCanvas=null,_lcCtx=null;
 
 function _lcGetCanvas(){
   if(!_lcCanvas){
     _lcCanvas=document.getElementById('lc-canvas');
-    _lcCtx=_lcCanvas?_lcCanvas.getContext('2d',{alpha:false}):null;
+    /* desynchronized=true убирает синхронизацию с DOM — рисуем строго через RAF */
+    _lcCtx=_lcCanvas?_lcCanvas.getContext('2d',{alpha:false,desynchronized:true}):null;
   }
   return _lcCanvas;
 }
 
 function _lcPreInit(){
-  const c=_lcGetCanvas();
-  if(!c||!_lcCtx)return;
-  const W=window.innerWidth,H=window.innerHeight,dpr=window.devicePixelRatio||1;
-  c.width=Math.round(W*dpr);c.height=Math.round(H*dpr);
-  c.style.width=W+'px';c.style.height=H+'px';
-  _lcCtx.scale(dpr,dpr);
-  _lcCtx.fillStyle='#111';_lcCtx.fillRect(0,0,W,H);
+  const c=_lcGetCanvas();if(!c||!_lcCtx)return;
+  _lcW=window.innerWidth;_lcH=window.innerHeight;
+  const dpr=window.devicePixelRatio||1;
+  c.width=Math.round(_lcW*dpr);c.height=Math.round(_lcH*dpr);
+  c.style.width=_lcW+'px';c.style.height=_lcH+'px';
+  _lcCtx.setTransform(dpr,0,0,dpr,0,0);
+  _lcCtx.fillStyle='#111';_lcCtx.fillRect(0,0,_lcW,_lcH);
+}
+
+/* Создаём уменьшенную копию изображения для плавного рисования в реальном времени.
+   Телефонные фото бывают 4000×3000px — рисовать их каждый кадр очень дорого.
+   Уменьшаем до MAX_DRAW по длинной стороне, это даёт 10–30× ускорение. */
+function _lcMakeThumb(img){
+  const MAX_DRAW=900;
+  const sw=img.naturalWidth||img.width,sh=img.naturalHeight||img.height;
+  if(sw<=MAX_DRAW&&sh<=MAX_DRAW){_lcThumb=img;_lcThumbScale=1;return;}
+  const ratio=MAX_DRAW/Math.max(sw,sh);
+  const tw=Math.round(sw*ratio),th=Math.round(sh*ratio);
+  const oc=document.createElement('canvas');oc.width=tw;oc.height=th;
+  const ox=oc.getContext('2d');
+  ox.imageSmoothingEnabled=true;ox.imageSmoothingQuality='high';
+  ox.drawImage(img,0,0,tw,th);
+  _lcThumb=oc;_lcThumbScale=ratio;
 }
 
 function _lcOpenCrop(src){
   const c=_lcGetCanvas();if(!c||!_lcCtx)return;
   _lcImg=new Image();
   _lcImg.onload=()=>{
+    _lcMakeThumb(_lcImg); // создаём быструю копию для рисования
     document.getElementById('lf-crop-scr').classList.add('show');
-    const W=window.innerWidth,H=window.innerHeight,dpr=window.devicePixelRatio||1;
-    const nW=Math.round(W*dpr),nH=Math.round(H*dpr);
+    _lcW=window.innerWidth;_lcH=window.innerHeight;
+    const dpr=window.devicePixelRatio||1;
+    const nW=Math.round(_lcW*dpr),nH=Math.round(_lcH*dpr);
     if(c.width!==nW||c.height!==nH){
-      _lcCtx.setTransform(1,0,0,1,0,0);
       c.width=nW;c.height=nH;
-      c.style.width=W+'px';c.style.height=H+'px';
-      _lcCtx.scale(dpr,dpr);
+      c.style.width=_lcW+'px';c.style.height=_lcH+'px';
+      _lcCtx.setTransform(dpr,0,0,dpr,0,0);
     }
-    _lcSz=Math.min(W*.78,H*.52,300);
+    _lcSz=Math.min(_lcW*.78,_lcH*.52,300);
     const fr=document.getElementById('lc-frame');
     if(fr){fr.style.width=_lcSz+'px';fr.style.height=_lcSz+'px';}
-    _lcSMin=Math.max(_lcSz/_lcImg.width,_lcSz/_lcImg.height);
-    _lcS=_lcSMin;_lcX=W/2;_lcY=H/2;
+    // _lcSMin считаем по оригиналу
+    _lcSMin=Math.max(_lcSz/(_lcImg.naturalWidth||_lcImg.width),_lcSz/(_lcImg.naturalHeight||_lcImg.height));
+    _lcS=_lcSMin;_lcX=_lcW/2;_lcY=_lcH/2;
     _lcCtx.imageSmoothingEnabled=true;_lcCtx.imageSmoothingQuality='high';
     _lcScheduleDraw();
   };
   _lcImg.src=src;
 }
 
-function _lcScheduleDraw(){if(_lcRafId)return;_lcRafId=requestAnimationFrame(()=>{_lcRafId=null;_lcDraw();});}
+function _lcScheduleDraw(){
+  if(_lcRafId)return; // уже запланирован — пропускаем дублирующий запрос
+  _lcRafId=requestAnimationFrame(()=>{_lcRafId=null;_lcDraw();});
+}
 
 function _lcDraw(){
-  if(!_lcImg||!_lcCtx)return;
-  const c=_lcCanvas;if(!c)return;
-  const W=parseInt(c.style.width),H=parseInt(c.style.height);
-  _lcCtx.fillStyle='#111';_lcCtx.fillRect(0,0,W,H);
-  const iw=_lcImg.width*_lcS,ih=_lcImg.height*_lcS;
-  const ix=_lcX-iw/2,iy=_lcY-ih/2;
-  const rad=Math.min(iw,ih)*.1;
-  _lcCtx.save();
-  _lcCtx.beginPath();
-  _lcCtx.moveTo(ix+rad,iy);
-  _lcCtx.lineTo(ix+iw-rad,iy);_lcCtx.arcTo(ix+iw,iy,ix+iw,iy+rad,rad);
-  _lcCtx.lineTo(ix+iw,iy+ih-rad);_lcCtx.arcTo(ix+iw,iy+ih,ix+iw-rad,iy+ih,rad);
-  _lcCtx.lineTo(ix+rad,iy+ih);_lcCtx.arcTo(ix,iy+ih,ix,iy+ih-rad,rad);
-  _lcCtx.lineTo(ix,iy+rad);_lcCtx.arcTo(ix,iy,ix+rad,iy,rad);
-  _lcCtx.closePath();_lcCtx.clip();
-  _lcCtx.drawImage(_lcImg,ix,iy,iw,ih);
-  _lcCtx.restore();
+  if(!_lcThumb||!_lcCtx)return;
+  /* Рисуем уменьшенную копию (_lcThumb), а не оригинал — в 10–30× быстрее.
+     _lcS — масштаб относительно оригинала, поэтому для thumb делим на _lcThumbScale */
+  const ts=_lcS/_lcThumbScale; // масштаб для thumb
+  const tw=(_lcThumb.width||_lcThumb.naturalWidth)*ts;
+  const th=(_lcThumb.height||_lcThumb.naturalHeight)*ts;
+  const ix=_lcX-tw/2,iy=_lcY-th/2;
+  _lcCtx.fillStyle='#111';_lcCtx.fillRect(0,0,_lcW,_lcH);
+  _lcCtx.drawImage(_lcThumb,ix,iy,tw,th);
 }
 
 function _lcClamp(){
-  if(!_lcImg||!_lcCanvas)return;
-  const W=parseInt(_lcCanvas.style.width),H=parseInt(_lcCanvas.style.height),h=_lcSz/2;
-  const iw=_lcImg.width*_lcS,ih=_lcImg.height*_lcS;
-  _lcX=Math.max(W/2+h-iw/2,Math.min(W/2-h+iw/2,_lcX));
-  _lcY=Math.max(H/2+h-ih/2,Math.min(H/2-h+ih/2,_lcY));
+  if(!_lcImg)return;
+  const iw=(_lcImg.naturalWidth||_lcImg.width)*_lcS;
+  const ih=(_lcImg.naturalHeight||_lcImg.height)*_lcS;
+  const h=_lcSz/2;
+  _lcX=Math.max(_lcW/2+h-iw/2,Math.min(_lcW/2-h+iw/2,_lcX));
+  _lcY=Math.max(_lcH/2+h-ih/2,Math.min(_lcH/2-h+ih/2,_lcY));
 }
 
 function _lcShowZoom(){
@@ -4521,12 +4538,8 @@ function _lcShowZoom(){
   _lcZoomTm=setTimeout(()=>z.classList.remove('visible'),900);
 }
 
-function _lcGestureStart(){if(!_lcGesture){_lcGesture=true;if(_lcCtx)_lcCtx.imageSmoothingEnabled=false;}}
-let _lcGestureEndTm=null;
-function _lcGestureEnd(){
-  if(_lcGestureEndTm)clearTimeout(_lcGestureEndTm);
-  _lcGestureEndTm=setTimeout(()=>{_lcGesture=false;if(_lcCtx){_lcCtx.imageSmoothingEnabled=true;_lcCtx.imageSmoothingQuality='high';}  _lcScheduleDraw();},120);
-}
+// Убрали _lcGestureStart/End — они только добавляли overhead и не нужны
+// после замены drawImage на thumb (всегда быстро)
 
 /* All crop DOM initialization deferred to DOMContentLoaded */
 function _lcDOMInit(){
@@ -4539,32 +4552,34 @@ function _lcDOMInit(){
   /* Touch / mouse events on canvas */
   _lcCanvas.addEventListener('touchstart',e=>{
     e.preventDefault();
-    if(e.touches.length===1){_lcDrag={ox:e.touches[0].clientX-_lcX,oy:e.touches[0].clientY-_lcY};_lcPinch=null;_lcGestureStart();}
-    else if(e.touches.length>=2){const dx=e.touches[1].clientX-e.touches[0].clientX,dy=e.touches[1].clientY-e.touches[0].clientY;_lcPinch={d:Math.hypot(dx,dy),s:_lcS};_lcDrag=null;_lcGestureStart();}
+    if(e.touches.length===1){_lcDrag={ox:e.touches[0].clientX-_lcX,oy:e.touches[0].clientY-_lcY};_lcPinch=null;}
+    else if(e.touches.length>=2){const dx=e.touches[1].clientX-e.touches[0].clientX,dy=e.touches[1].clientY-e.touches[0].clientY;_lcPinch={d:Math.hypot(dx,dy),s:_lcS};_lcDrag=null;}
   },{passive:false});
   _lcCanvas.addEventListener('touchmove',e=>{
     e.preventDefault();
     if(e.touches.length===1&&_lcDrag){_lcX=e.touches[0].clientX-_lcDrag.ox;_lcY=e.touches[0].clientY-_lcDrag.oy;_lcClamp();_lcScheduleDraw();}
     else if(e.touches.length>=2&&_lcPinch){const dx=e.touches[1].clientX-e.touches[0].clientX,dy=e.touches[1].clientY-e.touches[0].clientY;_lcS=Math.max(_lcSMin,Math.min(_lcSMin*5,_lcPinch.s*(Math.hypot(dx,dy)/_lcPinch.d)));_lcClamp();_lcScheduleDraw();_lcShowZoom();}
   },{passive:false});
-  _lcCanvas.addEventListener('touchend',()=>{_lcDrag=null;_lcPinch=null;_lcGestureEnd();});
-  _lcCanvas.addEventListener('mousedown',e=>{_lcDrag={ox:e.clientX-_lcX,oy:e.clientY-_lcY};_lcGestureStart();});
+  _lcCanvas.addEventListener('touchend',()=>{_lcDrag=null;_lcPinch=null;});
+  _lcCanvas.addEventListener('mousedown',e=>{_lcDrag={ox:e.clientX-_lcX,oy:e.clientY-_lcY};});
   _lcCanvas.addEventListener('mousemove',e=>{if(!_lcDrag)return;_lcX=e.clientX-_lcDrag.ox;_lcY=e.clientY-_lcDrag.oy;_lcClamp();_lcScheduleDraw();});
-  _lcCanvas.addEventListener('mouseup',()=>{_lcDrag=null;_lcGestureEnd();});
-  _lcCanvas.addEventListener('wheel',e=>{e.preventDefault();_lcGestureStart();_lcS=Math.max(_lcSMin,Math.min(_lcSMin*5,_lcS*(e.deltaY<0?1.09:.92)));_lcClamp();_lcScheduleDraw();_lcShowZoom();_lcGestureEnd();},{passive:false});
+  _lcCanvas.addEventListener('mouseup',()=>{_lcDrag=null;});
+  _lcCanvas.addEventListener('wheel',e=>{e.preventDefault();_lcS=Math.max(_lcSMin,Math.min(_lcSMin*5,_lcS*(e.deltaY<0?1.09:.92)));_lcClamp();_lcScheduleDraw();_lcShowZoom();},{passive:false});
 
   /* Cancel / Apply buttons */
   const cancel=document.getElementById('lc-cancel');
   const apply=document.getElementById('lc-apply');
-  if(cancel)cancel.addEventListener('click',()=>{document.getElementById('lf-crop-scr').classList.remove('show');_lcImg=null;});
+  if(cancel)cancel.addEventListener('click',()=>{document.getElementById('lf-crop-scr').classList.remove('show');_lcImg=null;_lcThumb=null;});
   if(apply)apply.addEventListener('click',()=>{
     if(!_lcImg)return;
-    const W=parseInt(_lcCanvas.style.width),H=parseInt(_lcCanvas.style.height);
+    const W=_lcW,H=_lcH; // используем кэшированные размеры
+    const iw=_lcImg.naturalWidth||_lcImg.width,ih=_lcImg.naturalHeight||_lcImg.height;
     const sz=Math.round(_lcSz);
     const out=document.createElement('canvas');out.width=sz;out.height=sz;
     const oc=out.getContext('2d');
+    oc.imageSmoothingEnabled=true;oc.imageSmoothingQuality='high';
     oc.save();oc.beginPath();oc.arc(sz/2,sz/2,sz/2,0,Math.PI*2);oc.clip();
-    const srcX=_lcX-_lcImg.width*_lcS/2,srcY=_lcY-_lcImg.height*_lcS/2;
+    const srcX=_lcX-iw*_lcS/2,srcY=_lcY-ih*_lcS/2;
     const cropL=(W/2-_lcSz/2)-srcX,cropT=(H/2-_lcSz/2)-srcY;
     oc.drawImage(_lcImg,cropL/_lcS,cropT/_lcS,_lcSz/_lcS,_lcSz/_lcS,0,0,sz,sz);
     oc.restore();
