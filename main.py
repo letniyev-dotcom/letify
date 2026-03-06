@@ -1,23 +1,23 @@
 #!/usr/bin/env python3
-"""letify ☀️ — Telegram-бот"""
-
-import subprocess, sys
-def _pip(pkg): subprocess.check_call([sys.executable, "-m", "pip", "install", pkg, "-q"])
-try:    import aiogram
-except: _pip("aiogram")
+"""letify ☀️ — Telegram-бот + HTTP-сервер"""
 
 import asyncio, logging, os
 from datetime import date
+from pathlib import Path
 
 from aiogram import Bot, Dispatcher
 from aiogram.filters import CommandStart
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
+from aiohttp import web
 
-TOKEN = os.environ.get("BOT_TOKEN")
-APP_URL = os.environ.get("APP_URL", "https://your-app-url.com")  # URL мини-приложения
+TOKEN   = os.environ.get("BOT_TOKEN")
+APP_URL = os.environ.get("APP_URL", "https://your-app-url.com")
+PORT    = int(os.environ.get("PORT", 8080))
+
+HTML_FILE = Path(__file__).parent / "static" / "letify.html"
 
 if not TOKEN:
-    raise RuntimeError("BOT_TOKEN не задан. Установи переменную окружения BOT_TOKEN.")
+    raise RuntimeError("BOT_TOKEN не задан!")
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 log = logging.getLogger(__name__)
@@ -27,8 +27,7 @@ dp  = Dispatcher()
 
 
 def days_to_summer() -> int:
-    """Количество дней до 1 июня."""
-    today = date.today()
+    today  = date.today()
     summer = date(today.year, 6, 1)
     if today >= summer:
         summer = date(today.year + 1, 6, 1)
@@ -36,14 +35,11 @@ def days_to_summer() -> int:
 
 
 def days_word(n: int) -> str:
-    """Склонение слова 'день'."""
     if 11 <= n % 100 <= 19:
         return "дней"
     r = n % 10
-    if r == 1:
-        return "день"
-    if 2 <= r <= 4:
-        return "дня"
+    if r == 1:      return "день"
+    if 2 <= r <= 4: return "дня"
     return "дней"
 
 
@@ -65,7 +61,26 @@ async def cmd_start(message: Message):
     await message.answer(text, parse_mode="HTML", reply_markup=keyboard)
 
 
+async def handle_index(request: web.Request) -> web.Response:
+    if HTML_FILE.exists():
+        return web.FileResponse(HTML_FILE)
+    return web.Response(text="letify ☀️ is running!")
+
+
+async def handle_health(request: web.Request) -> web.Response:
+    return web.Response(text="ok")
+
+
 async def main():
+    app = web.Application()
+    app.router.add_get("/",       handle_index)
+    app.router.add_get("/health", handle_health)
+
+    runner = web.AppRunner(app)
+    await runner.setup()
+    await web.TCPSite(runner, "0.0.0.0", PORT).start()
+    log.info(f"HTTP сервер запущен на порту {PORT}")
+
     log.info("letify ☀️ запущен!")
     await dp.start_polling(bot, drop_pending_updates=True)
 
