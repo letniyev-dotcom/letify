@@ -2853,7 +2853,21 @@ async function loadData(){
     const sumLs=(lsMac.prot||0)+(lsMac.fat||0)+(lsMac.carb||0);
     C.macros=sumLs>=sumSrv?lsMac:srvMac;
     C.weight_log=d.weight_log||[];C.sleep_log=d.sleep_log||[];
-    C.acts_today=d.acts_today||[];C.products=d.products||[];
+    // Merge server acts with localStorage — prevents race condition where server
+    // hasn't returned newly created task yet (task would disappear for 1-2 sec)
+    const _srvActs=d.acts_today||[];
+    const _lsActs=lsGet('acts_'+TODAY)||[];
+    if(_lsActs.length>_srvActs.length){
+      // localStorage has tasks not yet confirmed by server — keep them
+      const _srvIds=new Set(_srvActs.map(a=>a.id));
+      const _pendingLocal=_lsActs.filter(a=>!_srvIds.has(a.id));
+      C.acts_today=[..._srvActs,..._pendingLocal];
+    }else{
+      C.acts_today=_srvActs;
+      // Sync localStorage with server so future merges are accurate
+      lsSet('acts_'+TODAY,_srvActs);
+    }
+    C.products=d.products||[];
     // ALWAYS restore start_weight/goal_type from localStorage — it is the authoritative source
     const localUser=lsGet('user_sw');
     if(localUser?.start_weight>0){
@@ -3482,7 +3496,7 @@ function cancelLongPress(){
 async function deleteActDirectly(id,cardEl){
   tg?.HapticFeedback?.notificationOccurred('warning');
   C.acts_today=C.acts_today.filter(x=>x.id!==id);
-  if(!UID)lsSet('acts_'+TODAY,C.acts_today);
+  lsSet('acts_'+TODAY,C.acts_today);
   if(_completingMap.has(id)){clearTimeout(_completingMap.get(id).hideTimer);_completingMap.delete(id);}
 
   function _afterDelete(){
@@ -3527,7 +3541,7 @@ async function completeAct(id){
     const{hideTimer}=_completingMap.get(id);
     clearTimeout(hideTimer);_completingMap.delete(id);
     C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:0}:x);
-    if(!UID)lsSet('acts_'+TODAY,C.acts_today);
+    lsSet('acts_'+TODAY,C.acts_today);
     const cardEl=document.querySelector(`#pl-list .ac[data-id="${id}"]`);
     if(cardEl){
       cardEl.classList.remove('done');
@@ -3547,7 +3561,7 @@ async function completeAct(id){
   if(act.completed)return;
 
   C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:1}:x);
-  if(!UID)lsSet('acts_'+TODAY,C.acts_today);
+  lsSet('acts_'+TODAY,C.acts_today);
   _updatePlanCounters();
   renderHome();
   tg?.HapticFeedback?.notificationOccurred('success');
@@ -3743,10 +3757,21 @@ async function submitAct(){
   popPage();
   const fid=Date.now();
   const days=_actDays.length&&_actDays.length<7?_actDays:[];
-  C.acts_today=[...(C.acts_today||[]),{id:fid,name,type:_actType,scheduled_at:`${TODAY}T${time}:00`,duration:_actDur,completed:0,repeat_days:days}];
-  if(!UID)lsSet('acts_'+TODAY,C.acts_today);
+  const newAct={id:fid,name,type:_actType,scheduled_at:`${TODAY}T${time}:00`,duration:_actDur,completed:0,repeat_days:days};
+  C.acts_today=[...(C.acts_today||[]),newAct];
+  // Always persist to localStorage — prevents task from disappearing when reload() overwrites C.acts_today
+  lsSet('acts_'+TODAY,C.acts_today);
   renderPlan();renderHome();toast(name+' добавлено 🎉');tg?.HapticFeedback?.notificationOccurred('success');
-  await apiPost('/api/activity/create',{name,type:_actType,time,duration:_actDur,repeat_days:days});await reload();
+  await apiPost('/api/activity/create',{name,type:_actType,time,duration:_actDur,repeat_days:days});
+  // After server confirms, reload but MERGE to avoid race condition killing the new task
+  if(UID){
+    await loadData();
+    const lsActs=lsGet('acts_'+TODAY)||[];
+    const srvIds=new Set((C.acts_today||[]).map(a=>a.id));
+    const onlyLocal=lsActs.filter(a=>!srvIds.has(a.id));
+    if(onlyLocal.length)C.acts_today=[...C.acts_today,...onlyLocal];
+    if(_completingMap.size===0){renderPlan();renderHome();}
+  }
 }
 
 /* ══ HELPERS ══ */
@@ -4798,7 +4823,7 @@ function startPsLongPress(id,el){
     const name=saved?.querySelector('.ac-name')?.textContent||'задача';
     if(confirm('удалить «'+name+'»?')){
       C.acts_today=C.acts_today.filter(x=>x.id!==id);
-      if(!UID)lsSet('acts_'+TODAY,C.acts_today);
+      lsSet('acts_'+TODAY,C.acts_today);
       if(saved&&saved.parentNode){
         saved.style.transition='opacity .2s';saved.style.opacity='0';
         setTimeout(()=>{if(saved.parentNode)saved.remove();},200);
