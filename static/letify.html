@@ -865,12 +865,14 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   display:flex;flex-direction:column;
 }
 .tg-dark #pl-tasks-container{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1)}
+.tg-dark #ps-tasks-outer-wrap{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1)}
 #pl-tasks-scroll{
   flex:1;overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;scrollbar-width:none;
   padding:10px 12px 14px;
 }
 #pl-tasks-scroll::-webkit-scrollbar{display:none}
+#ps-tasks-list::-webkit-scrollbar{display:none}
 .pl-empty{
   flex:1;display:flex;flex-direction:column;
   align-items:center;justify-content:center;
@@ -878,23 +880,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   gap:8px;opacity:.5;
 }
 .pl-empty svg{opacity:.3}
-
-/* ══ PLAN SETTINGS TASKS CONTAINER ══ */
-#ps-tasks-container{
-  background:var(--bg2);
-  border-radius:20px;
-  border:1px solid var(--brd);
-  overflow:hidden;
-  margin-bottom:0;
-}
-.tg-dark #ps-tasks-container{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1)}
-#ps-tasks-list{
-  max-height:55vh;
-  overflow-y:auto;overflow-x:hidden;
-  -webkit-overflow-scrolling:touch;scrollbar-width:none;
-  padding:10px 12px 12px;
-}
-#ps-tasks-list::-webkit-scrollbar{display:none}
 
 /* ══ PLAN SETTINGS DAYS ══ */
 .ps-days{display:flex;gap:4px;padding:0;margin-bottom:14px}
@@ -1619,9 +1604,15 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 <div class="page" id="p-plan">
 <div class="plan-hdr" style="padding-top:var(--page-top)">
   <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:6px">
-    <div>
-      <div class="t2">план</div>
-      <div class="t5" id="pl-date">сегодня</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div>
+        <div class="t2">план</div>
+        <div class="t5" id="pl-date">сегодня</div>
+      </div>
+      <button onclick="pushPage('pp-act')" style="display:flex;align-items:center;gap:5px;padding:7px 13px;border-radius:99px;border:none;background:var(--sun);color:#fff;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;flex-shrink:0;transition:opacity .12s,transform .1s;-webkit-tap-highlight-color:transparent" onmousedown="this.style.opacity='.8'" onmouseup="this.style.opacity='1'" ontouchstart="this.style.transform='scale(.96)'" ontouchend="this.style.transform='scale(1)'">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        задача
+      </button>
     </div>
     <div style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="openDoneActs()">
       <div style="text-align:right">
@@ -2516,12 +2507,12 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       <button class="ps-day-btn" data-dow="0" onclick="psDaySelect(0,this)">вс</button>
     </div>
     <div style="font-size:11px;font-weight:700;color:var(--hint);margin-bottom:8px;letter-spacing:.04em" id="ps-day-label">задачи на понедельник</div>
-    <div id="ps-tasks-container">
-      <div id="ps-tasks-list">
+    <div id="ps-tasks-outer-wrap" style="background:var(--bg2);border-radius:20px;border:1px solid var(--brd);overflow:hidden;margin-bottom:4px">
+      <div id="ps-tasks-list" style="max-height:52vh;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:10px 12px 12px">
         <div style="text-align:center;padding:24px;color:var(--hint);font-size:13px;font-weight:600">нет задач</div>
       </div>
     </div>
-    <button class="btn btn-p" style="margin-top:16px" onclick="pushPage('pp-act')">+ добавить активность</button>
+    <button class="btn btn-p" style="margin-top:12px" onclick="popPage();pushPage('pp-act')">+ добавить активность</button>
   </div>
 </div>
 
@@ -3754,8 +3745,8 @@ async function submitAct(){
   const days=_actDays.length&&_actDays.length<7?_actDays:[];
   C.acts_today=[...(C.acts_today||[]),{id:fid,name,type:_actType,scheduled_at:`${TODAY}T${time}:00`,duration:_actDur,completed:0,repeat_days:days}];
   if(!UID)lsSet('acts_'+TODAY,C.acts_today);
-  renderPlan();renderHome();_renderPsTasksList();tg?.HapticFeedback?.notificationOccurred('success');
-  await apiPost('/api/activity/create',{name,type:_actType,time,duration:_actDur,repeat_days:days});
+  renderPlan();renderHome();toast(name+' добавлено 🎉');tg?.HapticFeedback?.notificationOccurred('success');
+  await apiPost('/api/activity/create',{name,type:_actType,time,duration:_actDur,repeat_days:days});await reload();
 }
 
 /* ══ HELPERS ══ */
