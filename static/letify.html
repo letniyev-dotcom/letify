@@ -508,6 +508,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   cursor:pointer;
   -webkit-tap-highlight-color:transparent;
   transition:transform .15s ease, background .65s ease, box-shadow .65s ease, filter .8s ease;
+  filter:brightness(1);
   /* форсируем аппаратное ускорение */
   transform:translateZ(0);
   -webkit-transform:translateZ(0);
@@ -583,27 +584,29 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 /* Only the avatar dims on press — never the whole card */
 .pav.pressing{filter:brightness(.62)}
 
-/* ══ AVATAR LOAD ANIMATION ══ */
-/* glow pulse — behind everything */
+/* ══ AVATAR LOAD ANIMATION — BREATHE ══ */
+
+/* glow behind avatar — дышит синхронно с кольцом */
 .pav-load-glow{
   position:absolute;
   top:50%;left:50%;
-  width:96px;height:96px;
+  width:90px;height:90px;
   transform:translate(-50%,-50%);
   border-radius:50%;
-  background:radial-gradient(circle,rgba(var(--pf-r),var(--pf-g),var(--pf-b),.32) 0%,transparent 70%);
+  background:radial-gradient(circle,rgba(var(--pf-r),var(--pf-g),var(--pf-b),.28) 0%,transparent 70%);
   pointer-events:none;
   opacity:0;
-  transition:opacity .35s ease;
-  animation:pav-glow-pulse 1.5s ease-in-out infinite;
+  transition:opacity .5s ease;
+  animation:breathe-glow 2s ease-in-out infinite;
   will-change:transform,opacity;
 }
 .pav-load-glow.show{opacity:1}
-@keyframes pav-glow-pulse{
-  0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.5}
-  50%{transform:translate(-50%,-50%) scale(1.18);opacity:1}
+@keyframes breathe-glow{
+  0%,100%{transform:translate(-50%,-50%) scale(.88);opacity:.35}
+  50%    {transform:translate(-50%,-50%) scale(1.08);opacity:.85}
 }
-/* arc ring — SVG outside .pav */
+
+/* SVG ring — кольцо заполняется и стирается */
 .pav-load-ring{
   position:absolute;
   top:50%;left:50%;
@@ -611,55 +614,36 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   transform:translate(-50%,-50%);
   pointer-events:none;
   opacity:0;
-  transition:opacity .35s ease;
+  transition:opacity .5s ease;
   will-change:opacity;
   z-index:3;
 }
 .pav-load-ring.show{opacity:1}
 .pav-load-ring .arc-track{
   fill:none;
-  stroke:rgba(var(--pf-r),var(--pf-g),var(--pf-b),.16);
-  stroke-width:2.8;
+  stroke:rgba(var(--pf-r),var(--pf-g),var(--pf-b),.13);
+  stroke-width:2.2;
 }
 .pav-load-ring .arc-spin{
   fill:none;
-  stroke:url(#pavArcGrad);
-  stroke-width:2.8;
+  stroke:rgba(var(--pf-r),var(--pf-g),var(--pf-b),1);
+  stroke-width:2.2;
   stroke-linecap:round;
-  stroke-dasharray:6 196;
-  stroke-dashoffset:0;
-  transform-origin:center;
-  animation:pav-arc-spin 1.15s cubic-bezier(.5,0,.5,1) infinite;
+  stroke-dasharray:226;
+  stroke-dashoffset:226;
+  transform-origin:39px 39px;
+  animation:breathe-ring 2s ease-in-out infinite;
 }
-@keyframes pav-arc-spin{
-  0%  {stroke-dashoffset:0;   stroke-dasharray:5 197}
-  30% {stroke-dasharray:100 102}
-  70% {stroke-dasharray:100 102}
-  100%{stroke-dashoffset:-202;stroke-dasharray:5 197}
+@keyframes breathe-ring{
+  0%   {stroke-dashoffset:226; opacity:.25; transform:rotate(-90deg)}
+  42%  {stroke-dashoffset:0;   opacity:1;   transform:rotate(-90deg)}
+  58%  {stroke-dashoffset:0;   opacity:1;   transform:rotate(-90deg)}
+  100% {stroke-dashoffset:-226;opacity:.25; transform:rotate(-90deg)}
 }
-/* shimmer sweep inside .pav */
+
+/* shimmer скрыт — breathe чистый */
 .pav-load-shimmer{
-  position:absolute;inset:0;
-  border-radius:50%;
-  background:linear-gradient(
-    115deg,
-    transparent 25%,
-    rgba(255,255,255,.22) 48%,
-    rgba(255,255,255,.08) 54%,
-    transparent 75%
-  );
-  background-size:220% 100%;
-  background-position:150% 0;
-  pointer-events:none;
-  opacity:0;
-  transition:opacity .35s ease;
-  z-index:2;
-  animation:pav-shimmer 1.5s ease-in-out infinite;
-}
-.pav-load-shimmer.show{opacity:1}
-@keyframes pav-shimmer{
-  0%  {background-position:150% 0}
-  100%{background-position:-60% 0}
+  display:none;
 }
 /* avatar dims while loading */
 .pav.loading{
@@ -1816,20 +1800,12 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       onmousedown="avDown(event)" onmouseup="avUp(event)" onmouseleave="avCancel()">
       <!-- Load glow (behind avatar) -->
       <div class="pav-load-glow" id="pav-load-glow"></div>
-      <!-- Load arc ring (outside avatar, not clipped) -->
+      <!-- Load arc ring — Breathe -->
       <svg class="pav-load-ring" id="pav-load-ring" viewBox="0 0 78 78">
-        <defs>
-          <linearGradient id="pavArcGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="rgb(var(--pf-r),var(--pf-g),var(--pf-b))" stop-opacity="1"/>
-            <stop offset="100%" stop-color="rgb(var(--pf-r),var(--pf-g),var(--pf-b))" stop-opacity="0"/>
-          </linearGradient>
-        </defs>
         <circle class="arc-track" cx="39" cy="39" r="36"/>
-        <circle class="arc-spin" cx="39" cy="39" r="36" transform="rotate(-90 39 39)"/>
+        <circle class="arc-spin" cx="39" cy="39" r="36"/>
       </svg>
       <div class="pav" id="pf-av">
-        <!-- Shimmer inside avatar -->
-        <div class="pav-load-shimmer" id="pav-load-shimmer"></div>
         <span id="pf-av-letter">А</span>
         <img class="pav-img" id="pf-av-img" alt="" src="">
       </div>
