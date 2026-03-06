@@ -3255,7 +3255,6 @@ function _populatePP(id){
     const ni=document.getElementById('inp-aname');if(ni)ni.value='пробежка';
     _drumReady=false;
     setTimeout(()=>initDrums(),50);
-    const ni=document.getElementById('inp-aname');if(ni)ni.value='пробежка';
     document.querySelectorAll('#act-quick .type-card').forEach((c,i)=>c.classList.toggle('on',i===0));
     document.getElementById('day-btn-daily')?.classList.add('on');
     document.querySelectorAll('#days-grid .day-btn').forEach(b=>b.classList.remove('on'));
