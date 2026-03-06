@@ -581,7 +581,8 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 }
 .pav-wrap{position:relative;display:inline-block;flex-shrink:0}
 /* Only the avatar dims on press — never the whole card */
-.pav.pressing{filter:brightness(.62);transition:filter .15s ease}
+.pav.pressing{filter:brightness(.55);transition:filter .35s ease}
+.pav:not(.pressing){transition:filter .35s ease}
 
 /* ══ AVATAR LOAD ANIMATION ══ */
 /* glow pulse — behind everything */
@@ -4723,7 +4724,9 @@ function _lcDOMInit(){
 }
 
 /* ── AVATAR LOAD ANIMATION ── */
+let _avLoadStart=0;
 function _avShowLoader(){
+  _avLoadStart=Date.now();
   document.getElementById('pav-load-glow')?.classList.add('show');
   document.getElementById('pav-load-ring')?.classList.add('show');
   document.getElementById('pav-load-shimmer')?.classList.add('show');
@@ -4755,32 +4758,43 @@ function _applyAvatarFull(dataUrl,animate){
     const alreadyLoaded=img.classList.contains('loaded');
     const applyNew=()=>{
       img.onload=()=>{
-        img.classList.add('loaded');
-        if(letter)letter.style.display='none';
-        let sc=_loadAvatarColor();
-        // Fallback: sample dominant color directly from image if not saved
-        if(!sc){
-          try{
-            const tmp=document.createElement('canvas');tmp.width=8;tmp.height=8;
-            const tc=tmp.getContext('2d');tc.drawImage(img,0,0,8,8);
-            const d=tc.getImageData(0,0,8,8).data;
-            let r=0,g=0,b=0,n=0;
-            for(let i=0;i<d.length;i+=4){
-              const mx=Math.max(d[i],d[i+1],d[i+2]),mn=Math.min(d[i],d[i+1],d[i+2]);
-              const sat=(mx-mn)/(mx||1),lum=(mx+mn)/510;
-              if(sat>.12&&lum>.06&&lum<.92){r+=d[i];g+=d[i+1];b+=d[i+2];n++;}
+        // ── enforce 3-second minimum loader ──
+        // The spinner always runs for at least 3 s so the animation
+        // feels deliberate; then the loader fades out (CSS .35s), and
+        // only after that does the avatar cross-fade in (.5s).
+        const MIN_LOAD_MS=3000;
+        const elapsed=Date.now()-_avLoadStart;
+        const remaining=Math.max(0,MIN_LOAD_MS-elapsed);
+        setTimeout(()=>{
+          // 1) fade out spinner / ring / glow
+          _avHideLoader();
+          // 2) after loader transition, reveal avatar
+          setTimeout(()=>{
+            img.classList.add('loaded');
+            if(letter)letter.style.display='none';
+            let sc=_loadAvatarColor();
+            if(!sc){
+              try{
+                const tmp=document.createElement('canvas');tmp.width=8;tmp.height=8;
+                const tc=tmp.getContext('2d');tc.drawImage(img,0,0,8,8);
+                const d=tc.getImageData(0,0,8,8).data;
+                let r=0,g=0,b=0,n=0;
+                for(let i=0;i<d.length;i+=4){
+                  const mx=Math.max(d[i],d[i+1],d[i+2]),mn=Math.min(d[i],d[i+1],d[i+2]);
+                  const sat=(mx-mn)/(mx||1),lum=(mx+mn)/510;
+                  if(sat>.12&&lum>.06&&lum<.92){r+=d[i];g+=d[i+1];b+=d[i+2];n++;}
+                }
+                if(n>0){sc=`${Math.round(r/n)},${Math.round(g/n)},${Math.round(b/n)}`;_saveAvatarColor(sc);}
+              }catch{}
             }
-            if(n>0){sc=`${Math.round(r/n)},${Math.round(g/n)},${Math.round(b/n)}`;_saveAvatarColor(sc);}
-          }catch{}
-        }
-        if(sc&&avEl){
-          avEl.style.transition='box-shadow .65s ease';
-          avEl.style.boxShadow=`0 5px 18px rgba(${sc},.45)`;
-        }
-        _setPfHeroColor(sc);
-        _updateNavAvatar();
-        // ← hide load animation once image is fully rendered
-        _avHideLoader();
+            if(sc&&avEl){
+              avEl.style.transition='box-shadow .65s ease';
+              avEl.style.boxShadow=`0 5px 18px rgba(${sc},.45)`;
+            }
+            _setPfHeroColor(sc);
+            _updateNavAvatar();
+          },320); // matches loader CSS fade-out (.35s) + small buffer
+        },remaining);
       };
       img.onerror=()=>{_avHideLoader();};
       img.src=dataUrl;
