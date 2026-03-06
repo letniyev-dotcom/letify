@@ -579,6 +579,8 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   to{stroke-dashoffset:0;}
 }
 .pav-wrap{position:relative;display:inline-block;flex-shrink:0}
+/* Only the avatar dims on press — never the whole card */
+.pav.pressing{filter:brightness(.62);transition:filter .15s ease}
 @keyframes pav-ripple{0%{transform:scale(0);opacity:.4}100%{transform:scale(3);opacity:0}}
 .pav-ripple{
   position:absolute;
@@ -1262,18 +1264,15 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .cal-meal-pbar-f{height:100%;border-radius:99px;transition:width .7s cubic-bezier(.25,.46,.45,.94);will-change:width}
 
 /* ══ PROFILE DASHBOARD ══ */
-#p-profile{overflow:hidden !important}
+#p-profile{overflow:hidden !important;--pf-r:255;--pf-g:107;--pf-b:53;}
 .pf-dash{
   display:flex;flex-direction:column;
-  padding:6px 14px 10px;
+  /* generous padding-top so hero card box-shadow isn't clipped */
+  padding:10px 14px 10px;
   height:100%;
   box-sizing:border-box;
-  overflow:hidden;
-}
-
-/* Profile adaptive color CSS vars */
-#p-profile{
-  --pf-r:255;--pf-g:107;--pf-b:53;
+  /* overflow visible so hero card shadow reaches page padding area */
+  overflow:visible;
 }
 
 /* Hero card — concept style: dark with adaptive glow */
@@ -1289,14 +1288,14 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   flex-shrink:0;
   margin-bottom:8px;
   position:relative;overflow:hidden;
-  cursor:pointer;
-  box-shadow:0 6px 28px rgba(var(--pf-r),var(--pf-g),var(--pf-b),.18);
-  transition:box-shadow .6s ease, border-color .6s ease, background .6s ease, opacity .12s;
+  /* NO cursor:pointer — card is not a button */
+  box-shadow:0 2px 20px rgba(var(--pf-r),var(--pf-g),var(--pf-b),.22);
+  transition:box-shadow .6s ease, border-color .6s ease, background .6s ease;
   will-change:box-shadow;
 }
 /* dark-mode falls through naturally since we use rgba vars */
 .tg-dark .pf-hero, .pf-hero{background:linear-gradient(140deg,rgba(var(--pf-r),var(--pf-g),var(--pf-b),.18) 0%,rgba(var(--pf-r),var(--pf-g),var(--pf-b),.07) 50%,rgba(0,0,0,.04) 100%)}
-.pf-hero:active{opacity:.8;transition:opacity .07s}
+/* NO :active on hero card — only avatar dims on hold */
 /* top-right orb */
 .pf-hero::before{
   content:'';position:absolute;top:-50px;right:-40px;
@@ -1453,6 +1452,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .av-tip{
   position:absolute;
   left:calc(100% + 10px);top:50%;
+  transform:translateY(-50%) scale(.82) translateX(-8px);
   transform-origin:left center;
   background:rgba(18,18,20,.98);
   border:1px solid rgba(255,255,255,.12);
@@ -1460,13 +1460,12 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   padding:10px 13px 22px;
   display:flex;align-items:center;gap:10px;
   white-space:nowrap;opacity:0;pointer-events:none;
-  transition:opacity .18s ease,transform .2s cubic-bezier(.34,1.38,.64,1);
+  transition:opacity .22s ease,transform .25s cubic-bezier(.34,1.38,.64,1);
   z-index:30;box-shadow:0 6px 24px rgba(0,0,0,.5);
   overflow:hidden;min-width:152px;
   will-change:opacity,transform;
-  transform:translateZ(0) translateY(-50%) scale(.85) translateX(-6px);
 }
-.av-tip.show{opacity:1;transform:translateZ(0) translateY(-50%) scale(1) translateX(0)}
+.av-tip.show{opacity:1;transform:translateY(-50%) scale(1) translateX(0)}
 .tip-ic{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
 .av-tip.cam .tip-ic{background:rgba(10,132,255,.2)}
 .av-tip.del .tip-ic{background:rgba(255,69,58,.18)}
@@ -1511,7 +1510,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 @keyframes lc-pulse{0%,100%{border-color:rgba(255,255,255,.5)}50%{border-color:rgba(255,255,255,.9)}}
 .lc-hint{position:absolute;bottom:0;left:0;right:0;z-index:10;padding:12px 24px max(env(safe-area-inset-bottom,24px),24px);background:linear-gradient(to top,rgba(0,0,0,.9),transparent);text-align:center;pointer-events:none}
 .lc-hint-txt{font-size:12px;color:rgba(255,255,255,.38);font-weight:600;letter-spacing:.03em}
-.lc-zoom{position:absolute;bottom:calc(max(env(safe-area-inset-bottom,24px),24px) + 36px);left:50%;transform:translateX(-50%);background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(12px);border-radius:20px;padding:5px 14px;z-index:11;font-size:11px;font-weight:700;color:rgba(255,255,255,.55);pointer-events:none;white-space:nowrap;opacity:0;transition:opacity .2s}
+.lc-zoom{position:absolute;bottom:calc(max(env(safe-area-inset-bottom,24px),24px) + 36px);left:50%;transform:translateX(-50%);background:rgba(0,0,0,.75);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:5px 14px;z-index:11;font-size:11px;font-weight:700;color:rgba(255,255,255,.55);pointer-events:none;white-space:nowrap;opacity:0;transition:opacity .2s}
 .lc-zoom.visible{opacity:1}
 </style>
 </head>
@@ -1759,7 +1758,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     <div class="pf-hero-right" style="position:relative;z-index:1">
       <div class="pf-hero-name" id="pf-name">—</div>
       <div class="pf-hero-meta" id="pf-meta">—</div>
-      <div style="font-size:9px;font-weight:600;color:rgba(255,255,255,.3);margin-top:5px;letter-spacing:.02em">удержи фото · смена / удаление</div>
       <div class="pf-hero-stats" id="pf-bmi-row" style="display:none;margin-top:8px">
         <div class="pf-hero-stat">
           <div class="pf-hero-stat-v" id="pf-bmi">—</div>
@@ -4314,7 +4312,7 @@ function _updateNavAvatar(){
    P2 = 3000ms → camera tooltip, release = pick photo
    P3 = 3000ms → delete tooltip (only if hasImg), auto-timer deletes
 */
-const P1=500,P2=2500,P3=2500;
+const P1=2000,P2=2500,P3=2500;
 let av={phase:0,pressing:false,hasImg:false,timer:null,raf:null,rafStart:null};
 
 const SVG_CAM=`<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>`;
