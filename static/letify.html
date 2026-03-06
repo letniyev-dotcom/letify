@@ -581,7 +581,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 }
 .pav-wrap{position:relative;display:inline-block;flex-shrink:0}
 /* Only the avatar dims on press — never the whole card */
-.pav.pressing{filter:brightness(.62);transition:filter .15s ease}
+.pav.pressing{filter:brightness(.58);transition:filter .35s ease}
 @keyframes pav-ripple{0%{transform:scale(0);opacity:.4}100%{transform:scale(3);opacity:0}}
 .pav-ripple{
   position:absolute;
@@ -599,33 +599,50 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   position:absolute;
   width:80px;height:80px;
   top:50%;left:50%;
-  transform:translate(-50%,-50%);
+  /* use translate3d — keeps compositing layer independent of .pav */
+  transform:translate3d(-50%,-50%,0);
   pointer-events:none;
   z-index:8;
   opacity:0;
+  will-change:opacity;
   transition:opacity .35s ease;
 }
 .pav-set-ring.show{opacity:1;}
-.pav-set-ring.hide{opacity:0;transition:opacity .75s ease;}
+.pav-set-ring.hide{opacity:0;transition:opacity .8s ease;}
+
+/* static glow ring — NO animation on this, just sits behind */
+.pav-set-ring .sr-glow{
+  position:absolute;inset:0;
+  border-radius:50%;
+  box-shadow:0 0 12px 2px rgba(var(--pf-r),var(--pf-g),var(--pf-b),.35);
+  pointer-events:none;
+}
+
+/* the SVG spins — NO filter on it, keeps GPU raster cheap */
 .pav-set-ring svg{
   width:100%;height:100%;
   overflow:visible;
-  animation:set-ring-spin 1s linear infinite;
-  filter:drop-shadow(0 0 5px rgba(var(--pf-r),var(--pf-g),var(--pf-b),.55));
+  display:block;
+  will-change:transform;
+  animation:set-ring-spin 1.1s linear infinite;
+  /* force own composited layer */
+  transform:translateZ(0);
 }
-@keyframes set-ring-spin{to{transform:rotate(360deg)}}
+@keyframes set-ring-spin{
+  0%  {transform:rotate(0deg)   translateZ(0)}
+  100%{transform:rotate(360deg) translateZ(0)}
+}
 .pav-set-ring .sr-track{
   fill:none;
-  stroke:rgba(var(--pf-r),var(--pf-g),var(--pf-b),.12);
-  stroke-width:3;
+  stroke:rgba(var(--pf-r),var(--pf-g),var(--pf-b),.14);
+  stroke-width:2.5;
 }
 .pav-set-ring .sr-arc{
   fill:none;
   stroke:rgb(var(--pf-r),var(--pf-g),var(--pf-b));
   stroke-width:3;
   stroke-linecap:round;
-  stroke-dasharray:174 59;
-  transform-origin:40px 40px;
+  stroke-dasharray:168 64;
 }
 
 /* avatar states during photo-set flow */
@@ -633,15 +650,15 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   transform:scale(.855) translateZ(0)!important;
   transition:transform .35s cubic-bezier(.4,0,.2,1)!important;
 }
-/* blur the image while ring is spinning */
-.pav.setting .pav-img.loaded:not(.revealing){
-  filter:blur(6px);
-  transition:opacity .5s cubic-bezier(.4,0,.2,1),filter .45s ease!important;
+/* keep image blurred while ring is visible */
+.pav-img.set-blurred{
+  filter:blur(7px) !important;
+  transition:opacity .5s cubic-bezier(.4,0,.2,1), filter .5s ease !important;
 }
-/* smooth unblur once revealed */
-.pav.setting .pav-img.loaded.revealing{
-  filter:blur(0);
-  transition:opacity .5s cubic-bezier(.4,0,.2,1),filter 1.1s ease!important;
+/* smooth unblur when ring fades */
+.pav-img.set-unblurring{
+  filter:blur(0px) !important;
+  transition:opacity .5s cubic-bezier(.4,0,.2,1), filter 1.1s ease !important;
 }
 /* spring back after ring done */
 .pav.set-restored{
@@ -1788,6 +1805,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       onmousedown="avDown(event)" onmouseup="avUp(event)" onmouseleave="avCancel()">
       <!-- Photo-set spinning ring -->
       <div class="pav-set-ring" id="pf-set-ring">
+        <div class="sr-glow"></div>
         <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
           <circle class="sr-track" cx="40" cy="40" r="37"/>
           <circle class="sr-arc" cx="40" cy="40" r="37"/>
@@ -4729,10 +4747,10 @@ function _applyAvatarFull(dataUrl,animate){
   }
 
   /* ── ANIMATED FLOW ──
-     1. Shrink avatar                 (instant, .setting)
-     2. Show spinning ring            (80ms delay, 3 s total)
-     3. Load image → fades in blurred → slowly unblurs (.revealing)
-     4. After 3 s: ring fades, avatar springs back, card color already applied
+     t=0:      shrink avatar
+     t=80ms:   ring fades in
+     t=120ms:  load image → appears BLURRED (stays blurred whole time ring spins)
+     t=3000ms: ring fades out, unblur starts (1.1s), avatar springs back
   */
   const ring=document.getElementById('pf-set-ring');
 
@@ -4745,13 +4763,14 @@ function _applyAvatarFull(dataUrl,animate){
     if(ring){ring.classList.remove('hide');ring.classList.add('show');}
   },80);
 
-  // 3. Load image
+  // 3. Load image — blurred immediately, stays blurred
   const doLoad=()=>{
-    img.classList.remove('revealing');
+    img.classList.remove('set-blurred','set-unblurring');
     img.onload=()=>{
-      img.classList.add('loaded'); // CSS: fades in blurred under .setting
+      img.classList.add('loaded');
+      img.classList.add('set-blurred'); // blurred — stays until ring hides
       if(letter)letter.style.display='none';
-      // extract dominant color
+      // extract dominant color and apply smoothly
       let sc=_loadAvatarColor();
       if(!sc){
         try{
@@ -4767,33 +4786,38 @@ function _applyAvatarFull(dataUrl,animate){
           if(n>0){sc=`${Math.round(r/n)},${Math.round(g/n)},${Math.round(b/n)}`;_saveAvatarColor(sc);}
         }catch{}
       }
-      // smooth color transition — pf-hero already has transition:background .6s,border .6s
       if(sc&&avEl){
         avEl.style.transition='box-shadow .9s ease';
         avEl.style.boxShadow=`0 5px 18px rgba(${sc},.45)`;
       }
       _setPfHeroColor(sc);
       _updateNavAvatar();
-      // unblur after image is visible (~500ms into ring spin)
-      setTimeout(()=>{img.classList.add('revealing');},500);
     };
     img.onerror=()=>{};
     img.src=dataUrl;
   };
 
   if(img.classList.contains('loaded')){
-    img.classList.remove('loaded','revealing');
-    setTimeout(doLoad,220);
+    img.classList.remove('loaded','set-blurred','set-unblurring');
+    setTimeout(doLoad,200);
   } else {
-    setTimeout(doLoad,120);
+    setTimeout(doLoad,100);
   }
 
-  // 4. After 3 s: ring fades, avatar springs back
+  // 4. At 3 s: ring fades, unblur starts simultaneously, avatar springs back
   setTimeout(()=>{
+    // ring fades out
     if(ring){ring.classList.remove('show');ring.classList.add('hide');}
+    // unblur: swap classes — 1.1s smooth transition
+    img.classList.remove('set-blurred');
+    img.classList.add('set-unblurring');
+    // avatar springs back
     avEl.classList.remove('setting');
     avEl.classList.add('set-restored');
-    setTimeout(()=>{avEl.classList.remove('set-restored');},700);
+    setTimeout(()=>{
+      avEl.classList.remove('set-restored');
+      img.classList.remove('set-unblurring');
+    },1200);
   },3000);
 }
 
