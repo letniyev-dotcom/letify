@@ -507,7 +507,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   position:relative;
   cursor:pointer;
   -webkit-tap-highlight-color:transparent;
-  transition:transform .15s ease, background .65s ease, box-shadow .65s ease, filter .15s ease;
+  transition:transform .15s ease, background .65s ease, box-shadow .65s ease, filter .8s ease;
   /* форсируем аппаратное ускорение */
   transform:translateZ(0);
   -webkit-transform:translateZ(0);
@@ -581,7 +581,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 }
 .pav-wrap{position:relative;display:inline-block;flex-shrink:0}
 /* Only the avatar dims on press — never the whole card */
-.pav.pressing{filter:brightness(.62);transition:filter .5s ease}
+.pav.pressing{filter:brightness(.62)}
 
 /* ══ AVATAR LOAD ANIMATION ══ */
 /* glow pulse — behind everything */
@@ -664,7 +664,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 /* avatar dims while loading */
 .pav.loading{
   filter:brightness(.58);
-  transition:filter .3s ease;
 }
 @keyframes pav-ripple{0%{transform:scale(0);opacity:.4}100%{transform:scale(3);opacity:0}}
 .pav-ripple{
@@ -4758,8 +4757,8 @@ function _applyAvatarFull(dataUrl,animate){
     const applyNew=()=>{
       img.onload=()=>{
         if(letter)letter.style.display='none';
+        // Sample dominant color from image
         let sc=_loadAvatarColor();
-        // Fallback: sample dominant color directly from image if not saved
         if(!sc){
           try{
             const tmp=document.createElement('canvas');tmp.width=8;tmp.height=8;
@@ -4774,19 +4773,27 @@ function _applyAvatarFull(dataUrl,animate){
             if(n>0){sc=`${Math.round(r/n)},${Math.round(g/n)},${Math.round(b/n)}`;_saveAvatarColor(sc);}
           }catch{}
         }
-        if(sc&&avEl){
-          avEl.style.transition='box-shadow .65s ease';
-          avEl.style.boxShadow=`0 5px 18px rgba(${sc},.45)`;
-        }
-        _setPfHeroColor(sc);
-        _updateNavAvatar();
-        // ← wait minimum 3s, then hide loader, then smoothly fade in avatar
-        const elapsed=Date.now()-_avLoaderStartTime;
-        const remaining=_avLoaderStartTime>0?Math.max(0,3000-elapsed):0;
+        // Wait minimum 3s from loader start, then:
+        // 1) hide loader → 2) avatar fades in → 3) THEN apply colors
+        // (so background doesn't change color before avatar is visible)
+        const elapsed=_avLoaderStartTime>0?Date.now()-_avLoaderStartTime:9999;
+        const wait=Math.max(0,3000-elapsed);
         setTimeout(()=>{
           _avHideLoader();
-          setTimeout(()=>{img.classList.add('loaded');},380);
-        },remaining);
+          // loader fade-out ~350ms, then show avatar
+          setTimeout(()=>{
+            img.classList.add('loaded');
+            _updateNavAvatar();
+            // apply bg color AFTER avatar fade-in completes (500ms)
+            setTimeout(()=>{
+              if(sc&&avEl){
+                avEl.style.transition='box-shadow .65s ease';
+                avEl.style.boxShadow=`0 5px 18px rgba(${sc},.45)`;
+              }
+              _setPfHeroColor(sc);
+            },520);
+          },360);
+        },wait);
       };
       img.onerror=()=>{_avHideLoader();img.classList.add('loaded');};
       img.src=dataUrl;
