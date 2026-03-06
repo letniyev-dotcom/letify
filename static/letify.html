@@ -5189,6 +5189,115 @@ document.addEventListener('DOMContentLoaded',async()=>{
   });
   // Предзагрузка камеры при первом касании кнопки сканера
   document.querySelector('[onclick*="pp-scanner"]')?.addEventListener('touchstart',_prewarmCamera,{once:true,passive:true});
+
+  /* ══ RUBBER-BAND / STRETCH OVERSCROLL ══
+     Эффект как в Android 12+ — список "растягивается" при оверскролле
+     и упруго возвращается обратно (пружина).
+  */
+  (function initRubberScroll(){
+    function applyRubber(scrollEl, getInnerEl){
+      if(!scrollEl) return;
+
+      let startY = 0;
+      let pulling = false;
+      let currentStretch = 0;
+      let rafId = null;
+
+      function rubberDelta(delta, dim){
+        const c = 0.55;
+        return (c * Math.abs(delta) * dim) / (dim + c * Math.abs(delta)) * Math.sign(delta);
+      }
+
+      function applyStretch(stretch){
+        const inner = getInnerEl();
+        if(!inner) return;
+        currentStretch = stretch;
+        const dim = scrollEl.clientHeight || 400;
+        const scale = 1 + Math.abs(stretch) / dim * 0.14;
+        const translateY = stretch * 0.28;
+        const origin = stretch > 0 ? 'top center' : 'bottom center';
+        inner.style.transformOrigin = origin;
+        inner.style.transform = 'translateY(' + translateY + 'px) scaleY(' + scale + ')';
+        inner.style.transition = 'none';
+      }
+
+      function springBack(){
+        const inner = getInnerEl();
+        if(!inner) return;
+        inner.style.transition = 'transform 0.45s cubic-bezier(0.22, 1, 0.36, 1)';
+        inner.style.transform = 'none';
+        currentStretch = 0;
+      }
+
+      scrollEl.addEventListener('touchstart', function(e){
+        startY = e.touches[0].clientY;
+        pulling = true;
+        const inner = getInnerEl();
+        if(inner) inner.style.transition = 'none';
+      }, { passive: true });
+
+      scrollEl.addEventListener('touchmove', function(e){
+        if(!pulling) return;
+        const dy = e.touches[0].clientY - startY;
+        const atTop = scrollEl.scrollTop <= 0;
+        const atBottom = scrollEl.scrollTop >= (scrollEl.scrollHeight - scrollEl.clientHeight - 1);
+        let overscroll = 0;
+        if(dy > 0 && atTop) overscroll = dy;
+        else if(dy < 0 && atBottom) overscroll = dy;
+
+        if(Math.abs(overscroll) > 2){
+          const dim = scrollEl.clientHeight || 400;
+          const stretched = rubberDelta(overscroll, dim);
+          if(rafId) cancelAnimationFrame(rafId);
+          rafId = requestAnimationFrame(function(){ applyStretch(stretched); rafId = null; });
+        } else if(currentStretch !== 0){
+          springBack();
+        }
+      }, { passive: true });
+
+      function onRelease(){
+        if(!pulling) return;
+        pulling = false;
+        if(rafId){ cancelAnimationFrame(rafId); rafId = null; }
+        if(currentStretch !== 0) springBack();
+      }
+      scrollEl.addEventListener('touchend', onRelease, { passive: true });
+      scrollEl.addEventListener('touchcancel', onRelease, { passive: true });
+    }
+
+    // Список задач на странице «план» — inner = #pl-list
+    applyRubber(
+      document.getElementById('pl-tasks-scroll'),
+      function(){ return document.getElementById('pl-list'); }
+    );
+
+    // Список задач в расписании по дням — оборачиваем содержимое во враппер
+    (function attachPs(){
+      const scroll = document.getElementById('ps-tasks-list');
+      if(!scroll) return;
+      // Создаём внутренний враппер один раз
+      let inner = document.getElementById('ps-rubber-inner');
+      if(!inner){
+        inner = document.createElement('div');
+        inner.id = 'ps-rubber-inner';
+        while(scroll.firstChild) inner.appendChild(scroll.firstChild);
+        scroll.appendChild(inner);
+      }
+      applyRubber(scroll, function(){ return document.getElementById('ps-rubber-inner'); });
+
+      // MutationObserver: при перерисовке содержимого — переносим в враппер
+      new MutationObserver(function(mutations){
+        const wrapper = document.getElementById('ps-rubber-inner');
+        if(!wrapper) return;
+        // Переносим прямых детей scroll (кроме самого враппера) внутрь
+        Array.from(scroll.childNodes).forEach(function(node){
+          if(node !== wrapper) wrapper.appendChild(node);
+        });
+      }).observe(scroll, { childList: true });
+    })();
+
+  })();
+
 });
 </script>
 
