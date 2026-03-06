@@ -1260,6 +1260,152 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .cal-meal-cnt{font-size:10px;font-weight:700;color:var(--hint)}
 .cal-meal-pbar{height:3px;background:rgba(255,255,255,.09);border-radius:99px;overflow:hidden}
 .cal-meal-pbar-f{height:100%;border-radius:99px;transition:width .7s cubic-bezier(.25,.46,.45,.94);will-change:width}
+
+/* ══ PROFILE DASHBOARD ══ */
+#p-profile{overflow:hidden !important}
+.pf-dash{
+  display:flex;flex-direction:column;
+  padding:6px 14px 10px;
+  height:100%;
+  box-sizing:border-box;
+  overflow:hidden;
+}
+
+/* Hero card */
+.pf-hero{
+  background:var(--bg2);
+  border-radius:20px;
+  padding:14px;
+  box-shadow:var(--sh);
+  display:flex;align-items:center;gap:12px;
+  flex-shrink:0;
+  margin-bottom:8px;
+  position:relative;overflow:hidden;
+  cursor:pointer;
+  transition:opacity .12s;
+}
+.pf-hero:active{opacity:.8;transition:opacity .07s}
+.pf-hero::before{
+  content:'';position:absolute;right:-20px;top:-20px;
+  width:90px;height:90px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,107,53,.07),transparent 70%);
+  pointer-events:none;
+}
+.tg-dark .pf-hero{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);box-shadow:none}
+.pf-hero-right{flex:1;min-width:0;position:relative;z-index:1}
+.pf-hero-name{font-size:18px;font-weight:900;color:var(--text);letter-spacing:-.02em;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pf-hero-meta{font-size:11px;font-weight:600;color:var(--hint);margin-top:2px}
+.pf-hero-stats{display:flex;gap:5px;margin-top:8px}
+.pf-hero-stat{
+  background:rgba(255,107,53,.07);border-radius:9px;
+  padding:5px 7px;flex:1;text-align:center;
+}
+.tg-dark .pf-hero-stat{background:rgba(255,107,53,.12)}
+.pf-hero-stat-v{font-size:13px;font-weight:900;color:var(--sun);letter-spacing:-.02em;line-height:1}
+.pf-hero-stat-l{font-size:8px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+.pf-hero-stat.s-blue .pf-hero-stat-v{color:var(--sleep)}
+.pf-hero-stat.s-green .pf-hero-stat-v{color:var(--green)}
+
+/* Section label */
+.pf-sec{
+  font-size:10px;font-weight:800;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--hint);
+  padding:0 2px 5px;flex-shrink:0;
+}
+
+/* 2×2 grid tiles */
+.pf-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:7px;flex-shrink:0;margin-bottom:8px;
+}
+.pf-tile{
+  background:var(--bg2);border-radius:18px;
+  padding:13px 12px 11px;
+  box-shadow:var(--sh);
+  cursor:pointer;
+  display:flex;flex-direction:column;gap:5px;
+  position:relative;overflow:hidden;
+  transition:opacity .12s,transform .12s;
+  -webkit-tap-highlight-color:transparent;
+}
+.pf-tile:active{opacity:.7;transform:scale(.97);transition:opacity .07s,transform .07s}
+.tg-dark .pf-tile{background:rgba(255,255,255,.07);box-shadow:none;border:1px solid rgba(255,255,255,.09)}
+.pf-tile-glow{
+  position:absolute;top:-14px;right:-14px;
+  width:56px;height:56px;border-radius:50%;
+  pointer-events:none;
+}
+.pf-tile-o .pf-tile-glow{background:radial-gradient(circle,rgba(255,107,53,.14),transparent 70%)}
+.pf-tile-r .pf-tile-glow{background:radial-gradient(circle,rgba(244,92,92,.12),transparent 70%)}
+.pf-tile-g .pf-tile-glow{background:radial-gradient(circle,rgba(82,193,119,.12),transparent 70%)}
+.pf-tile-b .pf-tile-glow{background:radial-gradient(circle,rgba(78,174,229,.12),transparent 70%)}
+.pf-tile-ic{
+  width:34px;height:34px;border-radius:11px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.pf-tile-o .pf-tile-ic{background:rgba(255,107,53,.12)}
+.pf-tile-r .pf-tile-ic{background:rgba(244,92,92,.1)}
+.pf-tile-g .pf-tile-ic{background:rgba(82,193,119,.1)}
+.pf-tile-b .pf-tile-ic{background:rgba(78,174,229,.1)}
+.pf-tile-lbl{font-size:12px;font-weight:800;color:var(--text);letter-spacing:-.01em;line-height:1.2}
+.pf-tile-val{font-size:10px;font-weight:600;color:var(--hint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Secondary list card */
+.pf-list-card{
+  background:var(--bg2);border-radius:16px;
+  box-shadow:var(--sh);overflow:hidden;
+  flex-shrink:0;margin-bottom:7px;
+}
+.tg-dark .pf-list-card{background:rgba(255,255,255,.07);box-shadow:none;border:1px solid rgba(255,255,255,.09)}
+.pf-list-row{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;
+  border-bottom:1px solid var(--brd);
+  cursor:pointer;
+  transition:opacity .12s;
+  -webkit-tap-highlight-color:transparent;
+}
+.pf-list-row:last-child{border-bottom:none}
+.pf-list-row:active{opacity:.6;transition:opacity .07s}
+.pf-list-row-ic{
+  width:30px;height:30px;border-radius:10px;
+  background:var(--bg3);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.tg-dark .pf-list-row-ic{background:rgba(255,255,255,.08)}
+.pf-list-row-lbl{flex:1;font-size:13px;font-weight:700;color:var(--text)}
+.pf-list-row-val{font-size:11px;font-weight:600;color:var(--hint);flex-shrink:0}
+.pf-list-row-chev{color:var(--hint);opacity:.4;flex-shrink:0;margin-left:4px}
+
+/* Toggle inside list row */
+.pf-tog{
+  width:40px;height:22px;border-radius:99px;
+  background:var(--bg3);
+  position:relative;cursor:pointer;flex-shrink:0;
+  transition:background .2s;
+}
+.pf-tog.on{background:linear-gradient(90deg,var(--sun),var(--sun2))}
+.pf-tog::after{
+  content:'';position:absolute;
+  width:16px;height:16px;border-radius:50%;
+  background:#fff;top:3px;left:3px;
+  transition:transform .2s;
+  box-shadow:0 1px 3px rgba(0,0,0,.2);
+}
+.pf-tog.on::after{transform:translateX(18px)}
+
+/* Danger + ver */
+.pf-danger-btn{
+  width:100%;padding:12px 14px;border-radius:14px;
+  background:rgba(244,92,92,.07);border:1.5px solid rgba(244,92,92,.13);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  color:#F45C5C;font-family:'Onest',inherit;font-size:13px;font-weight:800;
+  cursor:pointer;flex-shrink:0;
+  transition:background .14s;
+  -webkit-tap-highlight-color:transparent;
+}
+.pf-danger-btn:active{background:rgba(244,92,92,.14)}
+.pf-ver{font-size:10px;font-weight:600;color:var(--hint);text-align:center;padding:5px 0 0;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -1469,86 +1615,132 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 <!-- ══ PROFILE ══ -->
 <div class="page" id="p-profile">
-<div style="display:flex;align-items:center;gap:14px;padding:4px 16px 0">
-  <div class="pav-wrap" id="pf-av-wrap">
-    <div class="pav" id="pf-av">
-      <span id="pf-av-letter">А</span>
-      <img class="pav-img" id="pf-av-img" alt="" src="">
-      <div class="pav-spinner" id="pf-av-spinner">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="2.5" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+<!-- Hidden file input for avatar pick -->
+<input type="file" id="pf-av-input" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none" onchange="onAvatarPicked(this)">
+<!-- Hidden legacy IDs used by renderProfile() -->
+<span id="pf-pname" style="display:none"></span>
+<div class="pf-dash">
+
+  <!-- ── HERO CARD ── -->
+  <div class="pf-hero" onclick="pickAvatar()">
+    <div class="pav-wrap" id="pf-av-wrap">
+      <div class="pav" id="pf-av">
+        <span id="pf-av-letter">А</span>
+        <img class="pav-img" id="pf-av-img" alt="" src="">
+        <div class="pav-spinner" id="pf-av-spinner">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="2.5" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+        </div>
+        <div class="pav-del-overlay" id="pf-del-overlay">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(200,200,200,.65)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+        </div>
+        <div class="pav-del-ring" id="pf-del-ring">
+          <svg width="64" height="64" viewBox="0 0 64 64">
+            <circle class="ring-track" cx="32" cy="32" r="30" stroke-width="3"/>
+            <circle class="ring-fill" id="pf-del-ring-fill" cx="32" cy="32" r="30" stroke-width="3"/>
+          </svg>
+        </div>
       </div>
-      <!-- long-press delete: overlay + ring, скрыты по умолчанию -->
-      <div class="pav-del-overlay" id="pf-del-overlay">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(200,200,200,.65)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
-      </div>
-      <div class="pav-del-ring" id="pf-del-ring">
-        <svg width="64" height="64" viewBox="0 0 64 64">
-          <circle class="ring-track" cx="32" cy="32" r="30" stroke-width="3"/>
-          <circle class="ring-fill" id="pf-del-ring-fill" cx="32" cy="32" r="30" stroke-width="3"/>
-        </svg>
+    </div>
+    <div class="pf-hero-right">
+      <div class="pf-hero-name" id="pf-name">—</div>
+      <div class="pf-hero-meta" id="pf-meta">—</div>
+      <div class="pf-hero-stats" id="pf-bmi-row" style="display:none">
+        <div class="pf-hero-stat">
+          <div class="pf-hero-stat-v" id="pf-bmi">—</div>
+          <div class="pf-hero-stat-l">ИМТ</div>
+        </div>
+        <div class="pf-hero-stat s-blue">
+          <div class="pf-hero-stat-v" id="pf-ideal">—</div>
+          <div class="pf-hero-stat-l">идеал</div>
+        </div>
+        <div class="pf-hero-stat s-green">
+          <div class="pf-hero-stat-v" id="pf-bmr">—</div>
+          <div class="pf-hero-stat-l">BMR</div>
+        </div>
       </div>
     </div>
   </div>
-  <div>
-    <div class="t2" id="pf-name">—</div>
-    <div class="t5" id="pf-meta" style="margin-top:2px">—</div>
+
+  <!-- ── БЫСТРЫЙ ДОСТУП ── -->
+  <div class="pf-sec">Быстрый доступ</div>
+  <div class="pf-grid">
+    <div class="pf-tile pf-tile-o" onclick="pushPage('pp-pdata')">
+      <div class="pf-tile-glow"></div>
+      <div class="pf-tile-ic">
+        <iconify-icon icon="solar:user-circle-bold" style="font-size:18px;color:#FF6B35"></iconify-icon>
+      </div>
+      <div>
+        <div class="pf-tile-lbl">Профиль</div>
+        <div class="pf-tile-val" id="pf-tile-profile">—</div>
+      </div>
+    </div>
+    <div class="pf-tile pf-tile-r" onclick="pushPage('pp-start-weight')">
+      <div class="pf-tile-glow"></div>
+      <div class="pf-tile-ic">
+        <iconify-icon icon="solar:scale-bold" style="font-size:18px;color:#F45C5C"></iconify-icon>
+      </div>
+      <div>
+        <div class="pf-tile-lbl">Вес и цель</div>
+        <div class="pf-tile-val" id="pf-sw">—</div>
+      </div>
+    </div>
+    <div class="pf-tile pf-tile-g" onclick="pushPage('pp-goals')">
+      <div class="pf-tile-glow"></div>
+      <div class="pf-tile-ic">
+        <iconify-icon icon="solar:target-bold" style="font-size:18px;color:#52C177"></iconify-icon>
+      </div>
+      <div>
+        <div class="pf-tile-lbl">Нормы</div>
+        <div class="pf-tile-val" id="pf-gw">—</div>
+      </div>
+    </div>
+    <div class="pf-tile pf-tile-b" onclick="pushPage('pp-plan-settings')">
+      <div class="pf-tile-glow"></div>
+      <div class="pf-tile-ic">
+        <iconify-icon icon="solar:calendar-mark-bold" style="font-size:18px;color:#4EAEE5"></iconify-icon>
+      </div>
+      <div>
+        <div class="pf-tile-lbl">Расписание</div>
+        <div class="pf-tile-val">план по дням</div>
+      </div>
+    </div>
   </div>
-</div>
-<!-- Hidden file input for avatar pick -->
-<input type="file" id="pf-av-input" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none" onchange="onAvatarPicked(this)">
-<div id="pf-bmi-row" style="margin-top:12px;padding:0 16px;display:none">
-  <div class="sb-row">
-    <div class="sbox"><div class="sv" id="pf-bmi">—</div><div class="sl">ИМТ</div></div>
-    <div class="sbox"><div class="sv" id="pf-ideal">—</div><div class="sl">идеал кг</div></div>
-    <div class="sbox"><div class="sv" id="pf-bmr">—</div><div class="sl">BMR</div></div>
+
+  <!-- ── ПЕРСОНАЛИЗАЦИЯ ── -->
+  <div class="pf-sec">Персонализация</div>
+  <div class="pf-list-card">
+    <div class="pf-list-row" onclick="pushPage('pp-design')">
+      <div class="pf-list-row-ic">
+        <iconify-icon icon="solar:pallete-2-bold" style="font-size:15px;color:#8B7FD4"></iconify-icon>
+      </div>
+      <span class="pf-list-row-lbl">Оформление</span>
+      <span class="pf-list-row-val" id="pf-design-val">классический</span>
+      <iconify-icon icon="solar:alt-arrow-right-bold" class="pf-list-row-chev" style="font-size:13px"></iconify-icon>
+    </div>
+    <div class="pf-list-row" style="cursor:default">
+      <div class="pf-list-row-ic">
+        <iconify-icon icon="solar:moon-stars-bold" style="font-size:15px;color:var(--hint)"></iconify-icon>
+      </div>
+      <span class="pf-list-row-lbl">Тема</span>
+      <span class="pf-list-row-val">авто</span>
+    </div>
+    <div class="pf-list-row" style="border-bottom:none;cursor:default">
+      <div class="pf-list-row-ic">
+        <iconify-icon icon="solar:bell-bold" style="font-size:15px;color:#FFAB40"></iconify-icon>
+      </div>
+      <span class="pf-list-row-lbl">Уведомления</span>
+      <div class="pf-tog on" id="pf-notif-tog" onclick="this.classList.toggle('on');tg?.HapticFeedback?.selectionChanged()"></div>
+    </div>
   </div>
-</div>
-<div class="sec">настройки</div>
-<div class="pad">
-<div class="card">
-  <div class="lt" onclick="pushPage('pp-pdata')">
-    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
-    <span class="lt-lbl">данные профиля</span>
-    <span class="lt-val" id="pf-pname">—</span>
-    <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-  </div>
-  <div class="lt" onclick="pushPage('pp-start-weight')">
-    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 7l7-4 7 4M3 17h6a3 3 0 0 0 0-6H3l3 3-3 3zm18 0h-6a3 3 0 0 1 0-6h6l-3 3 3 3z"/></svg></div>
-    <span class="lt-lbl">начальный вес и цель</span>
-    <span class="lt-val" id="pf-sw">—</span>
-    <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-  </div>
-  <div class="lt" style="padding-bottom:0;border:none" onclick="pushPage('pp-goals')">
-    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg></div>
-    <span class="lt-lbl">мои цели</span>
-    <span class="lt-val"><span id="pf-gw">—</span></span>
-    <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-  </div>
-  <div class="lt" style="padding-bottom:0;border:none" onclick="pushPage('pp-plan-settings')">
-    <div class="lt-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/></svg></div>
-    <span class="lt-lbl">план по дням</span>
-    <span class="lt-val">расписание</span>
-    <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-  </div>
-</div>
-</div>
-<div class="sec">персонализация</div>
-<div class="pad">
-<div class="card">
-  <div class="lt" style="padding-bottom:0;border:none" onclick="pushPage('pp-design')">
-    <div class="lt-ic" style="background:rgba(255,107,53,.1)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--sun)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="var(--sun)"/><circle cx="17.5" cy="10.5" r=".5" fill="var(--sun)"/><circle cx="8.5" cy="7.5" r=".5" fill="var(--sun)"/><circle cx="6.5" cy="12.5" r=".5" fill="var(--sun)"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg></div>
-    <span class="lt-lbl">оформление</span>
-    <span class="lt-val" id="pf-design-val">классический</span>
-    <svg class="lt-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-  </div>
-</div>
-</div>
-<div class="pad" style="margin-top:10px">
-  <button class="btn btn-danger" style="width:100%;padding:14px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="resetAllData()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> сбросить все данные</button>
-  <div class="clear-hint">удалит все записи и настройки навсегда</div>
-</div>
-<div style="text-align:center;padding:16px 0 8px"><div class="t5">letify · ver 4.3</div></div>
-<div style="height:8px"></div>
+
+  <!-- ── DANGER + VERSION ── -->
+  <button class="pf-danger-btn" onclick="resetAllData()">
+    <iconify-icon icon="solar:trash-bin-2-bold" style="font-size:15px"></iconify-icon>
+    Сбросить все данные
+  </button>
+  <div class="pf-ver">letify · ver 4.3</div>
+
+</div><!-- /pf-dash -->
 </div>
 
 </div><!-- /pages -->
@@ -4267,18 +4459,29 @@ function renderProfile(){
   T('pf-name',u.name||'—');
   const meta=[];if(u.age)meta.push(u.age+' лет');if(u.height)meta.push(u.height+' см');if(u.gender)meta.push(u.gender==='male'?'♂':'♀');
   T('pf-meta',meta.join(' · ')||'—');
-  T('pf-gw',u.goal_weight?u.goal_weight+' кг':'—');T('pf-pname',u.name||'—');
-  const swLabel=u.start_weight&&u.start_weight>0?(u.start_weight.toFixed(1)+' кг · '+(u.goal_type==='gain'?'набор':'похудение')):'не задан';
+  // Tile: нормы — goal_weight
+  T('pf-gw',u.goal_weight?(u.goal_weight+' кг · цель'):'укажи цель');
+  T('pf-pname',u.name||'—');
+  // Tile: вес и цель
+  const swLabel=u.start_weight&&u.start_weight>0?(u.start_weight.toFixed(1)+' → '+(u.goal_weight?u.goal_weight.toFixed(1)+' кг':'...')):'не задан';
   T('pf-sw',swLabel);
+  // Tile: профиль subtitle
+  const tileProfileParts=[];
+  if(u.name)tileProfileParts.push(u.name);
+  if(u.height)tileProfileParts.push(u.height+' см');
+  if(u.age)tileProfileParts.push(u.age+' л');
+  T('pf-tile-profile',tileProfileParts.join(' · ')||'—');
   // Design label
   const labels={classic:'классический',linear:'линейный',bento:'бенто'};
   T('pf-design-val',labels[getHomeDesign()]||'классический');
+  // BMI stats row in hero
   const bmiRow=$('pf-bmi-row');
   if(u.height&&wl.length){
     const cw=wl[wl.length-1].weight,h2=u.height/100;
-    T('pf-bmi',+(cw/h2/h2).toFixed(1));T('pf-ideal',+((u.height-100)*.9).toFixed(1));
+    T('pf-bmi',+(cw/h2/h2).toFixed(1));
+    T('pf-ideal',+((u.height-100)*.9).toFixed(1));
     T('pf-bmr',Math.round(u.gender==='female'?10*cw+6.25*u.height-5*(u.age||25)-161:10*cw+6.25*u.height-5*(u.age||25)+5));
-    if(bmiRow)bmiRow.style.display='';
+    if(bmiRow)bmiRow.style.display='flex';
   }else if(bmiRow)bmiRow.style.display='none';
 }
 
