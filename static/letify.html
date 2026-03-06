@@ -92,16 +92,16 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;touch-action:pan-y;
   scrollbar-width:none;
-  transform:translateX(100%);
-  transition:transform .36s cubic-bezier(.32,1,.54,1);
+  opacity:0;
+  transform:translateY(6px);
+  transition:opacity .2s ease,transform .2s ease;
   pointer-events:none;
   display:flex;flex-direction:column;
-  backface-visibility:hidden;-webkit-backface-visibility:hidden;
-  will-change:transform;
+  will-change:opacity,transform;
   contain:layout;
 }
 .push-page::-webkit-scrollbar{display:none}
-.push-page.open{transform:translateX(0);pointer-events:all}
+.push-page.open{opacity:1;transform:none;pointer-events:all}
 .pp-hdr{
   flex-shrink:0;
   padding-top:calc(var(--st) + 10px);padding-bottom:12px;
@@ -2960,23 +2960,20 @@ function pushPage(id){
   document.getElementById('nav')?.classList.add('gone');
   const pp=document.getElementById(id);
   if(pp){
-    // сброс позиции без анимации, потом через RAF включаем — transition срабатывает чисто
-    pp.style.transition='none';
-    pp.style.transform='translateX(100%)';
+    // force layout flush перед добавлением класса чтобы transition сработал чисто
+    pp.getBoundingClientRect();
+    pp.classList.add('open');
     pp.scrollTop=0;
     const body=pp.querySelector('.pp-body');if(body)body.scrollTop=0;
-    requestAnimationFrame(()=>{
-      pp.style.transition='';
-      pp.style.transform='';
-      pp.classList.add('open');
-    });
   }
-  requestAnimationFrame(()=>requestAnimationFrame(()=>_populatePP(id)));
+  // defer populate чтобы не блокировать первый кадр анимации
+  requestAnimationFrame(()=>_populatePP(id));
   if(tg?.BackButton){
     tg.BackButton.show();
+    // каждой странице — свой обработчик назад
     const handler=id==='pp-cal'?calBackOrPop:id==='pp-scanner'?scannerBack:popPage;
     tg.BackButton.onClick(handler);
-    tg.BackButton._letifyHandler=handler;
+    tg.BackButton._letifyHandler=handler; // сохраняем чтобы снять в popPage
   }
   tg?.HapticFeedback?.impactOccurred('light');
 }
@@ -2984,18 +2981,16 @@ function popPage(doRender=true){
   if(!curPushPage)return;
   if(curPushPage==='pp-pdata')_saveProfileSilent();
   if(curPushPage==='pp-goals')_saveGoalsSilent();
-  if(curPushPage==='pp-scanner')stopScanner(false);
+  if(curPushPage==='pp-scanner')stopScanner(false);  // keep stream alive — no permission dialog
   if(curPushPage==='pp-weight-chart'){
     const wrap=document.getElementById('wchart-svg-wrap');
     if(wrap)wrap.innerHTML='';
   }
   const pp=document.getElementById(curPushPage);
   if(pp){
-    pp.classList.remove('open'); // CSS transition: translateX(0) → translateX(100%)
     pp.style.pointerEvents='none';
-    // после завершения анимации сбрасываем pointer-events через transition
-    const onEnd=()=>{pp.style.pointerEvents='';pp.removeEventListener('transitionend',onEnd);};
-    pp.addEventListener('transitionend',onEnd);
+    pp.classList.remove('open');
+    setTimeout(()=>{pp.style.pointerEvents='';},220);
   }
   const prev=_pageStack.pop()||null;
   curPushPage=prev;
