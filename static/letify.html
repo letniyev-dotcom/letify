@@ -407,15 +407,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 /* ══ ACT CARD ══ */
 /* ══ LEGACY .ac .pill (kept for pp-done-acts list) ══ */
-.ac{background:var(--bg2);border-radius:var(--r);padding:12px;display:flex;align-items:flex-start;gap:10px;box-shadow:var(--sh);margin-bottom:8px;transition:opacity .16s;position:relative;overflow:hidden;}
-.tg-dark .ac{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);box-shadow:none}
-.ac.done{opacity:.46}
-.ac-ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.ac-body{flex:1;min-width:0}
-.ac-name{font-size:14px;font-weight:800;margin-bottom:2px}
-.ac-name.done-text{text-decoration:line-through;opacity:.6}
-.ac-sub{font-size:11px;color:var(--hint);font-weight:600}
-.pill{display:inline-flex;align-items:center;padding:3px 9px;border-radius:99px;font-size:10px;font-weight:800;white-space:nowrap;margin-top:5px}
+.pill{display:inline-flex;align-items:center;padding:3px 9px;border-radius:99px;font-size:10px;font-weight:800;white-space:nowrap}
 .p-ok{background:rgba(82,193,119,.12);color:var(--green)}
 .p-late{background:rgba(244,92,92,.1);color:var(--red)}
 .p-soon{background:rgba(255,107,53,.1);color:var(--sun)}
@@ -433,35 +425,22 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   padding:17px 17px 15px;
   display:flex;flex-direction:column;gap:0;
   position:relative;overflow:hidden;
-  cursor:pointer;
   margin-bottom:10px;
-  contain:layout style;
-  transition:transform .15s cubic-bezier(.4,0,.2,1),border-color .3s;
   -webkit-tap-highlight-color:transparent;
 }
 .tg-dark .pl-mo-hero{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.1)}
-.pl-mo-hero:active{transform:scale(.988)}
 
-/* Hero glow blob */
+/* Static glow — no animation */
 .pl-mo-glow{
   position:absolute;top:-60px;right:-60px;
   width:180px;height:180px;border-radius:50%;
-  opacity:.09;pointer-events:none;
-  transition:opacity .5s;
-}
-.pl-mo-hero.is-now .pl-mo-glow{
-  opacity:.16;
-  animation:pl-glow-pulse 2.8s ease-in-out infinite;
-}
-@keyframes pl-glow-pulse{
-  0%,100%{opacity:.12;transform:scale(1)}
-  50%    {opacity:.22;transform:scale(1.08)}
+  opacity:.08;pointer-events:none;
 }
 
 /* Hero top row: badge + duration */
 .pl-mo-hero-top{
   display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:13px;position:relative;z-index:1;
+  margin-bottom:13px;
 }
 .pl-mo-badge{
   display:inline-flex;align-items:center;gap:5px;
@@ -469,80 +448,66 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   font-size:10px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;
 }
 .pl-mo-bd{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;}
-.pl-mo-bd-now{animation:pl-dot-pulse 1.8s ease-in-out infinite}
-@keyframes pl-dot-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.6);opacity:.5}}
 .pl-mo-dur{font-size:12px;font-weight:700;color:var(--hint)}
 .tg-dark .pl-mo-dur{color:rgba(255,255,255,.4)}
 
 /* Hero body: icon + name/time */
-.pl-mo-hero-body{
-  display:flex;align-items:center;gap:14px;
-  margin-bottom:13px;position:relative;z-index:1;
-}
+.pl-mo-hero-body{display:flex;align-items:center;gap:14px;margin-bottom:13px;}
 .pl-mo-ico{
   width:62px;height:62px;border-radius:19px;
   display:flex;align-items:center;justify-content:center;
   font-size:26px;flex-shrink:0;
-  transition:transform .2s cubic-bezier(.34,1.56,.64,1);
 }
-.pl-mo-hero:active .pl-mo-ico{transform:scale(.92)}
 .pl-mo-hero-info{flex:1;min-width:0}
-.pl-mo-name{
-  font-size:21px;font-weight:900;
-  letter-spacing:-.04em;line-height:1.1;
-  color:var(--text);
-}
+.pl-mo-name{font-size:21px;font-weight:900;letter-spacing:-.04em;line-height:1.1;color:var(--text);}
 .pl-mo-time-row{
   display:flex;align-items:center;gap:5px;
-  margin-top:4px;
-  font-size:12px;font-weight:700;color:var(--hint);
+  margin-top:4px;font-size:12px;font-weight:700;color:var(--hint);
 }
 .tg-dark .pl-mo-time-row{color:rgba(255,255,255,.4)}
 
 /* Hero foot: progress + button */
-.pl-mo-hero-foot{
-  display:flex;align-items:center;gap:12px;
-  position:relative;z-index:1;
-}
+.pl-mo-hero-foot{display:flex;align-items:center;gap:12px;}
 .pl-mo-prog-wrap{flex:1;display:flex;flex-direction:column;gap:4px}
 .pl-mo-prog{height:4px;background:rgba(0,0,0,.07);border-radius:99px;overflow:hidden}
 .tg-dark .pl-mo-prog{background:rgba(255,255,255,.08)}
-.pl-mo-prog-fill{height:100%;border-radius:99px;transition:width .9s cubic-bezier(.25,.46,.45,.94)}
+.pl-mo-prog-fill{height:100%;border-radius:99px;}
 .pl-mo-prog-lbl{font-size:10px;font-weight:700;color:var(--hint)}
 .tg-dark .pl-mo-prog-lbl{color:rgba(255,255,255,.35)}
 
-/* Hero done button */
+/* Hero done button — default state */
 .pl-mo-do-btn{
-  display:flex;align-items:center;gap:7px;
+  display:flex;align-items:center;justify-content:center;gap:7px;
   padding:11px 16px;border-radius:14px;border:none;
   color:#fff;font-family:inherit;font-size:13px;font-weight:800;
   cursor:pointer;flex-shrink:0;white-space:nowrap;
-  transition:transform .13s cubic-bezier(.34,1.56,.64,1),opacity .13s,box-shadow .13s;
-  will-change:transform;
+  position:relative;overflow:hidden;
   -webkit-tap-highlight-color:transparent;
+  transition:opacity .12s;
 }
-.pl-mo-do-btn:active{transform:scale(.9);opacity:.85;box-shadow:none!important}
+.pl-mo-do-btn:active{opacity:.7}
 
-/* Hero done overlay */
-.pl-mo-done-ov{
-  position:absolute;inset:0;border-radius:22px;
-  background:linear-gradient(135deg,rgba(68,191,121,.97),rgba(40,160,88,.97));
-  display:flex;align-items:center;justify-content:center;
-  gap:10px;
-  opacity:0;pointer-events:none;
-  transition:opacity .2s ease;
-  font-size:16px;font-weight:900;color:#fff;
-  letter-spacing:-.01em;z-index:50;
+/* Countdown drain bar — drawn OVER the button */
+.pl-mo-do-btn::after{
+  content:'';
+  position:absolute;
+  bottom:0;left:0;right:0;height:100%;
+  background:rgba(0,0,0,.22);
+  transform-origin:right center;
+  transform:scaleX(0);
+  pointer-events:none;
 }
-.pl-mo-hero.completing .pl-mo-done-ov{opacity:1}
-.pl-mo-hero.completing{pointer-events:none}
-
-/* Hero enter animation */
-@keyframes pl-hero-in{
-  from{opacity:0;transform:translateY(16px) scale(.95)}
-  to  {opacity:1;transform:none}
+.pl-mo-do-btn.counting{
+  cursor:pointer;
 }
-.pl-hero-enter{animation:pl-hero-in .38s cubic-bezier(.34,1.3,.64,1) both}
+.pl-mo-do-btn.counting::after{
+  transform:scaleX(1);
+  animation:btn-drain 3.5s linear forwards;
+}
+@keyframes btn-drain{
+  from{transform:scaleX(1)}
+  to  {transform:scaleX(0)}
+}
 
 /* Section labels */
 .pl-mo-label{
@@ -553,21 +518,19 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 }
 .tg-dark .pl-mo-label{color:rgba(255,255,255,.3)}
 
-/* Queue horizontal track */
+/* Queue horizontal track — no snap, no overscroll tricks */
 .pl-mo-track{
   overflow-x:auto;overflow-y:hidden;
   scrollbar-width:none;
   -webkit-overflow-scrolling:touch;
-  scroll-snap-type:x mandatory;
-  overscroll-behavior-x:contain;
   margin:0 -14px;padding:0 14px;
 }
 .pl-mo-track::-webkit-scrollbar{display:none}
-.pl-mo-row{display:flex;gap:8px;width:max-content;padding:2px 2px 4px}
+.pl-mo-row{display:flex;gap:8px;padding:2px 2px 8px}
 
-/* Queue card */
+/* Queue card — minimal, no will-change, no contain */
 .pl-mo-qcard{
-  width:144px;flex-shrink:0;
+  width:148px;flex-shrink:0;
   background:var(--bg2);
   border:1px solid rgba(0,0,0,.07);
   border-radius:18px;
@@ -575,65 +538,41 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   display:flex;flex-direction:column;gap:8px;
   cursor:pointer;
   position:relative;overflow:hidden;
-  scroll-snap-align:start;
-  contain:layout style;
-  transition:transform .15s cubic-bezier(.34,1.56,.64,1),opacity .2s,border-color .2s;
-  will-change:transform;
   -webkit-tap-highlight-color:transparent;
+  transition:opacity .12s;
 }
 .tg-dark .pl-mo-qcard{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.08)}
-.pl-mo-qcard:active{transform:scale(.93)}
-.pl-mo-qcard.is-future{background:rgba(0,0,0,.025);border-color:rgba(0,0,0,.04);cursor:default}
-.pl-mo-qcard.is-future:active{transform:none}
-.tg-dark .pl-mo-qcard.is-future{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.04)}
-.pl-mo-qcard.is-future .pl-mo-qname{opacity:.35}
-.pl-mo-qcard.is-future .pl-mo-qtime{opacity:.3}
-.pl-mo-qcard.is-future .pl-mo-qico{opacity:.25}
+.pl-mo-qcard:active{opacity:.65}
+.pl-mo-qcard.is-future{opacity:.45;cursor:default}
+.pl-mo-qcard.is-future:active{opacity:.45}
 
 .pl-mo-future-tag{
-  position:absolute;top:9px;right:9px;
   display:flex;align-items:center;gap:3px;
   background:rgba(0,0,0,.06);
   border-radius:99px;padding:3px 7px;
   font-size:9px;font-weight:800;color:var(--hint);
+  width:fit-content;
 }
 .tg-dark .pl-mo-future-tag{background:rgba(255,255,255,.08)}
-
-.pl-mo-qico{
-  width:36px;height:36px;border-radius:12px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:16px;flex-shrink:0;
-}
-.pl-mo-qname{
-  font-size:12.5px;font-weight:800;letter-spacing:-.01em;line-height:1.3;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  color:var(--text);
-}
+.pl-mo-qico{width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.pl-mo-qname{font-size:12.5px;font-weight:800;letter-spacing:-.01em;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text);}
 .pl-mo-qtime{font-size:10px;font-weight:700;color:var(--hint)}
-.pl-mo-qbadge{
-  display:inline-flex;align-items:center;gap:3px;
-  padding:3px 8px;border-radius:99px;
-  font-size:9.5px;font-weight:800;
-  width:fit-content;margin-top:auto;
-}
+.pl-mo-qbadge{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:99px;font-size:9.5px;font-weight:800;width:fit-content;margin-top:auto;}
 
-/* Queue card done overlay */
-.pl-mo-qcard-done{
-  position:absolute;inset:0;border-radius:18px;
-  background:linear-gradient(135deg,rgba(68,191,121,.96),rgba(40,160,88,.96));
-  display:flex;align-items:center;justify-content:center;
-  opacity:0;pointer-events:none;
-  transition:opacity .18s ease;
+/* Queue countdown bar */
+.pl-mo-qcard .pl-mo-qbar{
+  position:absolute;bottom:0;left:0;right:0;height:3px;
+  background:var(--green);
+  transform-origin:right center;
+  transform:scaleX(0);
+  pointer-events:none;
+  border-radius:0 0 18px 18px;
 }
-.pl-mo-qcard.completing .pl-mo-qcard-done{opacity:1}
-.pl-mo-qcard.completing{pointer-events:none}
-
-/* Queue card stagger enter */
-@keyframes pl-q-in{
-  from{opacity:0;transform:translateX(14px) scale(.95)}
-  to  {opacity:1;transform:none}
+.pl-mo-qcard.counting .pl-mo-qbar{
+  transform:scaleX(1);
+  animation:btn-drain 3.5s linear forwards;
 }
-.pl-q-enter{opacity:0;animation:pl-q-in .32s cubic-bezier(.34,1.3,.64,1) both}
+.pl-mo-qcard.counting{cursor:pointer}
 
 /* +more card */
 .pl-mo-more{
@@ -644,24 +583,51 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
   gap:4px;cursor:pointer;
-  scroll-snap-align:start;
   min-height:108px;
-  transition:background .14s,transform .12s;
+  -webkit-tap-highlight-color:transparent;
+  transition:opacity .12s;
 }
-.pl-mo-more:active{transform:scale(.93);background:rgba(255,107,53,.1)}
+.pl-mo-more:active{opacity:.65}
 .pl-mo-more-num{font-size:18px;font-weight:900;color:var(--sun)}
 .pl-mo-more-lbl{font-size:10px;font-weight:700;color:rgba(255,107,53,.5)}
 
-/* Timer bar on hero completing */
-.pl-mo-timer-bar{
-  position:absolute;bottom:0;left:0;
-  height:3px;
-  background:linear-gradient(90deg,rgba(68,191,121,.5),var(--green));
-  border-radius:0 99px 99px 0;
-  transition:width 3.55s linear;
-  pointer-events:none;
-  z-index:60;
+/* ══ DONE ACTS PAGE ══ */
+.da-list{display:flex;flex-direction:column;gap:8px;padding:14px}
+.da-item{
+  display:flex;align-items:center;gap:12px;
+  background:var(--bg2);
+  border-radius:18px;
+  padding:14px 14px 14px 14px;
+  border:1px solid rgba(0,0,0,.05);
+  position:relative;overflow:hidden;
 }
+.tg-dark .da-item{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.07)}
+.da-ico{
+  width:46px;height:46px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+}
+.da-info{flex:1;min-width:0}
+.da-name{font-size:14px;font-weight:800;letter-spacing:-.01em;line-height:1.2}
+.da-sub{font-size:11px;font-weight:600;color:var(--hint);margin-top:2px}
+.da-check{
+  width:28px;height:28px;border-radius:50%;
+  background:rgba(82,193,119,.15);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.da-stripe{
+  position:absolute;left:0;top:0;bottom:0;
+  width:3.5px;border-radius:18px 0 0 18px;
+}
+.da-empty{
+  text-align:center;padding:48px 20px;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  opacity:.45;
+}
+.da-empty-ico{font-size:38px}
+.da-empty-t{font-size:14px;font-weight:800}
+.da-empty-s{font-size:12px;font-weight:600;color:var(--hint)}
 
 /* ══ SLEEP DOTS ══ */
 .sq{display:flex;gap:3px}
@@ -2665,14 +2631,10 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 <div class="push-page" id="pp-done-acts">
   <div class="pp-hdr">
     <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
-    <div><div class="pp-title">выполненные</div><div class="pp-subtitle">задачи сегодня</div></div>
+    <div><div class="pp-title">выполнено</div><div class="pp-subtitle" id="done-acts-subtitle">сегодня</div></div>
   </div>
-  <div class="pp-body">
-    <div class="m3-card" style="padding:0;overflow:hidden">
-      <div class="hist-scroll" id="done-acts-list" style="padding:10px 12px">
-        <div style="text-align:center;padding:20px;color:var(--hint);font-size:13px;font-weight:600">нет выполненных задач</div>
-      </div>
-    </div>
+  <div class="pp-body" style="padding:0">
+    <div id="done-acts-list"></div>
   </div>
 </div>
 
@@ -3330,12 +3292,32 @@ function _populatePP(id){
   if(id==='pp-done-acts'){
     const acts=gActs().filter(a=>a.completed);
     const el=document.getElementById('done-acts-list');
+    const sub=document.getElementById('done-acts-subtitle');
+    if(sub)sub.textContent=acts.length?`${acts.length} ${_nWord(acts.length)} сегодня`:'сегодня';
     if(el){
-      if(!acts.length){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--hint);font-size:13px;font-weight:600">нет выполненных задач</div>';}
-      else{el.innerHTML=acts.map(a=>{
-        const col=ACT_COL[a.type]||'#FF9800';
-        return`<div class="ac done" style="margin-bottom:8px"><div class="ac-ico" style="background:${col}18">✅</div><div class="ac-body"><div class="ac-name done-text">${a.name}</div><div class="ac-sub">${fmtRange(a)} · ${a.duration} мин</div></div><span class="pill p-ok">✓</span></div>`;
-      }).join('');}
+      if(!acts.length){
+        el.innerHTML=`<div class="da-empty">
+          <div class="da-empty-ico">🏆</div>
+          <div class="da-empty-t">пока ничего нет</div>
+          <div class="da-empty-s">выполненные задачи появятся здесь</div>
+        </div>`;
+      } else {
+        el.innerHTML='<div class="da-list">'+acts.map(a=>{
+          const col=ACT_COL[a.type]||'#FF6B35';
+          const ico=ACT_ICO[a.type]||'✨';
+          return`<div class="da-item">
+            <div class="da-stripe" style="background:${col}"></div>
+            <div class="da-ico" style="background:${col}15">${ico}</div>
+            <div class="da-info">
+              <div class="da-name">${a.name}</div>
+              <div class="da-sub">${fmtRange(a)} · ${a.duration} мин</div>
+            </div>
+            <div class="da-check">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </div>`;
+        }).join('')+'</div>';
+      }
     }
   }
   if(id==='pp-plan-settings'){
@@ -3702,38 +3684,21 @@ async function deleteActDirectly(id,cardEl){
   lsSet('acts_'+TODAY,C.acts_today);
   if(_completingMap.has(id)){clearTimeout(_completingMap.get(id).hideTimer);_completingMap.delete(id);}
 
-  function _afterDelete(){
+  toast('удалено');
+  if(cardEl&&cardEl.parentNode){
+    cardEl.style.opacity='0';
+    cardEl.style.transition='opacity .2s ease';
+    setTimeout(()=>{
+      if(cardEl.parentNode)cardEl.remove();
+      renderPlan(false);
+      _updatePlanCounters();
+      renderHome();
+    },210);
+  }else{
+    renderPlan(false);
     _updatePlanCounters();
     renderHome();
   }
-
-  toast('удалено');
-  // For Momentum: hero is full-width, qcard is in scroll row — animate out then re-render
-  if(cardEl&&cardEl.parentNode){
-    const isHero=cardEl.classList.contains('pl-mo-hero');
-    requestAnimationFrame(()=>requestAnimationFrame(()=>{
-      cardEl.style.transition='opacity .25s ease, transform .25s ease';
-      cardEl.style.opacity='0';
-      cardEl.style.transform=isHero?'translateY(-8px) scale(.97)':'translateX(28px) scale(.95)';
-      setTimeout(()=>{
-        if(isHero){
-          // Hero: collapse height so queue rises smoothly
-          const h=cardEl.offsetHeight;
-          cardEl.style.transition='height .22s ease, margin-bottom .22s ease, padding .22s ease';
-          cardEl.style.height=h+'px';
-          requestAnimationFrame(()=>{
-            cardEl.style.height='0';cardEl.style.marginBottom='0';
-            cardEl.style.paddingTop='0';cardEl.style.paddingBottom='0';
-            cardEl.style.overflow='hidden';
-          });
-          setTimeout(()=>{if(cardEl.parentNode)cardEl.remove();renderPlan(true);_afterDelete();},230);
-        }else{
-          if(cardEl.parentNode)cardEl.remove();
-          renderPlan(false);_afterDelete();
-        }
-      },260);
-    }));
-  }else{renderPlan(false);_afterDelete();}
   await apiPost('/api/activity/delete',{act_id:id});
 }
 
@@ -3745,90 +3710,92 @@ async function completeAct(id){
   const act=C.acts_today.find(x=>x.id===id);
   if(!act)return;
 
-  // Undo
+  // — UNDO —
   if(_completingMap.has(id)){
-    const{hideTimer}=_completingMap.get(id);
+    const{hideTimer,btnEl,qEl,origBtnHTML,origBtnStyle}=_completingMap.get(id);
     clearTimeout(hideTimer);_completingMap.delete(id);
     C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:0}:x);
     lsSet('acts_'+TODAY,C.acts_today);
     _updatePlanCounters();
+    // Restore button
+    if(btnEl){
+      btnEl.classList.remove('counting');
+      btnEl.innerHTML=origBtnHTML;
+      btnEl.style.cssText=origBtnStyle;
+      btnEl.onclick=(e)=>{e.stopPropagation();completeAct(id);};
+    }
+    // Restore qcard
+    if(qEl){
+      qEl.classList.remove('counting');
+      qEl.onclick=()=>completeAct(id);
+    }
     toast('отменено');tg?.HapticFeedback?.notificationOccurred('warning');
-    renderPlan(true);
     apiPost('/api/activity/uncomplete',{act_id:id});
     return;
   }
 
   if(act.completed)return;
-
   tg?.HapticFeedback?.notificationOccurred('success');
-  toast('выполнено 🎉');
 
-  // Find which element was tapped: hero or qcard
+  // — Mark complete in data —
+  C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:1}:x);
+  lsSet('acts_'+TODAY,C.acts_today);
+  _updatePlanCounters();
+  renderHome();
+
+  // — Find elements —
   const heroEl=document.querySelector(`#pl-list .pl-mo-hero[data-id="${id}"]`);
   const qEl=document.querySelector(`#pl-list .pl-mo-qcard[data-id="${id}"]`);
 
+  let btnEl=null,origBtnHTML='',origBtnStyle='';
+
   if(heroEl){
-    // Show done overlay on hero
-    heroEl.classList.add('completing');
-    // Add timer bar
-    const timerBar=document.createElement('div');
-    timerBar.className='pl-mo-timer-bar';timerBar.style.width='100%';
-    heroEl.appendChild(timerBar);
-    requestAnimationFrame(()=>requestAnimationFrame(()=>{timerBar.style.width='0%';}));
+    btnEl=heroEl.querySelector('.pl-mo-do-btn');
+    if(btnEl){
+      origBtnHTML=btnEl.innerHTML;
+      origBtnStyle=btnEl.getAttribute('style')||'';
+      // Switch button to "отмена" + countdown
+      btnEl.classList.add('counting');
+      btnEl.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>отмена';
+      btnEl.onclick=(e)=>{e.stopPropagation();completeAct(id);};
+    }
+  } else if(qEl){
+    // Queue card: show drain bar
+    qEl.classList.add('counting');
+    qEl.onclick=()=>completeAct(id);
+  }
 
-    C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:1}:x);
-    lsSet('acts_'+TODAY,C.acts_today);
-    _updatePlanCounters();
-    renderHome();
+  const target=heroEl||qEl;
 
+  if(target){
     const hideTimer=setTimeout(()=>{
       _completingMap.delete(id);
-      requestAnimationFrame(()=>{
-        heroEl.style.transition='opacity .3s ease, transform .3s cubic-bezier(.4,0,.2,1)';
-        heroEl.style.opacity='0';
-        heroEl.style.transform='translateY(-6px) scale(.97)';
-        setTimeout(()=>{
-          heroEl.style.transition='none';
-          heroEl.style.height='0';heroEl.style.marginBottom='0';
-          heroEl.style.paddingTop='0';heroEl.style.paddingBottom='0';
-          heroEl.style.overflow='hidden';
-          requestAnimationFrame(()=>{
-            if(heroEl.parentNode)heroEl.remove();
-            if(_completingMap.size===0){renderPlan(true);renderHome();}
-          });
-        },320);
-      });
-    },3600);
+      // Simple opacity fade, then snap-remove
+      target.style.opacity='0';
+      target.style.transition='opacity .22s ease';
+      setTimeout(()=>{
+        target.style.transition='none';
+        target.style.height='0px';
+        target.style.minHeight='0';
+        target.style.overflow='hidden';
+        target.style.margin='0';
+        target.style.padding='0';
+        requestAnimationFrame(()=>{
+          if(target.parentNode)target.remove();
+          if(_completingMap.size===0){renderPlan(false);renderHome();}
+        });
+      },220);
+    },3500);
 
-    _completingMap.set(id,{hideTimer});
-    await apiPost('/api/activity/complete',{act_id:id});
-
-  }else if(qEl){
-    // Queue card: quick overlay → re-render
-    qEl.classList.add('completing');
-    qEl.style.pointerEvents='none';
-
-    C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:1}:x);
-    lsSet('acts_'+TODAY,C.acts_today);
-    _updatePlanCounters();
-    renderHome();
-
-    const hideTimer=setTimeout(()=>{
-      _completingMap.delete(id);
-      if(_completingMap.size===0){renderPlan(false);renderHome();}
-    },700);
-
-    _completingMap.set(id,{hideTimer});
-    await apiPost('/api/activity/complete',{act_id:id});
-
-  }else{
-    // Card not in DOM (shouldn't happen)
-    C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:1}:x);
-    lsSet('acts_'+TODAY,C.acts_today);
-    _updatePlanCounters();
+    _completingMap.set(id,{hideTimer,btnEl,qEl:qEl||null,origBtnHTML,origBtnStyle});
+    toast('выполнено 🎉 · нажми отмена');
+  } else {
+    // Not in DOM
     await apiPost('/api/activity/complete',{act_id:id});
     await reload();
+    return;
   }
+  await apiPost('/api/activity/complete',{act_id:id});
 }
 
 function _updatePlanCounters(){
@@ -4442,7 +4409,6 @@ function renderPlan(animated){
   }
   if(empty)empty.style.display='none';
 
-  // animated defaults to false if not passed
   if(animated===undefined)animated=false;
 
   const MAX_Q=5;
@@ -4457,37 +4423,23 @@ function renderPlan(animated){
   const showP=isNow||isSoon;
   const prog=isNow?Math.round((hst.p||0)*100):isSoon?58:0;
   const hpc=_moStatusClass(hst.s);
-  const dark=document.body.classList.contains('tg-dark');
-
-  // Badge dot class
-  const dotClass=isNow?'pl-mo-bd pl-mo-bd-now':'pl-mo-bd';
 
   let html=`
-  <!-- NOW LABEL -->
   <div class="pl-mo-label">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="${col}"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
     сейчас в фокусе
   </div>
-
-  <!-- HERO CARD -->
-  <div class="pl-mo-hero${isNow?' is-now':''}${animated?' pl-hero-enter':''}"
+  <div class="pl-mo-hero${isNow?' is-now':''}"
     data-id="${hero.id}"
     oncontextmenu="event.preventDefault()"
     ontouchstart="startLongPress(${hero.id},this)"
     ontouchend="cancelLongPress()"
     ontouchmove="cancelLongPress()">
-
     <div class="pl-mo-glow" style="background:radial-gradient(circle,${col},transparent)"></div>
-
-    <!-- Badge + duration -->
     <div class="pl-mo-hero-top">
-      <div class="pl-mo-badge ${hpc}">
-        <span class="${dotClass}"></span>${hst.l}
-      </div>
+      <div class="pl-mo-badge ${hpc}"><span class="pl-mo-bd"></span>${hst.l}</div>
       <div class="pl-mo-dur">${hero.duration} мин</div>
     </div>
-
-    <!-- Icon + name/time -->
     <div class="pl-mo-hero-body">
       <div class="pl-mo-ico" style="background:${col}1a">${ico}</div>
       <div class="pl-mo-hero-info">
@@ -4498,8 +4450,6 @@ function renderPlan(animated){
         </div>
       </div>
     </div>
-
-    <!-- Progress + button -->
     <div class="pl-mo-hero-foot">
       ${showP?`<div class="pl-mo-prog-wrap">
         <div class="pl-mo-prog"><div class="pl-mo-prog-fill" style="width:${prog}%;background:${col}"></div></div>
@@ -4507,51 +4457,38 @@ function renderPlan(animated){
       </div>`:'<div style="flex:1"></div>'}
       <button class="pl-mo-do-btn complete-btn-js"
         onclick="event.stopPropagation();completeAct(${hero.id})"
-        style="background:${col};box-shadow:0 4px 16px ${col}44">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        style="background:${col};box-shadow:0 4px 14px ${col}44">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         выполнить
       </button>
     </div>
-
-    <div class="pl-mo-done-ov">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-      отлично!
-    </div>
   </div>`;
 
-  // Queue section
   if(queue.length>0||hidden.length>0){
     html+=`
   <div class="pl-mo-label" style="margin-top:4px">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="opacity:.5"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="opacity:.5"><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="3" cy="12" r="1.5"/></svg>
     в очереди
   </div>
-  <div class="pl-mo-track">
-    <div class="pl-mo-row">`;
+  <div class="pl-mo-track"><div class="pl-mo-row">`;
 
-    queue.forEach((t,i)=>{
+    queue.forEach(t=>{
       const c=ACT_COL[t.type]||'#FF6B35';
       const ic=ACT_ICO[t.type]||'✨';
       const st=actStatus(t);
       const pc=_moStatusClass(st.s);
       const fut=st.s==='later';
-      const delay=animated?(i*55+55)+'ms':'0ms';
-      html+=`<div class="pl-mo-qcard${fut?' is-future':''}${animated?' pl-q-enter':''}"
-        data-id="${t.id}"
-        style="${animated?'animation-delay:'+delay:''}"
+      html+=`<div class="pl-mo-qcard${fut?' is-future':''}" data-id="${t.id}"
         oncontextmenu="event.preventDefault()"
         ontouchstart="startLongPress(${t.id},this)"
         ontouchend="cancelLongPress()"
         ontouchmove="cancelLongPress()"
-        ${!fut?`onclick="event.stopPropagation();completeAct(${t.id})"`:''}>
-        ${fut?`<div class="pl-mo-future-tag"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>${t.time}</div>`:''}
+        ${!fut?`onclick="completeAct(${t.id})"`:''}>
         <div class="pl-mo-qico" style="background:${c}18">${ic}</div>
         <div class="pl-mo-qname">${t.name}</div>
-        <div class="pl-mo-qtime">${t.duration} мин</div>
-        ${!fut?`<div class="pl-mo-qbadge ${pc}"><span class="pl-mo-bd" style="width:5px;height:5px"></span>${st.l}</div>`:'<div style="height:18px"></div>'}
-        <div class="pl-mo-qcard-done">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        </div>
+        <div class="pl-mo-qtime">${fmtRange(t)} · ${t.duration} мин</div>
+        ${!fut?`<div class="pl-mo-qbadge ${pc}"><span class="pl-mo-bd" style="width:5px;height:5px"></span>${st.l}</div>`:`<div class="pl-mo-future-tag">${t.time}</div>`}
+        <div class="pl-mo-qbar"></div>
       </div>`;
     });
 
@@ -4562,7 +4499,6 @@ function renderPlan(animated){
         <div class="pl-mo-more-lbl">${_nWord(hidden.length)}</div>
       </div>`;
     }
-
     html+=`</div></div>`;
   }
 
