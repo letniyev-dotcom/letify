@@ -406,13 +406,8 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .banner::after{content:'';position:absolute;right:-10px;top:-10px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.1);pointer-events:none}
 
 /* ══ ACT CARD ══ */
-.ac{
-  background:var(--bg2);border-radius:var(--r);padding:12px;
-  display:flex;align-items:flex-start;gap:10px;
-  box-shadow:var(--sh);margin-bottom:8px;
-  transition:opacity .16s;
-  position:relative;overflow:hidden;
-}
+/* ══ LEGACY .ac .pill (kept for pp-done-acts list) ══ */
+.ac{background:var(--bg2);border-radius:var(--r);padding:12px;display:flex;align-items:flex-start;gap:10px;box-shadow:var(--sh);margin-bottom:8px;transition:opacity .16s;position:relative;overflow:hidden;}
 .tg-dark .ac{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);box-shadow:none}
 .ac.done{opacity:.46}
 .ac-ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
@@ -426,18 +421,246 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .p-soon{background:rgba(255,107,53,.1);color:var(--sun)}
 .p-now{background:rgba(78,174,229,.12);color:var(--water)}
 .p-later{background:rgba(0,0,0,.05);color:var(--hint)}
-.ac-bar{margin-top:7px;height:4px;background:rgba(0,0,0,.06);border-radius:99px;overflow:hidden}
-.ac-barf{height:100%;border-radius:99px;transition:width .4s ease}
-.tg-dark .ac-bar{background:rgba(255,255,255,.1)}
 
-/* ══ COMPLETING TIMER BAR — 3.5s ══ */
-.ac-timer-bar{
+/* ══ MOMENTUM PLAN ══ */
+
+/* Hero card */
+.pl-mo-hero{
+  flex-shrink:0;
+  background:var(--bg2);
+  border-radius:22px;
+  border:1px solid rgba(0,0,0,.07);
+  padding:17px 17px 15px;
+  display:flex;flex-direction:column;gap:0;
+  position:relative;overflow:hidden;
+  cursor:pointer;
+  margin-bottom:10px;
+  contain:layout style;
+  transition:transform .15s cubic-bezier(.4,0,.2,1),border-color .3s;
+  -webkit-tap-highlight-color:transparent;
+}
+.tg-dark .pl-mo-hero{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.1)}
+.pl-mo-hero:active{transform:scale(.988)}
+
+/* Hero glow blob */
+.pl-mo-glow{
+  position:absolute;top:-60px;right:-60px;
+  width:180px;height:180px;border-radius:50%;
+  opacity:.09;pointer-events:none;
+  transition:opacity .5s;
+}
+.pl-mo-hero.is-now .pl-mo-glow{
+  opacity:.16;
+  animation:pl-glow-pulse 2.8s ease-in-out infinite;
+}
+@keyframes pl-glow-pulse{
+  0%,100%{opacity:.12;transform:scale(1)}
+  50%    {opacity:.22;transform:scale(1.08)}
+}
+
+/* Hero top row: badge + duration */
+.pl-mo-hero-top{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:13px;position:relative;z-index:1;
+}
+.pl-mo-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 11px;border-radius:99px;
+  font-size:10px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;
+}
+.pl-mo-bd{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.pl-mo-bd-now{animation:pl-dot-pulse 1.8s ease-in-out infinite}
+@keyframes pl-dot-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.6);opacity:.5}}
+.pl-mo-dur{font-size:12px;font-weight:700;color:var(--hint)}
+.tg-dark .pl-mo-dur{color:rgba(255,255,255,.4)}
+
+/* Hero body: icon + name/time */
+.pl-mo-hero-body{
+  display:flex;align-items:center;gap:14px;
+  margin-bottom:13px;position:relative;z-index:1;
+}
+.pl-mo-ico{
+  width:62px;height:62px;border-radius:19px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;flex-shrink:0;
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1);
+}
+.pl-mo-hero:active .pl-mo-ico{transform:scale(.92)}
+.pl-mo-hero-info{flex:1;min-width:0}
+.pl-mo-name{
+  font-size:21px;font-weight:900;
+  letter-spacing:-.04em;line-height:1.1;
+  color:var(--text);
+}
+.pl-mo-time-row{
+  display:flex;align-items:center;gap:5px;
+  margin-top:4px;
+  font-size:12px;font-weight:700;color:var(--hint);
+}
+.tg-dark .pl-mo-time-row{color:rgba(255,255,255,.4)}
+
+/* Hero foot: progress + button */
+.pl-mo-hero-foot{
+  display:flex;align-items:center;gap:12px;
+  position:relative;z-index:1;
+}
+.pl-mo-prog-wrap{flex:1;display:flex;flex-direction:column;gap:4px}
+.pl-mo-prog{height:4px;background:rgba(0,0,0,.07);border-radius:99px;overflow:hidden}
+.tg-dark .pl-mo-prog{background:rgba(255,255,255,.08)}
+.pl-mo-prog-fill{height:100%;border-radius:99px;transition:width .9s cubic-bezier(.25,.46,.45,.94)}
+.pl-mo-prog-lbl{font-size:10px;font-weight:700;color:var(--hint)}
+.tg-dark .pl-mo-prog-lbl{color:rgba(255,255,255,.35)}
+
+/* Hero done button */
+.pl-mo-do-btn{
+  display:flex;align-items:center;gap:7px;
+  padding:11px 16px;border-radius:14px;border:none;
+  color:#fff;font-family:inherit;font-size:13px;font-weight:800;
+  cursor:pointer;flex-shrink:0;white-space:nowrap;
+  transition:transform .13s cubic-bezier(.34,1.56,.64,1),opacity .13s,box-shadow .13s;
+  will-change:transform;
+  -webkit-tap-highlight-color:transparent;
+}
+.pl-mo-do-btn:active{transform:scale(.9);opacity:.85;box-shadow:none!important}
+
+/* Hero done overlay */
+.pl-mo-done-ov{
+  position:absolute;inset:0;border-radius:22px;
+  background:linear-gradient(135deg,rgba(68,191,121,.97),rgba(40,160,88,.97));
+  display:flex;align-items:center;justify-content:center;
+  gap:10px;
+  opacity:0;pointer-events:none;
+  transition:opacity .2s ease;
+  font-size:16px;font-weight:900;color:#fff;
+  letter-spacing:-.01em;z-index:50;
+}
+.pl-mo-hero.completing .pl-mo-done-ov{opacity:1}
+.pl-mo-hero.completing{pointer-events:none}
+
+/* Hero enter animation */
+@keyframes pl-hero-in{
+  from{opacity:0;transform:translateY(16px) scale(.95)}
+  to  {opacity:1;transform:none}
+}
+.pl-hero-enter{animation:pl-hero-in .38s cubic-bezier(.34,1.3,.64,1) both}
+
+/* Section labels */
+.pl-mo-label{
+  display:flex;align-items:center;gap:6px;
+  font-size:10px;font-weight:800;
+  color:var(--hint);letter-spacing:.07em;text-transform:uppercase;
+  margin-bottom:8px;flex-shrink:0;
+}
+.tg-dark .pl-mo-label{color:rgba(255,255,255,.3)}
+
+/* Queue horizontal track */
+.pl-mo-track{
+  overflow-x:auto;overflow-y:hidden;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+  scroll-snap-type:x mandatory;
+  overscroll-behavior-x:contain;
+  margin:0 -14px;padding:0 14px;
+}
+.pl-mo-track::-webkit-scrollbar{display:none}
+.pl-mo-row{display:flex;gap:8px;width:max-content;padding:2px 2px 4px}
+
+/* Queue card */
+.pl-mo-qcard{
+  width:144px;flex-shrink:0;
+  background:var(--bg2);
+  border:1px solid rgba(0,0,0,.07);
+  border-radius:18px;
+  padding:13px 12px 12px;
+  display:flex;flex-direction:column;gap:8px;
+  cursor:pointer;
+  position:relative;overflow:hidden;
+  scroll-snap-align:start;
+  contain:layout style;
+  transition:transform .15s cubic-bezier(.34,1.56,.64,1),opacity .2s,border-color .2s;
+  will-change:transform;
+  -webkit-tap-highlight-color:transparent;
+}
+.tg-dark .pl-mo-qcard{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.08)}
+.pl-mo-qcard:active{transform:scale(.93)}
+.pl-mo-qcard.is-future{background:rgba(0,0,0,.025);border-color:rgba(0,0,0,.04);cursor:default}
+.pl-mo-qcard.is-future:active{transform:none}
+.tg-dark .pl-mo-qcard.is-future{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.04)}
+.pl-mo-qcard.is-future .pl-mo-qname{opacity:.35}
+.pl-mo-qcard.is-future .pl-mo-qtime{opacity:.3}
+.pl-mo-qcard.is-future .pl-mo-qico{opacity:.25}
+
+.pl-mo-future-tag{
+  position:absolute;top:9px;right:9px;
+  display:flex;align-items:center;gap:3px;
+  background:rgba(0,0,0,.06);
+  border-radius:99px;padding:3px 7px;
+  font-size:9px;font-weight:800;color:var(--hint);
+}
+.tg-dark .pl-mo-future-tag{background:rgba(255,255,255,.08)}
+
+.pl-mo-qico{
+  width:36px;height:36px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;
+}
+.pl-mo-qname{
+  font-size:12.5px;font-weight:800;letter-spacing:-.01em;line-height:1.3;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  color:var(--text);
+}
+.pl-mo-qtime{font-size:10px;font-weight:700;color:var(--hint)}
+.pl-mo-qbadge{
+  display:inline-flex;align-items:center;gap:3px;
+  padding:3px 8px;border-radius:99px;
+  font-size:9.5px;font-weight:800;
+  width:fit-content;margin-top:auto;
+}
+
+/* Queue card done overlay */
+.pl-mo-qcard-done{
+  position:absolute;inset:0;border-radius:18px;
+  background:linear-gradient(135deg,rgba(68,191,121,.96),rgba(40,160,88,.96));
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity .18s ease;
+}
+.pl-mo-qcard.completing .pl-mo-qcard-done{opacity:1}
+.pl-mo-qcard.completing{pointer-events:none}
+
+/* Queue card stagger enter */
+@keyframes pl-q-in{
+  from{opacity:0;transform:translateX(14px) scale(.95)}
+  to  {opacity:1;transform:none}
+}
+.pl-q-enter{opacity:0;animation:pl-q-in .32s cubic-bezier(.34,1.3,.64,1) both}
+
+/* +more card */
+.pl-mo-more{
+  width:88px;flex-shrink:0;
+  border-radius:18px;
+  border:1.5px dashed rgba(255,107,53,.22);
+  background:rgba(255,107,53,.04);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:4px;cursor:pointer;
+  scroll-snap-align:start;
+  min-height:108px;
+  transition:background .14s,transform .12s;
+}
+.pl-mo-more:active{transform:scale(.93);background:rgba(255,107,53,.1)}
+.pl-mo-more-num{font-size:18px;font-weight:900;color:var(--sun)}
+.pl-mo-more-lbl{font-size:10px;font-weight:700;color:rgba(255,107,53,.5)}
+
+/* Timer bar on hero completing */
+.pl-mo-timer-bar{
   position:absolute;bottom:0;left:0;
   height:3px;
-  background:linear-gradient(90deg,rgba(82,193,119,.5),var(--green));
+  background:linear-gradient(90deg,rgba(68,191,121,.5),var(--green));
   border-radius:0 99px 99px 0;
   transition:width 3.55s linear;
   pointer-events:none;
+  z-index:60;
 }
 
 /* ══ SLEEP DOTS ══ */
@@ -837,10 +1060,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .md-item-g{font-size:10px;font-weight:700;color:var(--hint);margin-top:1px}
 .md-empty{text-align:center;padding:28px 16px;color:var(--hint);font-size:13px;font-weight:600}
 
-/* ══ PLAN ADD BTN — no longer used, kept for compat ══ */
-#pl-add-btn-wrap{display:none}
-
-/* ══ PLAN PAGE MD3 ══ */
+/* ══ PLAN PAGE MOMENTUM LAYOUT ══ */
 #p-plan{
   display:flex;flex-direction:column;
   overflow:hidden !important;
@@ -850,34 +1070,18 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 #p-plan .plan-hdr{
   flex-shrink:0;padding:0 16px 10px;
 }
-#pl-tasks-outer{
+/* Momentum scroll area — no bg card wrapper */
+#pl-mo-scroll{
   flex:1;
-  overflow:hidden;
-  display:flex;flex-direction:column;
-  margin:0 14px calc(var(--page-bot) - 10px);
-}
-#pl-tasks-container{
-  flex:1;
-  background:var(--bg2);
-  border-radius:20px;
-  border:1px solid var(--brd);
-  overflow:hidden;
-  display:flex;flex-direction:column;
-}
-.tg-dark #pl-tasks-container{background:rgba(255,255,255,.025);border-color:rgba(255,255,255,.07)}
-.tg-dark #ps-tasks-outer-wrap{background:rgba(255,255,255,.025);border-color:rgba(255,255,255,.07)}
-#pl-tasks-scroll{
-  flex:1;overflow-y:auto;overflow-x:hidden;
+  overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;scrollbar-width:none;
-  padding:10px 12px 14px;
+  padding:4px 14px calc(var(--page-bot) + 4px);
 }
-#pl-tasks-scroll::-webkit-scrollbar{display:none}
-#ps-tasks-list::-webkit-scrollbar{display:none}
+#pl-mo-scroll::-webkit-scrollbar{display:none}
 .pl-empty{
   flex:1;display:flex;flex-direction:column;
   align-items:center;justify-content:center;
-  padding:30px 16px;
-  gap:8px;opacity:.5;
+  padding:30px 16px;gap:8px;opacity:.5;
 }
 .pl-empty svg{opacity:.3}
 
@@ -1625,17 +1829,13 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       </svg>
     </div>
   </div>
-  <div style="font-size:9px;font-weight:700;color:var(--hint);text-align:center;letter-spacing:.04em;opacity:.7;padding-bottom:8px">удержи карточку чтобы удалить</div>
+  <div style="font-size:9px;font-weight:700;color:var(--hint);text-align:center;letter-spacing:.04em;opacity:.7;padding-bottom:4px">удержи карточку чтобы удалить</div>
 </div>
-<div id="pl-tasks-outer">
-  <div id="pl-tasks-container">
-    <div id="pl-tasks-scroll">
-      <div id="pl-list"></div>
-      <div id="pl-empty" style="display:none" class="pl-empty">
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/></svg>
-        <div style="font-size:13px;font-weight:700">нет задач на сегодня</div>
-      </div>
-    </div>
+<div id="pl-mo-scroll">
+  <div id="pl-list"></div>
+  <div id="pl-empty" style="display:none" class="pl-empty">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/></svg>
+    <div style="font-size:13px;font-weight:700">нет задач на сегодня</div>
   </div>
 </div>
 </div>
@@ -2923,7 +3123,7 @@ async function apiPost(path,body){
 async function reload(){
   await loadData();
   if(_completingMap.size>0)return;
-  const rMap={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};
+  const rMap={home:renderHome,track:()=>renderTrack(trackTab),plan:()=>renderPlan(false),sleep:renderSleep,progress:renderProgress,profile:renderProfile};
   rMap[curTab]?.();
 }
 
@@ -2957,7 +3157,7 @@ function navTo(tab){
   const pg=document.getElementById('p-'+tab);
   if(pg){pg.scrollTop=0;pg.classList.add('active');}
   TABS.forEach(t=>{document.getElementById('nt-'+t)?.classList.toggle('on',t===tab);});
-  const renders={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};
+  const renders={home:renderHome,track:()=>renderTrack(trackTab),plan:()=>renderPlan(false),sleep:renderSleep,progress:renderProgress,profile:renderProfile};
   renders[tab]?.();
   tg?.HapticFeedback?.selectionChanged();
 }
@@ -3032,7 +3232,7 @@ function popPage(doRender=true){
       if(tg.BackButton._letifyHandler){tg.BackButton.offClick(tg.BackButton._letifyHandler);tg.BackButton._letifyHandler=null;}
       tg.BackButton.offClick(popPage);
     }
-    if(doRender&&_completingMap.size===0){const renders={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};renders[curTab]?.();}
+    if(doRender&&_completingMap.size===0){const renders={home:renderHome,track:()=>renderTrack(trackTab),plan:()=>renderPlan(false),sleep:renderSleep,progress:renderProgress,profile:renderProfile};renders[curTab]?.();}
   }
 }
 
@@ -3482,7 +3682,7 @@ function startLongPress(id,el){
     const savedEl=_lpEl;_lpEl=null;
     tg?.HapticFeedback?.notificationOccurred('warning');
     navigator.vibrate?.([30,10,40]);
-    const actName=savedEl?.querySelector('.ac-name')?.textContent||'активность';
+    const actName=savedEl?.querySelector('.pl-mo-name,.ac-name')?.textContent||'активность';
     if(confirm('удалить «'+actName+'»?'))deleteActDirectly(id,savedEl);
   },700);
 }
@@ -3503,38 +3703,44 @@ async function deleteActDirectly(id,cardEl){
   if(_completingMap.has(id)){clearTimeout(_completingMap.get(id).hideTimer);_completingMap.delete(id);}
 
   function _afterDelete(){
-    const acts=gActs();
-    const done=acts.filter(a=>a.completed).length,total=acts.length;
-    T('pl-cnt',total?`${done}/${total}`:'0/0');
-    requestAnimationFrame(()=>{const r=$('pl-ring');if(r)r.setAttribute('stroke-dashoffset',125.7*(1-(total?done/total:0)));});
+    _updatePlanCounters();
     renderHome();
   }
 
   toast('удалено');
+  // For Momentum: hero is full-width, qcard is in scroll row — animate out then re-render
   if(cardEl&&cardEl.parentNode){
+    const isHero=cardEl.classList.contains('pl-mo-hero');
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
       cardEl.style.transition='opacity .25s ease, transform .25s ease';
       cardEl.style.opacity='0';
-      cardEl.style.transform='translateX(32px) scale(0.95)';
+      cardEl.style.transform=isHero?'translateY(-8px) scale(.97)':'translateX(28px) scale(.95)';
       setTimeout(()=>{
-        cardEl.style.transition='none';
-        cardEl.style.height='0';cardEl.style.marginBottom='0';
-        cardEl.style.paddingTop='0';cardEl.style.paddingBottom='0';
-        cardEl.style.overflow='hidden';
-        requestAnimationFrame(()=>{
+        if(isHero){
+          // Hero: collapse height so queue rises smoothly
+          const h=cardEl.offsetHeight;
+          cardEl.style.transition='height .22s ease, margin-bottom .22s ease, padding .22s ease';
+          cardEl.style.height=h+'px';
+          requestAnimationFrame(()=>{
+            cardEl.style.height='0';cardEl.style.marginBottom='0';
+            cardEl.style.paddingTop='0';cardEl.style.paddingBottom='0';
+            cardEl.style.overflow='hidden';
+          });
+          setTimeout(()=>{if(cardEl.parentNode)cardEl.remove();renderPlan(true);_afterDelete();},230);
+        }else{
           if(cardEl.parentNode)cardEl.remove();
-          _afterDelete();
-        });
+          renderPlan(false);_afterDelete();
+        }
       },260);
     }));
-  }else{_afterDelete();}
+  }else{renderPlan(false);_afterDelete();}
   await apiPost('/api/activity/delete',{act_id:id});
 }
 
 /* ══ COMPLETING MAP ══ */
 const _completingMap=new Map();
 
-/* ══ COMPLETE ACT ══ */
+/* ══ COMPLETE ACT (MOMENTUM) ══ */
 async function completeAct(id){
   const act=C.acts_today.find(x=>x.id===id);
   if(!act)return;
@@ -3545,71 +3751,80 @@ async function completeAct(id){
     clearTimeout(hideTimer);_completingMap.delete(id);
     C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:0}:x);
     lsSet('acts_'+TODAY,C.acts_today);
-    const cardEl=document.querySelector(`#pl-list .ac[data-id="${id}"]`);
-    if(cardEl){
-      cardEl.classList.remove('done');
-      const nameEl=cardEl.querySelector('.ac-name');if(nameEl)nameEl.classList.remove('done-text');
-      const pill=cardEl.querySelector('.pill');if(pill){pill.className='pill p-later';pill.innerHTML='запланировано';}
-      const btn=cardEl.querySelector('.complete-btn-js');
-      if(btn){btn.innerHTML='✓';btn.style.background='';btn.style.color='';btn.onclick=()=>completeAct(id);}
-      const tb=cardEl.querySelector('.ac-timer-bar');if(tb)tb.remove();
-      cardEl.style.transition='height .25s ease';cardEl.style.height='';cardEl.style.overflow='';
-    }
     _updatePlanCounters();
     toast('отменено');tg?.HapticFeedback?.notificationOccurred('warning');
+    renderPlan(true);
     apiPost('/api/activity/uncomplete',{act_id:id});
     return;
   }
 
   if(act.completed)return;
 
-  C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:1}:x);
-  lsSet('acts_'+TODAY,C.acts_today);
-  _updatePlanCounters();
-  renderHome();
   tg?.HapticFeedback?.notificationOccurred('success');
   toast('выполнено 🎉');
 
-  const cardEl=document.querySelector(`#pl-list .ac[data-id="${id}"]`);
-  if(cardEl){
-    cardEl.classList.add('done');
-    const nameEl=cardEl.querySelector('.ac-name');if(nameEl)nameEl.classList.add('done-text');
-    const pill=cardEl.querySelector('.pill');if(pill){pill.className='pill p-ok';pill.innerHTML='✓ выполнено';}
-    const btn=cardEl.querySelector('.complete-btn-js');
-    if(btn){btn.innerHTML='↩';btn.style.background='rgba(82,193,119,.12)';btn.style.color='var(--green)';btn.onclick=(e)=>{e.stopPropagation();completeAct(id);};}
+  // Find which element was tapped: hero or qcard
+  const heroEl=document.querySelector(`#pl-list .pl-mo-hero[data-id="${id}"]`);
+  const qEl=document.querySelector(`#pl-list .pl-mo-qcard[data-id="${id}"]`);
 
+  if(heroEl){
+    // Show done overlay on hero
+    heroEl.classList.add('completing');
+    // Add timer bar
     const timerBar=document.createElement('div');
-    timerBar.className='ac-timer-bar';timerBar.style.width='100%';
-    cardEl.appendChild(timerBar);
+    timerBar.className='pl-mo-timer-bar';timerBar.style.width='100%';
+    heroEl.appendChild(timerBar);
     requestAnimationFrame(()=>requestAnimationFrame(()=>{timerBar.style.width='0%';}));
+
+    C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:1}:x);
+    lsSet('acts_'+TODAY,C.acts_today);
+    _updatePlanCounters();
+    renderHome();
 
     const hideTimer=setTimeout(()=>{
       _completingMap.delete(id);
       requestAnimationFrame(()=>{
-        // Fade + slide right ONLY — no height collapse, button never jumps
-        cardEl.style.transition='opacity .35s ease, transform .35s cubic-bezier(.4,0,.2,1)';
-        cardEl.style.opacity='0';
-        cardEl.style.transform='translateX(72px)';
-        // After fade done — collapse silently with no transition so it snaps away
+        heroEl.style.transition='opacity .3s ease, transform .3s cubic-bezier(.4,0,.2,1)';
+        heroEl.style.opacity='0';
+        heroEl.style.transform='translateY(-6px) scale(.97)';
         setTimeout(()=>{
-          cardEl.style.transition='none';
-          cardEl.style.height='0';
-          cardEl.style.marginBottom='0';
-          cardEl.style.paddingTop='0';
-          cardEl.style.paddingBottom='0';
-          cardEl.style.overflow='hidden';
-          // Remove from DOM next frame so layout settles without animation
+          heroEl.style.transition='none';
+          heroEl.style.height='0';heroEl.style.marginBottom='0';
+          heroEl.style.paddingTop='0';heroEl.style.paddingBottom='0';
+          heroEl.style.overflow='hidden';
           requestAnimationFrame(()=>{
-            if(cardEl.parentNode)cardEl.remove();
-            if(_completingMap.size===0){renderPlan();renderHome();}
+            if(heroEl.parentNode)heroEl.remove();
+            if(_completingMap.size===0){renderPlan(true);renderHome();}
           });
-        },360);
+        },320);
       });
     },3600);
 
     _completingMap.set(id,{hideTimer});
     await apiPost('/api/activity/complete',{act_id:id});
+
+  }else if(qEl){
+    // Queue card: quick overlay → re-render
+    qEl.classList.add('completing');
+    qEl.style.pointerEvents='none';
+
+    C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:1}:x);
+    lsSet('acts_'+TODAY,C.acts_today);
+    _updatePlanCounters();
+    renderHome();
+
+    const hideTimer=setTimeout(()=>{
+      _completingMap.delete(id);
+      if(_completingMap.size===0){renderPlan(false);renderHome();}
+    },700);
+
+    _completingMap.set(id,{hideTimer});
+    await apiPost('/api/activity/complete',{act_id:id});
+
   }else{
+    // Card not in DOM (shouldn't happen)
+    C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:1}:x);
+    lsSet('acts_'+TODAY,C.acts_today);
     _updatePlanCounters();
     await apiPost('/api/activity/complete',{act_id:id});
     await reload();
@@ -3665,7 +3880,7 @@ function resetAllData(){
   };
   _completingMap.clear();
   lsSet('ds',1);
-  renderHome();renderProfile();renderProgress();renderPlan();renderSleep();renderTrack(trackTab);
+  renderHome();renderProfile();renderProgress();renderPlan(false);renderSleep();renderTrack(trackTab);
   toast('все данные сброшены');
   tg?.HapticFeedback?.notificationOccurred('warning');
   apiPost('/api/reset',{});
@@ -3764,7 +3979,7 @@ async function submitAct(){
   C.acts_today=[...(C.acts_today||[]),newAct];
   // Always persist to localStorage — prevents task from disappearing when reload() overwrites C.acts_today
   lsSet('acts_'+TODAY,C.acts_today);
-  renderPlan();renderHome();toast(name+' добавлено 🎉');tg?.HapticFeedback?.notificationOccurred('success');
+  renderPlan(true);renderHome();toast(name+' добавлено 🎉');tg?.HapticFeedback?.notificationOccurred('success');
   await apiPost('/api/activity/create',{name,type:_actType,time,duration:_actDur,repeat_days:days});
   // After server confirms, reload but MERGE to avoid race condition killing the new task
   if(UID){
@@ -3773,7 +3988,7 @@ async function submitAct(){
     const srvIds=new Set((C.acts_today||[]).map(a=>a.id));
     const onlyLocal=lsActs.filter(a=>!srvIds.has(a.id));
     if(onlyLocal.length)C.acts_today=[...C.acts_today,...onlyLocal];
-    if(_completingMap.size===0){renderPlan();renderHome();}
+    if(_completingMap.size===0){}
   }
 }
 
@@ -4206,7 +4421,7 @@ function renderCal(){
   }).join(''));
 }
 
-function renderPlan(){
+function renderPlan(animated){
   if(_completingMap.size>0)return;
   const acts=gActs();const now=new Date();
   const mons=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
@@ -4214,38 +4429,152 @@ function renderPlan(){
   const done=acts.filter(a=>a.completed).length,total=acts.length;
   T('pl-cnt',total?`${done}/${total}`:'0/0');
   requestAnimationFrame(()=>{const r=$('pl-ring');if(r)r.setAttribute('stroke-dashoffset',125.7*(1-(total?done/total:0)));});
+
   const list=$('pl-list');
   const empty=$('pl-empty');
-  const activeTasks=acts.filter(a=>!a.completed);
+  const active=acts.filter(a=>!a.completed);
+
   if(!list)return;
-  if(!activeTasks.length){
+  if(!active.length){
     list.innerHTML='';
     if(empty)empty.style.display='flex';
     return;
   }
   if(empty)empty.style.display='none';
-  list.innerHTML=activeTasks.map(a=>{
-    const ico=ACT_ICO[a.type]||'✨',col=ACT_COL[a.type]||'#FF9800';
-    const st=actStatus(a);
-    const pc={done:'p-ok',now:'p-now',soon:'p-soon',late:'p-late',later:'p-later'}[st.s]||'p-later';
-    const pct=st.s==='now'?Math.round((st.p||0)*100):0;
-    const bar=['now','soon'].includes(st.s);
-    return`<div class="ac" data-id="${a.id}" oncontextmenu="event.preventDefault()" ontouchstart="startLongPress(${a.id},this)" ontouchend="cancelLongPress()" ontouchmove="cancelLongPress()">
-      <div class="ac-ico" style="background:${col}18">${ico}</div>
-      <div class="ac-body">
-        <div class="ac-name">${a.name}</div>
-        <div class="ac-sub">${fmtRange(a)} · ${a.duration} мин</div>
-        <span class="pill ${pc}">${st.l}</span>
-        ${bar?`<div class="ac-bar"><div class="ac-barf" style="width:${st.s==='soon'?70:pct}%;background:${st.s==='now'?'var(--water)':'rgba(255,107,53,.35)'}"></div></div>`:''}
+
+  // animated defaults to false if not passed
+  if(animated===undefined)animated=false;
+
+  const MAX_Q=5;
+  const hero=active[0];
+  const queue=active.slice(1,MAX_Q+1);
+  const hidden=active.slice(MAX_Q+1);
+  const col=ACT_COL[hero.type]||'#FF6B35';
+  const ico=ACT_ICO[hero.type]||'✨';
+  const hst=actStatus(hero);
+  const isNow=hst.s==='now';
+  const isSoon=hst.s==='soon';
+  const showP=isNow||isSoon;
+  const prog=isNow?Math.round((hst.p||0)*100):isSoon?58:0;
+  const hpc=_moStatusClass(hst.s);
+  const dark=document.body.classList.contains('tg-dark');
+
+  // Badge dot class
+  const dotClass=isNow?'pl-mo-bd pl-mo-bd-now':'pl-mo-bd';
+
+  let html=`
+  <!-- NOW LABEL -->
+  <div class="pl-mo-label">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="${col}"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+    сейчас в фокусе
+  </div>
+
+  <!-- HERO CARD -->
+  <div class="pl-mo-hero${isNow?' is-now':''}${animated?' pl-hero-enter':''}"
+    data-id="${hero.id}"
+    oncontextmenu="event.preventDefault()"
+    ontouchstart="startLongPress(${hero.id},this)"
+    ontouchend="cancelLongPress()"
+    ontouchmove="cancelLongPress()">
+
+    <div class="pl-mo-glow" style="background:radial-gradient(circle,${col},transparent)"></div>
+
+    <!-- Badge + duration -->
+    <div class="pl-mo-hero-top">
+      <div class="pl-mo-badge ${hpc}">
+        <span class="${dotClass}"></span>${hst.l}
       </div>
-      <div style="flex-shrink:0">
-        <button class="btn btn-g complete-btn-js" style="padding:7px 11px;font-size:12px;border-radius:9px" onclick="completeAct(${a.id})">✓</button>
+      <div class="pl-mo-dur">${hero.duration} мин</div>
+    </div>
+
+    <!-- Icon + name/time -->
+    <div class="pl-mo-hero-body">
+      <div class="pl-mo-ico" style="background:${col}1a">${ico}</div>
+      <div class="pl-mo-hero-info">
+        <div class="pl-mo-name">${hero.name}</div>
+        <div class="pl-mo-time-row">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="${col}" stroke-width="2" stroke-linecap="round" opacity=".7"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          ${fmtRange(hero)}
+        </div>
       </div>
-    </div>`;
-  }).join('');
+    </div>
+
+    <!-- Progress + button -->
+    <div class="pl-mo-hero-foot">
+      ${showP?`<div class="pl-mo-prog-wrap">
+        <div class="pl-mo-prog"><div class="pl-mo-prog-fill" style="width:${prog}%;background:${col}"></div></div>
+        <div class="pl-mo-prog-lbl">${isNow?prog+'% выполнено':hst.l}</div>
+      </div>`:'<div style="flex:1"></div>'}
+      <button class="pl-mo-do-btn complete-btn-js"
+        onclick="event.stopPropagation();completeAct(${hero.id})"
+        style="background:${col};box-shadow:0 4px 16px ${col}44">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        выполнить
+      </button>
+    </div>
+
+    <div class="pl-mo-done-ov">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      отлично!
+    </div>
+  </div>`;
+
+  // Queue section
+  if(queue.length>0||hidden.length>0){
+    html+=`
+  <div class="pl-mo-label" style="margin-top:4px">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="opacity:.5"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+    в очереди
+  </div>
+  <div class="pl-mo-track">
+    <div class="pl-mo-row">`;
+
+    queue.forEach((t,i)=>{
+      const c=ACT_COL[t.type]||'#FF6B35';
+      const ic=ACT_ICO[t.type]||'✨';
+      const st=actStatus(t);
+      const pc=_moStatusClass(st.s);
+      const fut=st.s==='later';
+      const delay=animated?(i*55+55)+'ms':'0ms';
+      html+=`<div class="pl-mo-qcard${fut?' is-future':''}${animated?' pl-q-enter':''}"
+        data-id="${t.id}"
+        style="${animated?'animation-delay:'+delay:''}"
+        oncontextmenu="event.preventDefault()"
+        ontouchstart="startLongPress(${t.id},this)"
+        ontouchend="cancelLongPress()"
+        ontouchmove="cancelLongPress()"
+        ${!fut?`onclick="event.stopPropagation();completeAct(${t.id})"`:''}>
+        ${fut?`<div class="pl-mo-future-tag"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>${t.time}</div>`:''}
+        <div class="pl-mo-qico" style="background:${c}18">${ic}</div>
+        <div class="pl-mo-qname">${t.name}</div>
+        <div class="pl-mo-qtime">${t.duration} мин</div>
+        ${!fut?`<div class="pl-mo-qbadge ${pc}"><span class="pl-mo-bd" style="width:5px;height:5px"></span>${st.l}</div>`:'<div style="height:18px"></div>'}
+        <div class="pl-mo-qcard-done">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+      </div>`;
+    });
+
+    if(hidden.length>0){
+      html+=`<div class="pl-mo-more" onclick="openDoneActs()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--sun)" stroke-width="2" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        <div class="pl-mo-more-num">+${hidden.length}</div>
+        <div class="pl-mo-more-lbl">${_nWord(hidden.length)}</div>
+      </div>`;
+    }
+
+    html+=`</div></div>`;
+  }
+
+  list.innerHTML=html;
 }
 
-setInterval(()=>{if(curTab==='plan'&&_completingMap.size===0)renderPlan();},30000);
+function _moStatusClass(s){
+  return{done:'p-ok',now:'p-now',soon:'p-soon',late:'p-late',later:'p-later'}[s]||'p-later';
+}
+function _nWord(n){const a=Math.abs(n)%100;if(a>=11&&a<=19)return'задач';if(a%10===1)return'задача';if(a%10>=2&&a%10<=4)return'задачи';return'задач';}
+
+setInterval(()=>{if(curTab==='plan'&&_completingMap.size===0)renderPlan(false);},30000);
 
 function renderSleep(){
   const sl=gSL();
@@ -4832,7 +5161,7 @@ function startPsLongPress(id,el){
         setTimeout(()=>{if(saved.parentNode)saved.remove();},200);
       }
       _renderPsTasksList();
-      renderPlan();renderHome();
+      
       toast('удалено');
       apiPost('/api/activity/delete',{act_id:id});
     }
