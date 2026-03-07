@@ -2972,11 +2972,10 @@ function setTTab(t){
 
 function goToTrackTab(t){
   trackTab=t;
-  if(curTab==='track'&&!curPushPage){
-    setTTab(t);
-  }else{
+  // Переключаем DOM ДО того как страница стала видимой, чтобы не было мелькания
+  setTTab(t);
+  if(!(curTab==='track'&&!curPushPage)){
     navTo('track');
-    setTTab(t);
   }
 }
 
