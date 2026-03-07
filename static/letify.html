@@ -2841,7 +2841,10 @@ let C={
 async function loadData(){
   if(!UID){_demo();return;}
   try{
-    const r=await fetch(`${API_BASE}/api/data?uid=${UID}`);
+    const _ctrl=new AbortController();
+    const _tid=setTimeout(()=>_ctrl.abort(),5000);
+    const r=await fetch(`${API_BASE}/api/data?uid=${UID}`,{signal:_ctrl.signal});
+    clearTimeout(_tid);
     if(!r.ok)throw 0;
     const d=await r.json();
     C.user=d.user||C.user;C.settings=d.settings||C.settings;
@@ -5172,13 +5175,14 @@ document.addEventListener('DOMContentLoaded',async()=>{
   const pg=document.getElementById('p-home');
   if(pg){pg.classList.toggle('layout-linear',d==='linear');pg.classList.toggle('layout-bento',d==='bento');}
   ['classic','linear','bento'].forEach(k=>{const el=document.getElementById('dp-'+k);if(el)el.classList.toggle('selected',k===d);});
-  await loadData();
-  renderHome();
-  _updateNavAvatar(); // restore nav avatar from storage on startup
+  // Сплеш скрывается независимо от loadData — даже если fetch завис
   setTimeout(()=>{
     const sp=document.getElementById('splash');
     if(sp){sp.classList.add('hiding');setTimeout(()=>sp.remove(),520);}
-  },1200);
+  },1500);
+  await loadData();
+  renderHome();
+  _updateNavAvatar(); // restore nav avatar from storage on startup
   setInterval(async()=>{if(curTab==='home'&&_completingMap.size===0){await loadData();renderHome();}},30000);
   // освобождаем камеру только при сворачивании приложения
   document.addEventListener('visibilitychange',()=>{
