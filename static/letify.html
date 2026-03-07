@@ -26,6 +26,16 @@
 * { -webkit-font-smoothing: antialiased; text-rendering: optimizeSpeed; }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
 button,a,[onclick]{touch-action:manipulation;}
+
+/* ── Animatable CSS custom properties ──
+   Registering as <color> lets the browser interpolate them smoothly.
+   Everything that uses var(--sun) / var(--sun2) / var(--water) / var(--cal)
+   will transition automatically — banners, buttons, icons, rings, arcs. */
+@property --sun  { syntax:'<color>'; inherits:true; initial-value:#FF6B35; }
+@property --sun2 { syntax:'<color>'; inherits:true; initial-value:#FFAB40; }
+@property --water{ syntax:'<color>'; inherits:true; initial-value:#4EAEE5; }
+@property --cal  { syntax:'<color>'; inherits:true; initial-value:#F4814A; }
+
 :root{
   --bg:#FAF7F2;--bg2:#fff;--bg3:rgba(0,0,0,.05);
   --text:#1C1608;--hint:#A89F90;--brd:rgba(0,0,0,.07);
@@ -40,6 +50,8 @@ button,a,[onclick]{touch-action:manipulation;}
   --page-top:calc(var(--st) + 16px);
   /* adaptive hero color — default orange, overridden by _setPfHeroColor() */
   --pf-r:255;--pf-g:107;--pf-b:53;
+  /* smooth colour transitions — fires whenever JS changes --sun / --sun2 / etc */
+  transition:--sun .45s ease,--sun2 .45s ease,--water .45s ease,--cal .45s ease;
 }
 .pre-dark{
   --bg:#000000;--bg2:#000000;--bg3:rgba(255,255,255,.07);
@@ -2531,57 +2543,17 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
   <div class="pp-body">
     <div class="cg-grid" id="cg-grid">
-      <div class="cg-item" id="cg-sunset" data-id="sunset" onclick="setAccentTheme('sunset')">
-        <div class="cg-wrap" style="--ring:#FF6B35"><div class="cg-swatch" style="background:linear-gradient(135deg,#FF6B35,#FFAB40)"></div></div>
-        <div class="cg-lbl">закат</div>
+      <div class="cg-item" id="cg-terracotta" data-id="terracotta" onclick="setAccentTheme('terracotta')">
+        <div class="cg-wrap" style="--ring:#C05840"><div class="cg-swatch" style="background:linear-gradient(135deg,#C05840,#E08860)"></div></div>
+        <div class="cg-lbl">терракота</div>
       </div>
       <div class="cg-item" id="cg-peach" data-id="peach" onclick="setAccentTheme('peach')">
         <div class="cg-wrap" style="--ring:#FF8C69"><div class="cg-swatch" style="background:linear-gradient(135deg,#FF8C69,#FFD17A)"></div></div>
         <div class="cg-lbl">персик</div>
       </div>
-      <div class="cg-item" id="cg-mango" data-id="mango" onclick="setAccentTheme('mango')">
-        <div class="cg-wrap" style="--ring:#F5A623"><div class="cg-swatch" style="background:linear-gradient(135deg,#F5A623,#FFD65C)"></div></div>
-        <div class="cg-lbl">манго</div>
-      </div>
-      <div class="cg-item" id="cg-hibiscus" data-id="hibiscus" onclick="setAccentTheme('hibiscus')">
-        <div class="cg-wrap" style="--ring:#E85474"><div class="cg-swatch" style="background:linear-gradient(135deg,#E85474,#FF9FA0)"></div></div>
-        <div class="cg-lbl">гибискус</div>
-      </div>
-      <div class="cg-item" id="cg-lagoon" data-id="lagoon" onclick="setAccentTheme('lagoon')">
-        <div class="cg-wrap" style="--ring:#0CBFA0"><div class="cg-swatch" style="background:linear-gradient(135deg,#0CBFA0,#50D9C8)"></div></div>
-        <div class="cg-lbl">лагуна</div>
-      </div>
-      <div class="cg-item" id="cg-lime" data-id="lime" onclick="setAccentTheme('lime')">
-        <div class="cg-wrap" style="--ring:#76C442"><div class="cg-swatch" style="background:linear-gradient(135deg,#76C442,#C8E63A)"></div></div>
-        <div class="cg-lbl">лайм</div>
-      </div>
-      <div class="cg-item" id="cg-coral" data-id="coral" onclick="setAccentTheme('coral')">
-        <div class="cg-wrap" style="--ring:#FF4F6D"><div class="cg-swatch" style="background:linear-gradient(135deg,#FF4F6D,#FF8C61)"></div></div>
-        <div class="cg-lbl">кораллы</div>
-      </div>
-      <div class="cg-item" id="cg-watermelon" data-id="watermelon" onclick="setAccentTheme('watermelon')">
-        <div class="cg-wrap" style="--ring:#F52D56"><div class="cg-swatch" style="background:linear-gradient(135deg,#F52D56,#FF7B7B)"></div></div>
-        <div class="cg-lbl">арбуз</div>
-      </div>
-      <div class="cg-item" id="cg-sunflower" data-id="sunflower" onclick="setAccentTheme('sunflower')">
-        <div class="cg-wrap" style="--ring:#E8900A"><div class="cg-swatch" style="background:linear-gradient(135deg,#E8900A,#F5C842)"></div></div>
-        <div class="cg-lbl">подсолнух</div>
-      </div>
-      <div class="cg-item" id="cg-sakura" data-id="sakura" onclick="setAccentTheme('sakura')">
-        <div class="cg-wrap" style="--ring:#E8637A"><div class="cg-swatch" style="background:linear-gradient(135deg,#E8637A,#F4A7B9)"></div></div>
-        <div class="cg-lbl">сакура</div>
-      </div>
-      <div class="cg-item" id="cg-ocean" data-id="ocean" onclick="setAccentTheme('ocean')">
-        <div class="cg-wrap" style="--ring:#1E7FD8"><div class="cg-swatch" style="background:linear-gradient(135deg,#1E7FD8,#5BB8F5)"></div></div>
-        <div class="cg-lbl">океан</div>
-      </div>
-      <div class="cg-item" id="cg-violet" data-id="violet" onclick="setAccentTheme('violet')">
-        <div class="cg-wrap" style="--ring:#8B5CF6"><div class="cg-swatch" style="background:linear-gradient(135deg,#8B5CF6,#C084FC)"></div></div>
-        <div class="cg-lbl">фиолет</div>
-      </div>
-      <div class="cg-item" id="cg-mint" data-id="mint" onclick="setAccentTheme('mint')">
-        <div class="cg-wrap" style="--ring:#10B981"><div class="cg-swatch" style="background:linear-gradient(135deg,#10B981,#6EE7B7)"></div></div>
-        <div class="cg-lbl">мята</div>
+      <div class="cg-item" id="cg-sunset" data-id="sunset" onclick="setAccentTheme('sunset')">
+        <div class="cg-wrap" style="--ring:#FF6B35"><div class="cg-swatch" style="background:linear-gradient(135deg,#FF6B35,#FFAB40)"></div></div>
+        <div class="cg-lbl">закат</div>
       </div>
       <div class="cg-item" id="cg-tangerine" data-id="tangerine" onclick="setAccentTheme('tangerine')">
         <div class="cg-wrap" style="--ring:#F97316"><div class="cg-swatch" style="background:linear-gradient(135deg,#F97316,#FDE047)"></div></div>
@@ -2591,29 +2563,105 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
         <div class="cg-wrap" style="--ring:#B45309"><div class="cg-swatch" style="background:linear-gradient(135deg,#B45309,#D97706)"></div></div>
         <div class="cg-lbl">песок</div>
       </div>
-      <div class="cg-item" id="cg-apricot" data-id="apricot" onclick="setAccentTheme('apricot')">
-        <div class="cg-wrap" style="--ring:#F4845F"><div class="cg-swatch" style="background:linear-gradient(135deg,#F4845F,#FFBF8A)"></div></div>
-        <div class="cg-lbl">абрикос</div>
+      <div class="cg-item" id="cg-mango" data-id="mango" onclick="setAccentTheme('mango')">
+        <div class="cg-wrap" style="--ring:#F5A623"><div class="cg-swatch" style="background:linear-gradient(135deg,#F5A623,#FFD65C)"></div></div>
+        <div class="cg-lbl">манго</div>
       </div>
-      <div class="cg-item" id="cg-blossom" data-id="blossom" onclick="setAccentTheme('blossom')">
-        <div class="cg-wrap" style="--ring:#E8919A"><div class="cg-swatch" style="background:linear-gradient(135deg,#E8919A,#F4BEC8)"></div></div>
-        <div class="cg-lbl">цветение</div>
+      <div class="cg-item" id="cg-mimosa" data-id="mimosa" onclick="setAccentTheme('mimosa')">
+        <div class="cg-wrap" style="--ring:#D4BC20"><div class="cg-swatch" style="background:linear-gradient(135deg,#D4BC20,#EED848)"></div></div>
+        <div class="cg-lbl">мимоза</div>
       </div>
-      <div class="cg-item" id="cg-honey" data-id="honey" onclick="setAccentTheme('honey')">
-        <div class="cg-wrap" style="--ring:#E8A020"><div class="cg-swatch" style="background:linear-gradient(135deg,#E8A020,#F5D878)"></div></div>
-        <div class="cg-lbl">мёд</div>
+      <div class="cg-item" id="cg-matcha" data-id="matcha" onclick="setAccentTheme('matcha')">
+        <div class="cg-wrap" style="--ring:#8AAA18"><div class="cg-swatch" style="background:linear-gradient(135deg,#8AAA18,#C0D848)"></div></div>
+        <div class="cg-lbl">матча</div>
       </div>
-      <div class="cg-item" id="cg-rosegold" data-id="rosegold" onclick="setAccentTheme('rosegold')">
-        <div class="cg-wrap" style="--ring:#D4896A"><div class="cg-swatch" style="background:linear-gradient(135deg,#D4896A,#EBBEA0)"></div></div>
-        <div class="cg-lbl">розовое золото</div>
+      <div class="cg-item" id="cg-pineapple" data-id="pineapple" onclick="setAccentTheme('pineapple')">
+        <div class="cg-wrap" style="--ring:#A8C420"><div class="cg-swatch" style="background:linear-gradient(135deg,#A8C420,#D4E040)"></div></div>
+        <div class="cg-lbl">ананас</div>
       </div>
-      <div class="cg-item" id="cg-fig" data-id="fig" onclick="setAccentTheme('fig')">
-        <div class="cg-wrap" style="--ring:#C0607A">
-          <div class="cg-swatch" style="background:linear-gradient(135deg,#C0607A,#E8A0BA)">
-            <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-          </div>
-        </div>
-        <div class="cg-lbl">инжир</div>
+      <div class="cg-item" id="cg-olive" data-id="olive" onclick="setAccentTheme('olive')">
+        <div class="cg-wrap" style="--ring:#508C18"><div class="cg-swatch" style="background:linear-gradient(135deg,#508C18,#8CC030)"></div></div>
+        <div class="cg-lbl">олива</div>
+      </div>
+      <div class="cg-item" id="cg-lime" data-id="lime" onclick="setAccentTheme('lime')">
+        <div class="cg-wrap" style="--ring:#76C442"><div class="cg-swatch" style="background:linear-gradient(135deg,#76C442,#C8E63A)"></div></div>
+        <div class="cg-lbl">лайм</div>
+      </div>
+      <div class="cg-item" id="cg-fern" data-id="fern" onclick="setAccentTheme('fern')">
+        <div class="cg-wrap" style="--ring:#3AAB50"><div class="cg-swatch" style="background:linear-gradient(135deg,#3AAB50,#74D070)"></div></div>
+        <div class="cg-lbl">папоротник</div>
+      </div>
+      <div class="cg-item" id="cg-bamboo" data-id="bamboo" onclick="setAccentTheme('bamboo')">
+        <div class="cg-wrap" style="--ring:#48A070"><div class="cg-swatch" style="background:linear-gradient(135deg,#48A070,#88C898)"></div></div>
+        <div class="cg-lbl">бамбук</div>
+      </div>
+      <div class="cg-item" id="cg-mint" data-id="mint" onclick="setAccentTheme('mint')">
+        <div class="cg-wrap" style="--ring:#10B981"><div class="cg-swatch" style="background:linear-gradient(135deg,#10B981,#6EE7B7)"></div></div>
+        <div class="cg-lbl">мята</div>
+      </div>
+      <div class="cg-item" id="cg-lagoon" data-id="lagoon" onclick="setAccentTheme('lagoon')">
+        <div class="cg-wrap" style="--ring:#0CBFA0"><div class="cg-swatch" style="background:linear-gradient(135deg,#0CBFA0,#50D9C8)"></div></div>
+        <div class="cg-lbl">лагуна</div>
+      </div>
+      <div class="cg-item" id="cg-petrol" data-id="petrol" onclick="setAccentTheme('petrol')">
+        <div class="cg-wrap" style="--ring:#0D7A8A"><div class="cg-swatch" style="background:linear-gradient(135deg,#0D7A8A,#28AABB)"></div></div>
+        <div class="cg-lbl">петроль</div>
+      </div>
+      <div class="cg-item" id="cg-tropics" data-id="tropics" onclick="setAccentTheme('tropics')">
+        <div class="cg-wrap" style="--ring:#0898C8"><div class="cg-swatch" style="background:linear-gradient(135deg,#0898C8,#48C8E8)"></div></div>
+        <div class="cg-lbl">тропики</div>
+      </div>
+      <div class="cg-item" id="cg-ocean" data-id="ocean" onclick="setAccentTheme('ocean')">
+        <div class="cg-wrap" style="--ring:#1E7FD8"><div class="cg-swatch" style="background:linear-gradient(135deg,#1E7FD8,#5BB8F5)"></div></div>
+        <div class="cg-lbl">океан</div>
+      </div>
+      <div class="cg-item" id="cg-storm" data-id="storm" onclick="setAccentTheme('storm')">
+        <div class="cg-wrap" style="--ring:#3868C8"><div class="cg-swatch" style="background:linear-gradient(135deg,#3868C8,#78A8E8)"></div></div>
+        <div class="cg-lbl">гроза</div>
+      </div>
+      <div class="cg-item" id="cg-indigo" data-id="indigo" onclick="setAccentTheme('indigo')">
+        <div class="cg-wrap" style="--ring:#3C52C8"><div class="cg-swatch" style="background:linear-gradient(135deg,#3C52C8,#7090E0)"></div></div>
+        <div class="cg-lbl">индиго</div>
+      </div>
+      <div class="cg-item" id="cg-violet" data-id="violet" onclick="setAccentTheme('violet')">
+        <div class="cg-wrap" style="--ring:#8B5CF6"><div class="cg-swatch" style="background:linear-gradient(135deg,#8B5CF6,#C084FC)"></div></div>
+        <div class="cg-lbl">фиолет</div>
+      </div>
+      <div class="cg-item" id="cg-plum" data-id="plum" onclick="setAccentTheme('plum')">
+        <div class="cg-wrap" style="--ring:#9038C0"><div class="cg-swatch" style="background:linear-gradient(135deg,#9038C0,#C070E0)"></div></div>
+        <div class="cg-lbl">слива</div>
+      </div>
+      <div class="cg-item" id="cg-fuchsia" data-id="fuchsia" onclick="setAccentTheme('fuchsia')">
+        <div class="cg-wrap" style="--ring:#C028A0"><div class="cg-swatch" style="background:linear-gradient(135deg,#C028A0,#E870D0)"></div></div>
+        <div class="cg-lbl">фуксия</div>
+      </div>
+      <div class="cg-item" id="cg-mauve" data-id="mauve" onclick="setAccentTheme('mauve')">
+        <div class="cg-wrap" style="--ring:#A85888"><div class="cg-swatch" style="background:linear-gradient(135deg,#A85888,#D890B8)"></div></div>
+        <div class="cg-lbl">мов</div>
+      </div>
+      <div class="cg-item" id="cg-passion" data-id="passion" onclick="setAccentTheme('passion')">
+        <div class="cg-wrap" style="--ring:#C02870"><div class="cg-swatch" style="background:linear-gradient(135deg,#C02870,#E468A0)"></div></div>
+        <div class="cg-lbl">маракуйя</div>
+      </div>
+      <div class="cg-item" id="cg-crimson" data-id="crimson" onclick="setAccentTheme('crimson')">
+        <div class="cg-wrap" style="--ring:#B01845"><div class="cg-swatch" style="background:linear-gradient(135deg,#B01845,#E04878)"></div></div>
+        <div class="cg-lbl">кармин</div>
+      </div>
+      <div class="cg-item" id="cg-hibiscus" data-id="hibiscus" onclick="setAccentTheme('hibiscus')">
+        <div class="cg-wrap" style="--ring:#E85474"><div class="cg-swatch" style="background:linear-gradient(135deg,#E85474,#FF9FA0)"></div></div>
+        <div class="cg-lbl">гибискус</div>
+      </div>
+      <div class="cg-item" id="cg-watermelon" data-id="watermelon" onclick="setAccentTheme('watermelon')">
+        <div class="cg-wrap" style="--ring:#F52D56"><div class="cg-swatch" style="background:linear-gradient(135deg,#F52D56,#FF7B7B)"></div></div>
+        <div class="cg-lbl">арбуз</div>
+      </div>
+      <div class="cg-item" id="cg-coral" data-id="coral" onclick="setAccentTheme('coral')">
+        <div class="cg-wrap" style="--ring:#FF4F6D"><div class="cg-swatch" style="background:linear-gradient(135deg,#FF4F6D,#FF8C61)"></div></div>
+        <div class="cg-lbl">кораллы</div>
+      </div>
+      <div class="cg-item" id="cg-sakura" data-id="sakura" onclick="setAccentTheme('sakura')">
+        <div class="cg-wrap" style="--ring:#E8637A"><div class="cg-swatch" style="background:linear-gradient(135deg,#E8637A,#F4A7B9)"></div></div>
+        <div class="cg-lbl">сакура</div>
       </div>
     </div>
   </div>
@@ -4183,13 +4231,6 @@ const ACCENT_THEMES={
     water:'#5BA8E8',wr:'91',wg2:'168',wb:'232',
     navLight:'rgba(255,245,248,.96)',navDark:'rgba(22,5,10,.96)'
   },
-  sunflower: {
-    // Подсолнух: глубокий янтарь → тёплое золото
-    sun:'#E8900A',sun2:'#F5C842',cal:'#D98308',
-    r:'232',g:'144',b:'10', r2:'245',g2:'200',b2:'66',
-    water:'#4EAEE5',wr:'78',wg2:'174',wb:'229',
-    navLight:'rgba(255,253,240,.96)',navDark:'rgba(20,15,2,.96)'
-  },
   sakura: {
     // Сакура: нежный розово-персиковый → молочный кремовый
     sun:'#E8637A',sun2:'#F4A7B9',cal:'#DC5C72',
@@ -4232,40 +4273,118 @@ const ACCENT_THEMES={
     water:'#6BA3BE',wr:'107',wg2:'163',wb:'190',
     navLight:'rgba(255,250,240,.96)',navDark:'rgba(18,10,2,.96)'
   },
-  apricot: {
-    // Абрикос: нежный персиково-оранжевый → кремовый розово-абрикосовый
-    sun:'#F4845F',sun2:'#FFBF8A',cal:'#E87A55',
-    r:'244',g:'132',b:'95', r2:'255',g2:'191',b2:'138',
-    water:'#7BBDE8',wr:'123',wg2:'189',wb:'232',
-    navLight:'rgba(255,251,247,.96)',navDark:'rgba(22,12,8,.96)'
+  // ══ 20 новых летних тем ══
+  tropics: {
+    // Тропики: насыщенный лазурно-голубой → ярко-бирюзовый
+    sun:'#0898C8',sun2:'#48C8E8',cal:'#0888B8',
+    r:'8',g:'152',b:'200', r2:'72',g2:'200',b2:'232',
+    water:'#20E0D0',wr:'32',wg2:'224',wb:'208',
+    navLight:'rgba(242,253,255,.96)',navDark:'rgba(2,14,20,.96)'
   },
-  blossom: {
-    // Цветение: пыльная роза → нежный лиловый
-    sun:'#E8919A',sun2:'#F4BEC8',cal:'#DC8591',
-    r:'232',g:'145',b:'154', r2:'244',g2:'190',b2:'200',
-    water:'#B49FE8',wr:'180',wg2:'159',wb:'232',
-    navLight:'rgba(255,248,250,.96)',navDark:'rgba(20,10,12,.96)'
+  passion: {
+    // Маракуйя: насыщенный пурпурно-малиновый → яркий фуксия
+    sun:'#C02870',sun2:'#E468A0',cal:'#B01868',
+    r:'192',g:'40',b:'112', r2:'228',g2:'104',b2:'160',
+    water:'#7888E8',wr:'120',wg2:'136',wb:'232',
+    navLight:'rgba(255,245,251,.96)',navDark:'rgba(18,4,14,.96)'
   },
-  honey: {
-    // Мёд: янтарно-золотой → тёплый кремовый
-    sun:'#E8A020',sun2:'#F5D878',cal:'#D8921A',
-    r:'232',g:'160',b:'32', r2:'245',g2:'216',b2:'120',
-    water:'#5ABCE8',wr:'90',wg2:'188',wb:'232',
-    navLight:'rgba(255,253,242,.96)',navDark:'rgba(20,16,2,.96)'
+  terracotta: {
+    // Терракота: тёплый обожжённый красно-коричневый → песчано-оранжевый
+    sun:'#C05840',sun2:'#E08860',cal:'#B04830',
+    r:'192',g:'88',b:'64', r2:'224',g2:'136',b2:'96',
+    water:'#70A8C8',wr:'112',wg2:'168',wb:'200',
+    navLight:'rgba(255,249,245,.96)',navDark:'rgba(20,10,6,.96)'
   },
-  rosegold: {
-    // Розовое золото: тёплый розово-золотой → персиково-кремовый
-    sun:'#D4896A',sun2:'#EBBEA0',cal:'#C87E62',
-    r:'212',g:'137',b:'106', r2:'235',g2:'190',b2:'160',
-    water:'#8ABBE8',wr:'138',wg2:'187',wb:'232',
-    navLight:'rgba(255,250,246,.96)',navDark:'rgba(20,13,9,.96)'
+  bamboo: {
+    // Бамбук: свежий нефритово-зелёный → мягкий тёплый зелёный
+    sun:'#48A070',sun2:'#88C898',cal:'#389060',
+    r:'72',g:'160',b:'112', r2:'136',g2:'200',b2:'152',
+    water:'#48B8C8',wr:'72',wg2:'184',wb:'200',
+    navLight:'rgba(245,255,250,.96)',navDark:'rgba(5,16,10,.96)'
   },
-  fig: {
-    // Инжир: тёплый сливово-малиновый → нежный розово-лавандовый
-    sun:'#C0607A',sun2:'#E8A0BA',cal:'#B05870',
-    r:'192',g:'96',b:'122', r2:'232',g2:'160',b2:'186',
-    water:'#9E8FE8',wr:'158',wg2:'143',wb:'232',
-    navLight:'rgba(255,247,250,.96)',navDark:'rgba(18,8,12,.96)'
+  mimosa: {
+    // Мимоза: жёлто-золотистый → шампанский кремово-жёлтый
+    sun:'#D4BC20',sun2:'#EED848',cal:'#C4AC18',
+    r:'212',g:'188',b:'32', r2:'238',g2:'216',b2:'72',
+    water:'#48B8E8',wr:'72',wg2:'184',wb:'232',
+    navLight:'rgba(255,254,238,.96)',navDark:'rgba(18,16,2,.96)'
+  },
+  pineapple: {
+    // Ананас: кислотно-зелёно-жёлтый → яркий лимонный
+    sun:'#A8C420',sun2:'#D4E040',cal:'#98B418',
+    r:'168',g:'196',b:'32', r2:'212',g2:'224',b2:'64',
+    water:'#30C8D8',wr:'48',wg2:'200',wb:'216',
+    navLight:'rgba(250,255,238,.96)',navDark:'rgba(12,16,2,.96)'
+  },
+  storm: {
+    // Летняя гроза: насыщенный сапфировый → мягкий дымчато-голубой
+    sun:'#3868C8',sun2:'#78A8E8',cal:'#2858B8',
+    r:'56',g:'104',b:'200', r2:'120',g2:'168',b2:'232',
+    water:'#E87840',wr:'232',wg2:'120',wb:'64',
+    navLight:'rgba(244,248,255,.96)',navDark:'rgba(4,8,20,.96)'
+  },
+  olive: {
+    // Оливка: тёплый лесной оливково-зелёный (87°) → лаймово-зелёный
+    sun:'#508C18',sun2:'#8CC030',cal:'#448010',
+    r:'80',g:'140',b:'24', r2:'140',g2:'192',b2:'48',
+    water:'#30B8C8',wr:'48',wg2:'184',wb:'200',
+    navLight:'rgba(246,253,238,.96)',navDark:'rgba(6,14,2,.96)'
+  },
+  petrol: {
+    // Петроль: глубокий нефтяной сине-зелёный (185°) → бирюзовый
+    sun:'#0D7A8A',sun2:'#28AABB',cal:'#0C6878',
+    r:'13',g:'122',b:'138', r2:'40',g2:'170',b2:'187',
+    water:'#E07838',wr:'224',wg2:'120',wb:'56',
+    navLight:'rgba(240,252,254,.96)',navDark:'rgba(1,12,16,.96)'
+  },
+  indigo: {
+    // Индиго: глубокий синий индиго (233°) → мягкий лавандово-синий
+    sun:'#3C52C8',sun2:'#7090E0',cal:'#3048B8',
+    r:'60',g:'82',b:'200', r2:'112',g2:'144',b2:'224',
+    water:'#E07838',wr:'224',wg2:'120',wb:'56',
+    navLight:'rgba(242,244,255,.96)',navDark:'rgba(4,6,22,.96)'
+  },
+  plum: {
+    // Слива: насыщенный сливово-пурпурный (279°) → нежный лиловый
+    sun:'#9038C0',sun2:'#C070E0',cal:'#8030B0',
+    r:'144',g:'56',b:'192', r2:'192',g2:'112',b2:'224',
+    water:'#38C078',wr:'56',wg2:'192',wb:'120',
+    navLight:'rgba(250,244,255,.96)',navDark:'rgba(12,4,20,.96)'
+  },
+  mauve: {
+    // Мов: пыльный розово-лиловый (318°) → нежный пастельный
+    sun:'#A85888',sun2:'#D890B8',cal:'#984878',
+    r:'168',g:'88',b:'136', r2:'216',g2:'144',b2:'184',
+    water:'#88A8E0',wr:'136',wg2:'168',wb:'224',
+    navLight:'rgba(255,246,252,.96)',navDark:'rgba(18,6,16,.96)'
+  },
+  crimson: {
+    // Кармин: глубокий малиново-винный (342°) → насыщенный розово-алый
+    sun:'#B01845',sun2:'#E04878',cal:'#A01038',
+    r:'176',g:'24',b:'69', r2:'224',g2:'72',b2:'120',
+    water:'#5898D0',wr:'88',wg2:'152',wb:'208',
+    navLight:'rgba(255,243,247,.96)',navDark:'rgba(18,2,8,.96)'
+  },
+  fern: {
+    // Папоротник: сочный изумрудно-зелёный (122°) → свежий светло-зелёный
+    sun:'#3AAB50',sun2:'#74D070',cal:'#2E9842',
+    r:'58',g:'171',b:'80', r2:'116',g2:'208',b2:'112',
+    water:'#30B8C0',wr:'48',wg2:'184',wb:'192',
+    navLight:'rgba(242,255,244,.96)',navDark:'rgba(3,16,5,.96)'
+  },
+  fuchsia: {
+    // Фуксия: яркий пурпурно-розовый (305°) → насыщенный лиловато-розовый
+    sun:'#C028A0',sun2:'#E870D0',cal:'#B01890',
+    r:'192',g:'40',b:'160', r2:'232',g2:'112',b2:'208',
+    water:'#40B878',wr:'64',wg2:'184',wb:'120',
+    navLight:'rgba(255,243,253,.96)',navDark:'rgba(18,2,18,.96)'
+  },
+  matcha: {
+    // Матча: спокойный японский зелёно-жёлтый (68°) → нежный кремово-зелёный
+    sun:'#8AAA18',sun2:'#C0D848',cal:'#789810',
+    r:'138',g:'170',b:'24', r2:'192',g2:'216',b2:'72',
+    water:'#38B8C8',wr:'56',wg2:'184',wb:'200',
+    navLight:'rgba(249,254,238,.96)',navDark:'rgba(9,14,2,.96)'
   }
 };
 
@@ -4316,14 +4435,14 @@ function _syncColorRow(id){
   const t=ACCENT_THEMES[id]||ACCENT_THEMES.sunset;
   const swatch=document.getElementById('dp-color-swatch');
   const nameEl=document.getElementById('dp-color-name');
-  const themeLabels={sunset:'закат',peach:'персик',mango:'манго',hibiscus:'гибискус',lagoon:'лагуна',lime:'лайм',coral:'кораллы',watermelon:'арбуз',sunflower:'подсолнух',sakura:'сакура',ocean:'океан',violet:'фиолет',mint:'мята',tangerine:'мандарин',sand:'песок',apricot:'абрикос',blossom:'цветение',honey:'мёд',rosegold:'розовое золото',fig:'инжир'};
+  const themeLabels={sunset:'закат',peach:'персик',mango:'манго',hibiscus:'гибискус',lagoon:'лагуна',lime:'лайм',coral:'кораллы',watermelon:'арбуз',sakura:'сакура',ocean:'океан',violet:'фиолет',mint:'мята',tangerine:'мандарин',sand:'песок',tropics:'тропики',passion:'маракуйя',terracotta:'терракота',bamboo:'бамбук',mimosa:'мимоза',pineapple:'ананас',storm:'гроза',olive:'олива',petrol:'петроль',indigo:'индиго',plum:'слива',mauve:'мов',crimson:'кармин',fern:'папоротник',fuchsia:'фуксия',matcha:'матча'};
   if(swatch)swatch.style.background='linear-gradient(135deg,'+t.sun+','+t.sun2+')';
   if(nameEl)nameEl.textContent=themeLabels[id]||id;
 }
 
 function _updateDesignVal(){
   const layoutLabels={classic:'классический',linear:'линейный',bento:'бенто'};
-  const themeLabels={sunset:'закат',peach:'персик',mango:'манго',hibiscus:'гибискус',lagoon:'лагуна',lime:'лайм',coral:'кораллы',watermelon:'арбуз',sunflower:'подсолнух',sakura:'сакура',ocean:'океан',violet:'фиолет',mint:'мята',tangerine:'мандарин',sand:'песок',apricot:'абрикос',blossom:'цветение',honey:'мёд',rosegold:'розовое золото',fig:'инжир'};
+  const themeLabels={sunset:'закат',peach:'персик',mango:'манго',hibiscus:'гибискус',lagoon:'лагуна',lime:'лайм',coral:'кораллы',watermelon:'арбуз',sakura:'сакура',ocean:'океан',violet:'фиолет',mint:'мята',tangerine:'мандарин',sand:'песок',tropics:'тропики',passion:'маракуйя',terracotta:'терракота',bamboo:'бамбук',mimosa:'мимоза',pineapple:'ананас',storm:'гроза',olive:'олива',petrol:'петроль',indigo:'индиго',plum:'слива',mauve:'мов',crimson:'кармин',fern:'папоротник',fuchsia:'фуксия',matcha:'матча'};
   const layout=layoutLabels[getHomeDesign()]||'классический';
   const theme=themeLabels[getAccentTheme()]||'закат';
   T('pf-design-val',layout+' · '+theme);
