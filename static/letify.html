@@ -203,20 +203,110 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   border:1px solid rgba(255,255,255,.9);
   border-radius:24px;
   box-shadow:0 6px 24px rgba(0,0,0,.12),0 2px 6px rgba(0,0,0,.06);
+  overflow:hidden;
+  cursor:pointer;
+  /* base transition — only bottom/opacity for push-page hide */
   transition:bottom .28s ease,opacity .22s ease;
 }
 .tg-dark #nav{background:rgba(24,18,10,.96);border-color:rgba(255,255,255,.1)}
 #nav.gone{bottom:calc(-120px - var(--sb));opacity:0;pointer-events:none}
-/* Nav item — no dot, just icon centered */
+
+/* ── NAV ITEMS ── */
 .nt{
   width:50px;height:50px;border-radius:16px;
   display:flex;align-items:center;justify-content:center;
   cursor:pointer;color:var(--hint);
-  transition:color .12s ease,background .12s ease;
+  overflow:hidden;flex-shrink:0;
+  transition:
+    color .12s ease,
+    background .12s ease,
+    opacity 180ms ease,
+    transform 220ms ease,
+    width 200ms ease,
+    min-width 200ms ease;
 }
 .nt.on{color:var(--sun);background:rgba(255,107,53,.1)}
 .nt:active{transform:scale(.97);transition:transform .03s ease}
-.nt svg{width:22px;height:22px;flex-shrink:0}
+.nt svg{width:22px;height:22px;flex-shrink:0;pointer-events:none}
+
+/* ── PILL LABEL (hidden by default) ── */
+#nav-pill-lbl{
+  position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  color:#fff;font-size:12px;font-weight:800;letter-spacing:.03em;
+  white-space:nowrap;pointer-events:none;
+  opacity:0;
+  transition:opacity 200ms ease 290ms;
+  font-family:'Onest',system-ui,sans-serif;
+}
+
+/* ── COLLAPSED STATE ── */
+#nav.nav-collapsed{
+  /* width & height set by JS before this class is added */
+  border-radius:99px;
+  padding:0;
+  background:linear-gradient(105deg,var(--sun),var(--sun2));
+  border-color:transparent;
+  box-shadow:0 4px 20px rgba(255,107,53,.4),0 1px 6px rgba(255,107,53,.18);
+  /* pill transitions */
+  transition:
+    bottom .28s ease,
+    opacity .22s ease,
+    width  480ms cubic-bezier(.77,0,.18,1) 260ms,
+    height 480ms cubic-bezier(.77,0,.18,1) 260ms,
+    border-radius 480ms cubic-bezier(.77,0,.18,1) 260ms,
+    padding 360ms ease 260ms,
+    background 320ms ease 300ms,
+    border-color 300ms ease 300ms,
+    box-shadow 300ms ease 260ms;
+  animation:nav-pill-float 3.5s ease-in-out infinite;
+}
+.tg-dark #nav.nav-collapsed{
+  background:linear-gradient(105deg,var(--sun),var(--sun2));
+  border-color:transparent;
+}
+@keyframes nav-pill-float{
+  0%,100%{bottom:calc(12px + var(--sb))}
+  50%{bottom:calc(16px + var(--sb))}
+}
+
+/* ── EXPANDING STATE ── */
+#nav.nav-expanding{
+  transition:
+    bottom .28s ease,
+    opacity .22s ease,
+    width  440ms cubic-bezier(.34,1.25,.64,1),
+    height 440ms cubic-bezier(.34,1.25,.64,1),
+    border-radius 440ms cubic-bezier(.34,1.25,.64,1),
+    padding 360ms ease,
+    background 280ms ease,
+    border-color 280ms ease,
+    box-shadow 280ms ease;
+  animation:none;
+}
+
+/* ── ICON STAGGER: outside→in on collapse ── */
+#nav.nav-collapsed .nt{
+  opacity:0;transform:scale(.4);width:0!important;min-width:0!important;
+}
+/* delay: 1&6 first, 2&5 second, 3&4 last */
+#nav.nav-collapsed .nt:nth-child(1){transition-delay:0ms}
+#nav.nav-collapsed .nt:nth-child(6){transition-delay:0ms}
+#nav.nav-collapsed .nt:nth-child(2){transition-delay:55ms}
+#nav.nav-collapsed .nt:nth-child(5){transition-delay:55ms}
+#nav.nav-collapsed .nt:nth-child(3){transition-delay:110ms}
+#nav.nav-collapsed .nt:nth-child(4){transition-delay:110ms}
+
+/* ── ICON STAGGER: center→out on expand ── */
+#nav.nav-expanding .nt:nth-child(3){transition-delay:60ms}
+#nav.nav-expanding .nt:nth-child(4){transition-delay:60ms}
+#nav.nav-expanding .nt:nth-child(2){transition-delay:120ms}
+#nav.nav-expanding .nt:nth-child(5){transition-delay:120ms}
+#nav.nav-expanding .nt:nth-child(1){transition-delay:180ms}
+#nav.nav-expanding .nt:nth-child(6){transition-delay:180ms}
+
+/* label appears when collapsed */
+#nav.nav-collapsed #nav-pill-lbl{opacity:1}
 
 /* ══ TYPOGRAPHY ══ */
 .t1{font-size:26px;font-weight:900;line-height:1.1;letter-spacing:-.02em}
@@ -2773,6 +2863,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       <svg id="nav-av-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;color:#fff"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
     </div>
   </div>
+  <span id="nav-pill-lbl">letify</span>
 </nav>
 
 </div><!-- /root -->
@@ -5188,6 +5279,113 @@ document.addEventListener('DOMContentLoaded',async()=>{
   });
   // Предзагрузка камеры при первом касании кнопки сканера
   document.querySelector('[onclick*="pp-scanner"]')?.addEventListener('touchstart',_prewarmCamera,{once:true,passive:true});
+
+  // ── NAV AUTO-COLLAPSE (Variant B: Stagger Outside→In) ──
+  (function(){
+    const IDLE_MS = 10000;
+    const PILL_W  = 88, PILL_H = 32;
+    const nav     = document.getElementById('nav');
+    if(!nav) return;
+
+    let idleTimer   = null;
+    let isCollapsed = false;
+    let expandedW   = 0, expandedH = 0;
+
+    // Measure expanded size once layout is stable
+    function measureExpanded(){
+      const r = nav.getBoundingClientRect();
+      if(r.width > 60){ expandedW = r.width; expandedH = r.height; }
+    }
+
+    function collapseNav(){
+      if(isCollapsed || navHidden) return;
+      measureExpanded();
+      if(!expandedW) return;
+
+      // 1. Lock current size so CSS transition has a "from" value
+      nav.style.width  = expandedW + 'px';
+      nav.style.height = expandedH + 'px';
+
+      // 2. Next frame: set pill target + switch class
+      requestAnimationFrame(()=>{
+        nav.style.width  = PILL_W + 'px';
+        nav.style.height = PILL_H + 'px';
+        nav.classList.add('nav-collapsed');
+        nav.classList.remove('nav-expanding');
+        isCollapsed = true;
+      });
+    }
+
+    function expandNav(){
+      if(!isCollapsed) return;
+
+      // 1. Lock at pill size
+      nav.style.width  = PILL_W + 'px';
+      nav.style.height = PILL_H + 'px';
+      nav.classList.remove('nav-collapsed');
+      nav.classList.add('nav-expanding');
+      isCollapsed = false;
+
+      // 2. Next frame: animate to expanded size
+      requestAnimationFrame(()=>{
+        nav.style.width  = expandedW + 'px';
+        nav.style.height = expandedH + 'px';
+      });
+
+      // 3. After transition: free inline styles
+      setTimeout(()=>{
+        nav.classList.remove('nav-expanding');
+        nav.style.width  = '';
+        nav.style.height = '';
+      }, 500);
+    }
+
+    function resetIdleTimer(){
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(collapseNav, IDLE_MS);
+    }
+
+    // Tap on pill → expand
+    nav.addEventListener('click', e => {
+      if(isCollapsed){
+        e.stopPropagation();
+        expandNav();
+        resetIdleTimer();
+      }
+    }, true);
+
+    // Track user activity
+    const events = ['touchstart','mousedown','keydown'];
+    events.forEach(evt =>
+      document.addEventListener(evt, ()=>{
+        if(isCollapsed){ expandNav(); }
+        resetIdleTimer();
+      }, {passive:true})
+    );
+
+    // Start timer after splash hides
+    setTimeout(()=>{
+      measureExpanded();
+      resetIdleTimer();
+    }, 1800);
+
+    // Pause when push-page is open (navHidden)
+    const _origPushPage = window.pushPage;
+    if(typeof _origPushPage === 'function'){
+      window.pushPage = function(...a){
+        clearTimeout(idleTimer);
+        return _origPushPage.apply(this,a);
+      };
+    }
+    const _origPopPage = window.popPage;
+    if(typeof _origPopPage === 'function'){
+      window.popPage = function(...a){
+        const r = _origPopPage.apply(this,a);
+        resetIdleTimer();
+        return r;
+      };
+    }
+  })();
 });
 </script>
 
