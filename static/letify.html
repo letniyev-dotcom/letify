@@ -1432,50 +1432,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 }
 .pf-tog.on::after{transform:translateX(18px)}
 
-/* ══ GOOGLE FIT INTEGRATION ══ */
-.gf-connect-btn{
-  width:100%;padding:12px 14px;border-radius:14px;
-  background:var(--bg3);border:1.5px solid transparent;
-  display:flex;align-items:center;gap:12px;
-  cursor:pointer;font-family:'Onest',inherit;
-  transition:background .18s,border-color .18s,opacity .14s;
-  -webkit-tap-highlight-color:transparent;
-  text-align:left;
-}
-.gf-connect-btn:active{opacity:.7;transition:opacity .07s}
-.tg-dark .gf-connect-btn{background:rgba(255,255,255,.07)}
-.gf-icon-wrap{
-  width:36px;height:36px;border-radius:10px;
-  background:#fff;display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;box-shadow:0 1px 6px rgba(0,0,0,.1);
-}
-.tg-dark .gf-icon-wrap{background:rgba(255,255,255,.12)}
-.gf-sync-ico{
-  background:none;border:none;cursor:pointer;padding:4px;
-  font-size:20px;font-weight:700;color:var(--green);line-height:1;
-  flex-shrink:0;transition:transform .3s ease;
-  -webkit-tap-highlight-color:transparent;
-}
-.gf-sync-ico:active{transform:rotate(180deg);transition:transform .15s ease}
-.gf-disconnect-row{
-  display:none;align-items:center;justify-content:center;
-  padding:8px 0 2px;
-}
-.gf-disconnect-link{
-  font-size:11px;font-weight:700;color:var(--red);cursor:pointer;
-  background:none;border:none;font-family:inherit;padding:4px 8px;
-  -webkit-tap-highlight-color:transparent;
-}
-.gf-steps-widget{
-  display:flex;align-items:center;gap:10px;
-  background:rgba(82,193,119,.07);border:1px solid rgba(82,193,119,.15);
-  border-radius:14px;padding:10px 14px;margin-top:8px;cursor:pointer;
-  transition:opacity .14s;
-}
-.gf-steps-widget:active{opacity:.7;transition:opacity .07s}
-.gf-steps-arc-wrap{position:relative;flex-shrink:0}
-.gf-steps-pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:var(--green)}
-@keyframes gf-spin{to{transform:rotate(360deg)}}
 /* Danger + ver */
 .pf-danger-btn{
   width:100%;padding:12px 14px;border-radius:14px;
@@ -1488,6 +1444,44 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 }
 .pf-danger-btn:active{background:rgba(244,92,92,.14)}
 .pf-ver{font-size:10px;font-weight:600;color:var(--hint);text-align:center;padding:5px 0 0;flex-shrink:0}
+
+/* ══ GOOGLE FIT INTEGRATION ══ */
+.gfit-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 10px 5px 7px;
+  border-radius:20px;border:1.5px solid rgba(66,133,244,.3);
+  background:rgba(66,133,244,.07);
+  cursor:pointer;font-family:inherit;
+  transition:background .14s,transform .1s,border-color .14s;
+  -webkit-tap-highlight-color:transparent;flex-shrink:0;
+}
+.gfit-btn:active{transform:scale(.95);background:rgba(66,133,244,.14);transition:transform .07s,background .07s}
+.tg-dark .gfit-btn{border-color:rgba(66,133,244,.4);background:rgba(66,133,244,.12)}
+.gfit-btn.connected{border-color:rgba(82,193,119,.35);background:rgba(82,193,119,.08)}
+.tg-dark .gfit-btn.connected{border-color:rgba(82,193,119,.45);background:rgba(82,193,119,.13)}
+.gfit-btn.syncing{opacity:.7;pointer-events:none}
+.gfit-logo{width:16px;height:16px;flex-shrink:0}
+.gfit-btn-lbl{font-size:11px;font-weight:800;color:#4285F4;letter-spacing:-.01em}
+.gfit-btn.connected .gfit-btn-lbl{color:var(--green)}
+.gfit-steps-badge{font-size:10px;font-weight:800;color:var(--green);background:rgba(82,193,119,.12);border-radius:99px;padding:2px 6px;margin-left:2px}
+.tg-dark .gfit-steps-badge{background:rgba(82,193,119,.18)}
+.gfit-sync-dot{width:5px;height:5px;border-radius:50%;background:var(--green);flex-shrink:0;animation:gfit-pulse 2s ease-in-out infinite}
+@keyframes gfit-pulse{0%,100%{opacity:.5;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+.gfit-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--brd)}
+.gfit-row:last-child{border-bottom:none}
+.gfit-row-ic{width:30px;height:30px;border-radius:10px;background:rgba(66,133,244,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tg-dark .gfit-row-ic{background:rgba(66,133,244,.18)}
+.gfit-row-lbl{flex:1;font-size:13px;font-weight:700;color:var(--text)}
+.gfit-row-sub{font-size:10px;font-weight:600;color:var(--hint);margin-top:1px}
+.home-steps-row{display:flex;align-items:center;gap:8px;padding:11px 14px;background:var(--bg2);border-radius:14px;box-shadow:var(--sh);cursor:default}
+.tg-dark .home-steps-row{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);box-shadow:none}
+.home-steps-ico{width:28px;height:28px;border-radius:9px;background:rgba(82,193,119,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.home-steps-val{font-size:17px;font-weight:900;letter-spacing:-.02em}
+.home-steps-of{font-size:10px;font-weight:700;color:var(--hint);margin-left:2px}
+.home-steps-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--hint)}
+.home-steps-pb{height:4px;background:rgba(0,0,0,.06);border-radius:99px;overflow:hidden;margin-top:6px}
+.tg-dark .home-steps-pb{background:rgba(255,255,255,.1)}
+.home-steps-pbf{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--green),#7EDDA8);transition:width .7s cubic-bezier(.25,.46,.45,.94)}
 
 /* ══ AVATAR TOOLTIP PILL ══ */
 .av-tip{
@@ -1890,24 +1884,33 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
   <!-- ── ИНТЕГРАЦИИ ── -->
   <div class="pf-sec">Интеграции</div>
-  <div class="pf-list-card" style="padding:10px">
-    <button class="gf-connect-btn" id="gf-connect-btn" onclick="gfConnect()">
-      <div class="gf-icon-wrap">
-        <svg width="18" height="18" viewBox="0 0 24 24">
-          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
-          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+  <div class="pf-list-card">
+    <div class="gfit-row" id="gfit-profile-row" style="cursor:default">
+      <div class="gfit-row-ic">
+        <!-- Google Fit / Health G logo -->
+        <svg class="gfit-logo" width="18" height="18" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M24 4C13 4 4 13 4 24s9 20 20 20 20-9 20-20S35 4 24 4z" fill="#fff"/>
+          <path d="M43.6 24.5c0-1-.1-2-.2-3H24v5.7h11c-.5 2.5-2 4.6-4.2 6v5h6.8c4-3.7 6-9.1 6-13.7z" fill="#4285F4"/>
+          <path d="M24 44c5.4 0 10-1.8 13.3-4.8l-6.5-5C29 35.5 26.6 36.3 24 36.3c-5.2 0-9.6-3.5-11.2-8.2H6v5.1C9.2 39.8 16.1 44 24 44z" fill="#34A853"/>
+          <path d="M12.8 28.1c-.4-1.2-.6-2.5-.6-3.8s.2-2.6.6-3.8v-5.1H6A20 20 0 0 0 4 24c0 3.2.8 6.3 2.2 9l6.6-5z" fill="#FBBC05"/>
+          <path d="M24 11.7c2.9 0 5.5 1 7.5 2.9l5.6-5.6C33.9 5.8 29.3 4 24 4 16 4 9.2 8.2 6 15.3l6.8 5.1c1.5-4.7 6-8.7 11.2-8.7z" fill="#EA4335"/>
         </svg>
       </div>
       <div style="flex:1">
-        <div style="font-size:13px;font-weight:800">Подключить Google Fit</div>
-        <div style="font-size:11px;color:var(--hint);font-weight:600">синхронизация шагов</div>
+        <div class="gfit-row-lbl">Google Fit</div>
+        <div class="gfit-row-sub" id="gfit-status-text">не подключено · шаги не синхронизированы</div>
       </div>
-      <iconify-icon icon="solar:alt-arrow-right-bold" style="font-size:14px;color:var(--hint);opacity:.5"></iconify-icon>
-    </button>
-    <div class="gf-disconnect-row" id="gf-disconnect-row">
-      <button class="gf-disconnect-link" onclick="gfDisconnect()">отключить Google Fit</button>
+      <!-- Compact action button -->
+      <button class="gfit-btn" id="gfit-main-btn" onclick="gfitToggle()">
+        <!-- Google G icon -->
+        <svg class="gfit-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.83z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.83c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+        </svg>
+        <span class="gfit-btn-lbl" id="gfit-btn-label">Подключить</span>
+      </button>
     </div>
   </div>
 
@@ -4042,13 +4045,6 @@ function renderHomeClassic(){
     ?`<span style="font-size:9px;font-weight:800;color:var(--green)">${mac.prot||0}б</span><span style="font-size:9px;font-weight:800;color:var(--sun)">${mac.fat||0}ж</span><span style="font-size:9px;font-weight:800;color:var(--sleep)">${mac.carb||0}у</span>`:'';
   const arcW=(163.4*(1-wp)).toFixed(2),arcC=(207.3*(1-cp)).toFixed(2),arcS=(163.4*(1-sleepPct)).toFixed(2);
   const sqHtml=sqArr.map((on,i)=>`<div class="sqd${on?' on':''}"></div>`).join('');
-  // Steps widget
-  const gfSteps=gfGetSteps();
-  const stepsHtml=gfSteps!==null?`<div class="pad gap"><div class="gf-steps-widget" onclick="navTo('profile')">
-    <div class="gf-steps-arc-wrap"><svg width="42" height="42" viewBox="0 0 42 42"><circle cx="21" cy="21" r="16" fill="none" stroke="rgba(82,193,119,.15)" stroke-width="4"/><circle cx="21" cy="21" r="16" fill="none" stroke="var(--green)" stroke-width="4" stroke-linecap="round" stroke-dasharray="100.5" stroke-dashoffset="${(100.5*(1-Math.min(1,gfSteps/GF_STEPS_GOAL))).toFixed(2)}" transform="rotate(-90 21 21)" style="transition:stroke-dashoffset .8s ease"/></svg><div class="gf-steps-pct">${Math.round(Math.min(100,gfSteps/GF_STEPS_GOAL*100))}%</div></div>
-    <div style="flex:1"><div style="font-size:17px;font-weight:900;letter-spacing:-.02em;color:var(--green)">${gfSteps.toLocaleString('ru')}</div><div style="font-size:10px;font-weight:700;color:var(--hint)">шагов · цель ${GF_STEPS_GOAL.toLocaleString('ru')}</div></div>
-    <iconify-icon icon="solar:walking-bold" style="font-size:22px;color:var(--green);opacity:.7"></iconify-icon>
-  </div></div>`:'';
   let planHtml='';
   if(planItems.length){
     const nt=new Date();
@@ -4094,7 +4090,7 @@ function renderHomeClassic(){
   </div>
   <div class="pb gap"><div class="pbf pb-sun" style="width:${wbar}%"></div></div>
 </div></div>
-${planHtml}${streakHtml}${stepsHtml}<div style="height:8px"></div>`;
+${_gfitStepsHomeHtml()}${planHtml}${streakHtml}<div style="height:8px"></div>`;
 }
 
 function renderHomeLinear(){
@@ -4102,16 +4098,6 @@ function renderHomeLinear(){
   const sdHtml=sqArr.map(on=>`<div class="hl-sd${on?' on':''}"></div>`).join('');
   const macHtml=(mac.prot||0)+(mac.fat||0)+(mac.carb||0)>0
     ?`<span class="hl-mac" style="color:var(--green)">${mac.prot||0}б</span><span class="hl-mac" style="color:var(--sun)">${mac.fat||0}ж</span><span class="hl-mac" style="color:var(--sleep)">${mac.carb||0}у</span>`:'';
-  const gfSteps=gfGetSteps();
-  const stepsMetricHtml=gfSteps!==null?`
-    <div class="hl-metric" onclick="navTo('profile')">
-      <div class="hl-metric-top">
-        <div class="hl-metric-left"><div class="hl-metric-ico" style="background:rgba(82,193,119,.12)"><iconify-icon icon="solar:walking-bold" width="14" style="color:var(--green)"></iconify-icon></div><span class="hl-metric-name">шаги</span></div>
-        <div><span class="hl-metric-val" style="color:var(--green)">${gfSteps.toLocaleString('ru')}</span><span class="hl-metric-of">/ ${GF_STEPS_GOAL.toLocaleString('ru')}</span></div>
-      </div>
-      <div class="hl-bar"><div class="hl-bar-fill" style="width:${Math.round(Math.min(100,gfSteps/GF_STEPS_GOAL*100))}%;background:var(--green)"></div></div>
-      <div class="hl-metric-footer"><span style="font-size:10px;font-weight:700;color:var(--hint)">Google Fit</span><span style="font-size:10px;font-weight:800;color:var(--green)">${Math.round(Math.min(100,gfSteps/GF_STEPS_GOAL*100))}%</span></div>
-    </div>`:'';
   let planHtml='';
   if(planItems.length){
     const nt=new Date();
@@ -4158,7 +4144,6 @@ function renderHomeLinear(){
       <div class="hl-bar"><div class="hl-bar-fill" style="width:${Math.round(sleepPct*100)}%;background:var(--sleep)"></div></div>
       <div class="hl-metric-footer"><div class="hl-sleep-dots">${sdHtml}</div></div>
     </div>
-    ${stepsMetricHtml}
   </div></div>
   <div class="hl-weight" onclick="navTo('progress')">
     <div class="hl-weight-top">
@@ -4837,8 +4822,6 @@ function renderProfile(){
   // Design label
   const labels={classic:'классический',linear:'линейный',bento:'бенто'};
   T('pf-design-val',labels[getHomeDesign()]||'классический');
-  // Google Fit status
-  renderGfStatus();
   // BMI stats row in hero
   const bmiRow=$('pf-bmi-row');
   if(u.height&&wl.length){
@@ -4848,6 +4831,8 @@ function renderProfile(){
     T('pf-bmr',Math.round(u.gender==='female'?10*cw+6.25*u.height-5*(u.age||25)-161:10*cw+6.25*u.height-5*(u.age||25)+5));
     if(bmiRow)bmiRow.style.display='flex';
   }else if(bmiRow)bmiRow.style.display='none';
+  // Google Fit UI sync
+  _gfitRenderUI();
 }
 
 /* ══ PLAN SETTINGS ══ */
@@ -5245,186 +5230,401 @@ async function submitScanned(){
   await reload();
 }
 
-/* ══ GOOGLE FIT INTEGRATION ══
-   Требования:
-   1. Создай проект в Google Cloud Console
-   2. Включи Fitness API и People API
-   3. Создай OAuth 2.0 Client ID (тип: Web application)
-   4. Добавь в "Authorized JavaScript origins" адрес своего сайта
-   5. Вставь Client ID ниже
-*/
-const GF_CLIENT_ID = ''; // <-- сюда Client ID из Google Cloud Console
+/* ══ GOOGLE FIT — ПОЛНАЯ СИНХРОНИЗАЦИЯ ══
+ *  Данные: шаги, калории, вода, сон, вес, пульс, дистанция, активность
+ */
+const GFIT_CLIENT_ID = '169109868020-h0vndm88dfqvq2hjb8nftu9jjtimt8l5.apps.googleusercontent.com';
 
-let _gfTokenClient = null;
-let _gfAccessToken = null;
-let _gfConnected = false;
-const GF_STEPS_GOAL = 10000;
+// Все нужные scopes
+const GFIT_SCOPE = [
+  'https://www.googleapis.com/auth/fitness.activity.read',
+  'https://www.googleapis.com/auth/fitness.nutrition.read',
+  'https://www.googleapis.com/auth/fitness.sleep.read',
+  'https://www.googleapis.com/auth/fitness.body.read',
+  'https://www.googleapis.com/auth/fitness.heart_rate.read',
+].join(' ');
 
-function _gfLoad(){
-  try{
-    const saved = lsGet('gfit_token');
-    if(saved && saved.token && saved.expires > Date.now()){
-      _gfAccessToken = saved.token;
-      _gfConnected = true;
-    } else {
-      _gfAccessToken = null;
-      _gfConnected = false;
-    }
-  }catch{ _gfConnected = false; }
-}
+const GFIT_STEPS_GOAL = 10000;
 
-function _gfInitClient(){
-  if(!window.google?.accounts?.oauth2) return false;
-  if(_gfTokenClient) return true;
-  if(!GF_CLIENT_ID){ return false; }
-  try {
-    _gfTokenClient = google.accounts.oauth2.initTokenClient({
-      client_id: GF_CLIENT_ID,
-      scope: 'https://www.googleapis.com/auth/fitness.activity.read',
-      callback: async(resp) => {
-        if(resp.error || !resp.access_token){
-          toast('❌ ошибка авторизации Google');
-          return;
-        }
-        _gfAccessToken = resp.access_token;
-        _gfConnected = true;
-        lsSet('gfit_token', {token: resp.access_token, expires: Date.now() + ((resp.expires_in||3600)-60)*1000});
-        tg?.HapticFeedback?.notificationOccurred('success');
-        toast('Google Fit подключён ✓');
-        renderGfStatus();
-        const steps = await _gfFetchSteps();
-        if(steps !== null){
-          lsSet('gfit_steps', {steps, date: TODAY, synced_at: Date.now()});
-          renderHome();
-          renderGfStatus();
-        }
+/* ── localStorage helpers ── */
+const gfLS = {
+  getToken:  ()=>{ try{return JSON.parse(localStorage.getItem('lf2_gfit_token')||'null')}catch{return null} },
+  setToken:  v=>{ try{localStorage.setItem('lf2_gfit_token',JSON.stringify(v))}catch{} },
+  rmToken:   ()=>{ try{localStorage.removeItem('lf2_gfit_token')}catch{} },
+  // Все данные в одном объекте
+  getData:   ()=>{ try{return JSON.parse(localStorage.getItem('lf2_gfit_data')||'{}')}catch{return {}} },
+  setData:   v=>{ try{localStorage.setItem('lf2_gfit_data',JSON.stringify(v))}catch{} },
+  // Обратная совместимость
+  getSteps:  ()=>{ const d=gfLS.getData(); return d.steps||0; },
+  getSyncTs: ()=>{ try{return parseInt(localStorage.getItem('lf2_gfit_ts')||'0',10)||0}catch{return 0} },
+  setSyncTs: v=>{ try{localStorage.setItem('lf2_gfit_ts',String(v))}catch{} },
+};
+
+let _gfitTokenClient = null;
+let _gfitSyncing = false;
+
+/* ── инициализация GIS (после загрузки скрипта google) ── */
+function _gfitInitClient(){
+  if(typeof google==='undefined'||!google.accounts?.oauth2)return;
+  if(GFIT_CLIENT_ID==='YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com'){
+    console.warn('letify: Google Fit CLIENT_ID не задан — интеграция отключена');
+    return;
+  }
+  _gfitTokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: GFIT_CLIENT_ID,
+    scope: GFIT_SCOPE,
+    callback: async(resp)=>{
+      if(resp.error){
+        toast('Google Fit: ошибка авторизации');
+        _gfitSetSyncing(false);
+        return;
       }
+      /* Сохраняем токен + время истечения */
+      const expAt = Date.now() + (parseInt(resp.expires_in||3600,10)-60)*1000;
+      gfLS.setToken({access_token:resp.access_token, expires_at:expAt});
+      tg?.HapticFeedback?.notificationOccurred('success');
+      await _gfitFetchSteps(resp.access_token);
+      _gfitRenderUI();
+      renderHome();
+    }
+  });
+}
+
+/* ── проверить токен ── */
+function _gfitGetValidToken(){
+  const t = gfLS.getToken();
+  if(!t||!t.access_token)return null;
+  if(t.expires_at && Date.now()>t.expires_at)return null; // истёк
+  return t.access_token;
+}
+
+/* ── Получить ВСЕ данные из Google Fit ── */
+async function _gfitFetchAll(token){
+  try{
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(),now.getMonth(),now.getDate(),0,0,0,0);
+    const endOfDay   = new Date(now.getFullYear(),now.getMonth(),now.getDate(),23,59,59,999);
+    const s = startOfDay.getTime(), e = endOfDay.getTime();
+
+    const req = (dataTypeName, dataSourceId)=>({dataTypeName, ...(dataSourceId?{dataSourceId}:{})});
+
+    const body = {
+      aggregateBy:[
+        req('com.google.step_count.delta','derived:com.google.step_count.delta:com.google.android.gms:estimated_steps'),
+        req('com.google.calories.expended'),
+        req('com.google.hydration'),
+        req('com.google.weight'),
+        req('com.google.heart_rate.bpm'),
+        req('com.google.distance.delta'),
+        req('com.google.active_minutes'),
+      ],
+      bucketByTime:{durationMillis:86400000},
+      startTimeMillis:s,
+      endTimeMillis:e
+    };
+
+    const r = await fetch('https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+      body:JSON.stringify(body)
     });
-    return true;
-  } catch(e){ return false; }
+    if(r.status===401){gfLS.rmToken();_gfitRenderUI();return null;}
+    if(!r.ok)return null;
+    const d = await r.json();
+
+    // Парсим все метрики
+    let steps=0, kcal=0, water=0, weight=0, hr=0, hrCount=0, dist=0, active=0;
+    (d.bucket||[]).forEach(b=>{
+      (b.dataset||[]).forEach(ds=>{
+        (ds.point||[]).forEach(p=>{
+          const dt = ds.dataTypeName||'';
+          (p.value||[]).forEach(v=>{
+            if(dt.includes('step_count'))   steps  += (v.intVal||0);
+            if(dt.includes('calories'))     kcal   += (v.fpVal||0);
+            if(dt.includes('hydration'))    water  += (v.fpVal||0);
+            if(dt.includes('weight'))       { if(v.fpVal>0)weight=v.fpVal; }
+            if(dt.includes('heart_rate'))   { hr+=v.fpVal||0; hrCount++; }
+            if(dt.includes('distance'))     dist   += (v.fpVal||0);
+            if(dt.includes('active_minutes'))active += (v.intVal||0);
+          });
+        });
+      });
+    });
+
+    // Сон — отдельный запрос (sessions API)
+    let sleepHours = 0;
+    try{
+      const sleepR = await fetch(
+        `https://www.googleapis.com/fitness/v1/users/me/sessions?startTime=${startOfDay.toISOString()}&endTime=${endOfDay.toISOString()}&activityType=72`,
+        {headers:{'Authorization':'Bearer '+token}}
+      );
+      if(sleepR.ok){
+        const sd = await sleepR.json();
+        (sd.session||[]).forEach(s=>{
+          const dur=(parseInt(s.endTimeMillis||0)-parseInt(s.startTimeMillis||0))/3600000;
+          sleepHours+=Math.max(0,dur);
+        });
+      }
+    }catch{}
+
+    const result = {
+      steps:    Math.round(steps),
+      kcal:     Math.round(kcal),
+      waterMl:  Math.round(water*1000),  // Google Fit хранит воду в литрах
+      weight:   weight>0?+weight.toFixed(1):0,
+      hr:       hrCount>0?Math.round(hr/hrCount):0,
+      dist:     +(dist/1000).toFixed(2), // км
+      active:   Math.round(active),
+      sleep:    +sleepHours.toFixed(1),
+    };
+
+    gfLS.setData(result);
+    gfLS.setSyncTs(Date.now());
+
+    // ── Автоматически применяем данные в приложение ──
+    _gfitApplyToApp(result);
+
+    return result;
+  }catch(e){
+    console.warn('Google Fit fetch error:',e);
+    return null;
+  }
 }
 
-async function gfConnect(){
-  if(!GF_CLIENT_ID){
-    toast('⚙️ вставь Client ID Google в код');
-    return;
+/* ── Применить данные Google Fit в letify ── */
+function _gfitApplyToApp(d){
+  if(!d)return;
+  const apply = lsGet('gfit_apply')||{steps:1,water:1,sleep:1,weight:1,kcal:0};
+
+  // Вода — добавляем если есть данные и включено
+  if(apply.water && d.waterMl>0){
+    const curWater = C.water?.total||0;
+    if(d.waterMl > curWater){
+      // Google Fit показывает больше — обновляем
+      if(!UID){
+        lsSet('wd_'+TODAY,{total:d.waterMl, entries:C.water?.entries||[]});
+        C.water = {...C.water, total:d.waterMl};
+      }
+    }
   }
-  _gfLoad();
-  if(_gfConnected && _gfAccessToken){
-    toast('синхронизация...');
-    await gfSync();
-    return;
+
+  // Сон — записываем если есть и включено
+  if(apply.sleep && d.sleep>0){
+    const sl = gSL();
+    const todaySl = sl.find(x=>x.logged_at===TODAY);
+    if(!todaySl&&d.sleep>0){
+      const newSl=[...sl,{hours:d.sleep,quality:3,logged_at:TODAY,source:'google_fit'}];
+      if(!UID)lsSet('slog',newSl);
+      C.sleep_log=newSl;
+    }
   }
-  if(!window.google?.accounts?.oauth2){
-    toast('Google API загружается, попробуй снова');
-    return;
+
+  // Вес — если новее записи
+  if(apply.weight && d.weight>0){
+    const wl = gWL();
+    const todayW = wl.find(x=>x.logged_at===TODAY);
+    if(!todayW){
+      const newWl=[...wl,{weight:d.weight,logged_at:TODAY,source:'google_fit'}];
+      if(!UID)lsSet('wlog',newWl);
+      C.weight_log=newWl;
+    }
   }
-  if(!_gfInitClient()){ toast('ошибка инициализации'); return; }
-  tg?.HapticFeedback?.impactOccurred('light');
-  // Открываем Google OAuth popup — браузер/WebView откроет popup авторизации
-  try { _gfTokenClient.requestAccessToken({prompt: ''}); } catch(e){ toast('ошибка запуска авторизации'); }
 }
 
-async function gfDisconnect(){
-  tg?.HapticFeedback?.impactOccurred('medium');
-  if(_gfAccessToken){
-    try{ google.accounts.oauth2.revoke(_gfAccessToken, ()=>{}); }catch{}
+/* ── Обратная совместимость: steps alias ── */
+async function _gfitFetchSteps(token){ return _gfitFetchAll(token); }
+
+/* ── публичная: connect/disconnect ── */
+async function gfitToggle(){
+  const token = _gfitGetValidToken();
+  if(token){
+    /* Уже подключено — показываем выбор: синхр или отключить */
+    _gfitShowOptions();
+    return;
   }
-  _gfAccessToken = null;
-  _gfConnected = false;
-  lsSet('gfit_token', null);
-  lsSet('gfit_steps', null);
+  /* Не подключено — запрашиваем авторизацию */
+  if(!_gfitTokenClient){
+    if(GFIT_CLIENT_ID==='YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com'){
+      toast('Google Fit: настройте CLIENT_ID в коде');
+      return;
+    }
+    _gfitInitClient();
+    if(!_gfitTokenClient){toast('Google Fit: ошибка инициализации');return;}
+  }
+  _gfitSetSyncing(true);
+  try{
+    _gfitTokenClient.requestAccessToken({prompt:'consent'});
+    /* callback обрабатывает ответ */
+  }catch(e){
+    _gfitSetSyncing(false);
+    toast('Не удалось открыть Google Sign-In');
+  }
+}
+
+async function gfitSync(){
+  const token = _gfitGetValidToken();
+  if(!token){toast('Google Fit не подключён');return;}
+  _gfitSetSyncing(true);
+  const data = await _gfitFetchAll(token);
+  _gfitSetSyncing(false);
+  if(data){
+    toast(`Google Fit: ${data.steps.toLocaleString('ru')} шагов · ${data.kcal} ккал · ${data.waterMl} мл`);
+    _gfitRenderUI();
+    renderHome();
+    if(curTab==='sleep')renderSleep();
+    if(curTab==='progress')renderProgress();
+    if(curTab==='track')renderTrack(trackTab);
+  }else{
+    toast('Google Fit: не удалось получить данные');
+  }
+}
+
+function gfitDisconnect(){
+  const token = _gfitGetValidToken();
+  if(token&&typeof google!=='undefined'){
+    try{google.accounts.oauth2.revoke(token,()=>{});}catch{}
+  }
+  gfLS.rmToken();
+  gfLS.setSteps(0);
+  gfLS.setSyncTs(0);
+  tg?.HapticFeedback?.notificationOccurred('warning');
   toast('Google Fit отключён');
-  renderGfStatus();
+  _gfitRenderUI();
   renderHome();
 }
 
-async function gfSync(){
-  if(!_gfConnected || !_gfAccessToken){ toast('Google Fit не подключён'); return; }
-  // Animate sync icon
-  const ico = document.querySelector('.gf-sync-ico');
-  if(ico) ico.style.animation = 'gf-spin .6s linear infinite';
-  try {
-    const steps = await _gfFetchSteps();
-    if(steps === null){ if(ico)ico.style.animation=''; return; }
-    lsSet('gfit_steps', {steps, date: TODAY, synced_at: Date.now()});
-    toast('шаги: ' + steps.toLocaleString('ru'));
-    renderHome();
-    renderGfStatus();
-  } finally {
-    setTimeout(()=>{ if(ico) ico.style.animation=''; }, 600);
-  }
-}
-
-async function _gfFetchSteps(){
-  const now = new Date();
-  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-  const endOfDay = startOfDay + 86400000;
-  try {
-    const r = await fetch('https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${_gfAccessToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        aggregateBy: [{dataTypeName: 'com.google.step_count.delta'}],
-        bucketByTime: {durationMillis: 86400000},
-        startTimeMillis: startOfDay,
-        endTimeMillis: endOfDay
-      })
+/* ── контекстное меню (подключено) ── */
+function _gfitShowOptions(){
+  const d    = gfLS.getData();
+  const ts   = gfLS.getSyncTs();
+  const ago  = ts ? _gfitAgo(ts) : 'никогда';
+  const lines=[
+    d.steps  ? `👣 ${d.steps.toLocaleString('ru')} шагов` :'',
+    d.kcal   ? `🔥 ${d.kcal} ккал сожжено`:'',
+    d.waterMl? `💧 ${d.waterMl} мл воды`:'',
+    d.sleep  ? `😴 ${d.sleep} ч сна`:'',
+    d.weight ? `⚖️ ${d.weight} кг`:'',
+    d.hr     ? `❤️ ${d.hr} уд/мин`:'',
+    d.dist   ? `📍 ${d.dist} км`:'',
+  ].filter(Boolean).join('\n');
+  const msg = lines||'нет данных за сегодня';
+  if(tg?.showPopup){
+    tg.showPopup({
+      title:'Google Fit · '+ago,
+      message:msg,
+      buttons:[
+        {id:'sync',  type:'default',     text:'🔄 Синхронизировать'},
+        {id:'disc',  type:'destructive',  text:'Отключить аккаунт'},
+        {id:'cancel',type:'cancel'}
+      ]
+    },(btn)=>{
+      if(btn==='sync')gfitSync();
+      else if(btn==='disc')gfitDisconnect();
     });
-    if(r.status === 401){
-      _gfConnected = false; _gfAccessToken = null;
-      lsSet('gfit_token', null);
-      toast('токен истёк — переподключи Google Fit');
-      renderGfStatus();
-      return null;
-    }
-    if(!r.ok) return null;
-    const d = await r.json();
-    let steps = 0;
-    for(const b of (d.bucket||[])){
-      for(const ds of (b.dataset||[])){
-        for(const pt of (ds.point||[])){
-          for(const v of (pt.value||[])){
-            steps += v.intVal || 0;
-          }
-        }
-      }
-    }
-    return steps;
-  } catch{ return null; }
-}
-
-function gfGetSteps(){
-  _gfLoad();
-  if(!_gfConnected) return null;
-  const d = lsGet('gfit_steps');
-  if(!d || d.date !== TODAY) return null;
-  return typeof d.steps === 'number' ? d.steps : null;
-}
-
-function renderGfStatus(){
-  const btn = document.getElementById('gf-connect-btn');
-  if(!btn) return;
-  const steps = gfGetSteps();
-  const stepsGoal = GF_STEPS_GOAL;
-  const discRow = document.getElementById('gf-disconnect-row');
-  const gIcon = `<svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>`;
-  if(_gfConnected){
-    const stepsStr = steps !== null ? steps.toLocaleString('ru')+' / '+stepsGoal.toLocaleString('ru')+' шагов' : 'нажми ↻ для синхронизации';
-    const stepsColor = steps !== null && steps >= stepsGoal ? 'var(--green)' : steps !== null ? 'var(--sun)' : 'var(--hint)';
-    btn.innerHTML = `<div class="gf-icon-wrap">${gIcon}</div><div style="flex:1"><div style="font-size:13px;font-weight:800">Google Fit подключён</div><div style="font-size:11px;color:${stepsColor};font-weight:700">${stepsStr}</div></div><button class="gf-sync-ico" onclick="event.stopPropagation();gfSync()" title="синхронизировать">↻</button>`;
-    btn.style.cssText = 'background:rgba(82,193,119,.08);border:1.5px solid rgba(82,193,119,.22);padding:12px 14px;border-radius:14px;display:flex;align-items:center;gap:12px;cursor:pointer;font-family:inherit;width:100%;text-align:left;-webkit-tap-highlight-color:transparent';
-    btn.onclick = null;
-    if(discRow) discRow.style.display = 'flex';
-  } else {
-    btn.innerHTML = `<div class="gf-icon-wrap">${gIcon}</div><div style="flex:1"><div style="font-size:13px;font-weight:800">Подключить Google Fit</div><div style="font-size:11px;color:var(--hint);font-weight:600">синхронизация шагов</div></div><iconify-icon icon="solar:alt-arrow-right-bold" style="font-size:14px;color:var(--hint);opacity:.5"></iconify-icon>`;
-    btn.style.cssText = '';
-    btn.onclick = gfConnect;
-    if(discRow) discRow.style.display = 'none';
+  }else{
+    alert(`Google Fit (${ago})\n${msg}`);
+    gfitSync();
   }
+}
+
+/* ── helpers ── */
+function _gfitAgo(ts){
+  const sec = Math.round((Date.now()-ts)/1000);
+  if(sec<60)return 'только что';
+  if(sec<3600)return Math.round(sec/60)+' мин назад';
+  if(sec<86400)return Math.round(sec/3600)+' ч назад';
+  return Math.round(sec/86400)+' д назад';
+}
+
+function _gfitSetSyncing(v){
+  _gfitSyncing=v;
+  const btn=document.getElementById('gfit-main-btn');
+  if(btn)btn.classList.toggle('syncing',v);
+  if(v){
+    const lbl=document.getElementById('gfit-btn-label');
+    if(lbl)lbl.textContent='…';
+  }else{
+    _gfitRenderUI();
+  }
+}
+
+/* ── рендер кнопки / строки ── */
+function _gfitRenderUI(){
+  const token    = _gfitGetValidToken();
+  const d        = gfLS.getData();
+  const ts       = gfLS.getSyncTs();
+  const btn      = document.getElementById('gfit-main-btn');
+  const statusEl = document.getElementById('gfit-status-text');
+
+  if(!btn)return;
+  if(token){
+    btn.classList.add('connected');
+    const label = d.steps>0 ? d.steps.toLocaleString('ru')+' шаг' : 'синхр';
+    btn.innerHTML=`
+      <span class="gfit-sync-dot"></span>
+      <svg width="12" height="12" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.83z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.83c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+      </svg>
+      <span class="gfit-btn-lbl">${label}</span>`;
+    if(statusEl){
+      const ago = ts?_gfitAgo(ts):'никогда';
+      const parts=[];
+      if(d.steps)  parts.push(`${d.steps.toLocaleString('ru')} шаг`);
+      if(d.kcal)   parts.push(`${d.kcal} ккал`);
+      if(d.waterMl)parts.push(`${d.waterMl} мл`);
+      if(d.sleep)  parts.push(`${d.sleep}ч сна`);
+      if(d.weight) parts.push(`${d.weight} кг`);
+      statusEl.textContent = (parts.length?parts.join(' · '):('синхронизировано'))+` · ${ago}`;
+    }
+  }else{
+    btn.classList.remove('connected');
+    btn.innerHTML=`
+      <svg class="gfit-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.83z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.83c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+      </svg>
+      <span class="gfit-btn-lbl" id="gfit-btn-label">Подключить</span>`;
+    if(statusEl)statusEl.textContent='не подключено · шаги не синхронизированы';
+  }
+}
+
+/* ── виджет Google Fit на главной ── */
+function _gfitStepsHomeHtml(){
+  const token=_gfitGetValidToken();
+  if(!token)return '';
+  const d=gfLS.getData();
+  const steps=d.steps||0;
+  const pct=Math.min(100,Math.round(steps/GFIT_STEPS_GOAL*100));
+  const extras=[];
+  if(d.kcal)   extras.push(`<span style="font-size:10px;font-weight:800;color:var(--sun)">🔥${d.kcal}</span>`);
+  if(d.waterMl)extras.push(`<span style="font-size:10px;font-weight:800;color:var(--water)">💧${d.waterMl}мл</span>`);
+  if(d.sleep)  extras.push(`<span style="font-size:10px;font-weight:800;color:var(--sleep)">😴${d.sleep}ч</span>`);
+  if(d.dist)   extras.push(`<span style="font-size:10px;font-weight:800;color:var(--hint)">📍${d.dist}км</span>`);
+  return `<div class="pad" style="margin-top:2px">
+  <div class="home-steps-row">
+    <div class="home-steps-ico">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M13 3a2 2 0 1 1 4 0 2 2 0 0 1-4 0zM6.5 20l2-7-2.5-2L8 7.5l4.5 2L14 13h3l-2 7H6.5z" fill="#52C177"/>
+      </svg>
+    </div>
+    <div style="flex:1;min-width:0">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:baseline;gap:3px">
+          <span class="home-steps-val" style="color:var(--green)">${steps.toLocaleString('ru')}</span>
+          <span class="home-steps-of">/ ${GFIT_STEPS_GOAL.toLocaleString('ru')}</span>
+        </div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end">${extras.join('')}</div>
+      </div>
+      <div class="home-steps-lbl">шаги · google fit</div>
+      <div class="home-steps-pb"><div class="home-steps-pbf" style="width:${pct}%"></div></div>
+    </div>
+  </div>
+</div>`;
 }
 
 /* ══ INIT ══ */
@@ -5444,31 +5644,42 @@ document.addEventListener('DOMContentLoaded',async()=>{
   await loadData();
   renderHome();
   _updateNavAvatar(); // restore nav avatar from storage on startup
-  // Google Fit: load saved token state and try auto-sync
-  _gfLoad();
-  if(_gfConnected){
-    // auto-sync steps if data is older than 10 min or missing
-    const saved = lsGet('gfit_steps');
-    const needSync = !saved || saved.date !== TODAY || (Date.now() - (saved.synced_at||0)) > 600000;
-    if(needSync){ setTimeout(()=>gfSync(), 3000); } // slight delay after app start
-    else renderHome(); // refresh home to show cached steps
-  }
-  // Init GIS client after a short delay (library loads async)
-  setTimeout(()=>{ try{ _gfInitClient(); }catch{} }, 2000);
+  // ── Google Fit: init client + render UI + auto-sync если токен свежий ──
+  setTimeout(()=>{
+    _gfitInitClient();
+    _gfitRenderUI();
+    // автосинк если токен есть и синхронизация была >5 мин назад
+    const _gfTok=_gfitGetValidToken();
+    const _gfTs=gfLS.getSyncTs();
+    if(_gfTok&&(Date.now()-_gfTs)>5*60*1000){
+      _gfitFetchSteps(_gfTok).then(()=>{_gfitRenderUI();renderHome();});
+    }
+  },1500); // после загрузки GIS скрипта
   setTimeout(()=>{
     const sp=document.getElementById('splash');
     if(sp){sp.classList.add('hiding');setTimeout(()=>sp.remove(),520);}
   },1200);
   setInterval(async()=>{if(curTab==='home'&&_completingMap.size===0){await loadData();renderHome();}},30000);
-  // Google Fit auto-sync every 5 minutes if connected
-  setInterval(async()=>{ _gfLoad(); if(_gfConnected){ const s=lsGet('gfit_steps'); if(!s||s.date!==TODAY||(Date.now()-(s.synced_at||0))>300000) await gfSync(); } },60000);
   // освобождаем камеру только при сворачивании приложения
   document.addEventListener('visibilitychange',()=>{
     if(document.hidden&&_scanStream){
       stopScanner(false); // стоп детекции
       // НЕ останавливаем tracks — при возврате не нужен диалог разрешений
     }
+    // Google Fit: синхр при возвращении в приложение (если прошло >10 мин)
+    if(!document.hidden){
+      const _gfTok=_gfitGetValidToken();
+      const _gfTs=gfLS.getSyncTs();
+      if(_gfTok&&(Date.now()-_gfTs)>10*60*1000){
+        _gfitFetchSteps(_gfTok).then(()=>{_gfitRenderUI();renderHome();});
+      }
+    }
   });
+  // Google Fit: автосинхронизация каждые 15 минут
+  setInterval(()=>{
+    const _gfTok=_gfitGetValidToken();
+    if(_gfTok)_gfitFetchSteps(_gfTok).then(()=>{_gfitRenderUI();if(curTab==='home')renderHome();if(curTab==='profile'){}});
+  },15*60*1000);
   // Предзагрузка камеры при первом касании кнопки сканера
   document.querySelector('[onclick*="pp-scanner"]')?.addEventListener('touchstart',_prewarmCamera,{once:true,passive:true});
 });
