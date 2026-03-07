@@ -2768,10 +2768,12 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-4 4 4 4-6"/></svg>
   </div>
   <div class="nt" id="nt-profile" onclick="navTo('profile')">
-    <div id="nav-av-wrap" style="width:26px;height:26px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(var(--pf-r),var(--pf-g),var(--pf-b),1),rgba(var(--pf-r),var(--pf-g),var(--pf-b),.65));flex-shrink:0;transition:background .65s ease,box-shadow .65s ease">
-      <img id="nav-av-img" alt="" style="width:100%;height:100%;object-fit:cover;display:none">
-      <svg id="nav-av-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;color:#fff"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    <!-- аватар: кружок виден только когда загружено фото -->
+    <div id="nav-av-wrap" style="width:22px;height:22px;border-radius:50%;overflow:hidden;display:none;align-items:center;justify-content:center;flex-shrink:0;transition:box-shadow .65s ease">
+      <img id="nav-av-img" alt="" style="width:100%;height:100%;object-fit:cover;display:block">
     </div>
+    <!-- иконка профиля — показывается когда нет фото, стиль = остальные иконки навбара -->
+    <svg id="nav-av-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;flex-shrink:0"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
   </div>
 </nav>
 
@@ -2805,18 +2807,20 @@ function _applySA(){
   if(!navHidden){const nav=document.getElementById('nav');if(nav)nav.style.bottom=(12+bot)+'px';}
 }
 function applyTheme(){
-  const p=tg?.themeParams||{};
   const dark=tg?.colorScheme==='dark'||window.matchMedia?.('(prefers-color-scheme:dark)').matches;
   document.body.classList.toggle('tg-dark',dark);
+  // Всегда используем фиксированный фон: глубокий чёрный для тёмной темы,
+  // светлый для светлой — кастомные цвета Telegram не трогаем.
   if(dark){
-    const bg=p.bg_color||'#111111';
-    document.documentElement.style.setProperty('--bg',bg);
-    document.documentElement.style.setProperty('--bg2',bg);
-    document.documentElement.style.setProperty('--text',p.text_color||'#ffffff');
-    document.documentElement.style.setProperty('--hint',p.hint_color||'#708499');
+    document.documentElement.style.setProperty('--bg','#111111');
+    document.documentElement.style.setProperty('--bg2','#111111');
+    document.documentElement.style.setProperty('--text','#ffffff');
+    document.documentElement.style.setProperty('--hint','#708499');
   }else{
-    const m={'--bg':p.bg_color,'--bg2':p.secondary_bg_color||p.bg_color,'--text':p.text_color,'--hint':p.hint_color};
-    for(const[k,v]of Object.entries(m))if(v)document.documentElement.style.setProperty(k,v);
+    document.documentElement.style.setProperty('--bg','#FAF7F2');
+    document.documentElement.style.setProperty('--bg2','#ffffff');
+    document.documentElement.style.setProperty('--text','#1C1608');
+    document.documentElement.style.setProperty('--hint','#A89F90');
   }
 }
 applyTheme();
@@ -4329,14 +4333,16 @@ function _updateNavAvatar(){
   const wrap=document.getElementById('nav-av-wrap');
   const saved=_loadAvatarFromStorage();
   if(saved&&img){
-    img.src=saved;img.style.display='block';
+    // Есть фото — показываем кружок с фото, прячем иконку
+    img.src=saved;
+    if(wrap){wrap.style.display='flex';}
     if(svg)svg.style.display='none';
-    if(wrap){wrap.style.background='transparent';wrap.style.borderRadius='50%';}
     const sc=_loadAvatarColor();
     if(sc&&wrap)wrap.style.boxShadow=`0 0 8px rgba(${sc},.4)`;
-  }else if(img){
-    img.style.display='none';if(svg)svg.style.display='';
-    if(wrap){wrap.style.background='';wrap.style.boxShadow='';}
+  }else{
+    // Нет фото — прячем кружок, показываем обычную иконку навбара
+    if(wrap){wrap.style.display='none';wrap.style.boxShadow='';}
+    if(svg)svg.style.display='';
   }
 }
 
