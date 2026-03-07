@@ -203,7 +203,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   border:1px solid rgba(255,255,255,.9);
   border-radius:24px;
   box-shadow:0 6px 24px rgba(0,0,0,.12),0 2px 6px rgba(0,0,0,.06);
-  transition:bottom .28s ease,opacity .22s ease;
+  transition:bottom .28s ease,opacity .22s ease,background 3s ease,box-shadow 3s ease,border-color 3s ease;
 }
 .tg-dark #nav{background:rgba(24,18,10,.96);border-color:rgba(255,255,255,.1)}
 #nav.gone{bottom:calc(-120px - var(--sb));opacity:0;pointer-events:none}
@@ -214,7 +214,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   cursor:pointer;color:var(--hint);
   transition:color .12s ease,background .12s ease;
 }
-.nt.on{color:var(--sun);background:rgba(255,107,53,.1)}
+.nt.on{color:rgb(var(--pf-r),var(--pf-g),var(--pf-b));background:rgba(var(--pf-r),var(--pf-g),var(--pf-b),.1)}
 .nt:active{transform:scale(.97);transition:transform .03s ease}
 .nt svg{width:22px;height:22px;flex-shrink:0}
 
@@ -529,10 +529,10 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .pav-spinner{
   position:absolute;inset:0;
   display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(135deg,var(--sun),var(--sun2));
+  background:linear-gradient(135deg,rgba(var(--pf-r),var(--pf-g),var(--pf-b),1),rgba(var(--pf-r),var(--pf-g),var(--pf-b),.7));
   z-index:4;
   opacity:0;
-  transition:opacity .2s ease;
+  transition:opacity .3s ease;
   pointer-events:none;
 }
 .pav-spinner.show{opacity:1}
@@ -1742,6 +1742,19 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       <div class="pav" id="pf-av">
         <span id="pf-av-letter">А</span>
         <img class="pav-img" id="pf-av-img" alt="" src="">
+        <!-- Loading spinner — shown for 3s after photo pick -->
+        <div class="pav-spinner" id="pav-spinner">
+          <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+            <circle cx="15" cy="15" r="11" stroke="rgba(255,255,255,.22)" stroke-width="2.5"/>
+            <circle cx="15" cy="15" r="11" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="28 46"/>
+          </svg>
+        </div>
+        <!-- Hold-to-pick / hold-to-delete dim overlay -->
+        <div class="pav-del-overlay" id="pav-del-overlay">
+          <svg id="pav-overlay-ico" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>
+          </svg>
+        </div>
       </div>
       <!-- Tooltip pill -->
       <div class="av-tip cam" id="av-tip">
@@ -4402,6 +4415,7 @@ function _avReset(){
   av.timer=null;av.dimTimer=null;av.rafStart=null;
   av.pressing=false;av.phase=0;
   const avEl=_avEl();if(avEl)avEl.classList.remove('pressing');
+  const ov=document.getElementById('pav-del-overlay');if(ov)ov.classList.remove('show');
   const tip=_avTip();if(tip)tip.classList.remove('show');
   const fill=_avFill();if(fill)fill.style.width='0%';
 }
@@ -4410,9 +4424,14 @@ function avDown(e){
   e.preventDefault();
   if(av.pressing)return;
   av.pressing=true;av.phase=1;
-  // Dim only after 1s hold — not on quick tap
+  // Dim + overlay after 300ms hold — instant feedback
   const avEl=_avEl();
-  av.dimTimer=setTimeout(()=>{if(av.pressing&&avEl)avEl.classList.add('pressing');},1000);
+  av.dimTimer=setTimeout(()=>{
+    if(!av.pressing)return;
+    if(avEl)avEl.classList.add('pressing');
+    const ov=document.getElementById('pav-del-overlay');
+    if(ov)ov.classList.add('show');
+  },300);
 
   av.timer=setTimeout(()=>{
     if(!av.pressing)return;
@@ -4471,6 +4490,14 @@ function _lcInitFileInput(){
   if(!fi)return;
   fi.addEventListener('change',function(){
     const f=this.files[0];if(!f)return;this.value='';
+
+    // Show spinner immediately in the avatar circle
+    const spinner=document.getElementById('pav-spinner');
+    if(spinner)spinner.classList.add('show');
+    // Hide letter while loading
+    const letterEl=document.getElementById('pf-av-letter');
+    if(letterEl)letterEl.style.opacity='0';
+
     const r=new FileReader();
     r.onload=e=>{
       const src=e.target.result;
@@ -4487,6 +4514,7 @@ function _lcInitFileInput(){
         oc.restore();
         const url=out.toDataURL('image/jpeg',.92);
         // Extract dominant color
+        let rgb=null;
         try{
           const tmp=document.createElement('canvas');tmp.width=8;tmp.height=8;
           const tc=tmp.getContext('2d');tc.drawImage(out,0,0,8,8);
@@ -4497,12 +4525,17 @@ function _lcInitFileInput(){
             const sat=(mx-mn)/(mx||1),lum=(mx+mn)/510;
             if(sat>.12&&lum>.06&&lum<.92){rv+=d[i];gv+=d[i+1];bv+=d[i+2];n++;}
           }
-          const rgb=n>0?`${Math.round(rv/n)},${Math.round(gv/n)},${Math.round(bv/n)}`:null;
-          if(rgb)_saveAvatarColor(rgb);
+          if(n>0){rgb=`${Math.round(rv/n)},${Math.round(gv/n)},${Math.round(bv/n)}`;_saveAvatarColor(rgb);}
         }catch{}
         _saveAvatarToStorage(url);
-        _applyAvatarFull(url,true);
-        toast('аватар обновлён ✓');
+
+        // After 3 seconds spinner ends → avatar fades in, colors transition
+        setTimeout(()=>{
+          if(spinner)spinner.classList.remove('show');
+          if(letterEl)letterEl.style.opacity='';
+          _applyAvatarFull(url,true);
+          toast('аватар обновлён ✓');
+        },3000);
       };
       img.src=src;
     };
@@ -4672,6 +4705,17 @@ function _setPfHeroColor(rgb){
   root.style.setProperty('--pf-r',parts[0]);
   root.style.setProperty('--pf-g',parts[1]);
   root.style.setProperty('--pf-b',parts[2]);
+  // Tint navbar shadow + border with avatar dominant color
+  const nav=document.getElementById('nav');
+  if(nav){
+    if(rgb){
+      nav.style.boxShadow=`0 6px 24px rgba(${rgb},.22),0 2px 6px rgba(0,0,0,.05)`;
+      nav.style.borderColor=`rgba(${rgb},.28)`;
+    }else{
+      nav.style.boxShadow='';
+      nav.style.borderColor='';
+    }
+  }
 }
 
 function _applyAvatarFull(dataUrl,animate){
