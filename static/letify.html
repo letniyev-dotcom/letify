@@ -5289,10 +5289,16 @@ function _gfitCheckUrlToken(){
     gfLS.setToken({access_token:token, expires_at:expAt});
     // Убираем токен из URL
     window.history.replaceState(null,'',window.location.pathname+window.location.search);
-    // ── Возвращаем пользователя в Telegram бот ──
-    setTimeout(()=>{ window.location.href = 'https://t.me/let1fybot'; }, 300);
+    // ── Возвращаем в Telegram через нативный deep link ──
+    // tg:// открывает приложение Telegram напрямую
+    window.location.href = 'tg://resolve?domain=let1fybot';
+    // Fallback: если tg:// не сработал — через t.me
+    setTimeout(()=>{ window.location.href = 'https://t.me/let1fybot'; }, 1500);
   }catch(e){ console.warn('gfit token parse',e); }
 }
+
+// ── Запускаем проверку токена СРАЗУ при загрузке страницы (не ждём 1500мс) ──
+_gfitCheckUrlToken();
 
 /* ── инициализация: проверяем токен в URL ── */
 function _gfitInitClient(){
