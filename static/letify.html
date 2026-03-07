@@ -469,21 +469,50 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .cg-item{
   display:flex;flex-direction:column;align-items:center;gap:7px;
   cursor:pointer;-webkit-tap-highlight-color:transparent;
+  width:52px;
+}
+/* stable 52×52 box — ring lives inside, zero layout shift */
+.cg-wrap{
+  width:52px;height:52px;
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+/* ring drawn via ::after on wrap — inset so it never pushes layout */
+.cg-wrap::after{
+  content:'';
+  position:absolute;
+  inset:1px;
+  border-radius:50%;
+  border:2px solid var(--ring,transparent);
+  opacity:0;
+  transform:scale(0.82);
+  transition:opacity .32s ease, transform .32s ease;
+  pointer-events:none;
 }
 .cg-swatch{
   width:52px;height:52px;border-radius:50%;
-  position:relative;
+  position:relative;z-index:1;
   box-shadow:0 3px 10px rgba(0,0,0,.2);
   flex-shrink:0;
+  will-change:transform;
+  transition:transform .32s ease, box-shadow .32s ease;
 }
 .cg-check{display:none}
+/* selected: swatch shrinks, ring fades in — NO layout shift */
 .cg-item.on .cg-swatch{
-  box-shadow:0 0 0 3px var(--bg), 0 0 0 5.5px var(--sun);
+  transform:scale(0.80);
+  box-shadow:0 1px 6px rgba(0,0,0,.15);
+}
+.cg-item.on .cg-wrap::after{
+  opacity:1;
+  transform:scale(1);
 }
 .cg-lbl{
   font-size:10px;font-weight:700;
   color:var(--hint);text-align:center;
   white-space:nowrap;
+  transition:color .28s ease;
 }
 .cg-item.on .cg-lbl{color:var(--text);font-weight:800;}
 
@@ -511,7 +540,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .sl{font-size:10px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.06em}
 
 /* ══ BANNER ══ */
-.banner{background:linear-gradient(130deg,#FF6B35,#FFAB40);border-radius:var(--r-lg);padding:16px;color:#fff;position:relative;overflow:hidden}
+.banner{background:linear-gradient(130deg,var(--sun),var(--sun2));border-radius:var(--r-lg);padding:16px;color:#fff;position:relative;overflow:hidden}
 .banner::after{content:'';position:absolute;right:-10px;top:-10px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.1);pointer-events:none}
 
 /* ══ ACT CARD ══ */
@@ -1892,7 +1921,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     <div class="pf-tile pf-tile-o" onclick="pushPage('pp-pdata')">
       <div class="pf-tile-glow"></div>
       <div class="pf-tile-ic">
-        <iconify-icon icon="solar:user-circle-bold" style="font-size:18px;color:#FF6B35"></iconify-icon>
+        <iconify-icon icon="solar:user-circle-bold" style="font-size:18px;color:var(--sun)"></iconify-icon>
       </div>
       <div>
         <div class="pf-tile-lbl">Профиль</div>
@@ -1945,7 +1974,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
     <div class="pf-list-row" style="border-bottom:none;cursor:default">
       <div class="pf-list-row-ic">
-        <iconify-icon icon="solar:bell-bold" style="font-size:15px;color:#FFAB40"></iconify-icon>
+        <iconify-icon icon="solar:bell-bold" style="font-size:15px;color:var(--sun2)"></iconify-icon>
       </div>
       <span class="pf-list-row-lbl">Уведомления</span>
       <div class="pf-tog on" id="pf-notif-tog" onclick="this.classList.toggle('on');tg?.HapticFeedback?.selectionChanged()"></div>
@@ -2215,7 +2244,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
           <circle id="md-arc-p" cx="90" cy="90" r="72" fill="none" stroke="#52C177" stroke-width="20"
             stroke-dasharray="0 452.4" stroke-dashoffset="113.1"
             stroke-linecap="round" filter="url(#glow-p)"/>
-          <circle id="md-arc-f" cx="90" cy="90" r="72" fill="none" stroke="#FF6B35" stroke-width="20"
+          <circle id="md-arc-f" cx="90" cy="90" r="72" fill="none" stroke="var(--sun)" stroke-width="20"
             stroke-dasharray="0 452.4" stroke-dashoffset="113.1"
             stroke-linecap="round" filter="url(#glow-f)"/>
         </svg>
@@ -2234,9 +2263,9 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
           </div>
         </div>
         <div class="md-leg">
-          <div class="md-leg-dot" style="background:#FF6B35;box-shadow:0 0 6px rgba(var(--sun-rgb),.5)"></div>
+          <div class="md-leg-dot" style="background:var(--sun);box-shadow:0 0 6px rgba(var(--sun-rgb),.5)"></div>
           <div>
-            <div class="md-leg-v" style="color:#FF6B35" id="md-fat">0г</div>
+            <div class="md-leg-v" style="color:var(--sun)" id="md-fat">0г</div>
             <div class="md-leg-l">жиры</div>
           </div>
         </div>
@@ -2501,96 +2530,90 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     <div><div class="pp-title">цвет акцента</div><div class="pp-subtitle">выбери палитру под своё настроение</div></div>
   </div>
   <div class="pp-body">
-    <div class="cg-grid">
-      <div class="cg-item" id="cg-sunset" onclick="setAccentTheme('sunset')">
-        <div class="cg-swatch" style="background:linear-gradient(135deg,#FF6B35,#FFAB40)">
-          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-        </div>
+    <div class="cg-grid" id="cg-grid">
+      <div class="cg-item" id="cg-sunset" data-id="sunset" onclick="setAccentTheme('sunset')">
+        <div class="cg-wrap" style="--ring:#FF6B35"><div class="cg-swatch" style="background:linear-gradient(135deg,#FF6B35,#FFAB40)"></div></div>
         <div class="cg-lbl">закат</div>
       </div>
-      <div class="cg-item" id="cg-peach" onclick="setAccentTheme('peach')">
-        <div class="cg-swatch" style="background:linear-gradient(135deg,#FF8C69,#FFD17A)">
-          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-        </div>
+      <div class="cg-item" id="cg-peach" data-id="peach" onclick="setAccentTheme('peach')">
+        <div class="cg-wrap" style="--ring:#FF8C69"><div class="cg-swatch" style="background:linear-gradient(135deg,#FF8C69,#FFD17A)"></div></div>
         <div class="cg-lbl">персик</div>
       </div>
-      <div class="cg-item" id="cg-mango" onclick="setAccentTheme('mango')">
-        <div class="cg-swatch" style="background:linear-gradient(135deg,#F5A623,#FFD65C)">
-          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-        </div>
+      <div class="cg-item" id="cg-mango" data-id="mango" onclick="setAccentTheme('mango')">
+        <div class="cg-wrap" style="--ring:#F5A623"><div class="cg-swatch" style="background:linear-gradient(135deg,#F5A623,#FFD65C)"></div></div>
         <div class="cg-lbl">манго</div>
       </div>
-      <div class="cg-item" id="cg-hibiscus" onclick="setAccentTheme('hibiscus')">
-        <div class="cg-swatch" style="background:linear-gradient(135deg,#E85474,#FF9FA0)">
-          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-        </div>
+      <div class="cg-item" id="cg-hibiscus" data-id="hibiscus" onclick="setAccentTheme('hibiscus')">
+        <div class="cg-wrap" style="--ring:#E85474"><div class="cg-swatch" style="background:linear-gradient(135deg,#E85474,#FF9FA0)"></div></div>
         <div class="cg-lbl">гибискус</div>
       </div>
-      <div class="cg-item" id="cg-lagoon" onclick="setAccentTheme('lagoon')">
-        <div class="cg-swatch" style="background:linear-gradient(135deg,#0CBFA0,#50D9C8)">
-          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-        </div>
+      <div class="cg-item" id="cg-lagoon" data-id="lagoon" onclick="setAccentTheme('lagoon')">
+        <div class="cg-wrap" style="--ring:#0CBFA0"><div class="cg-swatch" style="background:linear-gradient(135deg,#0CBFA0,#50D9C8)"></div></div>
         <div class="cg-lbl">лагуна</div>
       </div>
-      <div class="cg-item" id="cg-lime" onclick="setAccentTheme('lime')">
-        <div class="cg-swatch" style="background:linear-gradient(135deg,#76C442,#C8E63A)">
-          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-        </div>
+      <div class="cg-item" id="cg-lime" data-id="lime" onclick="setAccentTheme('lime')">
+        <div class="cg-wrap" style="--ring:#76C442"><div class="cg-swatch" style="background:linear-gradient(135deg,#76C442,#C8E63A)"></div></div>
         <div class="cg-lbl">лайм</div>
       </div>
-      <div class="cg-item" id="cg-coral" onclick="setAccentTheme('coral')">
-        <div class="cg-swatch" style="background:linear-gradient(135deg,#FF4F6D,#FF8C61)">
-          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-        </div>
+      <div class="cg-item" id="cg-coral" data-id="coral" onclick="setAccentTheme('coral')">
+        <div class="cg-wrap" style="--ring:#FF4F6D"><div class="cg-swatch" style="background:linear-gradient(135deg,#FF4F6D,#FF8C61)"></div></div>
         <div class="cg-lbl">кораллы</div>
       </div>
-      <div class="cg-item" id="cg-watermelon" onclick="setAccentTheme('watermelon')">
-        <div class="cg-swatch" style="background:linear-gradient(135deg,#F52D56,#FF7B7B)">
-          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-        </div>
+      <div class="cg-item" id="cg-watermelon" data-id="watermelon" onclick="setAccentTheme('watermelon')">
+        <div class="cg-wrap" style="--ring:#F52D56"><div class="cg-swatch" style="background:linear-gradient(135deg,#F52D56,#FF7B7B)"></div></div>
         <div class="cg-lbl">арбуз</div>
       </div>
-      <div class="cg-item" id="cg-sunflower" onclick="setAccentTheme('sunflower')">
-        <div class="cg-swatch" style="background:linear-gradient(135deg,#E8900A,#F5C842)">
-          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-        </div>
+      <div class="cg-item" id="cg-sunflower" data-id="sunflower" onclick="setAccentTheme('sunflower')">
+        <div class="cg-wrap" style="--ring:#E8900A"><div class="cg-swatch" style="background:linear-gradient(135deg,#E8900A,#F5C842)"></div></div>
         <div class="cg-lbl">подсолнух</div>
       </div>
-      <div class="cg-item" id="cg-sakura" onclick="setAccentTheme('sakura')">
-        <div class="cg-swatch" style="background:linear-gradient(135deg,#E8637A,#F4A7B9)">
-          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-        </div>
+      <div class="cg-item" id="cg-sakura" data-id="sakura" onclick="setAccentTheme('sakura')">
+        <div class="cg-wrap" style="--ring:#E8637A"><div class="cg-swatch" style="background:linear-gradient(135deg,#E8637A,#F4A7B9)"></div></div>
         <div class="cg-lbl">сакура</div>
       </div>
-      <div class="cg-item" id="cg-ocean" onclick="setAccentTheme('ocean')">
-        <div class="cg-swatch" style="background:linear-gradient(135deg,#1E7FD8,#5BB8F5)">
-          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-        </div>
+      <div class="cg-item" id="cg-ocean" data-id="ocean" onclick="setAccentTheme('ocean')">
+        <div class="cg-wrap" style="--ring:#1E7FD8"><div class="cg-swatch" style="background:linear-gradient(135deg,#1E7FD8,#5BB8F5)"></div></div>
         <div class="cg-lbl">океан</div>
       </div>
-      <div class="cg-item" id="cg-violet" onclick="setAccentTheme('violet')">
-        <div class="cg-swatch" style="background:linear-gradient(135deg,#8B5CF6,#C084FC)">
-          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-        </div>
+      <div class="cg-item" id="cg-violet" data-id="violet" onclick="setAccentTheme('violet')">
+        <div class="cg-wrap" style="--ring:#8B5CF6"><div class="cg-swatch" style="background:linear-gradient(135deg,#8B5CF6,#C084FC)"></div></div>
         <div class="cg-lbl">фиолет</div>
       </div>
-      <div class="cg-item" id="cg-mint" onclick="setAccentTheme('mint')">
-        <div class="cg-swatch" style="background:linear-gradient(135deg,#10B981,#6EE7B7)">
-          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-        </div>
+      <div class="cg-item" id="cg-mint" data-id="mint" onclick="setAccentTheme('mint')">
+        <div class="cg-wrap" style="--ring:#10B981"><div class="cg-swatch" style="background:linear-gradient(135deg,#10B981,#6EE7B7)"></div></div>
         <div class="cg-lbl">мята</div>
       </div>
-      <div class="cg-item" id="cg-tangerine" onclick="setAccentTheme('tangerine')">
-        <div class="cg-swatch" style="background:linear-gradient(135deg,#F97316,#FDE047)">
-          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-        </div>
+      <div class="cg-item" id="cg-tangerine" data-id="tangerine" onclick="setAccentTheme('tangerine')">
+        <div class="cg-wrap" style="--ring:#F97316"><div class="cg-swatch" style="background:linear-gradient(135deg,#F97316,#FDE047)"></div></div>
         <div class="cg-lbl">мандарин</div>
       </div>
-      <div class="cg-item" id="cg-sand" onclick="setAccentTheme('sand')">
-        <div class="cg-swatch" style="background:linear-gradient(135deg,#B45309,#D97706)">
-          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-        </div>
+      <div class="cg-item" id="cg-sand" data-id="sand" onclick="setAccentTheme('sand')">
+        <div class="cg-wrap" style="--ring:#B45309"><div class="cg-swatch" style="background:linear-gradient(135deg,#B45309,#D97706)"></div></div>
         <div class="cg-lbl">песок</div>
+      </div>
+      <div class="cg-item" id="cg-apricot" data-id="apricot" onclick="setAccentTheme('apricot')">
+        <div class="cg-wrap" style="--ring:#F4845F"><div class="cg-swatch" style="background:linear-gradient(135deg,#F4845F,#FFBF8A)"></div></div>
+        <div class="cg-lbl">абрикос</div>
+      </div>
+      <div class="cg-item" id="cg-blossom" data-id="blossom" onclick="setAccentTheme('blossom')">
+        <div class="cg-wrap" style="--ring:#E8919A"><div class="cg-swatch" style="background:linear-gradient(135deg,#E8919A,#F4BEC8)"></div></div>
+        <div class="cg-lbl">цветение</div>
+      </div>
+      <div class="cg-item" id="cg-honey" data-id="honey" onclick="setAccentTheme('honey')">
+        <div class="cg-wrap" style="--ring:#E8A020"><div class="cg-swatch" style="background:linear-gradient(135deg,#E8A020,#F5D878)"></div></div>
+        <div class="cg-lbl">мёд</div>
+      </div>
+      <div class="cg-item" id="cg-rosegold" data-id="rosegold" onclick="setAccentTheme('rosegold')">
+        <div class="cg-wrap" style="--ring:#D4896A"><div class="cg-swatch" style="background:linear-gradient(135deg,#D4896A,#EBBEA0)"></div></div>
+        <div class="cg-lbl">розовое золото</div>
+      </div>
+      <div class="cg-item" id="cg-fig" data-id="fig" onclick="setAccentTheme('fig')">
+        <div class="cg-wrap" style="--ring:#C0607A">
+          <div class="cg-swatch" style="background:linear-gradient(135deg,#C0607A,#E8A0BA)">
+            <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          </div>
+        </div>
+        <div class="cg-lbl">инжир</div>
       </div>
     </div>
   </div>
@@ -2949,7 +2972,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
   <div class="nt" id="nt-profile" onclick="navTo('profile')">
     <!-- аватар: кружок виден только когда загружено фото -->
-    <div id="nav-av-wrap" style="width:22px;height:22px;border-radius:50%;overflow:hidden;display:none;align-items:center;justify-content:center;flex-shrink:0;transition:box-shadow .65s ease">
+    <div id="nav-av-wrap" style="width:28px;height:28px;border-radius:50%;overflow:hidden;display:none;align-items:center;justify-content:center;flex-shrink:0;transition:box-shadow .65s ease">
       <img id="nav-av-img" alt="" style="width:100%;height:100%;object-fit:cover;display:block">
     </div>
     <!-- иконка профиля — показывается когда нет фото, стиль = остальные иконки навбара -->
@@ -4208,6 +4231,41 @@ const ACCENT_THEMES={
     r:'180',g:'83',b:'9', r2:'217',g2:'119',b2:'6',
     water:'#6BA3BE',wr:'107',wg2:'163',wb:'190',
     navLight:'rgba(255,250,240,.96)',navDark:'rgba(18,10,2,.96)'
+  },
+  apricot: {
+    // Абрикос: нежный персиково-оранжевый → кремовый розово-абрикосовый
+    sun:'#F4845F',sun2:'#FFBF8A',cal:'#E87A55',
+    r:'244',g:'132',b:'95', r2:'255',g2:'191',b2:'138',
+    water:'#7BBDE8',wr:'123',wg2:'189',wb:'232',
+    navLight:'rgba(255,251,247,.96)',navDark:'rgba(22,12,8,.96)'
+  },
+  blossom: {
+    // Цветение: пыльная роза → нежный лиловый
+    sun:'#E8919A',sun2:'#F4BEC8',cal:'#DC8591',
+    r:'232',g:'145',b:'154', r2:'244',g2:'190',b2:'200',
+    water:'#B49FE8',wr:'180',wg2:'159',wb:'232',
+    navLight:'rgba(255,248,250,.96)',navDark:'rgba(20,10,12,.96)'
+  },
+  honey: {
+    // Мёд: янтарно-золотой → тёплый кремовый
+    sun:'#E8A020',sun2:'#F5D878',cal:'#D8921A',
+    r:'232',g:'160',b:'32', r2:'245',g2:'216',b2:'120',
+    water:'#5ABCE8',wr:'90',wg2:'188',wb:'232',
+    navLight:'rgba(255,253,242,.96)',navDark:'rgba(20,16,2,.96)'
+  },
+  rosegold: {
+    // Розовое золото: тёплый розово-золотой → персиково-кремовый
+    sun:'#D4896A',sun2:'#EBBEA0',cal:'#C87E62',
+    r:'212',g:'137',b:'106', r2:'235',g2:'190',b2:'160',
+    water:'#8ABBE8',wr:'138',wg2:'187',wb:'232',
+    navLight:'rgba(255,250,246,.96)',navDark:'rgba(20,13,9,.96)'
+  },
+  fig: {
+    // Инжир: тёплый сливово-малиновый → нежный розово-лавандовый
+    sun:'#C0607A',sun2:'#E8A0BA',cal:'#B05870',
+    r:'192',g:'96',b:'122', r2:'232',g2:'160',b2:'186',
+    water:'#9E8FE8',wr:'158',wg2:'143',wb:'232',
+    navLight:'rgba(255,247,250,.96)',navDark:'rgba(18,8,12,.96)'
   }
 };
 
@@ -4258,14 +4316,14 @@ function _syncColorRow(id){
   const t=ACCENT_THEMES[id]||ACCENT_THEMES.sunset;
   const swatch=document.getElementById('dp-color-swatch');
   const nameEl=document.getElementById('dp-color-name');
-  const themeLabels={sunset:'закат',peach:'персик',mango:'манго',hibiscus:'гибискус',lagoon:'лагуна',lime:'лайм',coral:'кораллы',watermelon:'арбуз',sunflower:'подсолнух',sakura:'сакура',ocean:'океан',violet:'фиолет',mint:'мята',tangerine:'мандарин',sand:'песок'};
+  const themeLabels={sunset:'закат',peach:'персик',mango:'манго',hibiscus:'гибискус',lagoon:'лагуна',lime:'лайм',coral:'кораллы',watermelon:'арбуз',sunflower:'подсолнух',sakura:'сакура',ocean:'океан',violet:'фиолет',mint:'мята',tangerine:'мандарин',sand:'песок',apricot:'абрикос',blossom:'цветение',honey:'мёд',rosegold:'розовое золото',fig:'инжир'};
   if(swatch)swatch.style.background='linear-gradient(135deg,'+t.sun+','+t.sun2+')';
   if(nameEl)nameEl.textContent=themeLabels[id]||id;
 }
 
 function _updateDesignVal(){
   const layoutLabels={classic:'классический',linear:'линейный',bento:'бенто'};
-  const themeLabels={sunset:'закат',peach:'персик',mango:'манго',hibiscus:'гибискус',lagoon:'лагуна',lime:'лайм',coral:'кораллы',watermelon:'арбуз',sunflower:'подсолнух',sakura:'сакура',ocean:'океан',violet:'фиолет',mint:'мята',tangerine:'мандарин',sand:'песок'};
+  const themeLabels={sunset:'закат',peach:'персик',mango:'манго',hibiscus:'гибискус',lagoon:'лагуна',lime:'лайм',coral:'кораллы',watermelon:'арбуз',sunflower:'подсолнух',sakura:'сакура',ocean:'океан',violet:'фиолет',mint:'мята',tangerine:'мандарин',sand:'песок',apricot:'абрикос',blossom:'цветение',honey:'мёд',rosegold:'розовое золото',fig:'инжир'};
   const layout=layoutLabels[getHomeDesign()]||'классический';
   const theme=themeLabels[getAccentTheme()]||'закат';
   T('pf-design-val',layout+' · '+theme);
@@ -5535,6 +5593,24 @@ document.addEventListener('DOMContentLoaded',async()=>{
     if(sp){sp.classList.add('hiding');setTimeout(()=>sp.remove(),520);}
   },1200);
   setInterval(async()=>{if(curTab==='home'&&_completingMap.size===0){await loadData();renderHome();}},30000);
+  // ── Drag-to-select on colour grid ──
+  (function(){
+    const grid=document.getElementById('cg-grid');
+    if(!grid)return;
+    let dragging=false,lastPicked=null;
+    function itemAt(x,y){const el=document.elementFromPoint(x,y);return el?el.closest('.cg-item'):null;}
+    grid.addEventListener('touchstart',e=>{
+      dragging=true;lastPicked=null;
+      const t=e.touches[0];const it=itemAt(t.clientX,t.clientY);
+      if(it){lastPicked=it;setAccentTheme(it.dataset.id||it.id.replace('cg-',''));}
+    },{passive:true});
+    grid.addEventListener('touchmove',e=>{
+      if(!dragging)return;e.preventDefault();
+      const t=e.touches[0];const it=itemAt(t.clientX,t.clientY);
+      if(it&&it!==lastPicked){lastPicked=it;setAccentTheme(it.dataset.id||it.id.replace('cg-',''));}
+    },{passive:false});
+    grid.addEventListener('touchend',()=>{dragging=false;lastPicked=null;});
+  })();
   // освобождаем камеру только при сворачивании приложения
   document.addEventListener('visibilitychange',()=>{
     if(document.hidden&&_scanStream){
