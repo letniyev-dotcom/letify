@@ -30,6 +30,7 @@ button,a,[onclick]{touch-action:manipulation;}
   --bg:#FAF7F2;--bg2:#fff;--bg3:rgba(0,0,0,.05);
   --text:#1C1608;--hint:#A89F90;--brd:rgba(0,0,0,.07);
   --sun:#FF6B35;--sun2:#FFAB40;--water:#4EAEE5;--cal:#F4814A;
+  --sun-rgb:255,107,53;--sun2-rgb:255,171,64;--water-rgb:78,174,229;
   --sleep:#8B7FD4;--green:#52C177;--red:#F45C5C;
   --r:14px;--r-lg:18px;
   --st:0px;--sb:0px;
@@ -60,7 +61,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 }
 #splash::before{
   content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse 45% 30% at 50% 40%, rgba(255,107,53,.10) 0%, transparent 70%);
+  background:radial-gradient(ellipse 45% 30% at 50% 40%, rgba(var(--sun-rgb),.10) 0%, transparent 70%);
   pointer-events:none;
 }
 #splash.hiding{opacity:0;transform:scale(1.04);}
@@ -143,8 +144,8 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   -webkit-appearance:none;
   transition:background .15s,box-shadow .15s;
 }
-.m3-input:focus{background:rgba(255,107,53,.08);box-shadow:0 0 0 2px rgba(255,107,53,.3)}
-.tg-dark .m3-input:focus{background:rgba(255,107,53,.15)}
+.m3-input:focus{background:rgba(var(--sun-rgb),.08);box-shadow:0 0 0 2px rgba(var(--sun-rgb),.3)}
+.tg-dark .m3-input:focus{background:rgba(var(--sun-rgb),.15)}
 .m3-label{
   position:absolute;top:8px;left:14px;
   font-size:10px;font-weight:700;color:var(--hint);
@@ -188,7 +189,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .dual-stepper{display:flex;gap:8px;align-items:stretch}
 .dual-stepper .stepper-wrap{flex:1}
 .big-val-card{
-  background:linear-gradient(135deg,rgba(255,107,53,.07),rgba(255,171,64,.04));
+  background:linear-gradient(135deg,rgba(var(--sun-rgb),.07),rgba(var(--sun2-rgb),.04));
   border-radius:20px;padding:24px 20px;text-align:center;margin-bottom:16px;
 }
 .big-val{font-size:64px;font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--text)}
@@ -199,13 +200,13 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   position:fixed;bottom:12px;left:0;right:0;margin:0 auto;
   width:fit-content;z-index:9999;
   display:flex;align-items:center;gap:3px;padding:5px;
-  background:rgba(255,255,255,.95);
-  border:1px solid rgba(255,255,255,.9);
+  background:var(--nav-bg,rgba(255,255,255,.95));
+  border:1px solid rgba(255,255,255,.12);
   border-radius:24px;
   box-shadow:0 6px 24px rgba(0,0,0,.12),0 2px 6px rgba(0,0,0,.06);
-  transition:bottom .28s ease,opacity .22s ease,background 3s ease,box-shadow 3s ease,border-color 3s ease;
+  transition:bottom .28s ease,opacity .22s ease,background .4s ease;
 }
-.tg-dark #nav{background:rgba(24,18,10,.96);border-color:rgba(255,255,255,.1)}
+.tg-dark #nav{background:var(--nav-bg-dark,rgba(24,18,10,.96));border-color:rgba(255,255,255,.1)}
 #nav.gone{bottom:calc(-120px - var(--sb));opacity:0;pointer-events:none}
 /* Nav item — no dot, just icon centered */
 .nt{
@@ -214,7 +215,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   cursor:pointer;color:var(--hint);
   transition:color .12s ease,background .12s ease;
 }
-.nt.on{color:rgb(var(--pf-r),var(--pf-g),var(--pf-b));background:rgba(var(--pf-r),var(--pf-g),var(--pf-b),.1)}
+.nt.on{color:var(--sun);background:rgba(var(--sun-rgb),.1)}
 .nt:active{transform:scale(.97);transition:transform .03s ease}
 .nt svg{width:22px;height:22px;flex-shrink:0}
 
@@ -259,10 +260,10 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .hl-body{display:flex;flex-direction:column;padding:6px 14px 10px;gap:9px;height:100%;box-sizing:border-box}
 .hl-header{display:flex;justify-content:space-between;align-items:flex-start;flex-shrink:0}
 .hl-greeting{font-size:22px;font-weight:900;letter-spacing:-.03em;line-height:1.1}
-.hl-days-badge{display:flex;align-items:center;gap:8px;background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.2);border-radius:14px;padding:8px 12px;margin-top:2px}
-.hl-days-ico{color:rgba(255,107,53,.75);flex-shrink:0}
+.hl-days-badge{display:flex;align-items:center;gap:8px;background:rgba(var(--sun-rgb),.1);border:1px solid rgba(var(--sun-rgb),.2);border-radius:14px;padding:8px 12px;margin-top:2px}
+.hl-days-ico{color:rgba(var(--sun-rgb),.75);flex-shrink:0}
 .hl-days-num{font-size:20px;font-weight:900;color:var(--sun);letter-spacing:-.04em;line-height:1}
-.hl-days-lbl{font-size:8px;font-weight:800;color:rgba(255,107,53,.65);text-transform:uppercase;letter-spacing:.07em;margin-top:1px}
+.hl-days-lbl{font-size:8px;font-weight:800;color:rgba(var(--sun-rgb),.65);text-transform:uppercase;letter-spacing:.07em;margin-top:1px}
 .hl-banner{flex-shrink:0;background:linear-gradient(130deg,var(--sun),var(--sun2));border-radius:18px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden}
 .hl-banner::before{content:'';position:absolute;right:-20px;top:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.11);pointer-events:none}
 .hl-banner::after{content:'';position:absolute;right:40px;bottom:-30px;width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,.07);pointer-events:none}
@@ -296,7 +297,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tg-dark .hl-weight{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);box-shadow:none}
 .hl-weight-top{display:flex;align-items:center;justify-content:space-between}
 .hl-weight-left{display:flex;align-items:center;gap:10px}
-.hl-weight-ico{width:34px;height:34px;border-radius:11px;background:rgba(255,107,53,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hl-weight-ico{width:34px;height:34px;border-radius:11px;background:rgba(var(--sun-rgb),.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .hl-weight-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--hint)}
 .hl-weight-nums{display:flex;align-items:baseline;gap:4px;margin-top:2px}
 .hl-weight-cur{font-size:22px;font-weight:900;letter-spacing:-.03em}
@@ -311,18 +312,18 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .hl-plan-name{font-size:11px;font-weight:800;line-height:1.2;flex:1}
 .hl-plan-sub{font-size:9px;color:var(--hint);font-weight:600;margin-top:1px}
 .hl-plan-pill{font-size:8px;font-weight:800;padding:3px 8px;border-radius:99px;flex-shrink:0}
-.hl-streak{display:flex;align-items:center;gap:7px;background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.15);border-radius:13px;padding:9px 12px;flex-shrink:0}
+.hl-streak{display:flex;align-items:center;gap:7px;background:rgba(var(--sun-rgb),.08);border:1px solid rgba(var(--sun-rgb),.15);border-radius:13px;padding:9px 12px;flex-shrink:0}
 .hl-streak-ico{color:var(--sun);flex-shrink:0}
 .hl-streak-val{font-size:12px;font-weight:900;color:var(--sun)}
-.hl-streak-lbl{font-size:9px;font-weight:700;color:rgba(255,107,53,.6)}
+.hl-streak-lbl{font-size:9px;font-weight:700;color:rgba(var(--sun-rgb),.6)}
 
 /* ══ HOME BENTO LAYOUT ══ */
 .hb-body{display:flex;flex-direction:column;padding:6px 12px 8px;gap:7px;height:100%;box-sizing:border-box}
 .hb-header{display:flex;justify-content:space-between;align-items:flex-start;flex-shrink:0;padding:0 2px}
 .hb-greeting{font-size:19px;font-weight:900;letter-spacing:-.03em;line-height:1.1}
-.hb-days{background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.18);border-radius:12px;padding:6px 10px;text-align:center;flex-shrink:0}
+.hb-days{background:rgba(var(--sun-rgb),.1);border:1px solid rgba(var(--sun-rgb),.18);border-radius:12px;padding:6px 10px;text-align:center;flex-shrink:0}
 .hb-days-n{font-size:20px;font-weight:900;color:var(--sun);letter-spacing:-.04em;line-height:1}
-.hb-days-l{font-size:8px;font-weight:700;color:rgba(255,107,53,.65);text-transform:uppercase;letter-spacing:.06em}
+.hb-days-l{font-size:8px;font-weight:700;color:rgba(var(--sun-rgb),.65);text-transform:uppercase;letter-spacing:.06em}
 .hb-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:7px;min-height:0}
 .hb-card{background:var(--bg2);border-radius:18px;padding:12px;border:1px solid var(--brd);display:flex;flex-direction:column;cursor:pointer;transition:opacity .12s;overflow:hidden;contain:layout style}
 .hb-card:active{opacity:.7}
@@ -351,7 +352,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .hb-weight:active{opacity:.7}
 .tg-dark .hb-weight{background:rgba(255,255,255,.07)}
 .hb-w-left{display:flex;align-items:center;gap:9px}
-.hb-w-ico{width:30px;height:30px;border-radius:9px;background:rgba(255,107,53,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hb-w-ico{width:30px;height:30px;border-radius:9px;background:rgba(var(--sun-rgb),.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .hb-w-lbl{font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.06em}
 .hb-w-vals{display:flex;align-items:baseline;gap:4px;margin-top:1px}
 .hb-w-cur{font-size:18px;font-weight:900;letter-spacing:-.03em}
@@ -369,19 +370,127 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .hb-ssd.on{background:var(--sun)}
 
 /* ══ DESIGN PICKER ══ */
-.dp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-.dp-option{background:var(--bg3);border-radius:18px;padding:14px;cursor:pointer;border:2px solid transparent;transition:all .2s;position:relative;overflow:hidden}
-.dp-option.selected{border-color:var(--sun);background:rgba(255,107,53,.08)}
-.dp-option:active{transform:scale(.985);transition:transform .08s ease}
-.dp-thumb{width:100%;aspect-ratio:9/16;border-radius:10px;background:rgba(255,255,255,.05);margin-bottom:10px;overflow:hidden;position:relative}
-.dp-name{font-size:13px;font-weight:900;margin-bottom:2px}
-.dp-desc{font-size:11px;color:var(--hint);font-weight:500;line-height:1.4}
-.dp-check{position:absolute;top:10px;right:10px;width:22px;height:22px;border-radius:50%;background:var(--sun);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s}
+/* ══ DESIGN PAGE ══ */
+.dp-grid{display:flex;gap:9px;margin-bottom:14px}
+.dp-option{
+  flex:1;background:var(--bg3);border-radius:16px;padding:10px 8px 10px;
+  cursor:pointer;border:2px solid transparent;transition:all .2s;
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;
+  aspect-ratio:1;
+}
+.dp-option.selected{border-color:var(--sun);background:rgba(var(--sun-rgb),.08)}
+.dp-option:active{transform:scale(.97);transition:transform .08s ease}
+.dp-thumb{width:100%;flex:1;border-radius:9px;background:rgba(255,255,255,.05);margin-bottom:6px;overflow:hidden;position:relative;min-height:0}
+.dp-name{font-size:11px;font-weight:900;white-space:nowrap;text-align:center}
+.dp-desc{display:none}
+.dp-check{position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;background:var(--sun);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s}
 .dp-option.selected .dp-check{opacity:1}
+
+/* ══ COLOR THEME PICKER ══ */
+.ct-scroll{
+  display:flex;gap:10px;
+  overflow-x:auto;overflow-y:hidden;
+  /* pan-x tells the browser THIS element owns horizontal scroll —
+     prevents the parent page from stealing touches mid-swipe */
+  touch-action:pan-x;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  padding:4px 2px 8px;
+  margin-bottom:12px;
+  /* own compositor layer — scroll never triggers main-thread layout */
+  will-change:scroll-position;
+  transform:translateZ(0);
+}
+.ct-scroll::-webkit-scrollbar{display:none}
+.ct-item{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  cursor:pointer;flex-shrink:0;
+  -webkit-tap-highlight-color:transparent;
+  /* contain keeps layout/paint inside each item — stops scroll from
+     repainting siblings when a swatch gets the .on class */
+  contain:layout style;
+  /* NO transition here — transitions on scroll containers cause jank */
+}
+/* press feedback via opacity only (compositor, no layout) */
+.ct-item:active .ct-swatch{opacity:.78;transition:opacity .07s ease}
+.ct-swatch{
+  width:46px;height:46px;border-radius:16px;
+  position:relative;
+  border:none;
+  box-shadow:0 2px 8px rgba(0,0,0,.15);
+  /* only transition opacity & box-shadow (compositor-friendly) */
+  transition:box-shadow .18s ease, opacity .18s ease;
+  flex-shrink:0;
+  /* own layer so shadow transitions don't repaint neighbours */
+  will-change:box-shadow;
+}
+.ct-item.on .ct-swatch{
+  box-shadow:0 5px 16px rgba(0,0,0,.28);
+}
+/* darkening overlay + checkmark on selected swatch */
+.ct-check{
+  position:absolute;inset:0;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.3);
+  opacity:0;
+  /* opacity is compositor-only — zero layout cost */
+  transition:opacity .16s ease;
+  pointer-events:none;
+}
+.ct-item.on .ct-check{opacity:1}
+/* label: plain colour change, no transition (saves repaint during scroll) */
+.ct-lbl{font-size:10px;font-weight:700;color:var(--hint);white-space:nowrap}
+.ct-item.on .ct-lbl{color:var(--text)}
+
+/* ── Design page: colour row entry ── */
+.dp-color-row{
+  display:flex;align-items:center;gap:12px;
+  background:var(--bg2);border:1px solid var(--brd);
+  border-radius:16px;padding:12px 14px;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:opacity .12s;
+}
+.dp-color-row:active{opacity:.7}
+.dp-color-swatch{
+  width:32px;height:32px;border-radius:10px;
+  flex-shrink:0;
+  box-shadow:0 2px 8px rgba(0,0,0,.2);
+}
+.dp-color-name{flex:1;font-size:15px;font-weight:700;color:var(--text)}
+
+/* ── Colour picker page: grid ── */
+.cg-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:20px 12px;
+  padding:8px 4px 24px;
+}
+.cg-item{
+  display:flex;flex-direction:column;align-items:center;gap:7px;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+.cg-swatch{
+  width:52px;height:52px;border-radius:50%;
+  position:relative;
+  box-shadow:0 3px 10px rgba(0,0,0,.2);
+  flex-shrink:0;
+}
+.cg-check{display:none}
+.cg-item.on .cg-swatch{
+  box-shadow:0 0 0 3px var(--bg), 0 0 0 5.5px var(--sun);
+}
+.cg-lbl{
+  font-size:10px;font-weight:700;
+  color:var(--hint);text-align:center;
+  white-space:nowrap;
+}
+.cg-item.on .cg-lbl{color:var(--text);font-weight:800;}
+
 /* Thumbnail previews */
 .dp-t-classic .dp-t-arc{width:36px;height:36px;position:absolute;border-radius:50%;border:3px solid var(--cal);opacity:.7}
 .dp-t-header{height:22px;background:rgba(255,255,255,.07);border-radius:6px;margin:8px 6px 4px}
-.dp-t-banner{height:30px;background:linear-gradient(130deg,rgba(255,107,53,.5),rgba(255,171,64,.3));border-radius:8px;margin:0 6px 5px}
+.dp-t-banner{height:30px;background:linear-gradient(130deg,rgba(var(--sun-rgb),.5),rgba(var(--sun2-rgb),.3));border-radius:8px;margin:0 6px 5px}
 .dp-t-bars{margin:0 6px;display:flex;flex-direction:column;gap:3px}
 .dp-t-bar-row{display:flex;gap:6px;align-items:center}
 .dp-t-bar-ico{width:12px;height:12px;border-radius:3px;flex-shrink:0}
@@ -423,8 +532,8 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .pill{display:inline-flex;align-items:center;padding:3px 9px;border-radius:99px;font-size:10px;font-weight:800;white-space:nowrap;margin-top:5px}
 .p-ok{background:rgba(82,193,119,.12);color:var(--green)}
 .p-late{background:rgba(244,92,92,.1);color:var(--red)}
-.p-soon{background:rgba(255,107,53,.1);color:var(--sun)}
-.p-now{background:rgba(78,174,229,.12);color:var(--water)}
+.p-soon{background:rgba(var(--sun-rgb),.1);color:var(--sun)}
+.p-now{background:rgba(var(--water-rgb),.12);color:var(--water)}
 .p-later{background:rgba(0,0,0,.05);color:var(--hint)}
 .ac-bar{margin-top:7px;height:4px;background:rgba(0,0,0,.06);border-radius:99px;overflow:hidden}
 .ac-barf{height:100%;border-radius:99px;transition:width .4s ease}
@@ -468,12 +577,12 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 /* ══ BTNS ══ */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;cursor:pointer;font-family:inherit;font-weight:800;transition:transform .18s ease,opacity .18s ease}
 .btn:active{transform:scale(.97);opacity:.88;transition:transform .12s ease,opacity .12s ease}
-.btn-p{background:linear-gradient(135deg,var(--sun),var(--sun2));color:#fff;padding:15px 20px;font-size:15px;border-radius:14px;box-shadow:0 4px 16px rgba(255,107,53,.28);width:100%;letter-spacing:.01em}
+.btn-p{background:linear-gradient(135deg,var(--sun),var(--sun2));color:#fff;padding:15px 20px;font-size:15px;border-radius:14px;box-shadow:0 4px 16px rgba(var(--sun-rgb),.28);width:100%;letter-spacing:.01em}
 .btn-g{background:var(--bg3);color:var(--text);padding:11px 16px;font-size:13px;border-radius:11px}
-.btn-water{background:rgba(78,174,229,.1);color:var(--water);padding:13px 8px;font-size:13px;border-radius:12px;flex:1;font-weight:800}
+.btn-water{background:rgba(var(--water-rgb),.12);color:var(--water);padding:13px 8px;font-size:13px;border-radius:12px;flex:1;font-weight:800}
 .btn-danger{background:rgba(244,92,92,.09);color:var(--red);padding:11px 16px;font-size:13px;border-radius:11px;width:100%}
 .tg-dark .btn-g{background:rgba(255,255,255,.1);color:#fff}
-.tg-dark .btn-water{background:rgba(78,174,229,.18);color:#7ecef5}
+.tg-dark .btn-water{background:rgba(var(--water-rgb),.18);color:var(--water)}
 .tg-dark .btn-danger{background:rgba(244,92,92,.15)}
 
 /* ══ TOGGLE ══ */
@@ -529,10 +638,10 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .pav-spinner{
   position:absolute;inset:0;
   display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(135deg,rgba(var(--pf-r),var(--pf-g),var(--pf-b),1),rgba(var(--pf-r),var(--pf-g),var(--pf-b),.7));
+  background:linear-gradient(135deg,var(--sun),var(--sun2));
   z-index:4;
   opacity:0;
-  transition:opacity .3s ease;
+  transition:opacity .2s ease;
   pointer-events:none;
 }
 .pav-spinner.show{opacity:1}
@@ -606,7 +715,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 }
 .type-card:active{transform:scale(.98);opacity:.9;transition:transform .07s ease,opacity .07s ease}
 .type-card.on{background:var(--bg3);border-color:transparent;box-shadow:none}
-.type-card.on .type-card-lbl-wrap{background:rgba(255,107,53,.15);border-radius:8px;padding:2px 6px;display:inline-block;color:var(--sun)}
+.type-card.on .type-card-lbl-wrap{background:rgba(var(--sun-rgb),.15);border-radius:8px;padding:2px 6px;display:inline-block;color:var(--sun)}
 .type-card-ico{font-size:28px;margin-bottom:4px;line-height:1}
 .type-card-lbl{font-size:12px;font-weight:700;color:var(--text)}
 .type-card-lbl-wrap{display:inline-block;border-radius:8px;padding:2px 6px;transition:background .2s ease,color .2s ease}
@@ -622,9 +731,9 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   transition:background .13s ease,border-color .13s ease,color .13s ease,transform .12s ease;
 }
 .dur-btn:active{transform:scale(.97);opacity:.88;transition:transform .07s ease,opacity .07s ease}
-.dur-btn.on{background:rgba(255,107,53,.08);border-color:var(--sun);color:var(--sun)}
+.dur-btn.on{background:rgba(var(--sun-rgb),.08);border-color:var(--sun);color:var(--sun)}
 .tg-dark .dur-btn{background:rgba(255,255,255,.07)}
-.tg-dark .dur-btn.on{background:rgba(255,107,53,.18)}
+.tg-dark .dur-btn.on{background:rgba(var(--sun-rgb),.18)}
 
 /* ══ STEP INDICATOR ══ */
 .step-ind{display:flex;align-items:center;gap:6px;margin-bottom:20px}
@@ -676,9 +785,9 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   transition:background .13s ease,border-color .13s ease,color .13s ease,opacity .12s ease;
 }
 .day-btn:active{opacity:.7}
-.day-btn.on{background:rgba(255,107,53,.1);border-color:var(--sun);color:var(--sun)}
+.day-btn.on{background:rgba(var(--sun-rgb),.1);border-color:var(--sun);color:var(--sun)}
 .tg-dark .day-btn{background:rgba(255,255,255,.07)}
-.tg-dark .day-btn.on{background:rgba(255,107,53,.18)}
+.tg-dark .day-btn.on{background:rgba(var(--sun-rgb),.18)}
 .day-btn-daily{
   grid-column:1/-1;padding:13px;border-radius:12px;border:2px solid transparent;
   background:var(--bg3);cursor:pointer;text-align:center;
@@ -686,9 +795,9 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   transition:background .13s ease,border-color .13s ease,color .13s ease,opacity .12s ease;margin-bottom:4px;
 }
 .day-btn-daily:active{opacity:.7}
-.day-btn-daily.on{background:rgba(255,107,53,.1);border-color:var(--sun);color:var(--sun)}
+.day-btn-daily.on{background:rgba(var(--sun-rgb),.1);border-color:var(--sun);color:var(--sun)}
 .tg-dark .day-btn-daily{background:rgba(255,255,255,.07)}
-.tg-dark .day-btn-daily.on{background:rgba(255,107,53,.18)}
+.tg-dark .day-btn-daily.on{background:rgba(var(--sun-rgb),.18)}
 
 /* ══ TIME PICKER ══ */
 .time-picker-row{display:flex;align-items:center;justify-content:center;gap:0}
@@ -729,30 +838,30 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 /* ══ VARIANT E ─ CAL INPUT STEP 2 ══ */
 .ve-hero{
-  background:linear-gradient(135deg,rgba(244,129,74,.1),rgba(255,171,64,.04));
+  background:linear-gradient(135deg,rgba(244,129,74,.1),rgba(var(--sun2-rgb),.04));
   border-radius:20px;padding:16px 18px;
   display:flex;align-items:flex-start;justify-content:space-between;
   margin-bottom:14px;gap:12px;
-  border:1px solid rgba(255,107,53,.13);
+  border:1px solid rgba(var(--sun-rgb),.13);
   position:relative;overflow:hidden;
 }
 .ve-hero::before{
   content:'';position:absolute;top:-40px;right:-24px;width:110px;height:110px;
   border-radius:50%;
-  background:radial-gradient(circle,rgba(255,107,53,.1),transparent 70%);
+  background:radial-gradient(circle,rgba(var(--sun-rgb),.1),transparent 70%);
   pointer-events:none;
 }
 .ve-kcal{font-size:48px;font-weight:900;color:var(--cal);line-height:1;letter-spacing:-.04em}
 .ve-sub{font-size:12px;font-weight:700;color:var(--hint);margin-top:3px}
 .ve-go{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;padding-top:2px}
 .ve-go-lbl{font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--hint)}
-.ve-go-btn{width:46px;height:46px;border-radius:14px;background:rgba(255,107,53,.15);border:1.5px solid rgba(255,107,53,.28);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--sun);transition:background .18s ease,transform .16s ease,opacity .16s ease;flex-shrink:0}
-.ve-go-btn:active{background:rgba(255,107,53,.26);transform:scale(.95);opacity:.85}
+.ve-go-btn{width:46px;height:46px;border-radius:14px;background:rgba(var(--sun-rgb),.15);border:1.5px solid rgba(var(--sun-rgb),.28);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--sun);transition:background .18s ease,transform .16s ease,opacity .16s ease;flex-shrink:0}
+.ve-go-btn:active{background:rgba(var(--sun-rgb),.26);transform:scale(.95);opacity:.85}
 .ve-go-btn svg{width:20px;height:20px;stroke:currentColor;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
 
 .ve-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:0}
 .ve-f{background:var(--bg3);border:1px solid var(--brd);border-radius:14px;padding:10px 12px;transition:border-color .18s ease,box-shadow .18s ease,background .18s ease}
-.ve-f:focus-within{background:rgba(255,107,53,.07);border-color:rgba(255,107,53,.35);box-shadow:0 0 0 3px rgba(255,107,53,.07)}
+.ve-f:focus-within{background:rgba(var(--sun-rgb),.07);border-color:rgba(var(--sun-rgb),.35);box-shadow:0 0 0 3px rgba(var(--sun-rgb),.07)}
 .ve-f.kcal-f:focus-within{background:rgba(244,129,74,.1);border-color:rgba(244,129,74,.4);box-shadow:0 0 0 3px rgba(244,129,74,.08)}
 .tg-dark .ve-f{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.09)}
 .ve-f label{display:block;font-size:9px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--hint);margin-bottom:4px}
@@ -785,13 +894,13 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .ve-s3-meal:last-child{border-right:none}
 .ve-s3-meal span{display:block;font-size:18px;margin-bottom:3px}
 .ve-s3-meal div{font-size:10px;font-weight:800;color:var(--hint);transition:color .22s ease}
-.ve-s3-meal.on{background:radial-gradient(ellipse 80% 100% at 50% 100%,rgba(255,107,53,.18) 0%,transparent 70%)}
+.ve-s3-meal.on{background:radial-gradient(ellipse 80% 100% at 50% 100%,rgba(var(--sun-rgb),.18) 0%,transparent 70%)}
 .ve-s3-meal.on div{color:var(--sun)}
 
 /* ══ MEAL DETAIL PUSH PAGE ─ DONUT GLOW ══ */
 .md-hero{
-  background:linear-gradient(160deg,rgba(255,107,53,.07),rgba(0,0,0,0));
-  border-radius:22px;border:1px solid rgba(255,107,53,.1);
+  background:linear-gradient(160deg,rgba(var(--sun-rgb),.07),rgba(0,0,0,0));
+  border-radius:22px;border:1px solid rgba(var(--sun-rgb),.1);
   padding:22px 18px 18px;
   display:flex;flex-direction:column;align-items:center;
   margin-bottom:14px;
@@ -800,7 +909,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .md-hero::before{
   content:'';position:absolute;top:-50px;left:50%;transform:translateX(-50%);
   width:220px;height:220px;border-radius:50%;
-  background:radial-gradient(circle,rgba(255,107,53,.08),transparent 70%);
+  background:radial-gradient(circle,rgba(var(--sun-rgb),.08),transparent 70%);
   pointer-events:none;
 }
 .md-ring-wrap{position:relative;width:170px;height:170px;margin-bottom:14px}
@@ -1064,15 +1173,15 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 /* ── PRODUCT SCREEN (step 2) ── */
 .sc-prod-header{
-  background:linear-gradient(135deg,rgba(255,107,53,.09),rgba(255,171,64,.04));
-  border:1px solid rgba(255,107,53,.14);
+  background:linear-gradient(135deg,rgba(var(--sun-rgb),.09),rgba(var(--sun2-rgb),.04));
+  border:1px solid rgba(var(--sun-rgb),.14);
   border-radius:20px;padding:16px;margin-bottom:14px;
 }
 .sc-prod-toprow{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
 .sc-prod-ico{
   width:52px;height:52px;border-radius:16px;
-  background:rgba(255,107,53,.1);
-  border:1px solid rgba(255,107,53,.2);
+  background:rgba(var(--sun-rgb),.1);
+  border:1px solid rgba(var(--sun-rgb),.2);
   display:flex;align-items:center;justify-content:center;
   font-size:24px;flex-shrink:0;
 }
@@ -1080,7 +1189,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .sc-product-name{font-size:19px;font-weight:900;letter-spacing:-.025em;line-height:1.2;margin-bottom:3px}
 .sc-prod-brand-tag{
   display:inline-flex;align-items:center;gap:4px;
-  background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.18);
+  background:rgba(var(--sun-rgb),.08);border:1px solid rgba(var(--sun-rgb),.18);
   border-radius:99px;padding:3px 8px;
   font-size:11px;font-weight:700;color:var(--sun);
 }
@@ -1124,7 +1233,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 /* Calorie result card */
 .sc-kcal-card{
-  background:linear-gradient(135deg,rgba(244,129,74,.1),rgba(255,171,64,.06));
+  background:linear-gradient(135deg,rgba(244,129,74,.1),rgba(var(--sun2-rgb),.06));
   border:1px solid rgba(244,129,74,.18);
   border-radius:20px;padding:18px 16px;margin-bottom:14px;
   display:flex;align-items:center;justify-content:space-between;
@@ -1161,12 +1270,12 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 }
 .sc-meal-card:active{transform:scale(.97);transition:transform .1s ease}
 .sc-meal-card.on{
-  background:rgba(255,107,53,.07);
-  border-color:rgba(255,107,53,.4);
-  box-shadow:0 0 0 3px rgba(255,107,53,.07);
+  background:rgba(var(--sun-rgb),.07);
+  border-color:rgba(var(--sun-rgb),.4);
+  box-shadow:0 0 0 3px rgba(var(--sun-rgb),.07);
 }
 .tg-dark .sc-meal-card{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.09)}
-.tg-dark .sc-meal-card.on{background:rgba(255,107,53,.12);border-color:rgba(255,107,53,.35)}
+.tg-dark .sc-meal-card.on{background:rgba(var(--sun-rgb),.12);border-color:rgba(var(--sun-rgb),.35)}
 .sc-meal-ico-wrap{
   width:38px;height:38px;border-radius:12px;
   background:var(--bg3);
@@ -1175,7 +1284,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   border:1px solid rgba(0,0,0,.04);
   transition:background .15s ease;
 }
-.sc-meal-card.on .sc-meal-ico-wrap{background:rgba(255,107,53,.12);border-color:rgba(255,107,53,.18)}
+.sc-meal-card.on .sc-meal-ico-wrap{background:rgba(var(--sun-rgb),.12);border-color:rgba(var(--sun-rgb),.18)}
 .tg-dark .sc-meal-ico-wrap{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.08)}
 .sc-meal-name{font-size:13px;font-weight:800;color:var(--text)}
 .sc-meal-time{font-size:10px;font-weight:600;color:var(--hint);margin-top:1px}
@@ -1189,8 +1298,8 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tg-dark .sc-confirm-header{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);box-shadow:none}
 .sc-confirm-ico{
   width:50px;height:50px;border-radius:15px;
-  background:linear-gradient(135deg,rgba(255,107,53,.12),rgba(255,171,64,.06));
-  border:1px solid rgba(255,107,53,.18);
+  background:linear-gradient(135deg,rgba(var(--sun-rgb),.12),rgba(var(--sun2-rgb),.06));
+  border:1px solid rgba(var(--sun-rgb),.18);
   display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;
 }
 .sc-confirm-name{font-size:17px;font-weight:900;letter-spacing:-.02em;line-height:1.2}
@@ -1208,12 +1317,12 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .kbzhu-l{font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
 .scan-ico-btn{
   width:42px;height:42px;border-radius:14px;
-  background:rgba(255,107,53,.1);color:var(--sun);
+  background:rgba(var(--sun-rgb),.1);color:var(--sun);
   display:flex;align-items:center;justify-content:center;
   border:none;cursor:pointer;flex-shrink:0;
   transition:background .12s,transform .12s;
 }
-.scan-ico-btn:active{transform:scale(.93);background:rgba(255,107,53,.18)}
+.scan-ico-btn:active{transform:scale(.93);background:rgba(var(--sun-rgb),.18)}
 /* ══ KBZHU track row ══ */
 .kbzhu-track-row{display:flex;gap:6px;margin-top:10px}
 .kbzhu-track-box{flex:1;background:var(--bg2);border-radius:12px;padding:10px 8px;text-align:center;box-shadow:var(--sh)}
@@ -1225,19 +1334,19 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .cal-hero-row{display:flex;gap:10px;padding:0 0 10px}
 .cal-hero-main{
   flex:1;border-radius:18px;padding:16px;
-  background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.16);
+  background:rgba(var(--sun-rgb),.08);border:1px solid rgba(var(--sun-rgb),.16);
   position:relative;overflow:hidden;
 }
 .cal-hero-main::before{
   content:'';position:absolute;bottom:-20px;right:-20px;
   width:100px;height:100px;border-radius:50%;
-  background:radial-gradient(circle,rgba(255,107,53,.12),transparent 70%);
+  background:radial-gradient(circle,rgba(var(--sun-rgb),.12),transparent 70%);
   pointer-events:none;
 }
-.cal-hero-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,107,53,.55);margin-bottom:6px}
+.cal-hero-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:rgba(var(--sun-rgb),.55);margin-bottom:6px}
 .cal-hero-num{font-size:42px;font-weight:900;letter-spacing:-.04em;color:var(--cal);line-height:.95}
 .cal-hero-of{font-size:10px;font-weight:700;color:rgba(255,255,255,.35);margin-top:8px}
-.cal-hero-macs{display:flex;gap:10px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,107,53,.12)}
+.cal-hero-macs{display:flex;gap:10px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(var(--sun-rgb),.12)}
 .cal-hero-mac{text-align:left}
 .cal-hero-mac-v{font-size:11px;font-weight:900;line-height:1}
 .cal-hero-mac-l{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:rgba(255,255,255,.3);margin-top:1px}
@@ -1372,18 +1481,18 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   width:56px;height:56px;border-radius:50%;
   pointer-events:none;
 }
-.pf-tile-o .pf-tile-glow{background:radial-gradient(circle,rgba(255,107,53,.14),transparent 70%)}
+.pf-tile-o .pf-tile-glow{background:radial-gradient(circle,rgba(var(--sun-rgb),.14),transparent 70%)}
 .pf-tile-r .pf-tile-glow{background:radial-gradient(circle,rgba(244,92,92,.12),transparent 70%)}
 .pf-tile-g .pf-tile-glow{background:radial-gradient(circle,rgba(82,193,119,.12),transparent 70%)}
-.pf-tile-b .pf-tile-glow{background:radial-gradient(circle,rgba(78,174,229,.12),transparent 70%)}
+.pf-tile-b .pf-tile-glow{background:radial-gradient(circle,rgba(var(--water-rgb),.12),transparent 70%)}
 .pf-tile-ic{
   width:34px;height:34px;border-radius:11px;
   display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
-.pf-tile-o .pf-tile-ic{background:rgba(255,107,53,.12)}
+.pf-tile-o .pf-tile-ic{background:rgba(var(--sun-rgb),.12)}
 .pf-tile-r .pf-tile-ic{background:rgba(244,92,92,.1)}
 .pf-tile-g .pf-tile-ic{background:rgba(82,193,119,.1)}
-.pf-tile-b .pf-tile-ic{background:rgba(78,174,229,.1)}
+.pf-tile-b .pf-tile-ic{background:rgba(var(--water-rgb),.1)}
 .pf-tile-lbl{font-size:12px;font-weight:800;color:var(--text);letter-spacing:-.01em;line-height:1.2}
 .pf-tile-val{font-size:10px;font-weight:600;color:var(--hint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
@@ -1463,14 +1572,14 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 }
 .av-tip.show{opacity:1;transform:translateY(-50%) scale(1) translateX(0)}
 .tip-ic{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
-.av-tip.cam .tip-ic{background:rgba(10,132,255,.2)}
+.av-tip.cam .tip-ic{background:rgba(var(--sun-rgb),.18)}
 .av-tip.del .tip-ic{background:rgba(255,69,58,.18)}
 .tip-text{display:flex;flex-direction:column;gap:2px}
 .tip-main{font-size:13px;font-weight:700;color:#fff}
 .tip-sub{font-size:10.5px;font-weight:500;color:rgba(255,255,255,.38)}
 .tip-prog{position:absolute;bottom:7px;left:11px;right:11px;height:3px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
 .tip-prog-fill{height:100%;width:0%;border-radius:99px;transition:none}
-.av-tip.cam .tip-prog-fill{background:linear-gradient(90deg,#0A84FF,rgba(10,132,255,.6))}
+.av-tip.cam .tip-prog-fill{background:linear-gradient(90deg,var(--sun),rgba(var(--sun-rgb),.45))}
 .av-tip.del .tip-prog-fill{background:linear-gradient(90deg,#FF453A,rgba(255,69,58,.6))}
 
 /* ══ CROP SCREEN ══ */
@@ -1491,7 +1600,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .lc-btn{padding:9px 20px;border-radius:22px;font-family:'Onest',sans-serif;font-size:14px;font-weight:700;transition:opacity .12s,transform .1s;cursor:pointer;border:none}
 .lc-btn:active{opacity:.7;transform:scale(.96)}
 .lc-cancel{background:rgba(255,255,255,.1);color:rgba(255,255,255,.85)}
-.lc-apply{background:linear-gradient(135deg,var(--sun),var(--sun2));color:#fff;box-shadow:0 4px 18px rgba(255,107,53,.45)}
+.lc-apply{background:linear-gradient(135deg,var(--sun),var(--sun2));color:#fff;box-shadow:0 4px 18px rgba(var(--sun-rgb),.45)}
 .lc-ttl{font-size:15px;font-weight:700;color:rgba(255,255,255,.75)}
 .lc-area{flex:1;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
 #lc-canvas{position:absolute;touch-action:none;will-change:contents}
@@ -1537,7 +1646,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 </div>
 <div id="tt-water-body">
 <div class="pad">
-<div class="card" style="margin-top:4px;text-align:center;padding:20px 16px;background:linear-gradient(160deg,rgba(78,174,229,.06),rgba(78,174,229,.02))">
+<div class="card" style="margin-top:4px;text-align:center;padding:20px 16px;background:linear-gradient(160deg,rgba(var(--water-rgb),.06),rgba(var(--water-rgb),.02))">
   <div class="t5">выпито сегодня</div>
   <div style="font-size:52px;font-weight:900;color:var(--water);line-height:1.1;margin:6px 0" id="w-total">0</div>
   <div class="t5">из <span id="w-goal">2000</span> мл</div>
@@ -1620,7 +1729,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
         <div class="t5" style="font-size:9px">выполнено →</div>
       </div>
       <svg width="44" height="44" viewBox="0 0 52 52">
-        <circle cx="26" cy="26" r="20" fill="none" stroke="rgba(255,107,53,.12)" stroke-width="4.5"/>
+        <circle cx="26" cy="26" r="20" fill="none" stroke="rgba(var(--sun-rgb),.12)" stroke-width="4.5"/>
         <circle cx="26" cy="26" r="20" fill="none" stroke="var(--sun)" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="125.7" id="pl-ring" stroke-dashoffset="125.7" transform="rotate(-90 26 26)" style="transition:stroke-dashoffset .6s cubic-bezier(.25,.46,.45,.94)"/>
       </svg>
     </div>
@@ -1742,24 +1851,11 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       <div class="pav" id="pf-av">
         <span id="pf-av-letter">А</span>
         <img class="pav-img" id="pf-av-img" alt="" src="">
-        <!-- Loading spinner — shown for 3s after photo pick -->
-        <div class="pav-spinner" id="pav-spinner">
-          <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
-            <circle cx="15" cy="15" r="11" stroke="rgba(255,255,255,.22)" stroke-width="2.5"/>
-            <circle cx="15" cy="15" r="11" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="28 46"/>
-          </svg>
-        </div>
-        <!-- Hold-to-pick / hold-to-delete dim overlay -->
-        <div class="pav-del-overlay" id="pav-del-overlay">
-          <svg id="pav-overlay-ico" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>
-          </svg>
-        </div>
       </div>
       <!-- Tooltip pill -->
       <div class="av-tip cam" id="av-tip">
         <div class="tip-ic" id="tip-ic">
-          <svg id="tip-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0A84FF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <svg id="tip-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--sun)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>
           </svg>
         </div>
@@ -2138,7 +2234,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
           </div>
         </div>
         <div class="md-leg">
-          <div class="md-leg-dot" style="background:#FF6B35;box-shadow:0 0 6px rgba(255,107,53,.5)"></div>
+          <div class="md-leg-dot" style="background:#FF6B35;box-shadow:0 0 6px rgba(var(--sun-rgb),.5)"></div>
           <div>
             <div class="md-leg-v" style="color:#FF6B35" id="md-fat">0г</div>
             <div class="md-leg-l">жиры</div>
@@ -2329,102 +2425,173 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 <div class="push-page" id="pp-design">
   <div class="pp-hdr">
     <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
-    <div><div class="pp-title">оформление</div><div class="pp-subtitle">выбери стиль главного экрана</div></div>
+    <div><div class="pp-title">оформление</div><div class="pp-subtitle">стиль и цвет интерфейса</div></div>
   </div>
   <div class="pp-body">
-    <div class="m3-sec" style="padding-top:0">стиль главного экрана</div>
+
+    <div class="m3-sec" style="padding-top:0">макет главного экрана</div>
     <div class="dp-grid">
 
-      <!-- Classic -->
       <div class="dp-option" id="dp-classic" onclick="setHomeDesign('classic')">
-        <div class="dp-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="dp-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div class="dp-thumb">
-          <div style="padding:6px 5px">
+          <div style="padding:5px 4px;height:100%;display:flex;flex-direction:column;">
             <div class="dp-t-header"></div>
             <div class="dp-t-banner"></div>
-            <div class="dp-t-arcs">
-              <div class="dp-t-arc-wrap">
-                <svg class="dp-t-arc-svg" width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="11" fill="none" stroke="rgba(78,174,229,.2)" stroke-width="2.5"/><circle cx="15" cy="15" r="11" fill="none" stroke="#4EAEE5" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="69" stroke-dashoffset="69" transform="rotate(-90 15 15)"/></svg>
-                <div style="width:20px;height:3px;background:rgba(255,255,255,.1);border-radius:99px"></div>
-              </div>
-              <div class="dp-t-arc-wrap">
-                <svg class="dp-t-arc-svg" width="38" height="38" viewBox="0 0 38 38"><circle cx="19" cy="19" r="14" fill="none" stroke="rgba(244,129,74,.2)" stroke-width="3"/><circle cx="19" cy="19" r="14" fill="none" stroke="#F4814A" stroke-width="3" stroke-linecap="round" stroke-dasharray="88" stroke-dashoffset="82.7" transform="rotate(-90 19 19)"/></svg>
-                <div style="width:24px;height:3px;background:rgba(255,255,255,.1);border-radius:99px"></div>
-              </div>
-              <div class="dp-t-arc-wrap">
-                <svg class="dp-t-arc-svg" width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="11" fill="none" stroke="rgba(139,127,212,.2)" stroke-width="2.5"/><circle cx="15" cy="15" r="11" fill="none" stroke="#8B7FD4" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="69" stroke-dashoffset="58" transform="rotate(-90 15 15)"/></svg>
-                <div style="width:20px;height:3px;background:rgba(255,255,255,.1);border-radius:99px"></div>
-              </div>
+            <div class="dp-t-arcs" style="flex:1;padding:4px 2px">
+              <div class="dp-t-arc-wrap"><svg width="22" height="22" viewBox="0 0 30 30"><circle cx="15" cy="15" r="11" fill="none" stroke="rgba(var(--water-rgb),.2)" stroke-width="2.5"/><circle cx="15" cy="15" r="11" fill="none" stroke="var(--water)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="69" stroke-dashoffset="47" transform="rotate(-90 15 15)"/></svg></div>
+              <div class="dp-t-arc-wrap"><svg width="28" height="28" viewBox="0 0 38 38"><circle cx="19" cy="19" r="14" fill="none" stroke="rgba(var(--sun-rgb),.2)" stroke-width="3"/><circle cx="19" cy="19" r="14" fill="none" stroke="var(--sun)" stroke-width="3" stroke-linecap="round" stroke-dasharray="88" stroke-dashoffset="30" transform="rotate(-90 19 19)"/></svg></div>
+              <div class="dp-t-arc-wrap"><svg width="22" height="22" viewBox="0 0 30 30"><circle cx="15" cy="15" r="11" fill="none" stroke="rgba(139,127,212,.2)" stroke-width="2.5"/><circle cx="15" cy="15" r="11" fill="none" stroke="#8B7FD4" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="69" stroke-dashoffset="20" transform="rotate(-90 15 15)"/></svg></div>
             </div>
             <div class="dp-t-weight"></div>
           </div>
         </div>
-        <div class="dp-name">классический</div>
-        <div class="dp-desc">три дуговых кольца с прогрессом</div>
+        <div class="dp-name">классик</div>
       </div>
 
-      <!-- Linear -->
       <div class="dp-option" id="dp-linear" onclick="setHomeDesign('linear')">
-        <div class="dp-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="dp-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div class="dp-thumb">
-          <div style="padding:6px 5px">
-            <div class="dp-t-header"></div>
-            <div class="dp-t-banner"></div>
-            <div style="margin:5px 6px;background:rgba(255,255,255,.05);border-radius:8px;padding:7px 7px">
-              <div class="dp-t-bars">
-                <div class="dp-t-bar-row">
-                  <div class="dp-t-bar-ico" style="background:rgba(244,129,74,.15)"></div>
-                  <div class="dp-t-bar-track"><div class="dp-t-bar-fill" style="width:6%;background:#F4814A"></div></div>
-                </div>
-                <div style="height:5px"></div>
-                <div class="dp-t-bar-row">
-                  <div class="dp-t-bar-ico" style="background:rgba(78,174,229,.15)"></div>
-                  <div class="dp-t-bar-track"><div class="dp-t-bar-fill" style="width:68%;background:#4EAEE5"></div></div>
-                </div>
-                <div style="height:5px"></div>
-                <div class="dp-t-bar-row">
-                  <div class="dp-t-bar-ico" style="background:rgba(139,127,212,.15)"></div>
-                  <div class="dp-t-bar-track"><div class="dp-t-bar-fill" style="width:82%;background:#8B7FD4"></div></div>
-                </div>
-              </div>
+          <div style="padding:5px 4px;height:100%;display:flex;flex-direction:column;">
+            <div class="dp-t-header"></div><div class="dp-t-banner"></div>
+            <div style="margin:4px 2px;background:rgba(255,255,255,.05);border-radius:6px;padding:5px;flex:1">
+              <div style="display:flex;gap:4px;align-items:center;margin-bottom:4px"><div style="width:8px;height:8px;border-radius:2px;background:rgba(var(--sun-rgb),.3);flex-shrink:0"></div><div style="flex:1;height:3px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden"><div style="width:35%;height:100%;background:var(--sun);border-radius:99px"></div></div></div>
+              <div style="display:flex;gap:4px;align-items:center;margin-bottom:4px"><div style="width:8px;height:8px;border-radius:2px;background:rgba(var(--water-rgb),.3);flex-shrink:0"></div><div style="flex:1;height:3px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden"><div style="width:68%;height:100%;background:var(--water);border-radius:99px"></div></div></div>
+              <div style="display:flex;gap:4px;align-items:center"><div style="width:8px;height:8px;border-radius:2px;background:rgba(139,127,212,.3);flex-shrink:0"></div><div style="flex:1;height:3px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden"><div style="width:82%;height:100%;background:#8B7FD4;border-radius:99px"></div></div></div>
             </div>
-            <div class="dp-t-weight" style="margin-top:5px"></div>
+            <div class="dp-t-weight"></div>
           </div>
         </div>
         <div class="dp-name">линейный</div>
-        <div class="dp-desc">прогресс-бары в одной карточке</div>
       </div>
 
-      <!-- Bento — full width -->
-      <div class="dp-option" id="dp-bento" onclick="setHomeDesign('bento')" style="grid-column:1/-1;display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center">
-        <div class="dp-check" style="top:12px;right:12px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="dp-thumb" style="width:100px;aspect-ratio:auto;height:110px;flex-shrink:0">
-          <div style="padding:6px 5px">
-            <div style="height:14px;background:rgba(255,255,255,.06);border-radius:4px;margin-bottom:4px"></div>
-            <div class="dp-t-grid">
-              <div class="dp-t-tile" style="grid-column:1/-1;background:linear-gradient(130deg,rgba(255,107,53,.3),rgba(255,171,64,.15));height:22px;border-radius:6px;display:flex;align-items:center;padding:4px 6px"><div style="font-size:6px;font-weight:900;color:#fff">путь к лету</div></div>
-              <div class="dp-t-tile">
-                <div class="dp-t-tile-v">120</div>
-                <div class="dp-t-tile-lbl">ккал</div>
-                <div style="height:2px;background:rgba(244,129,74,.3);border-radius:99px;margin-top:4px"></div>
-              </div>
-              <div style="display:flex;flex-direction:column;gap:4px">
-                <div class="dp-t-tile" style="flex:1"><div class="dp-t-tile-v" style="color:#4EAEE5;font-size:8px">1350</div><div class="dp-t-tile-lbl">мл</div></div>
-                <div class="dp-t-tile" style="flex:1"><div class="dp-t-tile-v" style="color:#8B7FD4;font-size:8px">7.5</div><div class="dp-t-tile-lbl">ч сна</div></div>
-              </div>
+      <div class="dp-option" id="dp-bento" onclick="setHomeDesign('bento')">
+        <div class="dp-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="dp-thumb">
+          <div style="padding:5px 4px;height:100%;display:flex;flex-direction:column;">
+            <div style="height:10px;background:rgba(255,255,255,.06);border-radius:3px;margin-bottom:3px"></div>
+            <div class="dp-t-grid" style="flex:1;margin:0;gap:3px">
+              <div style="grid-column:1/-1;background:linear-gradient(130deg,rgba(var(--sun-rgb),.4),rgba(var(--sun2-rgb),.2));height:16px;border-radius:5px;display:flex;align-items:center;padding:0 4px"><div style="font-size:5px;font-weight:900;color:#fff">летний путь</div></div>
+              <div class="dp-t-tile"><div style="font-size:8px;font-weight:900;color:var(--sun)">120</div><div style="font-size:5px;color:var(--hint);font-weight:600">ккал</div><div style="height:2px;background:rgba(var(--sun-rgb),.3);border-radius:99px;margin-top:3px"></div></div>
+              <div style="display:flex;flex-direction:column;gap:3px"><div class="dp-t-tile" style="flex:1"><div style="font-size:7px;font-weight:900;color:var(--water)">1.3л</div><div style="font-size:5px;color:var(--hint);font-weight:600">вода</div></div><div class="dp-t-tile" style="flex:1"><div style="font-size:7px;font-weight:900;color:#8B7FD4">7.5ч</div><div style="font-size:5px;color:var(--hint);font-weight:600">сон</div></div></div>
             </div>
+            <div class="dp-t-weight" style="margin-top:3px"></div>
           </div>
         </div>
-        <div>
-          <div class="dp-name">бенто</div>
-          <div class="dp-desc">сетка карточек с максимумом данных на экране без прокрутки</div>
-        </div>
+        <div class="dp-name">бенто</div>
       </div>
 
     </div>
-    <div style="background:rgba(255,107,53,.07);border:1px solid rgba(255,107,53,.15);border-radius:14px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start">
-      <iconify-icon icon="solar:info-circle-bold" width="18" style="color:var(--sun);flex-shrink:0;margin-top:1px"></iconify-icon>
-      <div style="font-size:12px;font-weight:600;color:rgba(255,107,53,.8);line-height:1.5">изменение сразу применяется к главному экрану — все данные остаются на месте</div>
+
+    <!-- Colour row — opens pp-color -->
+    <div class="m3-sec">цвет акцента</div>
+    <div class="dp-color-row" onclick="pushPage('pp-color')">
+      <div class="dp-color-swatch" id="dp-color-swatch"></div>
+      <div class="dp-color-name" id="dp-color-name">закат</div>
+      <iconify-icon icon="solar:alt-arrow-right-bold" style="font-size:14px;color:var(--hint);opacity:.5;flex-shrink:0"></iconify-icon>
+    </div>
+
+  </div>
+</div>
+
+<!-- PP: Цвет акцента -->
+<div class="push-page" id="pp-color">
+  <div class="pp-hdr">
+    <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <div><div class="pp-title">цвет акцента</div><div class="pp-subtitle">выбери палитру под своё настроение</div></div>
+  </div>
+  <div class="pp-body">
+    <div class="cg-grid">
+      <div class="cg-item" id="cg-sunset" onclick="setAccentTheme('sunset')">
+        <div class="cg-swatch" style="background:linear-gradient(135deg,#FF6B35,#FFAB40)">
+          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        </div>
+        <div class="cg-lbl">закат</div>
+      </div>
+      <div class="cg-item" id="cg-peach" onclick="setAccentTheme('peach')">
+        <div class="cg-swatch" style="background:linear-gradient(135deg,#FF8C69,#FFD17A)">
+          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        </div>
+        <div class="cg-lbl">персик</div>
+      </div>
+      <div class="cg-item" id="cg-mango" onclick="setAccentTheme('mango')">
+        <div class="cg-swatch" style="background:linear-gradient(135deg,#F5A623,#FFD65C)">
+          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        </div>
+        <div class="cg-lbl">манго</div>
+      </div>
+      <div class="cg-item" id="cg-hibiscus" onclick="setAccentTheme('hibiscus')">
+        <div class="cg-swatch" style="background:linear-gradient(135deg,#E85474,#FF9FA0)">
+          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        </div>
+        <div class="cg-lbl">гибискус</div>
+      </div>
+      <div class="cg-item" id="cg-lagoon" onclick="setAccentTheme('lagoon')">
+        <div class="cg-swatch" style="background:linear-gradient(135deg,#0CBFA0,#50D9C8)">
+          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        </div>
+        <div class="cg-lbl">лагуна</div>
+      </div>
+      <div class="cg-item" id="cg-lime" onclick="setAccentTheme('lime')">
+        <div class="cg-swatch" style="background:linear-gradient(135deg,#76C442,#C8E63A)">
+          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        </div>
+        <div class="cg-lbl">лайм</div>
+      </div>
+      <div class="cg-item" id="cg-coral" onclick="setAccentTheme('coral')">
+        <div class="cg-swatch" style="background:linear-gradient(135deg,#FF4F6D,#FF8C61)">
+          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        </div>
+        <div class="cg-lbl">кораллы</div>
+      </div>
+      <div class="cg-item" id="cg-watermelon" onclick="setAccentTheme('watermelon')">
+        <div class="cg-swatch" style="background:linear-gradient(135deg,#F52D56,#FF7B7B)">
+          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        </div>
+        <div class="cg-lbl">арбуз</div>
+      </div>
+      <div class="cg-item" id="cg-sunflower" onclick="setAccentTheme('sunflower')">
+        <div class="cg-swatch" style="background:linear-gradient(135deg,#E8900A,#F5C842)">
+          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        </div>
+        <div class="cg-lbl">подсолнух</div>
+      </div>
+      <div class="cg-item" id="cg-sakura" onclick="setAccentTheme('sakura')">
+        <div class="cg-swatch" style="background:linear-gradient(135deg,#E8637A,#F4A7B9)">
+          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        </div>
+        <div class="cg-lbl">сакура</div>
+      </div>
+      <div class="cg-item" id="cg-ocean" onclick="setAccentTheme('ocean')">
+        <div class="cg-swatch" style="background:linear-gradient(135deg,#1E7FD8,#5BB8F5)">
+          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        </div>
+        <div class="cg-lbl">океан</div>
+      </div>
+      <div class="cg-item" id="cg-violet" onclick="setAccentTheme('violet')">
+        <div class="cg-swatch" style="background:linear-gradient(135deg,#8B5CF6,#C084FC)">
+          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        </div>
+        <div class="cg-lbl">фиолет</div>
+      </div>
+      <div class="cg-item" id="cg-mint" onclick="setAccentTheme('mint')">
+        <div class="cg-swatch" style="background:linear-gradient(135deg,#10B981,#6EE7B7)">
+          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        </div>
+        <div class="cg-lbl">мята</div>
+      </div>
+      <div class="cg-item" id="cg-tangerine" onclick="setAccentTheme('tangerine')">
+        <div class="cg-swatch" style="background:linear-gradient(135deg,#F97316,#FDE047)">
+          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        </div>
+        <div class="cg-lbl">мандарин</div>
+      </div>
+      <div class="cg-item" id="cg-sand" onclick="setAccentTheme('sand')">
+        <div class="cg-swatch" style="background:linear-gradient(135deg,#B45309,#D97706)">
+          <div class="cg-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        </div>
+        <div class="cg-lbl">песок</div>
+      </div>
     </div>
   </div>
 </div>
@@ -2822,8 +2989,6 @@ function _applySA(){
 function applyTheme(){
   const dark=tg?.colorScheme==='dark'||window.matchMedia?.('(prefers-color-scheme:dark)').matches;
   document.body.classList.toggle('tg-dark',dark);
-  // Всегда используем фиксированный фон: глубокий чёрный для тёмной темы,
-  // светлый для светлой — кастомные цвета Telegram не трогаем.
   if(dark){
     document.documentElement.style.setProperty('--bg','#000000');
     document.documentElement.style.setProperty('--bg2','#000000');
@@ -3128,7 +3293,7 @@ function _populatePP(id){
     if(el){
       if(!entries.length){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--hint);font-size:13px;font-weight:600">пока ничего не записано</div>';}
       else{el.innerHTML=[...entries].reverse().map((e,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--brd)${i===entries.length-1?';border-bottom:none':''}">
-        <div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:32px;border-radius:10px;background:rgba(78,174,229,.1);display:flex;align-items:center;justify-content:center;font-size:14px">💧</div><span style="font-size:14px;font-weight:800;color:var(--water)">+${e} мл</span></div>
+        <div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:32px;border-radius:10px;background:rgba(var(--water-rgb),.1);display:flex;align-items:center;justify-content:center;font-size:14px">💧</div><span style="font-size:14px;font-weight:800;color:var(--water)">+${e} мл</span></div>
         <span class="t5">стакан ${entries.length-i}</span></div>`).join('');}
     }
   }
@@ -3380,8 +3545,8 @@ function renderMealDetail(){
     list.innerHTML='<div class="md-empty">нет записей за сегодня</div>';
     return;
   }
-  const MEAL_COLORS={breakfast:'rgba(255,152,0,',lunch:'rgba(255,107,53,',dinner:'rgba(139,127,212,',snack:'rgba(82,193,119,'};
-  const col=MEAL_COLORS[_currentMealKey]||'rgba(255,107,53,';
+  const MEAL_COLORS={breakfast:'rgba(255,152,0,',lunch:'rgba(var(--sun-rgb),',dinner:'rgba(139,127,212,',snack:'rgba(82,193,119,'};
+  const col=MEAL_COLORS[_currentMealKey]||'rgba(var(--sun-rgb),';
   list.innerHTML=entries.map(e=>`
     <div class="md-item">
       <div class="md-item-ico" style="background:${col}0.12)">${e.desc?e.desc[0].toUpperCase():'🍽'}</div>
@@ -3848,7 +4013,8 @@ function drawWeightChart(data){
   const xStep=n>1?chartW/(n-1):0;
   const pts=data.map((d,i)=>({x:PAD.l+i*xStep,y:PAD.t+chartH*(1-(d.weight-mn)/rng),w:d.weight,d:d.logged_at}));
   const dark=document.body.classList.contains('tg-dark');
-  const accent='#FF6B35';
+  // Read current accent colour from CSS variable so it follows the chosen theme
+  const accent=getComputedStyle(document.documentElement).getPropertyValue('--sun').trim()||'#FF6B35';
   const hintC=dark?'rgba(255,255,255,0.3)':'rgba(0,0,0,0.28)';
   const labelC=dark?'rgba(255,255,255,0.5)':'rgba(0,0,0,0.45)';
   const bg2C=dark?'#181818':'#ffffff';
@@ -3935,12 +4101,174 @@ function setHomeDesign(d){
     const el=document.getElementById('dp-'+k);
     if(el)el.classList.toggle('selected',k===d);
   });
-  const labels={classic:'классический',linear:'линейный',bento:'бенто'};
-  T('pf-design-val',labels[d]||'классический');
+  _updateDesignVal();
   const pg=$('p-home');
   if(pg){pg.classList.toggle('layout-linear',d==='linear');pg.classList.toggle('layout-bento',d==='bento');}
   renderHome();
   tg?.HapticFeedback?.selectionChanged();
+}
+
+/* ══ ACCENT COLOUR THEMES ══ */
+const ACCENT_THEMES={
+  sunset: {
+    sun:'#FF6B35',sun2:'#FFAB40',cal:'#F4814A',
+    r:'255',g:'107',b:'53', r2:'255',g2:'171',b2:'64',
+    water:'#5BB8F5',wr:'91',wg2:'184',wb:'245',
+    navLight:'rgba(255,255,255,.95)',navDark:'rgba(24,18,10,.96)'
+  },
+  peach: {
+    sun:'#FF8C69',sun2:'#FFD17A',cal:'#FF9A74',
+    r:'255',g:'140',b:'105', r2:'255',g2:'209',b2:'122',
+    water:'#74AEED',wr:'116',wg2:'174',wb:'237',
+    navLight:'rgba(255,252,248,.96)',navDark:'rgba(24,16,12,.96)'
+  },
+  mango: {
+    sun:'#F5A623',sun2:'#FFD65C',cal:'#EFA020',
+    r:'245',g:'166',b:'35', r2:'255',g2:'214',b2:'92',
+    water:'#4EAEE5',wr:'78',wg2:'174',wb:'229',
+    navLight:'rgba(255,254,245,.96)',navDark:'rgba(22,18,5,.96)'
+  },
+  hibiscus: {
+    sun:'#E85474',sun2:'#FF9FA0',cal:'#E05070',
+    r:'232',g:'84',b:'116', r2:'255',g2:'159',b2:'160',
+    water:'#7B9FE8',wr:'123',wg2:'159',wb:'232',
+    navLight:'rgba(255,248,250,.96)',navDark:'rgba(20,10,14,.96)'
+  },
+  lagoon: {
+    sun:'#0CBFA0',sun2:'#50D9C8',cal:'#0AB898',
+    r:'12',g:'191',b:'160', r2:'80',g2:'217',b2:'200',
+    water:'#06D6C0',wr:'6',wg2:'214',wb:'192',
+    navLight:'rgba(245,255,252,.96)',navDark:'rgba(5,18,16,.96)'
+  },
+  lime: {
+    sun:'#76C442',sun2:'#C8E63A',cal:'#6AB83A',
+    r:'118',g:'196',b:'66', r2:'200',g2:'230',b2:'58',
+    water:'#22C9D4',wr:'34',wg2:'201',wb:'212',
+    navLight:'rgba(248,255,243,.96)',navDark:'rgba(10,16,5,.96)'
+  },
+  coral: {
+    sun:'#FF4F6D',sun2:'#FF8C61',cal:'#F04468',
+    r:'255',g:'79',b:'109', r2:'255',g2:'140',b2:'97',
+    water:'#5CB8E8',wr:'92',wg2:'184',wb:'232',
+    navLight:'rgba(255,248,249,.96)',navDark:'rgba(22,8,12,.96)'
+  },
+  // ── дополнительные летние темы ──
+  watermelon: {
+    // Арбуз: сочный алый → нежный зеленоватый
+    sun:'#F52D56',sun2:'#FF7B7B',cal:'#E8284F',
+    r:'245',g:'45',b:'86', r2:'255',g2:'123',b2:'123',
+    water:'#5BA8E8',wr:'91',wg2:'168',wb:'232',
+    navLight:'rgba(255,245,248,.96)',navDark:'rgba(22,5,10,.96)'
+  },
+  sunflower: {
+    // Подсолнух: глубокий янтарь → тёплое золото
+    sun:'#E8900A',sun2:'#F5C842',cal:'#D98308',
+    r:'232',g:'144',b:'10', r2:'245',g2:'200',b2:'66',
+    water:'#4EAEE5',wr:'78',wg2:'174',wb:'229',
+    navLight:'rgba(255,253,240,.96)',navDark:'rgba(20,15,2,.96)'
+  },
+  sakura: {
+    // Сакура: нежный розово-персиковый → молочный кремовый
+    sun:'#E8637A',sun2:'#F4A7B9',cal:'#DC5C72',
+    r:'232',g:'99',b:'122', r2:'244',g2:'167',b2:'185',
+    water:'#7BAEE8',wr:'123',wg2:'174',wb:'232',
+    navLight:'rgba(255,248,251,.96)',navDark:'rgba(20,8,12,.96)'
+  },
+  ocean: {
+    // Океан: полуночный синий → ясный голубой
+    sun:'#1E7FD8',sun2:'#5BB8F5',cal:'#1A72C4',
+    r:'30',g:'127',b:'216', r2:'91',g2:'184',b2:'245',
+    water:'#38BDF8',wr:'56',wg2:'189',wb:'248',
+    navLight:'rgba(243,249,255,.96)',navDark:'rgba(4,12,22,.96)'
+  },
+  violet: {
+    // Фиолет-закат: сливовый фиолет → нежная сирень
+    sun:'#8B5CF6',sun2:'#C084FC',cal:'#7C4DEA',
+    r:'139',g:'92',b:'246', r2:'192',g2:'132',b2:'252',
+    water:'#818CF8',wr:'129',wg2:'140',wb:'248',
+    navLight:'rgba(250,247,255,.96)',navDark:'rgba(12,7,22,.96)'
+  },
+  mint: {
+    // Мята: свежая мята → ледяной голубовато-зелёный
+    sun:'#10B981',sun2:'#6EE7B7',cal:'#0EA572',
+    r:'16',g:'185',b:'129', r2:'110',g2:'231',b2:'183',
+    water:'#06B6D4',wr:'6',wg2:'182',wb:'212',
+    navLight:'rgba(242,255,252,.96)',navDark:'rgba(3,18,14,.96)'
+  },
+  tangerine: {
+    // Мандарин: насыщенный оранжевый → лимонный
+    sun:'#F97316',sun2:'#FDE047',cal:'#EA6B10',
+    r:'249',g:'115',b:'22', r2:'253',g2:'224',b2:'71',
+    water:'#4EAEE5',wr:'78',wg2:'174',wb:'229',
+    navLight:'rgba(255,251,242,.96)',navDark:'rgba(22,12,2,.96)'
+  },
+  sand: {
+    // Песок: тёплый бронзово-коричневый → пшеничный
+    sun:'#B45309',sun2:'#D97706',cal:'#A34B08',
+    r:'180',g:'83',b:'9', r2:'217',g2:'119',b2:'6',
+    water:'#6BA3BE',wr:'107',wg2:'163',wb:'190',
+    navLight:'rgba(255,250,240,.96)',navDark:'rgba(18,10,2,.96)'
+  }
+};
+
+function getAccentTheme(){return lsGet('accent_theme')||'sunset';}
+
+function applyAccentTheme(id){
+  const t=ACCENT_THEMES[id]||ACCENT_THEMES.sunset;
+  // Batch all CSS variable writes into a single cssText assignment
+  // on :root — one style recalc instead of 9 separate ones
+  const root=document.documentElement;
+  // Build a combined setProperty block; cssText assignment can't target
+  // :root custom props directly, so we use a fast sequential write
+  // but guard with a single forced-layout read BEFORE writing (read-write pattern)
+  // This avoids interleaved read/write which causes multiple reflows.
+  root.style.setProperty('--sun',t.sun);
+  root.style.setProperty('--sun2',t.sun2);
+  root.style.setProperty('--cal',t.cal);
+  root.style.setProperty('--sun-rgb',t.r+','+t.g+','+t.b);
+  root.style.setProperty('--sun2-rgb',t.r2+','+t.g2+','+t.b2);
+  root.style.setProperty('--pf-r',t.r);
+  root.style.setProperty('--pf-g',t.g);
+  root.style.setProperty('--pf-b',t.b);
+  root.style.setProperty('--nav-bg',t.navLight);
+  root.style.setProperty('--nav-bg-dark',t.navDark);
+  // Water colour — each theme has a harmonised accent-water
+  root.style.setProperty('--water',t.water||'#4EAEE5');
+  root.style.setProperty('--water-rgb',(t.wr||'78')+','+(t.wg2||'174')+','+(t.wb||'229'));
+}
+
+function setAccentTheme(id){
+  // 1. Instant visual — same frame as tap
+  Object.keys(ACCENT_THEMES).forEach(k=>{
+    const el=document.getElementById('ct-'+k);
+    if(el)el.classList.toggle('on',k===id);
+    const eg=document.getElementById('cg-'+k);
+    if(eg)eg.classList.toggle('on',k===id);
+  });
+  applyAccentTheme(id);
+  _syncColorRow(id);
+  tg?.HapticFeedback?.selectionChanged();
+  requestAnimationFrame(()=>{
+    lsSet('accent_theme',id);
+    _updateDesignVal();
+  });
+}
+
+function _syncColorRow(id){
+  const t=ACCENT_THEMES[id]||ACCENT_THEMES.sunset;
+  const swatch=document.getElementById('dp-color-swatch');
+  const nameEl=document.getElementById('dp-color-name');
+  const themeLabels={sunset:'закат',peach:'персик',mango:'манго',hibiscus:'гибискус',lagoon:'лагуна',lime:'лайм',coral:'кораллы',watermelon:'арбуз',sunflower:'подсолнух',sakura:'сакура',ocean:'океан',violet:'фиолет',mint:'мята',tangerine:'мандарин',sand:'песок'};
+  if(swatch)swatch.style.background='linear-gradient(135deg,'+t.sun+','+t.sun2+')';
+  if(nameEl)nameEl.textContent=themeLabels[id]||id;
+}
+
+function _updateDesignVal(){
+  const layoutLabels={classic:'классический',linear:'линейный',bento:'бенто'};
+  const themeLabels={sunset:'закат',peach:'персик',mango:'манго',hibiscus:'гибискус',lagoon:'лагуна',lime:'лайм',coral:'кораллы',watermelon:'арбуз',sunflower:'подсолнух',sakura:'сакура',ocean:'океан',violet:'фиолет',mint:'мята',tangerine:'мандарин',sand:'песок'};
+  const layout=layoutLabels[getHomeDesign()]||'классический';
+  const theme=themeLabels[getAccentTheme()]||'закат';
+  T('pf-design-val',layout+' · '+theme);
 }
 
 function _homeData(){
@@ -3978,8 +4306,7 @@ function renderHome(){
   const pg=$('p-home');
   if(pg){pg.classList.toggle('layout-linear',d==='linear');pg.classList.toggle('layout-bento',d==='bento');}
   ['classic','linear','bento'].forEach(k=>{const el=document.getElementById('dp-'+k);if(el)el.classList.toggle('selected',k===d);});
-  const labels={classic:'классический',linear:'линейный',bento:'бенто'};
-  T('pf-design-val',labels[d]||'классический');
+  _updateDesignVal();
   if(d==='linear')renderHomeLinear();
   else if(d==='bento')renderHomeBento();
   else renderHomeClassic();
@@ -4004,7 +4331,7 @@ function renderHomeClassic(){
       return`<div class="ac${done?' done':''}"><div class="ac-ico" style="background:${col}18">${ico}</div><div class="ac-body"><div class="ac-name">${a.name}</div><div class="ac-sub">${ts} · ${a.duration} мин</div></div>${badge}</div>`;
     }).join('')+`</div>`;
   }
-  const streakHtml=streak>=2?`<div class="pad" style="margin-top:10px"><div style="background:linear-gradient(90deg,rgba(255,107,53,.07),rgba(255,171,64,.04));border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;gap:10px"><svg width="20" height="20" viewBox="0 0 24 24" fill="var(--sun)"><path d="M12 2c0 5.5-5 7-5 11a5 5 0 0 0 10 0c0-4-5-5.5-5-11z"/></svg><div><div style="font-size:13px;font-weight:900">${streak} дней подряд</div><div class="t5">серия воды</div></div></div></div>`:'';
+  const streakHtml=streak>=2?`<div class="pad" style="margin-top:10px"><div style="background:linear-gradient(90deg,rgba(var(--sun-rgb),.07),rgba(var(--sun2-rgb),.04));border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;gap:10px"><svg width="20" height="20" viewBox="0 0 24 24" fill="var(--sun)"><path d="M12 2c0 5.5-5 7-5 11a5 5 0 0 0 10 0c0-4-5-5.5-5-11z"/></svg><div><div style="font-size:13px;font-weight:900">${streak} дней подряд</div><div class="t5">серия воды</div></div></div></div>`:'';
   const el=$('h-content');if(!el)return;
   el.style.display='block';
   el.innerHTML=`
@@ -4019,7 +4346,7 @@ function renderHomeClassic(){
 </div></div>
 <div class="pad gap"><div class="card" style="padding:16px 6px 12px">
   <div style="display:flex;justify-content:space-around;align-items:center">
-    <div style="text-align:center;cursor:pointer" onclick="goToTrackTab('water')">\n      <div class="aw"><svg width="68" height="68" viewBox="0 0 68 68"><circle cx="34" cy="34" r="26" fill="none" stroke="rgba(78,174,229,.15)" stroke-width="5"/><circle cx="34" cy="34" r="26" fill="none" stroke="var(--water)" stroke-width="5" stroke-linecap="round" stroke-dasharray="163.4" stroke-dashoffset="${arcW}" transform="rotate(-90 34 34)" style="transition:stroke-dashoffset .8s cubic-bezier(.25,.46,.45,.94)"/></svg>\n      <div class="ai"><div style="font-size:13px;font-weight:900;color:var(--water)">${Math.round(wp*100)}%</div></div></div>\n      <div style="font-size:11px;font-weight:900;margin-top:4px">${wt}</div><div class="t5" style="font-size:10px">мл</div>\n    </div>\n    <div style="text-align:center;cursor:pointer" onclick="goToTrackTab('cal')">\n      <div class="aw"><svg width="82" height="82" viewBox="0 0 82 82"><circle cx="41" cy="41" r="33" fill="none" stroke="rgba(244,129,74,.15)" stroke-width="6"/><circle cx="41" cy="41" r="33" fill="none" stroke="var(--cal)" stroke-width="6" stroke-linecap="round" stroke-dasharray="207.3" stroke-dashoffset="${arcC}" transform="rotate(-90 41 41)" style="transition:stroke-dashoffset .8s cubic-bezier(.25,.46,.45,.94)"/></svg>\n      <div class="ai"><div style="font-size:15px;font-weight:900;color:var(--cal)">${Math.round(cp*100)}%</div></div></div>\n      <div style="font-size:13px;font-weight:900;margin-top:4px">${ct}</div><div class="t5" style="font-size:10px">ккал</div>\n      <div style="margin-top:4px;display:flex;gap:4px;justify-content:center">${macHtml}</div>\n    </div>
+    <div style="text-align:center;cursor:pointer" onclick="goToTrackTab('water')">\n      <div class="aw"><svg width="68" height="68" viewBox="0 0 68 68"><circle cx="34" cy="34" r="26" fill="none" stroke="rgba(var(--water-rgb),.15)" stroke-width="5"/><circle cx="34" cy="34" r="26" fill="none" stroke="var(--water)" stroke-width="5" stroke-linecap="round" stroke-dasharray="163.4" stroke-dashoffset="${arcW}" transform="rotate(-90 34 34)" style="transition:stroke-dashoffset .8s cubic-bezier(.25,.46,.45,.94)"/></svg>\n      <div class="ai"><div style="font-size:13px;font-weight:900;color:var(--water)">${Math.round(wp*100)}%</div></div></div>\n      <div style="font-size:11px;font-weight:900;margin-top:4px">${wt}</div><div class="t5" style="font-size:10px">мл</div>\n    </div>\n    <div style="text-align:center;cursor:pointer" onclick="goToTrackTab('cal')">\n      <div class="aw"><svg width="82" height="82" viewBox="0 0 82 82"><circle cx="41" cy="41" r="33" fill="none" stroke="rgba(244,129,74,.15)" stroke-width="6"/><circle cx="41" cy="41" r="33" fill="none" stroke="var(--cal)" stroke-width="6" stroke-linecap="round" stroke-dasharray="207.3" stroke-dashoffset="${arcC}" transform="rotate(-90 41 41)" style="transition:stroke-dashoffset .8s cubic-bezier(.25,.46,.45,.94)"/></svg>\n      <div class="ai"><div style="font-size:15px;font-weight:900;color:var(--cal)">${Math.round(cp*100)}%</div></div></div>\n      <div style="font-size:13px;font-weight:900;margin-top:4px">${ct}</div><div class="t5" style="font-size:10px">ккал</div>\n      <div style="margin-top:4px;display:flex;gap:4px;justify-content:center">${macHtml}</div>\n    </div>
     <div style="text-align:center;cursor:pointer" onclick="navTo('sleep')">
       <div class="aw"><svg width="68" height="68" viewBox="0 0 68 68"><circle cx="34" cy="34" r="26" fill="none" stroke="rgba(139,127,212,.15)" stroke-width="5"/><circle cx="34" cy="34" r="26" fill="none" stroke="var(--sleep)" stroke-width="5" stroke-linecap="round" stroke-dasharray="163.4" stroke-dashoffset="${arcS}" transform="rotate(-90 34 34)" style="transition:stroke-dashoffset .8s cubic-bezier(.25,.46,.45,.94)"/></svg>
       <div class="ai"><div style="font-size:13px;font-weight:900;color:var(--sleep)">${sleepH}</div></div></div>
@@ -4047,7 +4374,7 @@ function renderHomeLinear(){
   let planHtml='';
   if(planItems.length){
     const nt=new Date();
-    const pills={done:'background:rgba(82,193,119,.1);color:var(--green)',now:'background:rgba(78,174,229,.1);color:var(--water)',soon:'background:rgba(255,107,53,.1);color:var(--sun)',late:'background:rgba(244,92,92,.1);color:var(--red)',later:'background:rgba(255,255,255,.07);color:var(--hint)'};
+    const pills={done:'background:rgba(82,193,119,.1);color:var(--green)',now:'background:rgba(var(--water-rgb),.1);color:var(--water)',soon:'background:rgba(var(--sun-rgb),.1);color:var(--sun)',late:'background:rgba(244,92,92,.1);color:var(--red)',later:'background:rgba(255,255,255,.07);color:var(--hint)'};
     planHtml=`<div class="hl-plan"><div class="hl-plan-lbl">сегодня</div>`+planItems.map(a=>{
       const st=actStatus(a);const col=ACT_COL[a.type]||'#FF9800';
       return`<div class="hl-plan-item"><div class="hl-plan-ico" style="background:${col}15;font-size:13px">${ACT_ICO[a.type]||'✨'}</div><div style="flex:1"><div class="hl-plan-name">${a.name}</div><div class="hl-plan-sub">${fmtRange(a)} · ${a.duration} мин</div></div><div class="hl-plan-pill" style="${pills[st.s]||pills.later}">${st.l}</div></div>`;
@@ -4076,7 +4403,7 @@ function renderHomeLinear(){
     </div>
     <div class="hl-metric" onclick="goToTrackTab('water')">
       <div class="hl-metric-top">
-        <div class="hl-metric-left"><div class="hl-metric-ico" style="background:rgba(78,174,229,.12)"><iconify-icon icon="solar:waterdrops-bold" width="14" style="color:var(--water)"></iconify-icon></div><span class="hl-metric-name">вода</span></div>
+        <div class="hl-metric-left"><div class="hl-metric-ico" style="background:rgba(var(--water-rgb),.12)"><iconify-icon icon="solar:waterdrops-bold" width="14" style="color:var(--water)"></iconify-icon></div><span class="hl-metric-name">вода</span></div>
         <div><span class="hl-metric-val" style="color:var(--water)">${wt}</span><span class="hl-metric-of">/ ${wg} мл</span></div>
       </div>
       <div class="hl-bar"><div class="hl-bar-fill" style="width:${Math.round(wp*100)}%;background:var(--water)"></div></div>
@@ -4187,7 +4514,7 @@ function renderWater(){
   T('w-total',wt);T('w-goal',wg);
   requestAnimationFrame(()=>{const b=$('w-bar');if(b)b.style.width=wp+'%';});
   const st=gStreak();
-  H('w-streak',st>=2?`<div style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,107,53,.1);color:var(--sun);padding:4px 12px;border-radius:99px;font-size:11px;font-weight:800">🔥 ${st} дней подряд</div>`:'');
+  H('w-streak',st>=2?`<div style="display:inline-flex;align-items:center;gap:4px;background:rgba(var(--sun-rgb),.1);color:var(--sun);padding:4px 12px;border-radius:99px;font-size:11px;font-weight:800">🔥 ${st} дней подряд</div>`:'');
 }
 function renderCal(){
   const u=gU(),cd=gCD();
@@ -4197,7 +4524,7 @@ function renderCal(){
   T('c-remain',Math.max(0,cg-ct));
   const m=C.macros||{prot:0,fat:0,carb:0};
   T('c-prot',(m.prot||0)+'г');T('c-fat',(m.fat||0)+'г');T('c-carb',(m.carb||0)+'г');
-  const MEALS=[{k:'breakfast',i:'🌅',n:'завтрак',col:'#FFAB40',bg:'rgba(255,171,64,.12)'},{k:'lunch',i:'☀️',n:'обед',col:'#FF6B35',bg:'rgba(255,107,53,.12)'},{k:'dinner',i:'🌙',n:'ужин',col:'#8B7FD4',bg:'rgba(139,127,212,.12)'},{k:'snack',i:'🍑',n:'перекус',col:'#52C177',bg:'rgba(82,193,119,.1)'}];
+  const MEALS=[{k:'breakfast',i:'🌅',n:'завтрак',col:'#FFAB40',bg:'rgba(var(--sun2-rgb),.12)'},{k:'lunch',i:'☀️',n:'обед',col:'#FF6B35',bg:'rgba(var(--sun-rgb),.12)'},{k:'dinner',i:'🌙',n:'ужин',col:'#8B7FD4',bg:'rgba(139,127,212,.12)'},{k:'snack',i:'🍑',n:'перекус',col:'#52C177',bg:'rgba(82,193,119,.1)'}];
   H('c-meals',MEALS.map(m=>{
     const entries=getMealEntries(m.k);
     const kcal=entries.reduce((s,e)=>s+(e.kcal||0),0);
@@ -4253,7 +4580,7 @@ function renderPlan(){
         <div class="ac-name">${a.name}</div>
         <div class="ac-sub">${fmtRange(a)} · ${a.duration} мин</div>
         <span class="pill ${pc}">${st.l}</span>
-        ${bar?`<div class="ac-bar"><div class="ac-barf" style="width:${st.s==='soon'?70:pct}%;background:${st.s==='now'?'var(--water)':'rgba(255,107,53,.35)'}"></div></div>`:''}
+        ${bar?`<div class="ac-bar"><div class="ac-barf" style="width:${st.s==='soon'?70:pct}%;background:${st.s==='now'?'var(--water)':'rgba(var(--sun-rgb),.35)'}"></div></div>`:''}
       </div>
       <div style="flex-shrink:0">
         <button class="btn btn-g complete-btn-js" style="padding:7px 11px;font-size:12px;border-radius:9px" onclick="completeAct(${a.id})">✓</button>
@@ -4384,7 +4711,8 @@ function _setTip(phase){
   if(phase==='cam'){
     if(tipMain)tipMain.textContent='выбрать фото';
     if(tipSub)tipSub.textContent='отпусти сейчас';
-    if(tipSvg){tipSvg.setAttribute('stroke','#0A84FF');tipSvg.innerHTML=SVG_CAM;}
+    const accentNow=getComputedStyle(document.documentElement).getPropertyValue('--sun').trim()||'#FF6B35';
+    if(tipSvg){tipSvg.setAttribute('stroke',accentNow);tipSvg.innerHTML=SVG_CAM;}
   }else{
     if(tipMain)tipMain.textContent='удалить фото';
     if(tipSub)tipSub.textContent='держи до конца';
@@ -4415,7 +4743,6 @@ function _avReset(){
   av.timer=null;av.dimTimer=null;av.rafStart=null;
   av.pressing=false;av.phase=0;
   const avEl=_avEl();if(avEl)avEl.classList.remove('pressing');
-  const ov=document.getElementById('pav-del-overlay');if(ov)ov.classList.remove('show');
   const tip=_avTip();if(tip)tip.classList.remove('show');
   const fill=_avFill();if(fill)fill.style.width='0%';
 }
@@ -4424,14 +4751,9 @@ function avDown(e){
   e.preventDefault();
   if(av.pressing)return;
   av.pressing=true;av.phase=1;
-  // Dim + overlay after 300ms hold — instant feedback
+  // Dim only after 1s hold — not on quick tap
   const avEl=_avEl();
-  av.dimTimer=setTimeout(()=>{
-    if(!av.pressing)return;
-    if(avEl)avEl.classList.add('pressing');
-    const ov=document.getElementById('pav-del-overlay');
-    if(ov)ov.classList.add('show');
-  },300);
+  av.dimTimer=setTimeout(()=>{if(av.pressing&&avEl)avEl.classList.add('pressing');},1000);
 
   av.timer=setTimeout(()=>{
     if(!av.pressing)return;
@@ -4490,14 +4812,6 @@ function _lcInitFileInput(){
   if(!fi)return;
   fi.addEventListener('change',function(){
     const f=this.files[0];if(!f)return;this.value='';
-
-    // Show spinner immediately in the avatar circle
-    const spinner=document.getElementById('pav-spinner');
-    if(spinner)spinner.classList.add('show');
-    // Hide letter while loading
-    const letterEl=document.getElementById('pf-av-letter');
-    if(letterEl)letterEl.style.opacity='0';
-
     const r=new FileReader();
     r.onload=e=>{
       const src=e.target.result;
@@ -4514,7 +4828,6 @@ function _lcInitFileInput(){
         oc.restore();
         const url=out.toDataURL('image/jpeg',.92);
         // Extract dominant color
-        let rgb=null;
         try{
           const tmp=document.createElement('canvas');tmp.width=8;tmp.height=8;
           const tc=tmp.getContext('2d');tc.drawImage(out,0,0,8,8);
@@ -4525,17 +4838,12 @@ function _lcInitFileInput(){
             const sat=(mx-mn)/(mx||1),lum=(mx+mn)/510;
             if(sat>.12&&lum>.06&&lum<.92){rv+=d[i];gv+=d[i+1];bv+=d[i+2];n++;}
           }
-          if(n>0){rgb=`${Math.round(rv/n)},${Math.round(gv/n)},${Math.round(bv/n)}`;_saveAvatarColor(rgb);}
+          const rgb=n>0?`${Math.round(rv/n)},${Math.round(gv/n)},${Math.round(bv/n)}`:null;
+          if(rgb)_saveAvatarColor(rgb);
         }catch{}
         _saveAvatarToStorage(url);
-
-        // After 3 seconds spinner ends → avatar fades in, colors transition
-        setTimeout(()=>{
-          if(spinner)spinner.classList.remove('show');
-          if(letterEl)letterEl.style.opacity='';
-          _applyAvatarFull(url,true);
-          toast('аватар обновлён ✓');
-        },3000);
+        _applyAvatarFull(url,true);
+        toast('аватар обновлён ✓');
       };
       img.src=src;
     };
@@ -4705,17 +5013,6 @@ function _setPfHeroColor(rgb){
   root.style.setProperty('--pf-r',parts[0]);
   root.style.setProperty('--pf-g',parts[1]);
   root.style.setProperty('--pf-b',parts[2]);
-  // Tint navbar shadow + border with avatar dominant color
-  const nav=document.getElementById('nav');
-  if(nav){
-    if(rgb){
-      nav.style.boxShadow=`0 6px 24px rgba(${rgb},.22),0 2px 6px rgba(0,0,0,.05)`;
-      nav.style.borderColor=`rgba(${rgb},.28)`;
-    }else{
-      nav.style.boxShadow='';
-      nav.style.borderColor='';
-    }
-  }
 }
 
 function _applyAvatarFull(dataUrl,animate){
@@ -5212,7 +5509,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   document.getElementById('pre-theme')?.remove();
   const dark=tg?.colorScheme==='dark'||window.matchMedia?.('(prefers-color-scheme:dark)').matches;
   if(dark)document.body.classList.add('tg-dark');
-  tg?.onEvent('themeChanged',()=>{document.body.classList.toggle('tg-dark',tg?.colorScheme==='dark');applyTheme();});
+  tg?.onEvent('themeChanged',()=>{document.body.classList.toggle('tg-dark',tg?.colorScheme==='dark');applyTheme();applyAccentTheme(getAccentTheme());});
   // Init crop engine (elements are after script block, must be deferred)
   _lcDOMInit();
   _lcInitFileInput();
@@ -5221,6 +5518,15 @@ document.addEventListener('DOMContentLoaded',async()=>{
   const pg=document.getElementById('p-home');
   if(pg){pg.classList.toggle('layout-linear',d==='linear');pg.classList.toggle('layout-bento',d==='bento');}
   ['classic','linear','bento'].forEach(k=>{const el=document.getElementById('dp-'+k);if(el)el.classList.toggle('selected',k===d);});
+  // Restore accent theme swatches + apply colours
+  const at=getAccentTheme();
+  Object.keys(ACCENT_THEMES).forEach(k=>{
+    const el=document.getElementById('ct-'+k);if(el)el.classList.toggle('on',k===at);
+    const eg=document.getElementById('cg-'+k);if(eg)eg.classList.toggle('on',k===at);
+  });
+  applyAccentTheme(at);
+  _syncColorRow(at);
+  _updateDesignVal();
   await loadData();
   renderHome();
   _updateNavAvatar(); // restore nav avatar from storage on startup
