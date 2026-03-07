@@ -5263,38 +5263,48 @@ const gfLS = {
 let _gfitTokenClient = null;
 let _gfitSyncing = false;
 
-/* ── инициализация GIS (после загрузки скрипта google) ── */
-function _gfitInitClient(){
-  if(typeof google==='undefined'||!google.accounts?.oauth2)return;
-  if(GFIT_CLIENT_ID==='YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com'){
-    console.warn('letify: Google Fit CLIENT_ID не задан — интеграция отключена');
-    return;
-  }
-  _gfitTokenClient = google.accounts.oauth2.initTokenClient({
-    client_id: GFIT_CLIENT_ID,
-    scope: GFIT_SCOPE,
-    callback: async(resp)=>{
-      if(resp.error){
-        toast('Google Fit: ошибка авторизации');
-        _gfitSetSyncing(false);
-        return;
-      }
-      /* Сохраняем токен + время истечения */
-      const expAt = Date.now() + (parseInt(resp.expires_in||3600,10)-60)*1000;
-      gfLS.setToken({access_token:resp.access_token, expires_at:expAt});
-      tg?.HapticFeedback?.notificationOccurred('success');
-      await _gfitFetchSteps(resp.access_token);
-      _gfitRenderUI();
-      renderHome();
-    }
+/* ── Строим URL для OAuth (implicit flow — токен приходит в хэше URL) ── */
+function _gfitBuildAuthUrl(){
+  const params = new URLSearchParams({
+    client_id:    GFIT_CLIENT_ID,
+    redirect_uri: 'https://letify-production.up.railway.app/',
+    response_type:'token',
+    scope:        GFIT_SCOPE,
+    prompt:       'consent',
+    include_granted_scopes:'true',
   });
+  return 'https://accounts.google.com/o/oauth2/v2/auth?'+params.toString();
+}
+
+/* ── При загрузке проверяем хэш URL — токен после редиректа ── */
+function _gfitCheckUrlToken(){
+  try{
+    const hash = window.location.hash.substring(1);
+    if(!hash||!hash.includes('access_token'))return;
+    const params   = new URLSearchParams(hash);
+    const token    = params.get('access_token');
+    const expiresIn= parseInt(params.get('expires_in')||'3600',10);
+    if(!token)return;
+    const expAt = Date.now()+(expiresIn-60)*1000;
+    gfLS.setToken({access_token:token, expires_at:expAt});
+    // Убираем токен из URL
+    window.history.replaceState(null,'',window.location.pathname+window.location.search);
+    tg?.HapticFeedback?.notificationOccurred('success');
+    toast('Google Fit подключён! Загружаем данные...');
+    _gfitFetchAll(token).then(()=>{ _gfitRenderUI(); renderHome(); });
+  }catch(e){ console.warn('gfit token parse',e); }
+}
+
+/* ── инициализация: проверяем токен в URL ── */
+function _gfitInitClient(){
+  _gfitCheckUrlToken();
 }
 
 /* ── проверить токен ── */
 function _gfitGetValidToken(){
   const t = gfLS.getToken();
   if(!t||!t.access_token)return null;
-  if(t.expires_at && Date.now()>t.expires_at)return null; // истёк
+  if(t.expires_at && Date.now()>t.expires_at)return null;
   return t.access_token;
 }
 
@@ -5438,26 +5448,19 @@ async function _gfitFetchSteps(token){ return _gfitFetchAll(token); }
 async function gfitToggle(){
   const token = _gfitGetValidToken();
   if(token){
-    /* Уже подключено — показываем выбор: синхр или отключить */
     _gfitShowOptions();
     return;
   }
-  /* Не подключено — запрашиваем авторизацию */
-  if(!_gfitTokenClient){
-    if(GFIT_CLIENT_ID==='YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com'){
-      toast('Google Fit: настройте CLIENT_ID в коде');
-      return;
-    }
-    _gfitInitClient();
-    if(!_gfitTokenClient){toast('Google Fit: ошибка инициализации');return;}
-  }
-  _gfitSetSyncing(true);
-  try{
-    _gfitTokenClient.requestAccessToken({prompt:'consent'});
-    /* callback обрабатывает ответ */
-  }catch(e){
-    _gfitSetSyncing(false);
-    toast('Не удалось открыть Google Sign-In');
+  /* Открываем авторизацию во внешнем браузере — Google не разрешает вход в WebView */
+  const url = _gfitBuildAuthUrl();
+  tg?.HapticFeedback?.impactOccurred('light');
+  if(tg?.openLink){
+    // Telegram: открываем в системном браузере
+    tg.openLink(url);
+    toast('Войди в Google и вернись в приложение 👆');
+  }else{
+    // Веб: обычный переход
+    window.location.href = url;
   }
 }
 
