@@ -424,12 +424,9 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   border:1px solid rgba(0,0,0,.07);
   padding:17px 17px 15px;
   display:flex;flex-direction:column;gap:0;
-  position:relative;
-  /* NO overflow:hidden — ring must not be clipped */
-  isolation:isolate;
+  position:relative;overflow:hidden;
   margin-bottom:10px;
   -webkit-tap-highlight-color:transparent;
-  transform:translateZ(0);
 }
 .tg-dark .pl-mo-hero{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.1)}
 
@@ -478,59 +475,39 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .pl-mo-prog-lbl{font-size:10px;font-weight:700;color:var(--hint)}
 .tg-dark .pl-mo-prog-lbl{color:rgba(255,255,255,.35)}
 
-/* Hero done button — GPU clip-path morph, zero reflow */
-.pl-mo-do-wrap{
-  position:relative;
-  flex-shrink:0;
-  width:124px;
-  height:38px;
-}
-/* Pill bg — GPU clip-path, no width animation = no reflow */
-.pl-mo-do-pill{
-  position:absolute;
-  inset:0;
-  border-radius:19px;
-  display:flex;align-items:center;
-  padding:0 46px 0 13px;
-  font-size:12px;font-weight:800;color:#fff;
-  white-space:nowrap;gap:5px;
-  pointer-events:none;
-  clip-path:inset(0 0 0 0 round 19px);
-  transition:clip-path .34s cubic-bezier(.34,1.2,.64,1);
-}
-.pl-mo-do-wrap.counting .pl-mo-do-pill{
-  clip-path:inset(0 0 0 86px round 19px);
-}
-/* Circle — always 38px, anchored right */
-.pl-mo-do-circle{
-  position:absolute;right:0;top:0;
-  width:38px;height:38px;border-radius:50%;
-  border:none;cursor:pointer;color:#fff;
-  display:flex;align-items:center;justify-content:center;
-  z-index:2;
+/* Hero done button — default state */
+.pl-mo-do-btn{
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  padding:11px 16px;border-radius:14px;border:none;
+  color:#fff;font-family:inherit;font-size:13px;font-weight:800;
+  cursor:pointer;flex-shrink:0;white-space:nowrap;
+  position:relative;overflow:hidden;
   -webkit-tap-highlight-color:transparent;
-  transition:transform .12s ease;
+  transition:opacity .12s;
 }
-.pl-mo-do-circle:active{transform:scale(.86);}
-.pl-mo-ic-check,.pl-mo-ic-x{
+.pl-mo-do-btn:active{opacity:.7}
+
+/* Countdown drain bar — drawn OVER the button */
+.pl-mo-do-btn::after{
+  content:'';
   position:absolute;
-  display:flex;align-items:center;justify-content:center;
-  transition:opacity .18s ease,transform .22s cubic-bezier(.34,1.56,.64,1);
+  bottom:0;left:0;right:0;height:100%;
+  background:rgba(0,0,0,.22);
+  transform-origin:right center;
+  transform:scaleX(0);
+  pointer-events:none;
 }
-.pl-mo-ic-x{opacity:0;transform:scale(.4) rotate(-45deg);}
-.pl-mo-do-wrap.counting .pl-mo-ic-check{opacity:0;transform:scale(.4) rotate(45deg);}
-.pl-mo-do-wrap.counting .pl-mo-ic-x{opacity:1;transform:scale(1) rotate(0);}
-/* Progress ring — overflows wrap, visible because hero has no overflow:hidden */
-.pl-mo-do-ring{
-  position:absolute;right:-5px;top:50%;
-  transform:translateY(-50%);
-  width:48px;height:48px;
-  pointer-events:none;opacity:0;
-  transition:opacity .2s ease;
-  z-index:1;
+.pl-mo-do-btn.counting{
+  cursor:pointer;
 }
-.pl-mo-do-ring circle{transform-origin:24px 24px;transform:rotate(-90deg);}
-.pl-mo-do-wrap.counting .pl-mo-do-ring{opacity:1;}
+.pl-mo-do-btn.counting::after{
+  transform:scaleX(1);
+  animation:btn-drain 3.5s linear forwards;
+}
+@keyframes btn-drain{
+  from{transform:scaleX(1)}
+  to  {transform:scaleX(0)}
+}
 
 /* Section labels */
 .pl-mo-label{
@@ -551,7 +528,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .pl-mo-track::-webkit-scrollbar{display:none}
 .pl-mo-row{display:flex;gap:8px;padding:2px 2px 8px}
 
-/* Queue card — non-interactive, informational only */
+/* Queue card — minimal, no will-change, no contain */
 .pl-mo-qcard{
   width:148px;flex-shrink:0;
   background:var(--bg2);
@@ -559,13 +536,15 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   border-radius:18px;
   padding:13px 12px 12px;
   display:flex;flex-direction:column;gap:8px;
-  cursor:default;
+  cursor:pointer;
   position:relative;overflow:hidden;
   -webkit-tap-highlight-color:transparent;
-  opacity:.8;
+  transition:opacity .12s;
 }
 .tg-dark .pl-mo-qcard{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.08)}
-.pl-mo-qcard.is-future{opacity:.45}
+.pl-mo-qcard:active{opacity:.65}
+.pl-mo-qcard.is-future{opacity:.45;cursor:default}
+.pl-mo-qcard.is-future:active{opacity:.45}
 
 .pl-mo-future-tag{
   display:flex;align-items:center;gap:3px;
@@ -579,6 +558,21 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .pl-mo-qname{font-size:12.5px;font-weight:800;letter-spacing:-.01em;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text);}
 .pl-mo-qtime{font-size:10px;font-weight:700;color:var(--hint)}
 .pl-mo-qbadge{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:99px;font-size:9.5px;font-weight:800;width:fit-content;margin-top:auto;}
+
+/* Queue countdown bar */
+.pl-mo-qcard .pl-mo-qbar{
+  position:absolute;bottom:0;left:0;right:0;height:3px;
+  background:var(--green);
+  transform-origin:right center;
+  transform:scaleX(0);
+  pointer-events:none;
+  border-radius:0 0 18px 18px;
+}
+.pl-mo-qcard.counting .pl-mo-qbar{
+  transform:scaleX(1);
+  animation:btn-drain 3.5s linear forwards;
+}
+.pl-mo-qcard.counting{cursor:pointer}
 
 /* +more card */
 .pl-mo-more{
@@ -1801,7 +1795,8 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       </svg>
     </div>
   </div>
-  </div>
+  <div style="font-size:9px;font-weight:700;color:var(--hint);text-align:center;letter-spacing:.04em;opacity:.7;padding-bottom:4px">удержи карточку чтобы удалить</div>
+</div>
 <div id="pl-mo-scroll">
   <div id="pl-list"></div>
   <div id="pl-empty" style="display:none" class="pl-empty">
@@ -3717,18 +3712,23 @@ async function completeAct(id){
 
   // — UNDO —
   if(_completingMap.has(id)){
-    const{hideTimer,rafId}=_completingMap.get(id);
-    clearTimeout(hideTimer);
-    cancelAnimationFrame(rafId||0);
-    _completingMap.delete(id);
+    const{hideTimer,btnEl,qEl,origBtnHTML,origBtnStyle}=_completingMap.get(id);
+    clearTimeout(hideTimer);_completingMap.delete(id);
     C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:0}:x);
     lsSet('acts_'+TODAY,C.acts_today);
     _updatePlanCounters();
-    // Reset button
-    const wrap=document.getElementById(`pl-do-wrap-${id}`);
-    const arc=document.getElementById(`pl-do-arc-${id}`);
-    if(wrap)wrap.classList.remove('counting');
-    if(arc)arc.style.strokeDashoffset='125.66';
+    // Restore button
+    if(btnEl){
+      btnEl.classList.remove('counting');
+      btnEl.innerHTML=origBtnHTML;
+      btnEl.style.cssText=origBtnStyle;
+      btnEl.onclick=(e)=>{e.stopPropagation();completeAct(id);};
+    }
+    // Restore qcard
+    if(qEl){
+      qEl.classList.remove('counting');
+      qEl.onclick=()=>completeAct(id);
+    }
     toast('отменено');tg?.HapticFeedback?.notificationOccurred('warning');
     apiPost('/api/activity/uncomplete',{act_id:id});
     return;
@@ -3737,59 +3737,60 @@ async function completeAct(id){
   if(act.completed)return;
   tg?.HapticFeedback?.notificationOccurred('success');
 
-  // Mark complete
+  // — Mark complete in data —
   C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:1}:x);
   lsSet('acts_'+TODAY,C.acts_today);
   _updatePlanCounters();
   renderHome();
 
-  // Morph button
-  const wrap=document.getElementById(`pl-do-wrap-${id}`);
-  const arc=document.getElementById(`pl-do-arc-${id}`);
-  if(wrap)wrap.classList.add('counting');
-  if(arc){arc.style.strokeDasharray='125.66';arc.style.strokeDashoffset='125.66';}
-
+  // — Find elements —
   const heroEl=document.querySelector(`#pl-list .pl-mo-hero[data-id="${id}"]`);
+  const qEl=document.querySelector(`#pl-list .pl-mo-qcard[data-id="${id}"]`);
 
-  // Animate ring via rAF
-  const startTime=performance.now();
-  const CONFIRM_MS=3500;
-  const CIRCUM=125.66;
-  let currentRaf=0;
-  function tickRing(now){
-    const pct=Math.min((now-startTime)/CONFIRM_MS,1);
-    if(arc)arc.style.strokeDashoffset=CIRCUM*(1-pct);
-    if(pct<1){
-      currentRaf=requestAnimationFrame(tickRing);
-      const cur=_completingMap.get(id);
-      if(cur)cur.rafId=currentRaf;
-    }
-  }
-  currentRaf=requestAnimationFrame(tickRing);
+  let btnEl=null,origBtnHTML='',origBtnStyle='';
 
   if(heroEl){
+    btnEl=heroEl.querySelector('.pl-mo-do-btn');
+    if(btnEl){
+      origBtnHTML=btnEl.innerHTML;
+      origBtnStyle=btnEl.getAttribute('style')||'';
+      // Switch button to "отмена" + countdown
+      btnEl.classList.add('counting');
+      btnEl.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>отмена';
+      btnEl.onclick=(e)=>{e.stopPropagation();completeAct(id);};
+    }
+  } else if(qEl){
+    // Queue card: show drain bar
+    qEl.classList.add('counting');
+    qEl.onclick=()=>completeAct(id);
+  }
+
+  const target=heroEl||qEl;
+
+  if(target){
     const hideTimer=setTimeout(()=>{
       _completingMap.delete(id);
-      // Smooth exit: opacity fade + height collapse
-      const h=heroEl.offsetHeight;
-      heroEl.style.maxHeight=h+'px';
-      heroEl.style.overflow='hidden';
-      heroEl.style.transition='opacity .25s ease,max-height .3s cubic-bezier(.4,0,.2,1),margin-bottom .3s ease,padding .3s ease';
-      requestAnimationFrame(()=>{
-        heroEl.style.opacity='0';
-        heroEl.style.maxHeight='0';
-        heroEl.style.marginBottom='0';
-        heroEl.style.paddingTop='0';
-        heroEl.style.paddingBottom='0';
-        setTimeout(()=>{
-          if(heroEl.parentNode)heroEl.remove();
+      // Simple opacity fade, then snap-remove
+      target.style.opacity='0';
+      target.style.transition='opacity .22s ease';
+      setTimeout(()=>{
+        target.style.transition='none';
+        target.style.height='0px';
+        target.style.minHeight='0';
+        target.style.overflow='hidden';
+        target.style.margin='0';
+        target.style.padding='0';
+        requestAnimationFrame(()=>{
+          if(target.parentNode)target.remove();
           if(_completingMap.size===0){renderPlan(false);renderHome();}
-        },320);
-      });
-    },CONFIRM_MS);
-    _completingMap.set(id,{hideTimer,rafId:currentRaf});
+        });
+      },220);
+    },3500);
+
+    _completingMap.set(id,{hideTimer,btnEl,qEl:qEl||null,origBtnHTML,origBtnStyle});
     toast('выполнено 🎉 · нажми отмена');
   } else {
+    // Not in DOM
     await apiPost('/api/activity/complete',{act_id:id});
     await reload();
     return;
@@ -4430,7 +4431,10 @@ function renderPlan(animated){
   </div>
   <div class="pl-mo-hero${isNow?' is-now':''}"
     data-id="${hero.id}"
-    oncontextmenu="event.preventDefault()">
+    oncontextmenu="event.preventDefault()"
+    ontouchstart="startLongPress(${hero.id},this)"
+    ontouchend="cancelLongPress()"
+    ontouchmove="cancelLongPress()">
     <div class="pl-mo-glow" style="background:radial-gradient(circle,${col},transparent)"></div>
     <div class="pl-mo-hero-top">
       <div class="pl-mo-badge ${hpc}"><span class="pl-mo-bd"></span>${hst.l}</div>
@@ -4451,26 +4455,12 @@ function renderPlan(animated){
         <div class="pl-mo-prog"><div class="pl-mo-prog-fill" style="width:${prog}%;background:${col}"></div></div>
         <div class="pl-mo-prog-lbl">${isNow?prog+'% выполнено':hst.l}</div>
       </div>`:'<div style="flex:1"></div>'}
-      <div class="pl-mo-do-wrap" id="pl-do-wrap-${hero.id}">
-        <div class="pl-mo-do-pill" style="background:${col};box-shadow:0 3px 14px ${col}55">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg>
-          выполнить
-        </div>
-        <svg class="pl-mo-do-ring" id="pl-do-ring-${hero.id}" viewBox="0 0 48 48">
-          <circle cx="24" cy="24" r="20" fill="none" stroke="${col}" stroke-width="3" opacity=".22"/>
-          <circle id="pl-do-arc-${hero.id}" cx="24" cy="24" r="20" fill="none" stroke="${col}" stroke-width="3" stroke-linecap="round" stroke-dasharray="125.66" stroke-dashoffset="125.66"/>
-        </svg>
-        <button class="pl-mo-do-circle complete-btn-js" id="pl-do-btn-${hero.id}"
-          style="background:${col}"
-          onclick="event.stopPropagation();completeAct(${hero.id})">
-          <div class="pl-mo-ic-check">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg>
-          </div>
-          <div class="pl-mo-ic-x">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
-          </div>
-        </button>
-      </div>
+      <button class="pl-mo-do-btn complete-btn-js"
+        onclick="event.stopPropagation();completeAct(${hero.id})"
+        style="background:${col};box-shadow:0 4px 14px ${col}44">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        выполнить
+      </button>
     </div>
   </div>`;
 
@@ -4489,11 +4479,16 @@ function renderPlan(animated){
       const pc=_moStatusClass(st.s);
       const fut=st.s==='later';
       html+=`<div class="pl-mo-qcard${fut?' is-future':''}" data-id="${t.id}"
-        oncontextmenu="event.preventDefault()">
+        oncontextmenu="event.preventDefault()"
+        ontouchstart="startLongPress(${t.id},this)"
+        ontouchend="cancelLongPress()"
+        ontouchmove="cancelLongPress()"
+        ${!fut?`onclick="completeAct(${t.id})"`:''}>
         <div class="pl-mo-qico" style="background:${c}18">${ic}</div>
         <div class="pl-mo-qname">${t.name}</div>
         <div class="pl-mo-qtime">${fmtRange(t)} · ${t.duration} мин</div>
         ${!fut?`<div class="pl-mo-qbadge ${pc}"><span class="pl-mo-bd" style="width:5px;height:5px"></span>${st.l}</div>`:`<div class="pl-mo-future-tag">${t.time}</div>`}
+        <div class="pl-mo-qbar"></div>
       </div>`;
     });
 
