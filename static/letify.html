@@ -420,23 +420,16 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .pl-mo-hero{
   flex-shrink:0;
   background:var(--bg2);
-  border-radius:24px;
+  border-radius:22px;
   border:1px solid rgba(0,0,0,.07);
-  padding:18px 18px 16px;
+  padding:17px 17px 15px;
   display:flex;flex-direction:column;gap:0;
-  position:relative;overflow:hidden;
-  margin-bottom:12px;
+  position:relative;
+  /* NO overflow:hidden — ring must not be clipped */
+  isolation:isolate;
+  margin-bottom:10px;
   -webkit-tap-highlight-color:transparent;
-  /* GPU layer for smooth child transitions */
   transform:translateZ(0);
-}
-/* Accent top line */
-.pl-mo-hero::after{
-  content:'';
-  position:absolute;top:0;left:36px;right:36px;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(255,107,53,.35),transparent);
-  pointer-events:none;
-  border-radius:0 0 99px 99px;
 }
 .tg-dark .pl-mo-hero{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.1)}
 
@@ -444,17 +437,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .pl-mo-glow{
   position:absolute;top:-60px;right:-60px;
   width:180px;height:180px;border-radius:50%;
-  opacity:.09;pointer-events:none;
-}
-/* Dismiss animation */
-@keyframes pl-hero-dismiss{
-  0%  {opacity:1;transform:translateZ(0) scale(1)}
-  55% {opacity:.4;transform:translateZ(0) translateY(-6px) scale(.975)}
-  100%{opacity:0;transform:translateZ(0) translateY(-12px) scale(.96)}
-}
-.pl-mo-hero.dismissing{
-  animation:pl-hero-dismiss .38s cubic-bezier(.4,0,.2,1) forwards;
-  pointer-events:none;
+  opacity:.08;pointer-events:none;
 }
 
 /* Hero top row: badge + duration */
@@ -487,7 +470,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tg-dark .pl-mo-time-row{color:rgba(255,255,255,.4)}
 
 /* Hero foot: progress + button */
-.pl-mo-hero-foot{display:flex;align-items:center;gap:12px;min-height:44px;}
+.pl-mo-hero-foot{display:flex;align-items:center;gap:12px;}
 .pl-mo-prog-wrap{flex:1;display:flex;flex-direction:column;gap:4px}
 .pl-mo-prog{height:4px;background:rgba(0,0,0,.07);border-radius:99px;overflow:hidden}
 .tg-dark .pl-mo-prog{background:rgba(255,255,255,.08)}
@@ -495,102 +478,59 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .pl-mo-prog-lbl{font-size:10px;font-weight:700;color:var(--hint)}
 .tg-dark .pl-mo-prog-lbl{color:rgba(255,255,255,.35)}
 
-/* Hero done button — default state */
-/* ═══════════════════════════════════════════
-   COMPLETE BUTTON — morphs pill ➜ circle
-   Only transform+opacity on GPU, no width
-   trick: we animate padding+max-width via CSS
-   ═══════════════════════════════════════════ */
-.pl-mo-do-btn-wrap{
+/* Hero done button — GPU clip-path morph, zero reflow */
+.pl-mo-do-wrap{
   position:relative;
   flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
+  width:124px;
+  height:38px;
 }
-.pl-mo-do-btn{
-  display:flex;align-items:center;justify-content:center;gap:7px;
-  height:44px;
-  /* pill default */
-  padding:0 16px;
-  border-radius:14px;
-  border:none;
-  color:#fff;font-family:inherit;font-size:13px;font-weight:800;
-  cursor:pointer;white-space:nowrap;
-  position:relative;overflow:hidden;
-  -webkit-tap-highlight-color:transparent;
-  /* animate ONLY cheap props — no width! */
-  transition:
-    padding .36s cubic-bezier(.4,0,.2,1),
-    border-radius .36s cubic-bezier(.4,0,.2,1),
-    background .2s ease,
-    transform .1s ease;
-  will-change:border-radius,padding;
-}
-.pl-mo-do-btn:active{transform:scale(.93)}
-/* label span inside button */
-.pl-mo-do-btn .btn-lbl{
-  display:inline-block;
-  max-width:90px;overflow:hidden;
-  transition:max-width .32s cubic-bezier(.4,0,.2,1), opacity .22s ease;
-  white-space:nowrap;
-}
-/* check icon */
-.pl-mo-do-btn .btn-ico-check{
-  flex-shrink:0;
-  transition:opacity .18s ease, transform .18s ease;
-}
-/* x icon — hidden by default */
-.pl-mo-do-btn .btn-ico-x{
-  flex-shrink:0;position:absolute;
-  opacity:0;transform:scale(0) rotate(-90deg);
-  transition:opacity .2s ease, transform .22s cubic-bezier(.34,1.56,.64,1);
-}
-
-/* ── CIRCLE STATE ── */
-.pl-mo-do-btn.is-circle{
-  padding:0;
-  border-radius:22px; /* will reach 50% as el is 44×44 */
-  background:rgba(255,255,255,.1) !important;
-  box-shadow:none !important;
-  border:1.5px solid rgba(255,255,255,.18);
-}
-.pl-mo-do-btn.is-circle .btn-lbl{
-  max-width:0;opacity:0;
-}
-.pl-mo-do-btn.is-circle .btn-ico-check{
-  opacity:0;transform:scale(0);
-}
-.pl-mo-do-btn.is-circle .btn-ico-x{
-  opacity:1;transform:scale(1) rotate(0deg);
-}
-
-/* ── RING AROUND CIRCLE ── */
-.pl-mo-ring-svg{
+/* Pill bg — GPU clip-path, no width animation = no reflow */
+.pl-mo-do-pill{
   position:absolute;
-  /* center over the 44px button, ring is 58px */
-  top:50%;left:50%;
-  transform:translate(-50%,-50%);
-  width:58px;height:58px;
+  inset:0;
+  border-radius:19px;
+  display:flex;align-items:center;
+  padding:0 46px 0 13px;
+  font-size:12px;font-weight:800;color:#fff;
+  white-space:nowrap;gap:5px;
   pointer-events:none;
-  opacity:0;
-  transition:opacity .22s ease;
+  clip-path:inset(0 0 0 0 round 19px);
+  transition:clip-path .34s cubic-bezier(.34,1.2,.64,1);
 }
-.pl-mo-ring-svg.visible{opacity:1}
-.pl-mo-ring-svg .rp-track{fill:none;stroke:rgba(255,255,255,.1);stroke-width:2.5}
-.pl-mo-ring-svg .rp-fill{
-  fill:none;stroke:var(--green);stroke-width:2.5;
-  stroke-linecap:round;
-  stroke-dasharray:163.4;
-  stroke-dashoffset:163.4;
-  transform:rotate(-90deg);
-  transform-origin:50% 50%;
+.pl-mo-do-wrap.counting .pl-mo-do-pill{
+  clip-path:inset(0 0 0 86px round 19px);
 }
-@keyframes rp-drain{
-  from{stroke-dashoffset:163.4}
-  to  {stroke-dashoffset:0}
+/* Circle — always 38px, anchored right */
+.pl-mo-do-circle{
+  position:absolute;right:0;top:0;
+  width:38px;height:38px;border-radius:50%;
+  border:none;cursor:pointer;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  z-index:2;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .12s ease;
 }
-.pl-mo-ring-svg.run .rp-fill{
-  animation:rp-drain 3.5s linear forwards;
+.pl-mo-do-circle:active{transform:scale(.86);}
+.pl-mo-ic-check,.pl-mo-ic-x{
+  position:absolute;
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .18s ease,transform .22s cubic-bezier(.34,1.56,.64,1);
 }
+.pl-mo-ic-x{opacity:0;transform:scale(.4) rotate(-45deg);}
+.pl-mo-do-wrap.counting .pl-mo-ic-check{opacity:0;transform:scale(.4) rotate(45deg);}
+.pl-mo-do-wrap.counting .pl-mo-ic-x{opacity:1;transform:scale(1) rotate(0);}
+/* Progress ring — overflows wrap, visible because hero has no overflow:hidden */
+.pl-mo-do-ring{
+  position:absolute;right:-5px;top:50%;
+  transform:translateY(-50%);
+  width:48px;height:48px;
+  pointer-events:none;opacity:0;
+  transition:opacity .2s ease;
+  z-index:1;
+}
+.pl-mo-do-ring circle{transform-origin:24px 24px;transform:rotate(-90deg);}
+.pl-mo-do-wrap.counting .pl-mo-do-ring{opacity:1;}
 
 /* Section labels */
 .pl-mo-label{
@@ -611,30 +551,21 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .pl-mo-track::-webkit-scrollbar{display:none}
 .pl-mo-row{display:flex;gap:8px;padding:2px 2px 8px}
 
-/* Queue card — minimal, no will-change, no contain */
+/* Queue card — non-interactive, informational only */
 .pl-mo-qcard{
-  width:152px;flex-shrink:0;
+  width:148px;flex-shrink:0;
   background:var(--bg2);
   border:1px solid rgba(0,0,0,.07);
-  border-radius:20px;
-  padding:14px 13px 13px;
+  border-radius:18px;
+  padding:13px 12px 12px;
   display:flex;flex-direction:column;gap:8px;
-  cursor:pointer;
+  cursor:default;
   position:relative;overflow:hidden;
   -webkit-tap-highlight-color:transparent;
-  transition:transform .14s ease, opacity .14s ease;
-  transform:translateZ(0);
-}
-/* subtle top shimmer */
-.pl-mo-qcard::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.07),transparent);
-  pointer-events:none;
+  opacity:.8;
 }
 .tg-dark .pl-mo-qcard{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.08)}
-.pl-mo-qcard:active{transform:scale(.95) translateZ(0);opacity:.8}
-.pl-mo-qcard.is-future{opacity:.38;cursor:default}
-.pl-mo-qcard.is-future:active{transform:translateZ(0);opacity:.38}
+.pl-mo-qcard.is-future{opacity:.45}
 
 .pl-mo-future-tag{
   display:flex;align-items:center;gap:3px;
@@ -648,38 +579,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .pl-mo-qname{font-size:12.5px;font-weight:800;letter-spacing:-.01em;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text);}
 .pl-mo-qtime{font-size:10px;font-weight:700;color:var(--hint)}
 .pl-mo-qbadge{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:99px;font-size:9.5px;font-weight:800;width:fit-content;margin-top:auto;}
-
-/* Queue countdown bar */
-.pl-mo-qcard .pl-mo-qbar{
-  position:absolute;bottom:0;left:0;height:2.5px;
-  background:linear-gradient(90deg,var(--green),rgba(82,193,119,.4));
-  border-radius:0 99px 99px 0;
-  pointer-events:none;
-  width:100%;
-  transform-origin:left center;
-}
-.pl-mo-qcard .pl-mo-qbar{
-  animation:none;
-  opacity:0;
-}
-.pl-mo-qcard.counting .pl-mo-qbar{
-  opacity:1;
-  animation:qbar-drain 3.5s linear forwards;
-}
-@keyframes qbar-drain{
-  from{transform:scaleX(1);transform-origin:left center}
-  to  {transform:scaleX(0);transform-origin:left center}
-}
-.pl-mo-qcard.counting{cursor:pointer}
-/* queue dismiss */
-@keyframes qcard-dismiss{
-  0%  {opacity:1;transform:translateZ(0) scale(1)}
-  100%{opacity:0;transform:translateZ(0) scale(.88)}
-}
-.pl-mo-qcard.dismissing{
-  animation:qcard-dismiss .28s cubic-bezier(.4,0,.2,1) forwards;
-  pointer-events:none;
-}
 
 /* +more card */
 .pl-mo-more{
@@ -1902,8 +1801,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       </svg>
     </div>
   </div>
-  
-</div>
+  </div>
 <div id="pl-mo-scroll">
   <div id="pl-list"></div>
   <div id="pl-empty" style="display:none" class="pl-empty">
@@ -3812,25 +3710,25 @@ async function deleteActDirectly(id,cardEl){
 /* ══ COMPLETING MAP ══ */
 const _completingMap=new Map();
 
-/* ══ COMPLETE ACT (MOMENTUM) — smooth morph ══ */
+/* ══ COMPLETE ACT (MOMENTUM) ══ */
 async function completeAct(id){
   const act=C.acts_today.find(x=>x.id===id);
   if(!act)return;
 
-  // ── UNDO ──
+  // — UNDO —
   if(_completingMap.has(id)){
-    const{hideTimer,btnEl,ringEl,qEl,origBtnCol,origBtnShadow}=_completingMap.get(id);
+    const{hideTimer,rafId}=_completingMap.get(id);
     clearTimeout(hideTimer);
+    cancelAnimationFrame(rafId||0);
     _completingMap.delete(id);
     C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:0}:x);
     lsSet('acts_'+TODAY,C.acts_today);
     _updatePlanCounters();
-    // revert button morph
-    if(btnEl) _btnMorphToPill(btnEl,origBtnCol,origBtnShadow,id);
-    // stop ring
-    if(ringEl){ringEl.classList.remove('run');ringEl.classList.remove('visible');}
-    // revert qcard
-    if(qEl){qEl.classList.remove('counting');}
+    // Reset button
+    const wrap=document.getElementById(`pl-do-wrap-${id}`);
+    const arc=document.getElementById(`pl-do-arc-${id}`);
+    if(wrap)wrap.classList.remove('counting');
+    if(arc)arc.style.strokeDashoffset='125.66';
     toast('отменено');tg?.HapticFeedback?.notificationOccurred('warning');
     apiPost('/api/activity/uncomplete',{act_id:id});
     return;
@@ -3839,51 +3737,57 @@ async function completeAct(id){
   if(act.completed)return;
   tg?.HapticFeedback?.notificationOccurred('success');
 
-  // mark complete in data
+  // Mark complete
   C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:1}:x);
   lsSet('acts_'+TODAY,C.acts_today);
   _updatePlanCounters();
   renderHome();
 
-  // find elements
-  const heroEl=document.querySelector(`#pl-list .pl-mo-hero[data-id="${id}"]`);
-  const qEl=document.querySelector(`#pl-list .pl-mo-qcard[data-id="${id}"]`);
+  // Morph button
+  const wrap=document.getElementById(`pl-do-wrap-${id}`);
+  const arc=document.getElementById(`pl-do-arc-${id}`);
+  if(wrap)wrap.classList.add('counting');
+  if(arc){arc.style.strokeDasharray='125.66';arc.style.strokeDashoffset='125.66';}
 
-  let btnEl=null,ringEl=null,origBtnCol='',origBtnShadow='';
+  const heroEl=document.querySelector(`#pl-list .pl-mo-hero[data-id="${id}"]`);
+
+  // Animate ring via rAF
+  const startTime=performance.now();
+  const CONFIRM_MS=3500;
+  const CIRCUM=125.66;
+  let currentRaf=0;
+  function tickRing(now){
+    const pct=Math.min((now-startTime)/CONFIRM_MS,1);
+    if(arc)arc.style.strokeDashoffset=CIRCUM*(1-pct);
+    if(pct<1){
+      currentRaf=requestAnimationFrame(tickRing);
+      const cur=_completingMap.get(id);
+      if(cur)cur.rafId=currentRaf;
+    }
+  }
+  currentRaf=requestAnimationFrame(tickRing);
 
   if(heroEl){
-    btnEl=heroEl.querySelector('.pl-mo-do-btn');
-    ringEl=heroEl.querySelector('.pl-mo-ring-svg');
-    if(btnEl){
-      origBtnCol=btnEl.style.background||'';
-      origBtnShadow=btnEl.style.boxShadow||'';
-      _btnMorphToCircle(btnEl,id);
-    }
-    // start ring after morph settles
-    if(ringEl){
-      setTimeout(()=>{
-        ringEl.classList.add('visible');
-        requestAnimationFrame(()=>requestAnimationFrame(()=>{
-          ringEl.classList.add('run');
-        }));
-      },200);
-    }
-  } else if(qEl){
-    qEl.classList.add('counting');
-  }
-
-  const target=heroEl||qEl;
-  if(target){
     const hideTimer=setTimeout(()=>{
       _completingMap.delete(id);
-      // smooth dismiss
-      target.classList.add('dismissing');
-      setTimeout(()=>{
-        if(target.parentNode)target.remove();
-        if(_completingMap.size===0){renderPlan(false);renderHome();}
-      },400);
-    },3500);
-    _completingMap.set(id,{hideTimer,btnEl,ringEl,qEl:qEl||null,origBtnCol,origBtnShadow});
+      // Smooth exit: opacity fade + height collapse
+      const h=heroEl.offsetHeight;
+      heroEl.style.maxHeight=h+'px';
+      heroEl.style.overflow='hidden';
+      heroEl.style.transition='opacity .25s ease,max-height .3s cubic-bezier(.4,0,.2,1),margin-bottom .3s ease,padding .3s ease';
+      requestAnimationFrame(()=>{
+        heroEl.style.opacity='0';
+        heroEl.style.maxHeight='0';
+        heroEl.style.marginBottom='0';
+        heroEl.style.paddingTop='0';
+        heroEl.style.paddingBottom='0';
+        setTimeout(()=>{
+          if(heroEl.parentNode)heroEl.remove();
+          if(_completingMap.size===0){renderPlan(false);renderHome();}
+        },320);
+      });
+    },CONFIRM_MS);
+    _completingMap.set(id,{hideTimer,rafId:currentRaf});
     toast('выполнено 🎉 · нажми отмена');
   } else {
     await apiPost('/api/activity/complete',{act_id:id});
@@ -3891,54 +3795,6 @@ async function completeAct(id){
     return;
   }
   await apiPost('/api/activity/complete',{act_id:id});
-}
-
-/* morph pill → circle */
-function _btnMorphToCircle(btn,id){
-  const lbl=btn.querySelector('.btn-lbl');
-  const icoCheck=btn.querySelector('.btn-ico-check');
-  const icoX=btn.querySelector('.btn-ico-x');
-  const progLbl=document.getElementById('pl-prog-lbl-'+id);
-
-  // 1. collapse label + check icon via CSS transitions
-  if(lbl){lbl.style.maxWidth='0';lbl.style.opacity='0';}
-  if(icoCheck){icoCheck.style.opacity='0';icoCheck.style.transform='scale(0)';}
-
-  // 2. after label collapses, switch to circle shape
-  setTimeout(()=>{
-    btn.style.minWidth='44px';
-    btn.classList.add('is-circle');
-    // 3. reveal X icon
-    if(icoX){
-      setTimeout(()=>{
-        icoX.style.opacity='1';
-        icoX.style.transform='scale(1) rotate(0deg)';
-      },60);
-    }
-    if(progLbl)progLbl.textContent='нажми ✕ для отмены';
-  },180);
-}
-
-/* morph circle → pill */
-function _btnMorphToPill(btn,origCol,origShadow,id){
-  const lbl=btn.querySelector('.btn-lbl');
-  const icoCheck=btn.querySelector('.btn-ico-check');
-  const icoX=btn.querySelector('.btn-ico-x');
-  const progLbl=document.getElementById('pl-prog-lbl-'+id);
-
-  // 1. hide X icon
-  if(icoX){icoX.style.opacity='0';icoX.style.transform='scale(0) rotate(-90deg)';}
-  // 2. revert to pill shape
-  setTimeout(()=>{
-    btn.classList.remove('is-circle');
-    btn.style.minWidth='130px';
-    if(origCol)btn.style.background=origCol;
-    if(origShadow)btn.style.boxShadow=origShadow;
-    // 3. restore label + check
-    if(lbl){lbl.style.maxWidth='90px';lbl.style.opacity='1';}
-    if(icoCheck){icoCheck.style.opacity='1';icoCheck.style.transform='scale(1)';}
-    if(progLbl)progLbl.textContent='нажми чтобы отметить';
-  },160);
 }
 
 function _updatePlanCounters(){
@@ -4572,7 +4428,9 @@ function renderPlan(animated){
     <svg width="13" height="13" viewBox="0 0 24 24" fill="${col}"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
     сейчас в фокусе
   </div>
-  <div class="pl-mo-hero${isNow?' is-now':''}" data-id="${hero.id}">
+  <div class="pl-mo-hero${isNow?' is-now':''}"
+    data-id="${hero.id}"
+    oncontextmenu="event.preventDefault()">
     <div class="pl-mo-glow" style="background:radial-gradient(circle,${col},transparent)"></div>
     <div class="pl-mo-hero-top">
       <div class="pl-mo-badge ${hpc}"><span class="pl-mo-bd"></span>${hst.l}</div>
@@ -4591,21 +4449,27 @@ function renderPlan(animated){
     <div class="pl-mo-hero-foot">
       ${showP?`<div class="pl-mo-prog-wrap">
         <div class="pl-mo-prog"><div class="pl-mo-prog-fill" style="width:${prog}%;background:${col}"></div></div>
-        <div class="pl-mo-prog-lbl" id="pl-prog-lbl-${hero.id}">${isNow?prog+'% выполнено':hst.l}</div>
-      </div>`:`<div class="pl-mo-prog-wrap"><div class="pl-mo-prog"><div class="pl-mo-prog-fill" style="width:0%;background:${col}"></div></div><div class="pl-mo-prog-lbl" id="pl-prog-lbl-${hero.id}">нажми чтобы отметить</div></div>`}
-      <div class="pl-mo-do-btn-wrap" id="pl-btn-wrap-${hero.id}">
-        <button class="pl-mo-do-btn"
-          id="pl-btn-${hero.id}"
-          onclick="event.stopPropagation();completeAct(${hero.id})"
-          style="background:${col};box-shadow:0 4px 16px ${col}55;min-width:130px">
-          <svg class="btn-ico-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-          <svg class="btn-ico-x" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
-          <span class="btn-lbl">выполнить</span>
-        </button>
-        <svg class="pl-mo-ring-svg" id="pl-ring-${hero.id}" viewBox="0 0 58 58">
-          <circle class="rp-track" cx="29" cy="29" r="26"/>
-          <circle class="rp-fill" id="pl-rfill-${hero.id}" cx="29" cy="29" r="26"/>
+        <div class="pl-mo-prog-lbl">${isNow?prog+'% выполнено':hst.l}</div>
+      </div>`:'<div style="flex:1"></div>'}
+      <div class="pl-mo-do-wrap" id="pl-do-wrap-${hero.id}">
+        <div class="pl-mo-do-pill" style="background:${col};box-shadow:0 3px 14px ${col}55">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg>
+          выполнить
+        </div>
+        <svg class="pl-mo-do-ring" id="pl-do-ring-${hero.id}" viewBox="0 0 48 48">
+          <circle cx="24" cy="24" r="20" fill="none" stroke="${col}" stroke-width="3" opacity=".22"/>
+          <circle id="pl-do-arc-${hero.id}" cx="24" cy="24" r="20" fill="none" stroke="${col}" stroke-width="3" stroke-linecap="round" stroke-dasharray="125.66" stroke-dashoffset="125.66"/>
         </svg>
+        <button class="pl-mo-do-circle complete-btn-js" id="pl-do-btn-${hero.id}"
+          style="background:${col}"
+          onclick="event.stopPropagation();completeAct(${hero.id})">
+          <div class="pl-mo-ic-check">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg>
+          </div>
+          <div class="pl-mo-ic-x">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </div>
+        </button>
       </div>
     </div>
   </div>`;
@@ -4625,12 +4489,11 @@ function renderPlan(animated){
       const pc=_moStatusClass(st.s);
       const fut=st.s==='later';
       html+=`<div class="pl-mo-qcard${fut?' is-future':''}" data-id="${t.id}"
-        ${!fut?`onclick="completeAct(${t.id})"`:''}>
+        oncontextmenu="event.preventDefault()">
         <div class="pl-mo-qico" style="background:${c}18">${ic}</div>
         <div class="pl-mo-qname">${t.name}</div>
         <div class="pl-mo-qtime">${fmtRange(t)} · ${t.duration} мин</div>
         ${!fut?`<div class="pl-mo-qbadge ${pc}"><span class="pl-mo-bd" style="width:5px;height:5px"></span>${st.l}</div>`:`<div class="pl-mo-future-tag">${t.time}</div>`}
-        <div class="pl-mo-qbar"></div>
       </div>`;
     });
 
