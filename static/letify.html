@@ -5289,9 +5289,8 @@ function _gfitCheckUrlToken(){
     gfLS.setToken({access_token:token, expires_at:expAt});
     // Убираем токен из URL
     window.history.replaceState(null,'',window.location.pathname+window.location.search);
-    tg?.HapticFeedback?.notificationOccurred('success');
-    toast('Google Fit подключён! Загружаем данные...');
-    _gfitFetchAll(token).then(()=>{ _gfitRenderUI(); renderHome(); });
+    // ── Возвращаем пользователя в Telegram бот ──
+    setTimeout(()=>{ window.location.href = 'https://t.me/let1fybot'; }, 300);
   }catch(e){ console.warn('gfit token parse',e); }
 }
 
@@ -5651,13 +5650,17 @@ document.addEventListener('DOMContentLoaded',async()=>{
   setTimeout(()=>{
     _gfitInitClient();
     _gfitRenderUI();
-    // автосинк если токен есть и синхронизация была >5 мин назад
     const _gfTok=_gfitGetValidToken();
     const _gfTs=gfLS.getSyncTs();
-    if(_gfTok&&(Date.now()-_gfTs)>5*60*1000){
-      _gfitFetchSteps(_gfTok).then(()=>{_gfitRenderUI();renderHome();});
+    const _justConnected=_gfTok&&_gfTs===0;
+    if(_gfTok&&(_justConnected||(Date.now()-_gfTs)>5*60*1000)){
+      if(_justConnected)toast('Google Fit подключён! 🎉 Загружаем данные...');
+      _gfitFetchAll(_gfTok).then(()=>{
+        _gfitRenderUI();renderHome();
+        if(_justConnected){tg?.HapticFeedback?.notificationOccurred('success');toast('Данные синхронизированы ✅');}
+      });
     }
-  },1500); // после загрузки GIS скрипта
+  },1500);
   setTimeout(()=>{
     const sp=document.getElementById('splash');
     if(sp){sp.classList.add('hiding');setTimeout(()=>sp.remove(),520);}
@@ -5674,14 +5677,14 @@ document.addEventListener('DOMContentLoaded',async()=>{
       const _gfTok=_gfitGetValidToken();
       const _gfTs=gfLS.getSyncTs();
       if(_gfTok&&(Date.now()-_gfTs)>10*60*1000){
-        _gfitFetchSteps(_gfTok).then(()=>{_gfitRenderUI();renderHome();});
+        _gfitFetchAll(_gfTok).then(()=>{_gfitRenderUI();renderHome();});
       }
     }
   });
   // Google Fit: автосинхронизация каждые 15 минут
   setInterval(()=>{
     const _gfTok=_gfitGetValidToken();
-    if(_gfTok)_gfitFetchSteps(_gfTok).then(()=>{_gfitRenderUI();if(curTab==='home')renderHome();if(curTab==='profile'){}});
+    if(_gfTok)_gfitFetchAll(_gfTok).then(()=>{_gfitRenderUI();if(curTab==='home')renderHome();});
   },15*60*1000);
   // Предзагрузка камеры при первом касании кнопки сканера
   document.querySelector('[onclick*="pp-scanner"]')?.addEventListener('touchstart',_prewarmCamera,{once:true,passive:true});
