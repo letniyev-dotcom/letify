@@ -1698,57 +1698,44 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tifi-home-btn:active{transform:scale(0.975) translateZ(0);}
 
 
-/* ── loading — clean arc ring ── */
+/* ── loading — segment style ── */
 #tifi-loading{
   position:absolute;inset:0;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:0 40px 60px;
+  padding:0 28px 60px;
   transition:opacity .4s ease;z-index:20;
   background:#0A0A0C;
 }
-.tifi-ring-wrap{
-  position:relative;width:80px;height:80px;
-  margin-bottom:26px;flex-shrink:0;
-}
-.tifi-ring-svg{
-  width:80px;height:80px;
-  animation:tifi-orbit 1.2s linear infinite;
-  will-change:transform;
-  display:block;
-}
-@keyframes tifi-orbit{to{transform:rotate(360deg)}}
+.tifi-load-segs{display:flex;gap:4px;width:100%;margin-bottom:34px}
+.tifi-load-seg{flex:1;height:3px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+.tifi-load-seg-fill{height:100%;width:0%;border-radius:99px;transition:width .55s ease}
+.tifi-load-title{font-size:28px;font-weight:900;letter-spacing:-.04em;margin-bottom:6px}
+.tifi-load-title span{background:linear-gradient(105deg,#FF6B35,#FFAB40);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.tifi-load-s{font-size:13px;font-weight:500;color:rgba(255,255,255,.3);text-align:center;line-height:1.5;transition:opacity .3s ease;margin-bottom:30px}
+.tifi-load-cats{width:100%;display:flex;flex-direction:column;gap:11px}
+.tifi-load-cat{display:flex;align-items:center;gap:11px}
+.tifi-load-cat-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.tifi-load-cat-name{font-size:12px;font-weight:700;color:rgba(255,255,255,.28);flex:1;transition:color .3s}
+.tifi-load-cat.done .tifi-load-cat-name{color:rgba(255,255,255,.72)}
+.tifi-load-cat-bar{flex:2;height:2px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden}
+.tifi-load-cat-fill{height:100%;width:0%;border-radius:99px;transition:width .55s ease}
+.tifi-load-cat-pct{font-size:10px;font-weight:700;color:rgba(255,255,255,.22);width:28px;text-align:right;flex-shrink:0;transition:color .3s}
+.tifi-load-cat.done .tifi-load-cat-pct{color:rgba(255,255,255,.45)}
 
-.tifi-load-label{
-  font-size:18px;font-weight:800;letter-spacing:-.03em;
-  color:rgba(255,255,255,.65);
-  margin-bottom:12px;
-}
-.tifi-load-s{
-  font-size:12px;font-weight:500;
-  color:rgba(255,255,255,.26);
-  text-align:center;line-height:1.5;
-  transition:opacity .35s ease;
-}
-
-
-/* ── carousel dots ── */
-.tifi-cdots{
-  position:absolute;top:10px;left:0;right:0;
-  display:flex;justify-content:center;align-items:center;gap:5px;z-index:8;padding:0 20px;flex-wrap:wrap;
-}
-.tifi-cdot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.18);transition:width .25s,background .25s,border-radius .25s,height .25s;flex-shrink:0}
-.tifi-cdot.on{width:18px;border-radius:3px}
-.tifi-cdot.div-dot{width:20px;height:4px;border-radius:2px;opacity:.5}
-.tifi-cdot.div-dot.on{opacity:1;width:28px}
-
-#tifi-carousel{position:absolute;inset:0;opacity:0;transition:opacity .5s ease;pointer-events:none}
+/* ── focus carousel ── */
+#tifi-carousel{position:absolute;inset:0;opacity:0;transition:opacity .4s ease;pointer-events:none}
 #tifi-carousel.visible{opacity:1;pointer-events:all}
-.tifi-ctrack-vp{
-  position:absolute;
-  top:30px;left:0;right:0;bottom:50px;
-  overflow:hidden;
-}
-/* Cards — NO transition by default, only during .animating */
+/* progress segments at top */
+.tifi-prog{display:flex;gap:3px;padding:10px 16px 0;position:absolute;top:0;left:0;right:0;z-index:8}
+.tifi-prog-seg{flex:1;height:2px;border-radius:99px;background:rgba(255,255,255,.09);overflow:hidden}
+.tifi-prog-fill{height:100%;border-radius:99px;width:0%;transition:width .18s ease}
+/* cat label row */
+.tifi-cat-row{position:absolute;top:20px;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:0 18px;z-index:8;pointer-events:none}
+.tifi-cat-lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.3);transition:color .18s}
+.tifi-cat-cnt{font-size:10px;font-weight:700;color:rgba(255,255,255,.25)}
+/* card stage */
+.tifi-ctrack-vp{position:absolute;top:40px;left:0;right:0;bottom:46px;overflow:hidden}
+/* Cards — instant swap */
 .tifi-ccard{
   position:absolute;top:0;bottom:0;left:14px;right:14px;
   border-radius:22px;overflow:hidden;
@@ -1756,48 +1743,22 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   will-change:transform,opacity;
   backface-visibility:hidden;-webkit-backface-visibility:hidden;
 }
-.tifi-ccard.animating{
-  transition:transform .3s cubic-bezier(.4,0,.2,1),opacity .28s ease;
-}
 .tifi-ccard.state-current{transform:translate3d(0,0,0);opacity:1;z-index:3}
 .tifi-ccard.state-prev{transform:translate3d(-106%,0,0);opacity:0;z-index:1}
 .tifi-ccard.state-next{transform:translate3d(106%,0,0);opacity:0;z-index:1}
-
-/* ── tap zones ── */
-.tifi-tap-zone{
-  position:absolute;top:30px;bottom:50px;
-  width:48px;z-index:10;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
-  touch-action:manipulation;
-  user-select:none;
-  transition:opacity .2s ease;
+/* dots at bottom */
+.tifi-cdots{
+  position:absolute;bottom:26px;left:0;right:0;
+  display:flex;justify-content:center;align-items:center;gap:4px;z-index:8;padding:0 20px;flex-wrap:wrap;
 }
-.tifi-tap-zone.tp-prev{left:0;}
-.tifi-tap-zone.tp-next{right:0;}
-.tifi-tap-zone.tp-hidden{opacity:0;pointer-events:none;}
-.tifi-tap-btn{
-  width:28px;height:28px;border-radius:50%;
-  background:rgba(255,255,255,.05);
-  border:1px solid rgba(255,255,255,.07);
-  display:flex;align-items:center;justify-content:center;
-  transition:background .12s,transform .12s;
-}
-.tifi-tap-zone:active .tifi-tap-btn{
-  background:rgba(255,255,255,.14);
-  transform:scale(.85);
-}
-.tifi-tap-btn svg{width:12px;height:12px;color:rgba(255,255,255,.4);}
-
-/* ── counter ── */
+.tifi-cdot{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.14);transition:width .18s,background .18s,border-radius .18s;flex-shrink:0}
+.tifi-cdot.on{width:14px;border-radius:2px}
+/* counter */
 .tifi-counter-pill{
-  position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
-  font-size:11px;font-weight:700;letter-spacing:.03em;
-  color:rgba(255,255,255,.28);
-  background:rgba(255,255,255,.05);
-  border:1px solid rgba(255,255,255,.07);
-  border-radius:20px;padding:5px 13px;
+  position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
+  font-size:10px;font-weight:700;letter-spacing:.03em;
+  color:rgba(255,255,255,.22);
+  white-space:nowrap;
   pointer-events:none;z-index:10;
   white-space:nowrap;
 }
@@ -2453,62 +2414,58 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   <!-- Тело: всё контентное пространство ниже хедера -->
   <div id="tifi-body">
 
-    <!-- Loading -->
+    <!-- Loading: segment style -->
     <div id="tifi-loading">
-      <div class="tifi-ring-wrap">
-        <!--
-          viewBox 0 0 80 80 · cx=cy=40 · r=34
-          circumference = 2π×34 ≈ 213.6
-          Arc 90° = 213.6/4 ≈ 53.4  gap = 160.2
-          Tail fade via linearGradient on stroke (userSpaceOnUse).
-          Single arc with rounded caps = zero fill artifacts.
-          rotate(-90 40 40) → head starts at 12 o'clock.
-        -->
-        <svg class="tifi-ring-svg" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <!-- Gradient runs left→right across the arc at 12 o'clock position:
-                 tail ≈ x=22 (10:30), head ≈ x=40 (12:00) -->
-            <linearGradient id="tifi-arc-grad" gradientUnits="userSpaceOnUse"
-              x1="22" y1="6" x2="40" y2="6">
-              <stop offset="0%" stop-color="#FF8040" stop-opacity="0"/>
-              <stop offset="100%" stop-color="#FFAB40" stop-opacity="1"/>
-            </linearGradient>
-          </defs>
-          <!-- track -->
-          <circle fill="none" cx="40" cy="40" r="34"
-            stroke="rgba(255,255,255,.07)" stroke-width="4"/>
-          <!-- comet arc — single element, rounded caps, gradient stroke -->
-          <circle fill="none" cx="40" cy="40" r="34"
-            stroke="url(#tifi-arc-grad)"
-            stroke-width="4"
-            stroke-linecap="round"
-            stroke-dasharray="53.4 160.2"
-            transform="rotate(-90 40 40)"/>
-        </svg>
+      <div class="tifi-load-segs">
+        <div class="tifi-load-seg"><div class="tifi-load-seg-fill" id="tlsf0" style="background:#FF8040"></div></div>
+        <div class="tifi-load-seg"><div class="tifi-load-seg-fill" id="tlsf1" style="background:#4EAEE5"></div></div>
+        <div class="tifi-load-seg"><div class="tifi-load-seg-fill" id="tlsf2" style="background:#3DCC72"></div></div>
+        <div class="tifi-load-seg"><div class="tifi-load-seg-fill" id="tlsf3" style="background:#9D85F2"></div></div>
       </div>
-      <div class="tifi-load-label">тифи</div>
-      <div class="tifi-load-s" id="tifi-load-status">анализирую данные</div>
+      <div class="tifi-load-title"><span>тифи</span></div>
+      <div class="tifi-load-s" id="tifi-load-status">собираю данные о тебе</div>
+      <div class="tifi-load-cats">
+        <div class="tifi-load-cat" id="tlc0">
+          <div class="tifi-load-cat-dot" style="background:#FF8040"></div>
+          <div class="tifi-load-cat-name">советы</div>
+          <div class="tifi-load-cat-bar"><div class="tifi-load-cat-fill" id="tlcf0" style="background:#FF8040"></div></div>
+          <div class="tifi-load-cat-pct" id="tlcp0">0%</div>
+        </div>
+        <div class="tifi-load-cat" id="tlc1">
+          <div class="tifi-load-cat-dot" style="background:#4EAEE5"></div>
+          <div class="tifi-load-cat-name">питание</div>
+          <div class="tifi-load-cat-bar"><div class="tifi-load-cat-fill" id="tlcf1" style="background:#4EAEE5"></div></div>
+          <div class="tifi-load-cat-pct" id="tlcp1">0%</div>
+        </div>
+        <div class="tifi-load-cat" id="tlc2">
+          <div class="tifi-load-cat-dot" style="background:#3DCC72"></div>
+          <div class="tifi-load-cat-name">активность</div>
+          <div class="tifi-load-cat-bar"><div class="tifi-load-cat-fill" id="tlcf2" style="background:#3DCC72"></div></div>
+          <div class="tifi-load-cat-pct" id="tlcp2">0%</div>
+        </div>
+        <div class="tifi-load-cat" id="tlc3">
+          <div class="tifi-load-cat-dot" style="background:#9D85F2"></div>
+          <div class="tifi-load-cat-name">сон</div>
+          <div class="tifi-load-cat-bar"><div class="tifi-load-cat-fill" id="tlcf3" style="background:#9D85F2"></div></div>
+          <div class="tifi-load-cat-pct" id="tlcp3">0%</div>
+        </div>
+      </div>
     </div>
 
-    <!-- Dots (absolute top:10px внутри body) -->
-    <div class="tifi-cdots" id="tifi-cdots"></div>
-
-    <!-- Carousel (absolute inset:0 внутри body) -->
+    <!-- Focus carousel -->
     <div id="tifi-carousel">
+      <!-- progress segments (one per card) -->
+      <div class="tifi-prog" id="tifi-prog"></div>
+      <!-- cat label + in-category counter -->
+      <div class="tifi-cat-row">
+        <div class="tifi-cat-lbl" id="tifi-cat-lbl"></div>
+        <div class="tifi-cat-cnt" id="tifi-cat-cnt"></div>
+      </div>
+      <!-- card stage -->
       <div class="tifi-ctrack-vp" id="tifi-ctrack"></div>
-      <!-- Tap prev zone -->
-      <div class="tifi-tap-zone tp-prev tp-hidden" id="tifi-tap-prev" onclick="tifiPrevCard()">
-        <div class="tifi-tap-btn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-        </div>
-      </div>
-      <!-- Tap next zone -->
-      <div class="tifi-tap-zone tp-next" id="tifi-tap-next" onclick="tifiNextCard()">
-        <div class="tifi-tap-btn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
-      </div>
-      <!-- Counter -->
+      <!-- dots -->
+      <div class="tifi-cdots" id="tifi-cdots"></div>
+      <!-- page counter -->
       <div class="tifi-counter-pill" id="tifi-counter">1 / 1</div>
     </div>
 
@@ -6354,9 +6311,13 @@ function tifiDeleteKey(){
 function tifiRefresh(){
   tifiLoaded=false;
   tg?.HapticFeedback?.impactOccurred('medium');
-  // анимация кнопки
+  // remove mid-day badge if any
   const btn=document.getElementById('tifi-refresh-btn');
-  if(btn){btn.style.opacity='.6';btn.style.transform='scale(.9) rotate(180deg)';setTimeout(()=>{btn.style.opacity='';btn.style.transform='';},400);}
+  if(btn){
+    if(btn._badge){btn._badge.remove();btn._badge=null;}
+    btn.style.opacity='.6';btn.style.transform='scale(.9) rotate(180deg)';
+    setTimeout(()=>{btn.style.opacity='';btn.style.transform='';},400);
+  }
   tifiStartScreen();
 }
 
@@ -6786,108 +6747,231 @@ function tifiBuildCard(data,idx){
 function tifiBuildCarousel(){
   const track=document.getElementById('tifi-ctrack');
   const dotsEl=document.getElementById('tifi-cdots');
-  if(!track||!dotsEl)return;
-  track.innerHTML='';dotsEl.innerHTML='';tifiCardEls=[];
-  tifiCards.forEach((data,i)=>{
-    const el=data.divider?tifiBuildDivider(data):tifiBuildCard(data,i);
-    track.appendChild(el);tifiCardEls.push(el);
-    const dot=document.createElement('div');
+  const progEl=document.getElementById('tifi-prog');
+  if(!track||!dotsEl||!progEl)return;
+
+  // Filter out divider cards — focus UI handles categories via top label
+  const cards=tifiCards.filter(d=>!d.divider);
+  tifiCardEls=[];
+  track.innerHTML='';
+  dotsEl.innerHTML='';
+  progEl.innerHTML='';
+
+  cards.forEach((data,i)=>{
+    // card element
+    const el=tifiBuildCard(data,i);
+    el.className='tifi-ccard '+(data.type||'tifi-cc-dark')+' '+(i===0?'state-current':'state-next');
+    if(data.glow){const g=document.createElement('div');g.className='tifi-cc-warm-glow';el.prepend(g);}
+    track.appendChild(el);
+    tifiCardEls.push(el);
+
+    // progress segment
+    const seg=document.createElement('div');
+    seg.className='tifi-prog-seg';
+    const fill=document.createElement('div');
+    fill.className='tifi-prog-fill';
+    fill.id='tpf'+i;
     const cat=TIFI_CATS[data.cat]||TIFI_CATS['советы'];
-    if(data.divider){dot.className='tifi-cdot div-dot'+(i===0?' on':'');dot.style.background=cat.dotClr;}
-    else{dot.className='tifi-cdot'+(i===0?' on':'');dot.style.background=i===0?cat.dotClr:'rgba(255,255,255,.18)';dot._catClr=cat.dotClr;}
+    fill.style.background=cat.clr;
+    fill.style.width=i===0?'100%':'0%';
+    seg.appendChild(fill);
+    progEl.appendChild(seg);
+
+    // dot
+    const dot=document.createElement('div');
+    const on=i===0;
+    dot.className='tifi-cdot'+(on?' on':'');
+    dot.style.background=on?cat.dotClr:'rgba(255,255,255,.14)';
+    dot._catClr=cat.dotClr;
     dotsEl.appendChild(dot);
   });
-  const ctr=document.getElementById('tifi-counter');
-  if(ctr)ctr.textContent=`1 / ${tifiCards.length}`;
-  tifiUpdateStates(0,true); // true = no animation on initial build
-}
-let _tifiAnim=false;
 
-/* Мгновенно позиционирует карточку без анимации */
+  // Store filtered cards reference
+  tifiCards._display=cards;
+
+  const ctr=document.getElementById('tifi-counter');
+  if(ctr)ctr.textContent='1 / '+cards.length;
+
+  _tifiUpdateTopBar(0);
+
+  // Single click handler — tap left 35% = prev, right 35% = next
+  // Middle 30% = safe zone. Todo items stop propagation.
+  const stage=document.getElementById('tifi-ctrack');
+  stage.onclick=function(e){
+    // check if tap is on interactive element (todo, chip, button)
+    if(e.target.closest('.tifi-cc-todo-item,.tifi-cc-chip,.tifi-div-enter-btn,button,a')){return;}
+    const rect=stage.getBoundingClientRect();
+    const x=e.clientX-rect.left;
+    const third=rect.width*0.35;
+    if(x<third) tifiPrevCard();
+    else if(x>rect.width-third) tifiNextCard();
+  };
+}
+
+function _tifiUpdateTopBar(idx){
+  const cards=tifiCards._display||tifiCards.filter(d=>!d.divider);
+
+  // progress fills
+  cards.forEach((_,i)=>{
+    const f=document.getElementById('tpf'+i);
+    if(f)f.style.width=i<=idx?'100%':'0%';
+  });
+
+  // dots
+  document.querySelectorAll('.tifi-cdot').forEach((d,i)=>{
+    const on=i===idx;
+    d.classList.toggle('on',on);
+    d.style.background=on?(d._catClr||'rgba(255,255,255,.5)'):'rgba(255,255,255,.14)';
+  });
+
+  // cat label + in-category counter
+  const d=cards[idx];
+  if(d){
+    const cat=TIFI_CATS[d.cat]||TIFI_CATS['советы'];
+    const lbl=document.getElementById('tifi-cat-lbl');
+    const cnt=document.getElementById('tifi-cat-cnt');
+    if(lbl){lbl.textContent=d.cat;lbl.style.color=cat.clr;}
+    if(cnt){
+      const catCards=cards.filter(c=>c.cat===d.cat);
+      let pos=0;for(let i=0;i<idx;i++){if(cards[i].cat===d.cat)pos++;}
+      cnt.textContent=(pos+1)+' / '+catCards.length;
+    }
+  }
+
+  // global counter
+  const ctr=document.getElementById('tifi-counter');
+  if(ctr)ctr.textContent=(idx+1)+' / '+cards.length;
+}
+
 function _tifiPlace(el,pos){
-  // pos: 'cur' | 'prev' | 'next'
   el.style.transition='none';
   if(pos==='cur'){el.style.transform='translate3d(0,0,0)';el.style.opacity='1';el.style.zIndex='3';}
   else if(pos==='prev'){el.style.transform='translate3d(-106%,0,0)';el.style.opacity='0';el.style.zIndex='1';}
   else{el.style.transform='translate3d(106%,0,0)';el.style.opacity='0';el.style.zIndex='1';}
 }
 
-/* Анимированный переход к конкретной карточке */
-function tifiGoTo(newIdx, forward){
-  if(_tifiAnim||newIdx===tifiCur)return;
-  _tifiAnim=true;
+function tifiGoTo(newIdx){
+  if(newIdx===tifiCur||newIdx<0)return;
+  const cards=tifiCards._display||tifiCards.filter(d=>!d.divider);
+  if(newIdx>=cards.length)return;
   const oldIdx=tifiCur;
   tifiCur=newIdx;
-  const total=tifiCardEls.length;
-
-  /* 1. Мгновенно расставляем все неучастники */
   tifiCardEls.forEach((el,i)=>{
     if(i===oldIdx||i===newIdx)return;
-    _tifiPlace(el, i<newIdx?'prev':'next');
+    _tifiPlace(el,i<newIdx?'prev':'next');
   });
-
-  /* 2. Убеждаемся что текущая стоит ровно в центре */
-  _tifiPlace(tifiCardEls[oldIdx],'cur');
-
-  /* 3. Стартовая позиция входящей карточки — с нужной стороны */
-  _tifiPlace(tifiCardEls[newIdx], forward?'next':'prev');
-
-  /* 4. Force reflow — браузер фиксирует все позиции */
-  tifiCardEls[newIdx].offsetHeight;
-
-  /* 5. Включаем transition и анимируем */
-  const tr='transform .3s cubic-bezier(.4,0,.2,1),opacity .28s ease';
-  tifiCardEls[oldIdx].style.transition=tr;
-  tifiCardEls[newIdx].style.transition=tr;
-
-  requestAnimationFrame(()=>{
-    /* текущая уходит в противоположную сторону */
-    const outPos=forward?'prev':'next';
-    tifiCardEls[oldIdx].style.transform=forward?'translate3d(-106%,0,0)':'translate3d(106%,0,0)';
-    tifiCardEls[oldIdx].style.opacity='0';
-    tifiCardEls[oldIdx].style.zIndex='1';
-    /* входящая встаёт в центр */
-    tifiCardEls[newIdx].style.transform='translate3d(0,0,0)';
-    tifiCardEls[newIdx].style.opacity='1';
-    tifiCardEls[newIdx].style.zIndex='3';
-  });
-
-  /* Обновляем UI */
-  document.querySelectorAll('.tifi-cdot').forEach((d,i)=>{
-    const isOn=i===newIdx;d.classList.toggle('on',isOn);
-    if(!tifiCards[i]?.divider)d.style.background=isOn?(d._catClr||'var(--sun)'):'rgba(255,255,255,.18)';
-  });
-  const ctr=document.getElementById('tifi-counter');
-  if(ctr)ctr.textContent=`${newIdx+1} / ${total}`;
-
-  setTimeout(()=>{ _tifiAnim=false; },320);
-}
-
-function tifiUpdateStates(newIdx,noAnim){
-  /* Используется только при первом построении карусели */
-  tifiCur=newIdx;
-  tifiCardEls.forEach((el,i)=>{
-    _tifiPlace(el, i===newIdx?'cur':i<newIdx?'prev':'next');
-  });
-  const ctr=document.getElementById('tifi-counter');
-  if(ctr)ctr.textContent=`1 / ${tifiCardEls.length}`;
-  /* Оба тап-зона видны всегда если карточек > 1 */
-  const tapPrev=document.getElementById('tifi-tap-prev');
-  const tapNext=document.getElementById('tifi-tap-next');
-  const single=tifiCardEls.length<=1;
-  if(tapPrev)tapPrev.classList.toggle('tp-hidden',single);
-  if(tapNext)tapNext.classList.toggle('tp-hidden',single);
+  _tifiPlace(tifiCardEls[oldIdx],oldIdx<newIdx?'prev':'next');
+  _tifiPlace(tifiCardEls[newIdx],'cur');
+  _tifiUpdateTopBar(newIdx);
 }
 
 function tifiNextCard(){
-  const next=(tifiCur+1)%tifiCards.length;
-  const forward=true; // вперёд всегда = входит справа
-  tifiGoTo(next,forward);
+  const cards=tifiCards._display||tifiCards.filter(d=>!d.divider);
+  tifiGoTo(Math.min(tifiCur+1,cards.length-1));
 }
 function tifiPrevCard(){
-  const prev=(tifiCur-1+tifiCards.length)%tifiCards.length;
-  const forward=false; // назад всегда = входит слева
-  tifiGoTo(prev,forward);
+  tifiGoTo(Math.max(tifiCur-1,0));
+}
+
+function tifiUpdateStates(idx){
+  tifiCur=idx||0;
+  tifiCardEls.forEach((el,i)=>{_tifiPlace(el,i===tifiCur?'cur':i<tifiCur?'prev':'next');});
+  _tifiUpdateTopBar(tifiCur);
+}
+
+/* ── добавление новой карточки в течение дня (тифи-планировщик) ── */
+function tifiAddCard(data){
+  if(!tifiLoaded||!tifiCards||!tifiCards.length)return;
+  data.custom=true; // метка «создано тифи»
+  tifiCards.push(data);
+  // rebuild with new card appended
+  tifiBuildCarousel();
+  // stay on same index
+  const cards=tifiCards._display||tifiCards.filter(d=>!d.divider);
+  const newCardIdx=cards.length-1;
+  tifiUpdateStates(tifiCur); // keep position
+  // show badge in header
+  _tifiShowNewCardBadge();
+}
+
+function _tifiShowNewCardBadge(){
+  // Add a small pulsing dot to the refresh button to signal new content
+  const btn=document.getElementById('tifi-refresh-btn');
+  if(!btn||btn._badge)return;
+  const badge=document.createElement('div');
+  badge.style.cssText='position:absolute;top:-3px;right:-3px;width:8px;height:8px;border-radius:50%;background:#FF6B35;border:1.5px solid #0A0A0C;pointer-events:none;z-index:10';
+  btn.style.position='relative';
+  btn.appendChild(badge);
+  btn._badge=badge;
+}
+
+/* ── тифи-планировщик: сам создаёт карточки в течение дня ── */
+const _TIFI_MIDDAY_KEY='tifi_midday_'+new Date().toISOString().slice(0,10);
+
+function _tifiScheduleMidday(){
+  // Run once per day — check if we already fired today
+  if(localStorage.getItem(_TIFI_MIDDAY_KEY))return;
+
+  const now=new Date();
+  const h=now.getHours(),m=now.getMinutes();
+
+  // Times when tifi might add new cards: 12:00, 15:00, 18:00, 21:00
+  const slots=[
+    {h:12,m:0,label:'обед'},
+    {h:15,m:0,label:'полдень'},
+    {h:18,m:0,label:'вечер'},
+    {h:21,m:0,label:'ночь'}
+  ];
+
+  slots.forEach(slot=>{
+    const slotKey=_TIFI_MIDDAY_KEY+'_'+slot.h;
+    if(localStorage.getItem(slotKey))return; // already fired this slot today
+
+    const slotMs=new Date(now);
+    slotMs.setHours(slot.h,slot.m,0,0);
+    const delay=slotMs-now;
+    if(delay<0)return; // already passed
+
+    setTimeout(()=>{
+      if(!tifiLoaded)return;
+      localStorage.setItem(slotKey,'1');
+      _tifiRequestMidDayCard(slot.label);
+    },delay);
+  });
+}
+
+async function _tifiRequestMidDayCard(timeLabel){
+  const apiKey=_tifiGetKey();
+  if(!apiKey)return;
+  const userData=_tifiGetUserData();
+
+  const sysPrompt=`Ты — ТИФИ, персональный тренер в приложении letify. Сейчас ${timeLabel}. Создай ОДНУ новую карточку — краткое наблюдение или напоминание по текущему времени дня. Отвечай ТОЛЬКО валидным JSON-объектом одной карточки без массива и без markdown.`;
+  const userPrompt=`Имя: ${userData.name} | Время: ${timeLabel} | Калории: ${userData.calToday}/${userData.calGoal} | Вода: ${userData.waterToday}/${userData.waterGoal} мл | Задачи: ${userData.actsDone}/${userData.actsTotal}`;
+
+  try{
+    const resp=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
+      body:JSON.stringify({
+        model:'llama-3.3-70b-versatile',
+        max_tokens:600,
+        temperature:0.7,
+        messages:[{role:'system',content:sysPrompt},{role:'user',content:userPrompt}]
+      })
+    });
+    if(!resp.ok)return;
+    const d=await resp.json();
+    const text=(d.choices?.[0]?.message?.content||'').trim();
+    const clean=text.replace(/^```(?:json)?/i,'').replace(/```$/,'').trim();
+    const s=clean.indexOf('{'),e=clean.lastIndexOf('}');
+    if(s===-1||e===-1)return;
+    const card=JSON.parse(clean.slice(s,e+1));
+    if(!card.title)return;
+    // Normalize tag classes same as full normalize
+    if(card.tag?.cls&&!card.tag.cls.startsWith('tifi-tag-'))card.tag.cls='tifi-tag-'+card.tag.cls;
+    card.type=card.type?('tifi-cc-'+card.type.replace('tifi-cc-','')):'tifi-cc-dark';
+    tifiAddCard(card);
+  }catch(e){/* silent */}
 }
 
 /* ── запуск тифи-экрана ── */
@@ -6896,35 +6980,76 @@ async function tifiStartScreen(){
   const car=document.getElementById('tifi-carousel');
   if(!ldg||!car)return;
 
-  // Каждый запуск получает уникальный токен
   const myToken=++_tifiToken;
-  // alive() = страница открыта И этот запуск всё ещё актуален
   const alive=()=>(myToken===_tifiToken)&&document.getElementById('pp-tifi')?.classList.contains('open');
 
   ldg.style.display='flex';ldg.style.opacity='1';
   car.classList.remove('visible');car.style.pointerEvents='';
   tifiCur=0;tifiLoaded=false;
 
-  const steps=[
-    {id:'tifi-ls1',delay:260,pct:20,status:'читаю профиль'},
-    {id:'tifi-ls2',delay:700,pct:40,status:'анализирую питание'},
-    {id:'tifi-ls3',delay:1200,pct:60,status:'запрос в Groq AI'},
-    {id:'tifi-ls4',delay:1700,pct:80,status:'создаю карточки'},
-    {id:'tifi-ls5',delay:2200,pct:100,status:'почти готово'},
-  ];
+  // Reset loading UI
+  [0,1,2,3].forEach(i=>{
+    const sf=document.getElementById('tlsf'+i);const cf=document.getElementById('tlcf'+i);
+    const cp=document.getElementById('tlcp'+i);const lc=document.getElementById('tlc'+i);
+    if(sf)sf.style.width='0%';if(cf)cf.style.width='0%';
+    if(cp)cp.textContent='0%';if(lc)lc.classList.remove('done');
+  });
   const statusEl=document.getElementById('tifi-load-status');
+  if(statusEl)statusEl.textContent='собираю данные о тебе';
 
-  steps.forEach((s,i)=>{
-    setTimeout(()=>{
+  // Animate loading categories with rAF counters
+  const catDefs=[
+    {delay:0,   dur:700, idx:0, segIdx:0},
+    {delay:300, dur:900, idx:1, segIdx:1},
+    {delay:700, dur:700, idx:2, segIdx:2},
+    {delay:1000,dur:800, idx:3, segIdx:3}
+  ];
+  const _ldgTimers=[];
+
+  function _animCatPct(idx,dur,startMs){
+    function step(ts){
       if(!alive())return;
-      if(statusEl){statusEl.style.opacity='0';setTimeout(()=>{if(statusEl)statusEl.textContent=s.status;statusEl.style.opacity='1';},180);}
-    },s.delay);
+      const prog=Math.min((ts-startMs)/dur,1);
+      const val=Math.round(prog*100);
+      const cf=document.getElementById('tlcf'+idx);
+      const cp=document.getElementById('tlcp'+idx);
+      if(cf)cf.style.width=val+'%';
+      if(cp)cp.textContent=val+'%';
+      if(prog<1)requestAnimationFrame(step);
+      else{const lc=document.getElementById('tlc'+idx);if(lc)lc.classList.add('done');}
+    }
+    requestAnimationFrame(step);
+  }
+
+  catDefs.forEach(cat=>{
+    const t=setTimeout(()=>{
+      if(!alive())return;
+      const sf=document.getElementById('tlsf'+cat.segIdx);
+      if(sf)sf.style.width='100%';
+      _animCatPct(cat.idx,cat.dur,performance.now());
+    },cat.delay);
+    _ldgTimers.push(t);
   });
 
-  const loadSt=document.getElementById('tifi-load-status');
+  // Status text changes
+  const statusSteps=[
+    {delay:400, t:'анализирую питание'},
+    {delay:900, t:'смотрю активность и сон'},
+    {delay:1500,t:'запрос к Groq AI'},
+    {delay:2100,t:'создаю карточки'},
+  ];
+  statusSteps.forEach(s=>{
+    const t=setTimeout(()=>{
+      if(!alive()||!statusEl)return;
+      statusEl.style.opacity='0';
+      setTimeout(()=>{if(statusEl&&alive()){statusEl.textContent=s.t;statusEl.style.opacity='1';}},180);
+    },s.delay);
+    _ldgTimers.push(t);
+  });
+
   const apiKey=_tifiGetKey();
   const userData=_tifiGetUserData();
-  const minDelay=new Promise(r=>setTimeout(r,2700));
+  const minDelay=new Promise(r=>setTimeout(r,2600));
   let apiResult=null,apiError=null;
 
   try{
@@ -6935,37 +7060,47 @@ async function tifiStartScreen(){
   }catch(e){apiError=e;}
 
   await minDelay;
+  _ldgTimers.forEach(t=>clearTimeout(t));
 
-  // Если страница закрыта пока шла загрузка — сохраняем результат но не трогаем DOM
   if(!alive()){
     if(apiResult){tifiCards=apiResult;tifiLoaded=true;}
     return;
   }
 
   if(apiError&&!apiResult){
-    if(loadSt){loadSt.textContent='ошибка соединения';}
+    if(statusEl)statusEl.textContent='ошибка соединения';
     const isKey=apiError.message&&(apiError.message.toLowerCase().includes('invalid api key')||apiError.message.toLowerCase().includes('401'));
-    if(isKey&&loadSt){loadSt.innerHTML='неверный ключ Groq · <span style="color:var(--sun);cursor:pointer" onclick="popPage();setTimeout(()=>{pushPage(\'pp-tifi-key\');_populateTifiKey();},280)">изменить</span>';}
+    if(isKey&&statusEl){statusEl.innerHTML='неверный ключ · <span style="color:#FF8040;cursor:pointer" onclick="popPage();setTimeout(()=>{pushPage(\'pp-tifi-key\');_populateTifiKey();},280)">изменить</span>';}
     tifiCards=_tifiGetCards();
-    await new Promise(r=>setTimeout(r,apiError.message&&apiError.message.toLowerCase().includes('401')?2000:1500));
+    await new Promise(r=>setTimeout(r,isKey?2000:1400));
   }else{
     tifiCards=apiResult;
-    if(loadSt)loadSt.textContent='готово';
+    if(statusEl){statusEl.style.opacity='0';setTimeout(()=>{if(statusEl)statusEl.textContent='готово';statusEl.style.opacity='1';},180);}
   }
 
-  if(!alive())return; // последняя проверка перед показом карточек
+  if(!alive())return;
 
+  // Ensure all segments reach 100% visually
+  [0,1,2,3].forEach(i=>{
+    const sf=document.getElementById('tlsf'+i);const cf=document.getElementById('tlcf'+i);
+    const cp=document.getElementById('tlcp'+i);const lc=document.getElementById('tlc'+i);
+    if(sf)sf.style.width='100%';if(cf)cf.style.width='100%';
+    if(cp)cp.textContent='100%';if(lc)lc.classList.add('done');
+  });
+
+  await new Promise(r=>setTimeout(r,420));
+  if(!alive())return;
+
+  ldg.style.opacity='0';
   setTimeout(()=>{
     if(!alive())return;
-    ldg.style.opacity='0';
-    setTimeout(()=>{
-      if(!alive())return;
-      ldg.style.display='none';
-      tifiBuildCarousel();
-      car.classList.add('visible');
-      tifiLoaded=true;
-    },340);
-  },380);
+    ldg.style.display='none';
+    tifiBuildCarousel();
+    car.classList.add('visible');
+    tifiLoaded=true;
+    // Schedule mid-day cards after initial load
+    _tifiScheduleMidday();
+  },350);
 }
 
 /* вызывается из _populatePP */
