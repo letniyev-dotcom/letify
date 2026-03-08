@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -6391,9 +6391,7 @@ async function _tifiCallGroq(apiKey, userData){
   const text=(data.choices?.[0]?.message?.content||'').trim();
 
   // Extract JSON array robustly
-  let jsonStr=text.replace(/^```(?:json)?
-?/i,'').replace(/
-?```$/,'').trim();
+  let jsonStr=text.replace(/^```(?:json)?[\s\S]{0,2}/i,'').replace(/[\s\S]{0,2}```$/,'').trim();
   const s=jsonStr.indexOf('['),e=jsonStr.lastIndexOf(']');
   if(s===-1||e===-1)throw new Error('No JSON array in response');
   const cards=JSON.parse(jsonStr.slice(s,e+1));
