@@ -7198,12 +7198,16 @@ async function tifiStartScreen(){
   const minDelay=new Promise(r=>setTimeout(r,3800)); // minimum visible time
   let apiResult=null,apiError=null;
 
-  try{
-    apiResult=await Promise.race([
-      _tifiCallGroq(apiKey,userData),
-      new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),25000))
-    ]);
-  }catch(e){apiError=e;}
+  if(!apiKey){
+    apiError=new Error('invalid api key');
+  }else{
+    try{
+      apiResult=await Promise.race([
+        _tifiCallGroq(apiKey,userData),
+        new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),25000))
+      ]);
+    }catch(e){apiError=e;}
+  }
 
   await minDelay;
   _killTimers();
@@ -7218,7 +7222,7 @@ async function tifiStartScreen(){
 
   if(apiError&&!apiResult){
     // error path
-    const isKey=apiError.message&&(apiError.message.toLowerCase().includes('invalid api key')||apiError.message.toLowerCase().includes('401'));
+    const isKey=apiError.message&&(apiError.message.toLowerCase().includes('invalid api key')||apiError.message.toLowerCase().includes('401')||apiError.message.toLowerCase().includes('no api key')||apiError.message.toLowerCase().includes('invalid_api_key')||!apiKey);
     tlSetPct(100);
     if(liveEl){liveEl.textContent='error';liveEl.style.color='#F45C5C';}
     if(isKey){
