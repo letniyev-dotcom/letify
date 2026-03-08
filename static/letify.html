@@ -1698,41 +1698,34 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tifi-home-btn:active{transform:scale(0.975) translateZ(0);}
 
 
-/* ── loading ── */
+/* ── loading — minimal ── */
 #tifi-loading{
   position:absolute;inset:0;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:24px 36px 60px;
-  transition:opacity .35s ease;z-index:20;
+  gap:0;padding:0 40px 60px;
+  transition:opacity .4s ease;z-index:20;
   background:#0A0A0C;
 }
-.tifi-spin-wrap{position:relative;width:60px;height:60px;margin-bottom:28px;flex-shrink:0}
-.tifi-spin-track{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(255,255,255,.07)}
-.tifi-spin-arc{
-  position:absolute;inset:0;border-radius:50%;
-  border:2px solid transparent;
-  border-top-color:var(--sun);
-  animation:tifi-sp 1s cubic-bezier(.5,0,.5,1) infinite;
-  will-change:transform;
+.tifi-load-wordmark{
+  font-size:30px;font-weight:900;letter-spacing:-.04em;
+  color:rgba(255,255,255,.82);margin-bottom:36px;
 }
-.tifi-spin-ico{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
-.tifi-spin-ico svg{width:20px;height:20px;color:rgba(var(--sun-rgb),.65)}
-@keyframes tifi-sp{to{transform:rotate(360deg)}}
-.tifi-load-h{font-size:17px;font-weight:800;text-align:center;margin-bottom:6px;color:#F5F4F2}
-.tifi-load-s{font-size:13px;color:rgba(255,255,255,.32);font-weight:500;line-height:1.5;text-align:center;margin-bottom:26px}
-.tifi-load-list{width:100%;max-width:240px;display:flex;flex-direction:column;gap:10px}
-.tifi-ls{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:600;color:rgba(255,255,255,.22);transition:color .3s ease}
-.tifi-ls.on{color:rgba(255,255,255,.85)}.tifi-ls.ok{color:rgba(255,255,255,.38)}
-.tifi-ls-dot{
-  width:18px;height:18px;border-radius:50%;flex-shrink:0;
-  border:1.5px solid rgba(255,255,255,.08);
-  display:flex;align-items:center;justify-content:center;
-  transition:background .3s,border-color .3s;
+.tifi-load-dots{display:flex;gap:8px;margin-bottom:22px}
+.tifi-ld{
+  width:6px;height:6px;border-radius:50%;
+  background:rgba(255,255,255,.18);
+  animation:tifi-ld-pulse 1.5s ease-in-out infinite;
+  will-change:transform,background;
 }
-.tifi-ls.on .tifi-ls-dot{background:rgba(var(--sun-rgb),.15);border-color:var(--sun)}
-.tifi-ls.ok .tifi-ls-dot{background:rgba(82,193,119,.2);border-color:#52C177}
-.tifi-load-bar{margin-top:22px;width:100%;max-width:240px;height:1.5px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden}
-.tifi-load-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--sun),var(--sun2));border-radius:99px;transition:width .6s ease}
+.tifi-ld:nth-child(1){animation-delay:0s}
+.tifi-ld:nth-child(2){animation-delay:.2s}
+.tifi-ld:nth-child(3){animation-delay:.4s}
+@keyframes tifi-ld-pulse{
+  0%,60%,100%{background:rgba(255,255,255,.14);transform:scale(1)}
+  30%{background:rgba(var(--sun-rgb),.75);transform:scale(1.5)}
+}
+.tifi-load-s{font-size:12px;font-weight:500;color:rgba(255,255,255,.28);text-align:center;line-height:1.5;transition:opacity .4s ease}
+
 
 /* ── carousel dots ── */
 .tifi-cdots{
@@ -1744,8 +1737,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tifi-cdot.div-dot{width:20px;height:4px;border-radius:2px;opacity:.5}
 .tifi-cdot.div-dot.on{opacity:1;width:28px}
 
-/* ── carousel — inside #tifi-body, positions relative to body top ── */
-#tifi-carousel{position:absolute;inset:0;opacity:0;transition:opacity .45s;pointer-events:none}
+#tifi-carousel{position:absolute;inset:0;opacity:0;transition:opacity .5s ease;pointer-events:none}
 #tifi-carousel.visible{opacity:1;pointer-events:all}
 .tifi-ctrack-vp{
   position:absolute;
@@ -1753,43 +1745,50 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   left:0;right:0;
   bottom:50px;
   overflow:hidden;
+  contain:layout style;
 }
 .tifi-ccard{
-  position:absolute;top:0;bottom:0;left:16px;right:16px;
-  border-radius:24px;overflow:hidden;
+  position:absolute;top:0;bottom:0;left:14px;right:14px;
+  border-radius:22px;overflow:hidden;
   display:flex;flex-direction:column;
-  transition:transform .38s cubic-bezier(.4,0,.2,1),opacity .38s ease;
   will-change:transform,opacity;
+  transform:translate3d(0,0,0);
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
 }
-.tifi-ccard.state-current{transform:translateX(0);opacity:1;z-index:3}
-.tifi-ccard.state-prev{transform:translateX(-112%);opacity:0;z-index:1}
-.tifi-ccard.state-next{transform:translateX(112%);opacity:0;z-index:1}
+/* transitions only when animating */
+.tifi-ccard.animating{
+  transition:transform .3s cubic-bezier(.4,0,.2,1),opacity .3s ease;
+}
+.tifi-ccard.state-current{transform:translate3d(0,0,0);opacity:1;z-index:3}
+.tifi-ccard.state-prev{transform:translate3d(-105%,0,0);opacity:0;z-index:1}
+.tifi-ccard.state-next{transform:translate3d(105%,0,0);opacity:0;z-index:1}
 
 .tifi-cc-scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
 .tifi-cc-scroll::-webkit-scrollbar{display:none}
 .tifi-cc-body{padding:20px;display:flex;flex-direction:column;position:relative;z-index:1}
 .tifi-cc-counter{position:absolute;top:14px;right:14px;font-size:11px;font-weight:800;color:rgba(255,255,255,.22);z-index:4;pointer-events:none}
 
-/* card backgrounds */
-.tifi-cc-warm{background:rgba(28,22,18,.72);border:1px solid rgba(var(--sun-rgb),.18);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
-.tifi-cc-warm-glow{position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse 80% 60% at 85% 5%,rgba(var(--sun-rgb),.1),transparent 65%),radial-gradient(ellipse 60% 50% at 15% 90%,rgba(var(--sun2-rgb),.06),transparent 65%);pointer-events:none;z-index:0}
-.tifi-cc-dark{background:rgba(22,22,24,.75);border:1px solid rgba(255,255,255,.07);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
-.tifi-cc-blue{background:rgba(18,26,38,.75);border:1px solid rgba(78,174,229,.14);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
-.tifi-cc-green{background:rgba(16,28,22,.76);border:1px solid rgba(61,204,114,.13);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
-.tifi-cc-purple{background:rgba(22,18,34,.76);border:1px solid rgba(157,133,242,.13);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
-.tifi-cc-orange{background:rgba(28,20,14,.74);border:1px solid rgba(var(--sun-rgb),.13);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
-.tifi-cc-teal{background:rgba(16,26,28,.76);border:1px solid rgba(61,204,114,.12);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+/* card backgrounds — no backdrop-filter (GPU lag) */
+.tifi-cc-warm{background:#1A1410;border:1px solid rgba(var(--sun-rgb),.14)}
+.tifi-cc-warm-glow{position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse 70% 50% at 80% 0%,rgba(var(--sun-rgb),.08),transparent 60%);pointer-events:none;z-index:0}
+.tifi-cc-dark{background:#141416;border:1px solid rgba(255,255,255,.06)}
+.tifi-cc-blue{background:#101820;border:1px solid rgba(78,174,229,.12)}
+.tifi-cc-green{background:#0E1A14;border:1px solid rgba(61,204,114,.11)}
+.tifi-cc-purple{background:#131020;border:1px solid rgba(157,133,242,.11)}
+.tifi-cc-orange{background:#181008;border:1px solid rgba(var(--sun-rgb),.11)}
+.tifi-cc-teal{background:#0E1A1A;border:1px solid rgba(61,204,114,.10)}
 
 /* tags */
-.tifi-cc-tag{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;padding:5px 10px;border-radius:8px;margin-bottom:12px;align-self:flex-start;flex-shrink:0}
-.tifi-tag-orange{background:rgba(var(--sun-rgb),.14);color:var(--sun)}
-.tifi-tag-blue{background:rgba(78,174,229,.14);color:var(--water)}
-.tifi-tag-green{background:rgba(61,204,114,.14);color:var(--green)}
-.tifi-tag-purple{background:rgba(157,133,242,.14);color:#9D85F2}
-.tifi-tag-red{background:rgba(244,92,92,.12);color:var(--red)}
+.tifi-cc-tag{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:6px;margin-bottom:14px;align-self:flex-start;flex-shrink:0}
+.tifi-tag-orange{background:rgba(var(--sun-rgb),.10);color:rgba(var(--sun-rgb),1)}
+.tifi-tag-blue{background:rgba(78,174,229,.10);color:#4EAEE5}
+.tifi-tag-green{background:rgba(61,204,114,.10);color:#3DCC72}
+.tifi-tag-purple{background:rgba(157,133,242,.10);color:#9D85F2}
+.tifi-tag-red{background:rgba(244,92,92,.09);color:#F45C5C}
 
-.tifi-cc-h{font-size:22px;font-weight:900;letter-spacing:-.02em;line-height:1.2;color:#F5F4F2}
-.tifi-cc-s{font-size:13px;font-weight:500;line-height:1.55;margin-top:7px;color:rgba(255,255,255,.45)}
+.tifi-cc-h{font-size:20px;font-weight:800;letter-spacing:-.025em;line-height:1.2;color:#EDEAE6}
+.tifi-cc-s{font-size:13px;font-weight:400;line-height:1.6;margin-top:8px;color:rgba(255,255,255,.38)}
 .tifi-cc-bignums{display:flex;gap:8px;margin-top:15px}
 .tifi-cc-num{flex:1;min-width:0;border-radius:13px;padding:11px 10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06)}
 .tifi-cc-num-v{font-size:19px;font-weight:900;letter-spacing:-.02em;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1851,74 +1850,76 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
   overflow:hidden;cursor:default;
+  background:#0E0E10;border:1px solid rgba(255,255,255,.06);
 }
 .tifi-div-bg{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none}
 
 .tifi-div-content{
   position:relative;z-index:2;
   display:flex;flex-direction:column;align-items:center;
-  padding:0 32px;gap:0;
+  padding:0 40px;gap:0;
   font-family:'Onest',sans-serif;
   width:100%;
 }
 
-/* Иконка — компактная, мягкая */
+/* Иконка в divider */
 .tifi-div-ico-wrap{
-  width:72px;height:72px;border-radius:24px;
+  width:56px;height:56px;border-radius:18px;
   display:flex;align-items:center;justify-content:center;
-  font-size:32px;
-  margin-bottom:20px;
-  position:relative;
-  border:1px solid rgba(255,255,255,.1);
-}
-.tifi-div-ico-glow{
-  position:absolute;inset:-10px;border-radius:34px;
-  opacity:.2;filter:blur(18px);pointer-events:none;
+  margin-bottom:22px;
+  border:1px solid;
+  flex-shrink:0;
 }
 
-/* Бейдж-категория — маленькая таблетка над названием */
+/* Линия-акцент (оставляем для fallback) */
+.tifi-div-line{
+  width:32px;height:2px;border-radius:99px;
+  margin-bottom:28px;
+}
+
+/* Бейдж-категория */
 .tifi-div-badge{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:4px 11px;border-radius:99px;
-  font-size:10px;font-weight:700;
-  letter-spacing:.04em;text-transform:uppercase;
-  margin-bottom:12px;
-  border:1px solid rgba(255,255,255,.14);
-  background:rgba(255,255,255,.06);
-  color:rgba(255,255,255,.55);
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 10px;border-radius:99px;
+  font-size:9px;font-weight:700;
+  letter-spacing:.05em;text-transform:uppercase;
+  margin-bottom:14px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.04);
+  color:rgba(255,255,255,.38);
 }
 
-/* Название категории — крупное но не гигантское, строчные */
+/* Название категории */
 .tifi-div-cat-name{
-  font-size:28px;font-weight:900;
-  letter-spacing:-.02em;
+  font-size:26px;font-weight:800;
+  letter-spacing:-.03em;
   text-align:center;
-  line-height:1.05;
-  margin-bottom:8px;
-  text-transform:none; /* НЕ капс */
+  line-height:1.1;
+  margin-bottom:10px;
 }
 
 .tifi-div-cat-sub{
-  font-size:13px;font-weight:500;
-  color:rgba(255,255,255,.42);
+  font-size:13px;font-weight:400;
+  color:rgba(255,255,255,.32);
   text-align:center;
-  margin-bottom:28px;
-  line-height:1.4;
-  max-width:220px;
+  margin-bottom:32px;
+  line-height:1.5;
+  max-width:210px;
 }
 
-/* Кнопка — pill-стиль, аккуратная */
+/* Кнопка */
 .tifi-div-enter-btn{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:12px 24px;border-radius:99px;
-  font-size:14px;font-weight:700;color:#fff;
+  display:inline-flex;align-items:center;gap:7px;
+  padding:11px 22px;border-radius:99px;
+  font-size:13px;font-weight:600;color:#fff;
   cursor:pointer;letter-spacing:.01em;
-  transition:transform .15s cubic-bezier(.34,1.56,.64,1),box-shadow .15s;
+  transition:transform .15s cubic-bezier(.34,1.56,.64,1),opacity .15s;
   border:none;
   font-family:'Onest',sans-serif;
+  background:rgba(255,255,255,.1);
 }
-.tifi-div-enter-btn:active{transform:scale(.94);box-shadow:none !important}
-.tifi-div-enter-btn svg{width:15px;height:15px;flex-shrink:0}
+.tifi-div-enter-btn:active{transform:scale(.94);opacity:.8}
+.tifi-div-enter-btn svg{width:13px;height:13px;flex-shrink:0;opacity:.7}
 
 /* carousel nav */
 .tifi-carousel-nav{position:absolute;bottom:10px;left:0;right:0;display:flex;align-items:center;justify-content:center;z-index:10;pointer-events:none}
@@ -2416,23 +2417,13 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
     <!-- Loading (absolute inset:0 внутри body) -->
     <div id="tifi-loading">
-      <div class="tifi-spin-wrap">
-        <div class="tifi-spin-track"></div>
-        <div class="tifi-spin-arc"></div>
-        <div class="tifi-spin-ico">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-        </div>
+      <div class="tifi-load-wordmark">тифи</div>
+      <div class="tifi-load-dots">
+        <div class="tifi-ld"></div>
+        <div class="tifi-ld"></div>
+        <div class="tifi-ld"></div>
       </div>
-      <div class="tifi-load-h">тифи думает</div>
-      <div class="tifi-load-s">Groq AI анализирует твои данные<br>и создаёт персональные карточки</div>
-      <div class="tifi-load-list">
-        <div class="tifi-ls" id="tifi-ls1"><div class="tifi-ls-dot"></div>читаю профиль и цели</div>
-        <div class="tifi-ls" id="tifi-ls2"><div class="tifi-ls-dot"></div>анализирую питание и вес</div>
-        <div class="tifi-ls" id="tifi-ls3"><div class="tifi-ls-dot"></div>отправляю запрос в Groq AI</div>
-        <div class="tifi-ls" id="tifi-ls4"><div class="tifi-ls-dot"></div>создаю персональные карточки</div>
-        <div class="tifi-ls" id="tifi-ls5"><div class="tifi-ls-dot"></div>готовлю советы и рекомендации</div>
-      </div>
-      <div class="tifi-load-bar"><div class="tifi-load-bar-fill" id="tifi-lpf"></div></div>
+      <div class="tifi-load-s" id="tifi-load-status">анализирую данные</div>
     </div>
 
     <!-- Dots (absolute top:10px внутри body) -->
@@ -6555,9 +6546,9 @@ const TIFI_SVGS={
 function tifiMkSvg(k){return`<svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${TIFI_SVGS[k]||''}</svg>`}
 
 const TIFI_CATS={
-  советы:    {clr:'#FF8040', rgb:'255,128,64',  icon:'💡', bg:'rgba(255,128,64,.08)', brd:'rgba(255,128,64,.18)',  dotClr:'#FF8040'},
-  питание:   {clr:'#4EAEE5', rgb:'78,174,229',  icon:'🥗', bg:'rgba(78,174,229,.08)', brd:'rgba(78,174,229,.18)',  dotClr:'#4EAEE5'},
-  активность:{clr:'#3DCC72', rgb:'61,204,114',  icon:'🏃', bg:'rgba(61,204,114,.08)', brd:'rgba(61,204,114,.18)',  dotClr:'#3DCC72'},
+  советы:    {clr:'#FF8040', rgb:'255,128,64',  icon:'solar:stars-bold',      bg:'rgba(255,128,64,.08)', brd:'rgba(255,128,64,.18)',  dotClr:'#FF8040'},
+  питание:   {clr:'#4EAEE5', rgb:'78,174,229',  icon:'solar:leaf-bold',        bg:'rgba(78,174,229,.08)', brd:'rgba(78,174,229,.18)',  dotClr:'#4EAEE5'},
+  активность:{clr:'#3DCC72', rgb:'61,204,114',  icon:'solar:dumbbell-bold',    bg:'rgba(61,204,114,.08)', brd:'rgba(61,204,114,.18)',  dotClr:'#3DCC72'},
 };
 
 function _tifiGetCards(){
@@ -6667,23 +6658,19 @@ function tifiBuildDivider(data){
   };
   const el=document.createElement('div');
   el.className='tifi-ccard cc-divider state-next';
-  el.style.cssText=`background:${cat.bg};border:1px solid ${cat.brd}`;
   el.innerHTML=`
     <div class="tifi-div-bg" style="background:
-      radial-gradient(ellipse 80% 55% at 50% 10%, rgba(${cat.rgb},.20), transparent 60%),
-      radial-gradient(ellipse 45% 35% at 85% 85%, rgba(${cat.rgb},.09), transparent 55%),
-      radial-gradient(ellipse 35% 25% at 10% 80%, rgba(${cat.rgb},.06), transparent 50%)">
+      radial-gradient(ellipse 65% 40% at 50% 10%, rgba(${cat.rgb},.07), transparent 65%)">
     </div>
     <div class="tifi-div-content">
-      <div class="tifi-div-ico-wrap" style="background:rgba(${cat.rgb},.13);box-shadow:0 6px 24px rgba(${cat.rgb},.18)">
-        <div class="tifi-div-ico-glow" style="background:${cat.clr}"></div>
-        <span style="position:relative;z-index:1;font-size:30px;line-height:1">${cat.icon}</span>
+      <div class="tifi-div-ico-wrap" style="background:rgba(${cat.rgb},.10);border-color:rgba(${cat.rgb},.16)">
+        <iconify-icon icon="${cat.icon}" style="font-size:26px;color:${cat.clr}"></iconify-icon>
       </div>
       <div class="tifi-div-badge">${cntLabel}</div>
-      <div class="tifi-div-cat-name" style="color:${cat.clr}">${data.cat}</div>
+      <div class="tifi-div-cat-name" style="color:rgba(255,255,255,.88)">${data.cat}</div>
       <div class="tifi-div-cat-sub">${catDescr[data.cat]||'анализ и рекомендации'}</div>
       <button class="tifi-div-enter-btn" onclick="tifiNextCard()"
-        style="background:${cat.clr};box-shadow:0 4px 18px rgba(${cat.rgb},.32)">
+        style="background:rgba(${cat.rgb},.12);border:1px solid rgba(${cat.rgb},.2);color:${cat.clr}">
         смотреть
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
           stroke-linecap="round" stroke-linejoin="round">
@@ -6737,33 +6724,46 @@ function tifiBuildCarousel(){
 }
 /* swipe — один раз инициализируется на tifi-body */
 let _tifiSwipeInit=false;
+let _tifiSwiping=false; // debounce
 function _tifiInitSwipe(){
   if(_tifiSwipeInit)return;
   _tifiSwipeInit=true;
   const vp=document.getElementById('tifi-body');
   if(!vp)return;
-  let t0=null,y0=null;
-  vp.addEventListener('touchstart',e=>{t0=e.touches[0].clientX;y0=e.touches[0].clientY},{passive:true});
+  let t0=null,y0=null,x0=null;
+  vp.addEventListener('touchstart',e=>{
+    t0=e.touches[0].clientX;y0=e.touches[0].clientY;x0=e.touches[0].clientX;
+  },{passive:true});
   vp.addEventListener('touchend',e=>{
     if(t0===null)return;
-    const dx=e.changedTouches[0].clientX-t0,dy=Math.abs(e.changedTouches[0].clientY-y0);
-    if(Math.abs(dx)>44&&dy<60){dx<0?tifiNextCard():tifiPrevCard();}
-    t0=null;y0=null;
+    const dx=e.changedTouches[0].clientX-t0;
+    const dy=Math.abs(e.changedTouches[0].clientY-y0);
+    t0=null;y0=null;x0=null;
+    if(Math.abs(dx)<40||dy>Math.abs(dx)*0.8)return; // не свайп
+    if(_tifiSwiping)return; // предотвращаем двойной свайп
+    _tifiSwiping=true;
+    if(dx<0)tifiNextCard();else tifiPrevCard();
+    setTimeout(()=>{_tifiSwiping=false;},360); // ждём конца transition
   },{passive:true});
 }
 
 function tifiUpdateStates(newIdx){
   tifiCur=newIdx;
-  const data=tifiCards[newIdx];
-  tifiCardEls.forEach((el,i)=>{
-    el.classList.remove('state-current','state-prev','state-next');
-    if(i===newIdx)el.classList.add('state-current');
-    else if(i<newIdx)el.classList.add('state-prev');
-    else el.classList.add('state-next');
-  });
-  document.querySelectorAll('.tifi-cdot').forEach((d,i)=>{
-    const isOn=i===newIdx;d.classList.toggle('on',isOn);
-    if(!tifiCards[i]?.divider)d.style.background=isOn?(d._catClr||'var(--sun)'):'rgba(255,255,255,.18)';
+  // add animating class, then apply state in next RAF for smooth GPU transition
+  tifiCardEls.forEach(el=>el.classList.add('animating'));
+  requestAnimationFrame(()=>{
+    tifiCardEls.forEach((el,i)=>{
+      el.classList.remove('state-current','state-prev','state-next');
+      if(i===newIdx)el.classList.add('state-current');
+      else if(i<newIdx)el.classList.add('state-prev');
+      else el.classList.add('state-next');
+    });
+    document.querySelectorAll('.tifi-cdot').forEach((d,i)=>{
+      const isOn=i===newIdx;d.classList.toggle('on',isOn);
+      if(!tifiCards[i]?.divider)d.style.background=isOn?(d._catClr||'var(--sun)'):'rgba(255,255,255,.18)';
+    });
+    // remove animating class after transition ends
+    setTimeout(()=>{tifiCardEls.forEach(el=>el.classList.remove('animating'));},320);
   });
 }
 
@@ -6786,26 +6786,22 @@ async function tifiStartScreen(){
   tifiCur=0;tifiLoaded=false;
 
   const steps=[
-    {id:'tifi-ls1',delay:260,pct:20},{id:'tifi-ls2',delay:700,pct:40},
-    {id:'tifi-ls3',delay:1200,pct:60},{id:'tifi-ls4',delay:1700,pct:80},
-    {id:'tifi-ls5',delay:2200,pct:100},
+    {id:'tifi-ls1',delay:260,pct:20,status:'читаю профиль'},
+    {id:'tifi-ls2',delay:700,pct:40,status:'анализирую питание'},
+    {id:'tifi-ls3',delay:1200,pct:60,status:'запрос в Groq AI'},
+    {id:'tifi-ls4',delay:1700,pct:80,status:'создаю карточки'},
+    {id:'tifi-ls5',delay:2200,pct:100,status:'почти готово'},
   ];
-  const bar=document.getElementById('tifi-lpf');
-  const chk=`<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
-  steps.forEach(s=>{const el=document.getElementById(s.id);if(el){el.className='tifi-ls';el.querySelector('.tifi-ls-dot').innerHTML=''}});
-  if(bar)bar.style.width='0%';
+  const statusEl=document.getElementById('tifi-load-status');
 
   steps.forEach((s,i)=>{
     setTimeout(()=>{
-      if(!alive())return; // страница закрыта — ничего не делаем
-      if(i>0){const p=document.getElementById(steps[i-1].id);if(p){p.classList.remove('on');p.classList.add('ok');p.querySelector('.tifi-ls-dot').innerHTML=chk;}}
-      const el=document.getElementById(s.id);if(el)el.classList.add('on');
-      if(bar)bar.style.width=s.pct+'%';
+      if(!alive())return;
+      if(statusEl){statusEl.style.opacity='0';setTimeout(()=>{if(statusEl)statusEl.textContent=s.status;statusEl.style.opacity='1';},180);}
     },s.delay);
   });
 
-  const loadH=ldg.querySelector('.tifi-load-h');
-  const loadS=ldg.querySelector('.tifi-load-s');
+  const loadSt=document.getElementById('tifi-load-status');
   const apiKey=_tifiGetKey();
   const userData=_tifiGetUserData();
   const minDelay=new Promise(r=>setTimeout(r,2700));
@@ -6826,22 +6822,15 @@ async function tifiStartScreen(){
     return;
   }
 
-  const l=document.getElementById('tifi-ls5');
-  if(l){l.classList.remove('on');l.classList.add('ok');l.querySelector('.tifi-ls-dot').innerHTML=chk;}
-
   if(apiError&&!apiResult){
-    if(loadH)loadH.textContent='ошибка';
-    if(loadS){
-      const isKey=apiError.message&&(apiError.message.toLowerCase().includes('invalid api key')||apiError.message.toLowerCase().includes('401'));
-      loadS.innerHTML=isKey
-        ?'Неверный ключ Groq.<br><span style="color:var(--sun);cursor:pointer;font-weight:700" onclick="popPage();setTimeout(()=>{pushPage(\'pp-tifi-key\');_populateTifiKey();},280)">изменить ключ →</span>'
-        :'Не удалось связаться с Groq.<br>Показываю примерные данные';
-    }
+    if(loadSt){loadSt.textContent='ошибка соединения';}
+    const isKey=apiError.message&&(apiError.message.toLowerCase().includes('invalid api key')||apiError.message.toLowerCase().includes('401'));
+    if(isKey&&loadSt){loadSt.innerHTML='неверный ключ Groq · <span style="color:var(--sun);cursor:pointer" onclick="popPage();setTimeout(()=>{pushPage(\'pp-tifi-key\');_populateTifiKey();},280)">изменить</span>';}
     tifiCards=_tifiGetCards();
     await new Promise(r=>setTimeout(r,apiError.message&&apiError.message.toLowerCase().includes('401')?2000:1500));
   }else{
     tifiCards=apiResult;
-    if(loadH)loadH.textContent='готово ✓';
+    if(loadSt)loadSt.textContent='готово';
   }
 
   if(!alive())return; // последняя проверка перед показом карточек
