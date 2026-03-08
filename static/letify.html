@@ -1658,6 +1658,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .lc-hint-txt{font-size:12px;color:rgba(255,255,255,.38);font-weight:600;letter-spacing:.03em}
 .lc-zoom{position:absolute;bottom:calc(max(env(safe-area-inset-bottom,24px),24px) + 36px);left:50%;transform:translateX(-50%);background:rgba(0,0,0,.75);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:5px 14px;z-index:11;font-size:11px;font-weight:700;color:rgba(255,255,255,.55);pointer-events:none;white-space:nowrap;opacity:0;transition:opacity .2s}
 .lc-zoom.visible{opacity:1}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -1993,11 +1994,18 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     </div>
   </div>
 
-  <!-- ── DANGER + VERSION ── -->
-  <button class="pf-danger-btn" onclick="resetAllData()">
-    <iconify-icon icon="solar:trash-bin-2-bold" style="font-size:15px"></iconify-icon>
-    Сбросить все данные
-  </button>
+  <!-- ── ДРУГОЕ ── -->
+  <div class="pf-sec">Другое</div>
+  <div class="pf-list-card">
+    <div class="pf-list-row" onclick="pushPage('pp-other')" style="border-bottom:none">
+      <div class="pf-list-row-ic" style="background:rgba(var(--sun-rgb),.12)">
+        <iconify-icon icon="solar:settings-bold" style="font-size:15px;color:var(--sun)"></iconify-icon>
+      </div>
+      <span class="pf-list-row-lbl">Другое</span>
+      <iconify-icon icon="solar:alt-arrow-right-bold" class="pf-list-row-chev" style="font-size:13px"></iconify-icon>
+    </div>
+  </div>
+
   <div class="pf-ver">letify · ver 4.3</div>
 
 </div><!-- /pf-dash -->
@@ -2006,6 +2014,131 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 </div><!-- /pages -->
 
 <!-- ══════ PUSH PAGES ══════ -->
+
+<!-- PP: Другое -->
+<div class="push-page" id="pp-other">
+  <div class="pp-hdr">
+    <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <div><div class="pp-title">другое</div></div>
+  </div>
+  <div class="pp-body">
+    <div class="pf-list-card" style="margin-bottom:10px">
+      <div class="pf-list-row" onclick="pushPage('pp-tifi-key')">
+        <div class="pf-list-row-ic" style="background:rgba(var(--sun-rgb),.12)">
+          <iconify-icon icon="solar:stars-bold" style="font-size:15px;color:var(--sun)"></iconify-icon>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div class="pf-list-row-lbl">тифи</div>
+          <div class="pf-list-row-val" id="pp-other-tifi-status" style="margin-top:1px">AI · ключ не добавлен</div>
+        </div>
+        <iconify-icon icon="solar:alt-arrow-right-bold" class="pf-list-row-chev" style="font-size:13px"></iconify-icon>
+      </div>
+    </div>
+    <div style="padding:2px 4px">
+      <div style="font-size:11px;font-weight:600;color:var(--hint);line-height:1.55">
+        скоро здесь появятся новые функции приложения
+      </div>
+    </div>
+    <button class="pf-danger-btn" style="margin-top:16px" onclick="resetAllData()">
+      <iconify-icon icon="solar:trash-bin-2-bold" style="font-size:15px"></iconify-icon>
+      Сбросить все данные
+    </button>
+
+<!-- PP: тифи — ключ -->
+<div class="push-page" id="pp-tifi-key">
+  <div class="pp-hdr">
+    <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <div>
+      <div class="pp-title">тифи</div>
+      <div class="pp-subtitle">AI · Groq</div>
+    </div>
+  </div>
+  <div class="pp-body">
+
+    <!-- hero: статус ключа -->
+    <div id="tifi-key-status-card" style="
+      background:var(--bg2);border-radius:20px;
+      border:1px solid var(--brd);padding:20px 18px;
+      margin-bottom:14px;
+      display:flex;align-items:center;gap:14px;
+      box-shadow:var(--sh);
+    ">
+      <!-- иконка тифи -->
+      <div style="width:48px;height:48px;border-radius:15px;flex-shrink:0;background:linear-gradient(135deg,var(--sun),var(--sun2));display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(var(--sun-rgb),.3);position:relative">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        <div id="tifi-status-dot" style="position:absolute;width:10px;height:10px;border-radius:50%;background:var(--hint);border:2px solid var(--bg2);bottom:-2px;right:-2px;transition:background .3s ease"></div>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div id="tifi-status-title" style="font-size:15px;font-weight:800;color:var(--text)">ключ не добавлен</div>
+        <div id="tifi-status-sub" style="font-size:12px;font-weight:500;color:var(--hint);margin-top:3px;line-height:1.4">вставь ключ Groq чтобы активировать тифи</div>
+      </div>
+    </div>
+
+    <!-- маска сохранённого ключа -->
+    <div id="tifi-key-saved-wrap" style="display:none;margin-bottom:14px">
+      <div style="
+        background:rgba(var(--sun-rgb),.06);border-radius:14px;padding:12px 16px;
+        font-size:12px;font-weight:600;color:var(--hint);
+        font-family:monospace;letter-spacing:.04em;word-break:break-all;
+        border:1px solid rgba(var(--sun-rgb),.15);
+        display:flex;align-items:center;gap:10px;
+      ">
+        <iconify-icon icon="solar:key-bold" style="font-size:16px;color:var(--sun);flex-shrink:0"></iconify-icon>
+        <span id="tifi-key-masked-display" style="flex:1"></span>
+        <button onclick="tifiDeleteKey()" style="background:none;border:none;color:var(--hint);cursor:pointer;padding:0;font-size:12px;font-weight:700;flex-shrink:0;font-family:inherit">удалить</button>
+      </div>
+    </div>
+
+    <!-- одна кнопка вставки -->
+    <button id="tifi-paste-btn" onclick="tifiPasteKey()" style="
+      width:100%;padding:18px 20px;border-radius:18px;border:none;cursor:pointer;
+      background:linear-gradient(135deg,var(--sun),var(--sun2));
+      color:#fff;font-size:16px;font-weight:800;font-family:inherit;
+      display:flex;align-items:center;justify-content:center;gap:10px;
+      box-shadow:0 6px 20px rgba(var(--sun-rgb),.35);
+      transition:transform .12s ease,opacity .12s ease,box-shadow .12s ease;
+      -webkit-tap-highlight-color:transparent;
+    " ontouchstart="this.style.transform='scale(.97)';this.style.opacity='.88'" ontouchend="this.style.transform='';this.style.opacity=''">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+      вставить ключ из буфера
+    </button>
+
+    <!-- индикатор проверки / результат -->
+    <div id="tifi-check-row" style="
+      display:none;align-items:center;gap:12px;
+      margin-top:12px;padding:14px 16px;
+      background:var(--bg3);border-radius:14px;
+      border:1px solid var(--brd);
+      transition:background .3s;
+    ">
+      <div id="tifi-check-spinner" style="
+        width:18px;height:18px;flex-shrink:0;
+        border:2.5px solid rgba(var(--sun-rgb),.2);
+        border-top-color:var(--sun);
+        border-radius:50%;
+        animation:spin 0.8s linear infinite;
+        display:none;
+      "></div>
+      <div id="tifi-check-icon" style="font-size:18px;display:none;flex-shrink:0"></div>
+      <div id="tifi-check-text" style="font-size:13px;font-weight:700;color:var(--text)">проверяю ключ…</div>
+    </div>
+
+    <!-- подсказка как получить ключ -->
+    <div style="margin-top:16px;padding:16px;background:var(--bg3);border-radius:16px;border:1px solid var(--brd)">
+      <div style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:10px">как получить ключ</div>
+      <div style="font-size:12px;font-weight:500;color:var(--hint);line-height:1.7">
+        1. зайди на <span style="color:var(--sun);font-weight:700">console.groq.com</span><br>
+        2. зарегистрируйся бесплатно<br>
+        3. нажми <span style="font-weight:700;color:var(--text)">API Keys → Create API Key</span><br>
+        4. скопируй ключ — затем нажми кнопку выше
+      </div>
+    </div>
+
+
+
+
+  </div>
+</div>
 
 <!-- PP: Начальный вес и цель -->
 <div class="push-page" id="pp-start-weight">
@@ -3291,6 +3424,8 @@ function popPage(doRender=true){
 
 function _populatePP(id){
   const u=gU();
+  if(id==='pp-tifi-key'){_populateTifiKey();}
+  if(id==='pp-other'){_tifiUpdateOtherStatus();}
   if(id==='pp-weight-chart'){_populateWeightChart();}
   if(id==='pp-start-weight'){
     const sw=u.start_weight&&u.start_weight>0?u.start_weight:80;
@@ -4514,13 +4649,15 @@ function renderHomeClassic(){
   el.innerHTML=`
 <div class="pad" style="display:flex;align-items:flex-start;justify-content:space-between;padding-top:2px">
   <div><div class="t1">привет, <span class="grad">${u.name||'—'}</span></div><div class="t5" style="margin-top:3px">${dateStr}</div></div>
-  <div style="text-align:right;padding-top:4px"><div class="t5">до лета</div><div style="font-size:22px;font-weight:900;color:var(--sun);line-height:1.1">${dsl}</div><div class="t5">${pD(dsl)}</div></div>
 </div>
-<div class="pad gap"><div class="banner">
-  <div style="font-size:13px;font-weight:800;opacity:.88;margin-bottom:2px">путь к лету</div>
-  <div style="font-size:28px;font-weight:900;line-height:1.1">${dsl} дней</div>
-  <div style="font-size:11px;opacity:.72;font-weight:600;margin-top:3px">ты делаешь это каждый день</div>
-</div></div>
+<div class="pad gap" onclick="pushPage('pp-tifi-key')" style="cursor:pointer">
+  <div style="background:var(--bg2);border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:13px;box-shadow:var(--sh);border:1px solid rgba(var(--sun-rgb),.12);overflow:hidden;position:relative;transition:opacity .12s" ontouchstart="this.style.opacity='.7'" ontouchend="this.style.opacity=''">
+    <div style="position:absolute;inset:0;background:linear-gradient(110deg,rgba(var(--sun-rgb),.05),rgba(var(--sun2-rgb),.02));pointer-events:none"></div>
+    <div style="width:42px;height:42px;border-radius:13px;flex-shrink:0;background:linear-gradient(135deg,var(--sun),var(--sun2));display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(var(--sun-rgb),.3)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+    <div style="flex:1;min-width:0"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(var(--sun-rgb),.7);margin-bottom:2px">AI</div><div style="font-size:15px;font-weight:800">тифи</div><div style="font-size:12px;color:var(--hint);font-weight:500;margin-top:1px">${_tifiGetKey()?'ключ активен · готов к работе':'нажми чтобы добавить ключ'}</div></div>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--hint)" stroke-width="2.5" stroke-linecap="round" style="opacity:.4;flex-shrink:0"><path d="M9 18l6-6-6-6"/></svg>
+  </div>
+</div>
 <div class="pad gap"><div class="card" style="padding:16px 6px 12px">
   <div style="display:flex;justify-content:space-around;align-items:center">
     <div style="text-align:center;cursor:pointer" onclick="goToTrackTab('water')">\n      <div class="aw"><svg width="68" height="68" viewBox="0 0 68 68"><circle cx="34" cy="34" r="26" fill="none" stroke="rgba(var(--water-rgb),.15)" stroke-width="5"/><circle cx="34" cy="34" r="26" fill="none" stroke="var(--water)" stroke-width="5" stroke-linecap="round" stroke-dasharray="163.4" stroke-dashoffset="${arcW}" transform="rotate(-90 34 34)" style="transition:stroke-dashoffset .8s cubic-bezier(.25,.46,.45,.94)"/></svg>\n      <div class="ai"><div style="font-size:13px;font-weight:900;color:var(--water)">${Math.round(wp*100)}%</div></div></div>\n      <div style="font-size:11px;font-weight:900;margin-top:4px">${wt}</div><div class="t5" style="font-size:10px">мл</div>\n    </div>\n    <div style="text-align:center;cursor:pointer" onclick="goToTrackTab('cal')">\n      <div class="aw"><svg width="82" height="82" viewBox="0 0 82 82"><circle cx="41" cy="41" r="33" fill="none" stroke="rgba(244,129,74,.15)" stroke-width="6"/><circle cx="41" cy="41" r="33" fill="none" stroke="var(--cal)" stroke-width="6" stroke-linecap="round" stroke-dasharray="207.3" stroke-dashoffset="${arcC}" transform="rotate(-90 41 41)" style="transition:stroke-dashoffset .8s cubic-bezier(.25,.46,.45,.94)"/></svg>\n      <div class="ai"><div style="font-size:15px;font-weight:900;color:var(--cal)">${Math.round(cp*100)}%</div></div></div>\n      <div style="font-size:13px;font-weight:900;margin-top:4px">${ct}</div><div class="t5" style="font-size:10px">ккал</div>\n      <div style="margin-top:4px;display:flex;gap:4px;justify-content:center">${macHtml}</div>\n    </div>
@@ -4563,11 +4700,13 @@ function renderHomeLinear(){
   el.innerHTML=`<div class="hl-body">
   <div class="hl-header">
     <div><div class="hl-greeting">привет, <span class="grad">${u.name||'—'}</span></div><div class="t5" style="margin-top:3px">${dateStr}</div></div>
-    <div class="hl-days-badge"><iconify-icon icon="solar:sun-bold" width="16" class="hl-days-ico"></iconify-icon><div><div class="hl-days-num">${dsl}</div><div class="hl-days-lbl">${pD(dsl)}</div></div></div>
   </div>
-  <div class="hl-banner" style="z-index:1">
-    <div style="z-index:1"><div class="hl-banner-text">путь к лету</div><div class="hl-banner-days">${dsl} дней</div><div class="hl-banner-sub">ты делаешь это каждый день</div></div>
-    <iconify-icon icon="solar:running-bold" width="32" style="color:rgba(255,255,255,.3);z-index:1;flex-shrink:0"></iconify-icon>
+  <!-- тифи card -->
+  <div onclick="pushPage('pp-tifi-key')" style="background:var(--bg2);border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:11px;box-shadow:var(--sh);border:1px solid rgba(var(--sun-rgb),.12);overflow:hidden;position:relative;cursor:pointer;flex-shrink:0;transition:opacity .12s" ontouchstart="this.style.opacity='.7'" ontouchend="this.style.opacity=''">
+    <div style="position:absolute;inset:0;background:linear-gradient(110deg,rgba(var(--sun-rgb),.05),rgba(var(--sun2-rgb),.02));pointer-events:none"></div>
+    <div style="width:36px;height:36px;border-radius:11px;flex-shrink:0;background:linear-gradient(135deg,var(--sun),var(--sun2));display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(var(--sun-rgb),.28)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+    <div style="flex:1;min-width:0"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(var(--sun-rgb),.7)">AI</div><div style="font-size:13px;font-weight:800">тифи</div></div>
+    <div style="font-size:10px;font-weight:700;color:${_tifiGetKey()?'var(--green)':'var(--hint)'};flex-shrink:0">${_tifiGetKey()?'активен':'настроить'}</div>
   </div>
   <div class="hl-metrics"><div class="hl-card">
     <div class="hl-metric" onclick="goToTrackTab('cal')">
@@ -4628,13 +4767,14 @@ function renderHomeBento(){
   el.innerHTML=`<div class="hb-body">
   <div class="hb-header">
     <div><div class="hb-greeting">привет, <span class="grad">${u.name||'—'}</span></div><div class="t5" style="margin-top:3px">${dateStr}</div></div>
-    <div class="hb-days"><div class="hb-days-n">${dsl}</div><div class="hb-days-l">${pD(dsl)}</div></div>
   </div>
   <div class="hb-grid">
-    <!-- Banner -->
-    <div class="hb-banner hb-full" style="flex-shrink:0">
-      <div style="z-index:1"><div class="hb-banner-label">путь к лету</div><div class="hb-banner-days">${dsl} дней</div><div class="hb-banner-sub">ты делаешь это каждый день</div></div>
-      <iconify-icon icon="solar:sun-bold" width="28" style="color:rgba(255,255,255,.4);z-index:1"></iconify-icon>
+    <!-- тифи card (full width) -->
+    <div class="hb-full" onclick="pushPage('pp-tifi-key')" style="background:var(--bg2);border-radius:16px;padding:11px 14px;display:flex;align-items:center;gap:11px;border:1px solid rgba(var(--sun-rgb),.12);overflow:hidden;position:relative;cursor:pointer;flex-shrink:0;transition:opacity .12s;box-shadow:var(--sh)" ontouchstart="this.style.opacity='.7'" ontouchend="this.style.opacity=''">
+      <div style="position:absolute;inset:0;background:linear-gradient(110deg,rgba(var(--sun-rgb),.06),rgba(var(--sun2-rgb),.02));pointer-events:none"></div>
+      <div style="width:34px;height:34px;border-radius:10px;flex-shrink:0;background:linear-gradient(135deg,var(--sun),var(--sun2));display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(var(--sun-rgb),.28)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+      <div style="flex:1;min-width:0"><div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(var(--sun-rgb),.7)">AI</div><div style="font-size:13px;font-weight:800">тифи</div></div>
+      <div style="font-size:10px;font-weight:700;color:${_tifiGetKey()?'var(--green)':'var(--hint)'};">${_tifiGetKey()?'активен ✓':'настроить →'}</div>
     </div>
     <!-- Calories -->
     <div class="hb-card" onclick="goToTrackTab('cal')">
@@ -5740,6 +5880,183 @@ document.addEventListener('DOMContentLoaded',async()=>{
   // Предзагрузка камеры при первом касании кнопки сканера
   document.querySelector('[onclick*="pp-scanner"]')?.addEventListener('touchstart',_prewarmCamera,{once:true,passive:true});
 });
+
+/* ══════════════════════════════════════
+   ТИФИ — управление ключом
+══════════════════════════════════════ */
+
+/* ── helpers ── */
+function _tifiMaskKey(k){
+  if(!k||k.length<8)return k;
+  return k.slice(0,8)+'•••••••••'+k.slice(-4);
+}
+function _tifiGetKey(){return lsGet('groq_key')||'';}
+function _tifiSetKey(k){lsSet('groq_key',k);}
+
+/* ── обновить статус-карточку ── */
+function _tifiUpdateStatusCard(state){
+  const dot=document.getElementById('tifi-status-dot');
+  const title=document.getElementById('tifi-status-title');
+  const sub=document.getElementById('tifi-status-sub');
+  if(!dot)return;
+  const states={
+    empty:   {bg:'var(--hint)',  t:'ключ не добавлен',     s:'вставь ключ Groq чтобы активировать тифи'},
+    ok:      {bg:'var(--green)', t:'тифи активен ✓',       s:'AI подключён и готов к работе'},
+    invalid: {bg:'var(--red)',   t:'ключ не подходит',     s:'проверь правильность ключа и попробуй снова'},
+    checking:{bg:'var(--sun)',   t:'проверяю ключ…',       s:'соединяюсь с сервером Groq'},
+  };
+  const s=states[state]||states.empty;
+  dot.style.background=s.bg;
+  title.textContent=s.t;
+  sub.textContent=s.s;
+}
+
+/* ── обновить подпись в списке pp-other ── */
+function _tifiUpdateOtherStatus(){
+  const el=document.getElementById('pp-other-tifi-status');
+  if(!el)return;
+  const k=_tifiGetKey();
+  el.textContent=k?'AI · ключ добавлен':'AI · ключ не добавлен';
+}
+
+/* ── открытие экрана pp-tifi-key (вызывается через _populatePP) ── */
+function _populateTifiKey(){
+  const k=_tifiGetKey();
+  const savedWrap=document.getElementById('tifi-key-saved-wrap');
+  const maskedDisplay=document.getElementById('tifi-key-masked-display');
+  const checkRow=document.getElementById('tifi-check-row');
+  /* сброс UI */
+  if(checkRow)checkRow.style.display='none';
+  if(k){
+    _tifiUpdateStatusCard('ok');
+    if(savedWrap)savedWrap.style.display='block';
+    if(maskedDisplay)maskedDisplay.textContent=_tifiMaskKey(k);
+  } else {
+    _tifiUpdateStatusCard('empty');
+    if(savedWrap)savedWrap.style.display='none';
+  }
+}
+
+/* ── удалить ключ ── */
+function tifiDeleteKey(){
+  _tifiSetKey('');
+  const savedWrap=document.getElementById('tifi-key-saved-wrap');
+  const checkRow=document.getElementById('tifi-check-row');
+  if(savedWrap)savedWrap.style.display='none';
+  if(checkRow)checkRow.style.display='none';
+  _tifiUpdateStatusCard('empty');
+  _tifiUpdateOtherStatus();
+  tg?.HapticFeedback?.notificationOccurred('success');
+}
+
+/* ── legacy stubs ── */
+function tifiKeyOnInput(){}
+async function tifiSaveKey(){}
+function _tifiShowCheckResult(ok,msg){
+  const checkRow=document.getElementById('tifi-check-row');
+  const checkSpinner=document.getElementById('tifi-check-spinner');
+  const checkIcon=document.getElementById('tifi-check-icon');
+  const checkText=document.getElementById('tifi-check-text');
+  if(!checkRow)return;
+  checkRow.style.display='flex';
+  if(checkSpinner)checkSpinner.style.display='none';
+  if(checkIcon){
+    checkIcon.style.display='block';
+    checkIcon.textContent=ok?'✓':'✗';
+    checkIcon.style.color=ok?'var(--green)':'var(--red)';
+  }
+  if(checkText){
+    checkText.textContent=msg||'';
+    checkText.style.color=ok?'var(--green)':'var(--red)';
+  }
+  checkRow.style.background=ok?'rgba(82,193,119,.08)':'rgba(244,92,92,.08)';
+  checkRow.style.borderColor=ok?'rgba(82,193,119,.2)':'rgba(244,92,92,.2)';
+}
+
+/* ── вставить и автоматически проверить ── */
+async function tifiPasteKey(){
+  let key='';
+  try{
+    const text=await navigator.clipboard.readText();
+    key=(text||'').trim();
+  }catch(e){
+    /* clipboard недоступен — показываем нативный prompt */
+    const entered=prompt('Вставьте ключ Groq:');
+    key=(entered||'').trim();
+  }
+  if(!key||key.length<10){
+    _tifiShowCheckResult(false,'буфер пустой или ключ слишком короткий');
+    return;
+  }
+  await _tifiDoVerify(key);
+}
+
+/* ── основная логика проверки и сохранения ── */
+async function _tifiDoVerify(key){
+  const checkRow=document.getElementById('tifi-check-row');
+  const checkSpinner=document.getElementById('tifi-check-spinner');
+  const checkIcon=document.getElementById('tifi-check-icon');
+  const checkText=document.getElementById('tifi-check-text');
+  const pasteBtn=document.getElementById('tifi-paste-btn');
+
+  /* показываем состояние проверки */
+  if(checkRow){checkRow.style.display='flex';checkRow.style.background='var(--bg3)';checkRow.style.borderColor='var(--brd)';}
+  if(checkSpinner){checkSpinner.style.display='block';}
+  if(checkIcon){checkIcon.style.display='none';}
+  if(checkText){checkText.textContent='проверяю ключ…';checkText.style.color='var(--text)';}
+  if(pasteBtn){pasteBtn.style.opacity='.5';pasteBtn.style.pointerEvents='none';}
+  _tifiUpdateStatusCard('checking');
+  tg?.HapticFeedback?.selectionChanged();
+
+  let ok=false;
+  let networkErr=false;
+  try{
+    const resp=await fetch('https://api.groq.com/openai/v1/models',{
+      method:'GET',
+      headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json'},
+      signal:AbortSignal.timeout(10000),
+    });
+    if(resp.ok){ok=true;}
+    else if(resp.status===401||resp.status===403){ok=false;}
+    else{networkErr=true;} /* другие статусы — считаем сетевой сбой */
+  }catch(e){
+    networkErr=true; /* CORS, fetch blocked, timeout — сохраняем ключ без проверки */
+  }
+
+  /* восстанавливаем кнопку */
+  if(pasteBtn){pasteBtn.style.opacity='';pasteBtn.style.pointerEvents='';}
+
+  if(ok){
+    _tifiSetKey(key);
+    _tifiFinalizeKeyUI(key);
+    _tifiShowCheckResult(true,'ключ подтверждён — тифи активирован ✓');
+    tg?.HapticFeedback?.notificationOccurred('success');
+  }else if(networkErr){
+    /* сеть недоступна / CORS — сохраняем, предупреждаем */
+    _tifiSetKey(key);
+    _tifiFinalizeKeyUI(key);
+    _tifiShowCheckResult(true,'ключ сохранён (проверка в браузере недоступна)');
+    tg?.HapticFeedback?.notificationOccurred('success');
+  }else{
+    _tifiUpdateStatusCard('invalid');
+    _tifiShowCheckResult(false,'ключ не подошёл — проверь и попробуй снова');
+    tg?.HapticFeedback?.notificationOccurred('error');
+  }
+}
+
+/* ── обновить UI после сохранения ── */
+function _tifiFinalizeKeyUI(key){
+  const savedWrap=document.getElementById('tifi-key-saved-wrap');
+  const maskedDisplay=document.getElementById('tifi-key-masked-display');
+  if(savedWrap)savedWrap.style.display='block';
+  if(maskedDisplay)maskedDisplay.textContent=_tifiMaskKey(key);
+  _tifiUpdateStatusCard('ok');
+  _tifiUpdateOtherStatus();
+}
+
+/* ── legacy stubs ── */
+function tifiKeyOnInput(){}
+async function tifiSaveKey(){}
 </script>
 
 <!-- ── AVATAR CROP SCREEN ── -->
