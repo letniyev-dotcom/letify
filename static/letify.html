@@ -1698,29 +1698,152 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tifi-home-btn:active{transform:scale(0.975) translateZ(0);}
 
 
-/* ── loading — segment style ── */
+/* ── loading — TERMINAL style ── */
 #tifi-loading{
   position:absolute;inset:0;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:0 28px 60px;
-  transition:opacity .4s ease;z-index:20;
-  background:#0A0A0C;
+  display:flex;flex-direction:column;
+  padding:12px 14px 14px;
+  transition:opacity .45s ease;
+  z-index:20;background:#0A0A0C;
+  min-height:0;
 }
-.tifi-load-segs{display:flex;gap:4px;width:100%;margin-bottom:34px}
-.tifi-load-seg{flex:1;height:3px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
-.tifi-load-seg-fill{height:100%;width:0%;border-radius:99px;transition:width .55s ease}
-.tifi-load-title{font-size:28px;font-weight:900;letter-spacing:-.04em;margin-bottom:6px}
-.tifi-load-title span{background:linear-gradient(105deg,#FF6B35,#FFAB40);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.tifi-load-s{font-size:13px;font-weight:500;color:rgba(255,255,255,.3);text-align:center;line-height:1.5;transition:opacity .3s ease;margin-bottom:30px}
-.tifi-load-cats{width:100%;display:flex;flex-direction:column;gap:11px}
-.tifi-load-cat{display:flex;align-items:center;gap:11px}
-.tifi-load-cat-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.tifi-load-cat-name{font-size:12px;font-weight:700;color:rgba(255,255,255,.28);flex:1;transition:color .3s}
-.tifi-load-cat.done .tifi-load-cat-name{color:rgba(255,255,255,.72)}
-.tifi-load-cat-bar{flex:2;height:2px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden}
-.tifi-load-cat-fill{height:100%;width:0%;border-radius:99px;transition:width .55s ease}
-.tifi-load-cat-pct{font-size:10px;font-weight:700;color:rgba(255,255,255,.22);width:28px;text-align:right;flex-shrink:0;transition:color .3s}
-.tifi-load-cat.done .tifi-load-cat-pct{color:rgba(255,255,255,.45)}
+
+/* terminal window */
+.tl-term{
+  flex:1;min-height:0;
+  background:#0D0F0C;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:18px;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+
+/* mac-style top bar */
+.tl-bar{
+  display:flex;align-items:center;gap:8px;
+  padding:12px 14px 11px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  background:#0F110E;flex-shrink:0;
+}
+.tl-dots{display:flex;gap:5px}
+.tl-dot{width:9px;height:9px;border-radius:50%}
+.tl-bar-title{
+  flex:1;text-align:center;
+  font-size:10px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:rgba(255,255,255,.22);
+}
+.tl-bar-live{
+  font-size:10px;font-weight:700;color:#3DCC72;
+  letter-spacing:.02em;display:flex;align-items:center;gap:4px;
+}
+.tl-bar-live::before{
+  content:'';width:5px;height:5px;border-radius:50%;
+  background:currentColor;animation:tl-live-pulse 1.5s ease-in-out infinite;
+}
+@keyframes tl-live-pulse{0%,100%{opacity:.35}50%{opacity:1}}
+
+/* scrollable lines */
+.tl-lines{
+  flex:1;min-height:0;
+  overflow-y:auto;overflow-x:hidden;
+  padding:14px 14px 10px;
+  display:flex;flex-direction:column;gap:10px;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  position:relative;
+}
+.tl-lines::-webkit-scrollbar{display:none}
+/* top fade via sibling overlay — НЕ mask, т.к. webkit-mask на мобиле ломает grid детей */
+.tl-fade-top{
+  position:absolute;top:0;left:0;right:0;height:36px;
+  background:linear-gradient(to bottom,#0D0F0C 0%,transparent 100%);
+  pointer-events:none;z-index:2;flex-shrink:0;
+}
+
+.tl-line{
+  display:grid;
+  grid-template-columns:56px 18px 1fr;
+  column-gap:7px;
+  align-items:start;
+  width:100%;
+  opacity:0;transform:translateY(7px);
+  transition:opacity .25s ease,transform .25s ease;
+  flex-shrink:0;
+}
+.tl-line.show{opacity:1;transform:none}
+.tl-ts{
+  font-size:9px;font-weight:600;
+  color:rgba(255,255,255,.16);
+  margin-top:2px;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+  overflow:hidden;
+}
+.tl-pfx{
+  font-size:12px;font-weight:800;
+  margin-top:1px;
+  text-align:center;
+  overflow:hidden;
+}
+.tl-pfx-run{color:rgba(255,107,53,.85)}
+.tl-pfx-ok{color:rgba(61,204,114,.9)}
+.tl-pfx-info{color:rgba(78,174,229,.7)}
+.tl-pfx-ai{color:rgba(157,133,242,.85)}
+.tl-pfx-warn{color:rgba(255,171,64,.85)}
+.tl-txt{
+  font-size:13px;font-weight:500;line-height:1.45;
+  overflow-wrap:break-word;
+  word-break:break-word;
+  min-width:0;
+  color:rgba(255,255,255,.7);
+}
+.tl-txt.dim{color:rgba(255,255,255,.32)}
+.tl-txt.ok{color:rgba(61,204,114,.85)}
+.tl-txt.tl-ai{color:rgba(157,133,242,.8)}
+.tl-txt.warn{color:rgba(255,171,64,.8)}
+
+/* thinking indicator */
+.tl-thinking{
+  display:none;align-items:center;gap:9px;
+  padding:10px 14px;flex-shrink:0;
+  border-top:1px solid rgba(255,255,255,.04);
+  background:rgba(157,133,242,.04);
+  opacity:0;transition:opacity .3s ease;
+  min-height:0;
+}
+.tl-thinking.show{display:flex;opacity:1}
+.tl-think-pfx{font-size:12px;color:rgba(157,133,242,.8)}
+.tl-think-text{font-size:12px;color:rgba(157,133,242,.7);font-weight:500}
+.tl-think-cursor{
+  display:inline-block;width:2px;height:13px;
+  background:rgba(157,133,242,.75);border-radius:1px;
+  margin-left:3px;vertical-align:middle;
+  animation:tl-blink .8s step-end infinite;
+}
+@keyframes tl-blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* progress bar */
+.tl-progress{
+  padding:10px 14px 12px;flex-shrink:0;
+  border-top:1px solid rgba(255,255,255,.05);
+  background:#0D0F0C;
+}
+.tl-prog-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.tl-prog-lbl{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.18)}
+.tl-prog-pct{font-size:11px;font-weight:800;color:#FF6B35;letter-spacing:.02em}
+.tl-prog-track{height:3px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;position:relative}
+.tl-prog-fill{
+  height:100%;border-radius:99px;width:0%;
+  background:linear-gradient(90deg,#FF6B35,#FFAB40);
+  transition:width .65s cubic-bezier(.4,0,.2,1);
+  position:relative;
+}
+.tl-prog-fill::after{
+  content:'';position:absolute;right:-1px;top:50%;
+  width:5px;height:5px;border-radius:50%;
+  background:#FFAB40;transform:translateY(-50%);
+  box-shadow:0 0 6px rgba(255,171,64,.9);
+}
 
 /* ── focus carousel ── */
 #tifi-carousel{position:absolute;inset:0;opacity:0;transition:opacity .4s ease;pointer-events:none}
@@ -2414,40 +2537,37 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   <!-- Тело: всё контентное пространство ниже хедера -->
   <div id="tifi-body">
 
-    <!-- Loading: segment style -->
+    <!-- Loading: TERMINAL style -->
     <div id="tifi-loading">
-      <div class="tifi-load-segs">
-        <div class="tifi-load-seg"><div class="tifi-load-seg-fill" id="tlsf0" style="background:#FF8040"></div></div>
-        <div class="tifi-load-seg"><div class="tifi-load-seg-fill" id="tlsf1" style="background:#4EAEE5"></div></div>
-        <div class="tifi-load-seg"><div class="tifi-load-seg-fill" id="tlsf2" style="background:#3DCC72"></div></div>
-        <div class="tifi-load-seg"><div class="tifi-load-seg-fill" id="tlsf3" style="background:#9D85F2"></div></div>
-      </div>
-      <div class="tifi-load-title"><span>тифи</span></div>
-      <div class="tifi-load-s" id="tifi-load-status">собираю данные о тебе</div>
-      <div class="tifi-load-cats">
-        <div class="tifi-load-cat" id="tlc0">
-          <div class="tifi-load-cat-dot" style="background:#FF8040"></div>
-          <div class="tifi-load-cat-name">советы</div>
-          <div class="tifi-load-cat-bar"><div class="tifi-load-cat-fill" id="tlcf0" style="background:#FF8040"></div></div>
-          <div class="tifi-load-cat-pct" id="tlcp0">0%</div>
+      <div class="tl-term">
+        <!-- mac bar -->
+        <div class="tl-bar">
+          <div class="tl-dots">
+            <div class="tl-dot" style="background:#F45C5C"></div>
+            <div class="tl-dot" style="background:#FFAB40"></div>
+            <div class="tl-dot" style="background:#3DCC72"></div>
+          </div>
+          <div class="tl-bar-title">тифи · ai анализ</div>
+          <div class="tl-bar-live" id="tl-live">live</div>
         </div>
-        <div class="tifi-load-cat" id="tlc1">
-          <div class="tifi-load-cat-dot" style="background:#4EAEE5"></div>
-          <div class="tifi-load-cat-name">питание</div>
-          <div class="tifi-load-cat-bar"><div class="tifi-load-cat-fill" id="tlcf1" style="background:#4EAEE5"></div></div>
-          <div class="tifi-load-cat-pct" id="tlcp1">0%</div>
+        <!-- scrollable log -->
+        <div class="tl-lines" id="tl-lines">
+          <div class="tl-fade-top"></div>
         </div>
-        <div class="tifi-load-cat" id="tlc2">
-          <div class="tifi-load-cat-dot" style="background:#3DCC72"></div>
-          <div class="tifi-load-cat-name">активность</div>
-          <div class="tifi-load-cat-bar"><div class="tifi-load-cat-fill" id="tlcf2" style="background:#3DCC72"></div></div>
-          <div class="tifi-load-cat-pct" id="tlcp2">0%</div>
+        <!-- thinking -->
+        <div class="tl-thinking" id="tl-thinking">
+          <div class="tl-think-pfx">◆</div>
+          <div class="tl-think-text">groq генерирует карточки<span class="tl-think-cursor"></span></div>
         </div>
-        <div class="tifi-load-cat" id="tlc3">
-          <div class="tifi-load-cat-dot" style="background:#9D85F2"></div>
-          <div class="tifi-load-cat-name">сон</div>
-          <div class="tifi-load-cat-bar"><div class="tifi-load-cat-fill" id="tlcf3" style="background:#9D85F2"></div></div>
-          <div class="tifi-load-cat-pct" id="tlcp3">0%</div>
+        <!-- progress -->
+        <div class="tl-progress">
+          <div class="tl-prog-row">
+            <span class="tl-prog-lbl">прогресс</span>
+            <span class="tl-prog-pct" id="tl-pct">0%</span>
+          </div>
+          <div class="tl-prog-track">
+            <div class="tl-prog-fill" id="tl-fill"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -6974,7 +7094,7 @@ async function _tifiRequestMidDayCard(timeLabel){
   }catch(e){/* silent */}
 }
 
-/* ── запуск тифи-экрана ── */
+/* ── запуск тифи-экрана — TERMINAL ── */
 async function tifiStartScreen(){
   const ldg=document.getElementById('tifi-loading');
   const car=document.getElementById('tifi-carousel');
@@ -6983,73 +7103,99 @@ async function tifiStartScreen(){
   const myToken=++_tifiToken;
   const alive=()=>(myToken===_tifiToken)&&document.getElementById('pp-tifi')?.classList.contains('open');
 
+  // show loading, hide carousel
   ldg.style.display='flex';ldg.style.opacity='1';
   car.classList.remove('visible');car.style.pointerEvents='';
   tifiCur=0;tifiLoaded=false;
 
-  // Reset loading UI
-  [0,1,2,3].forEach(i=>{
-    const sf=document.getElementById('tlsf'+i);const cf=document.getElementById('tlcf'+i);
-    const cp=document.getElementById('tlcp'+i);const lc=document.getElementById('tlc'+i);
-    if(sf)sf.style.width='0%';if(cf)cf.style.width='0%';
-    if(cp)cp.textContent='0%';if(lc)lc.classList.remove('done');
-  });
-  const statusEl=document.getElementById('tifi-load-status');
-  if(statusEl)statusEl.textContent='собираю данные о тебе';
+  // reset terminal UI
+  const linesEl=document.getElementById('tl-lines');
+  const fillEl=document.getElementById('tl-fill');
+  const pctEl=document.getElementById('tl-pct');
+  const thinkEl=document.getElementById('tl-thinking');
+  const liveEl=document.getElementById('tl-live');
+  if(linesEl)linesEl.innerHTML='';
+  if(fillEl)fillEl.style.width='0%';
+  if(pctEl)pctEl.textContent='0%';
+  if(thinkEl){thinkEl.classList.remove('show');thinkEl.style.display='none';}
+  if(liveEl){liveEl.textContent='live';liveEl.style.color='#3DCC72';}
 
-  // Animate loading categories with rAF counters
-  const catDefs=[
-    {delay:0,   dur:700, idx:0, segIdx:0},
-    {delay:300, dur:900, idx:1, segIdx:1},
-    {delay:700, dur:700, idx:2, segIdx:2},
-    {delay:1000,dur:800, idx:3, segIdx:3}
-  ];
-  const _ldgTimers=[];
+  // helpers
+  function tlTs(){
+    const d=new Date();
+    return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0')+':'+d.getSeconds().toString().padStart(2,'0');
+  }
+  function tlAddLine(pfx,pfxCls,txt,txtCls){
+    if(!linesEl||!alive())return;
+    const row=document.createElement('div');
+    row.className='tl-line';
+    // inline-стиль — страховка если CSS класс не применился (мобильный Chrome quirk)
+    row.style.cssText='display:grid;grid-template-columns:56px 18px 1fr;column-gap:7px;align-items:start;width:100%;flex-shrink:0;opacity:0;transition:opacity .25s ease,transform .25s ease;transform:translateY(7px)';
 
-  function _animCatPct(idx,dur,startMs){
-    function step(ts){
-      if(!alive())return;
-      const prog=Math.min((ts-startMs)/dur,1);
-      const val=Math.round(prog*100);
-      const cf=document.getElementById('tlcf'+idx);
-      const cp=document.getElementById('tlcp'+idx);
-      if(cf)cf.style.width=val+'%';
-      if(cp)cp.textContent=val+'%';
-      if(prog<1)requestAnimationFrame(step);
-      else{const lc=document.getElementById('tlc'+idx);if(lc)lc.classList.add('done');}
-    }
-    requestAnimationFrame(step);
+    const ts=document.createElement('div');
+    ts.className='tl-ts';
+    ts.textContent=tlTs();
+
+    const px=document.createElement('div');
+    px.className='tl-pfx '+(pfxCls||'');
+    px.textContent=pfx;
+
+    const tx=document.createElement('div');
+    tx.className='tl-txt'+(txtCls?' '+txtCls:'');
+    tx.textContent=txt;
+
+    row.appendChild(ts);
+    row.appendChild(px);
+    row.appendChild(tx);
+    linesEl.appendChild(row);
+    setTimeout(()=>{
+      row.style.opacity='1';
+      row.style.transform='none';
+      linesEl.scrollTop=linesEl.scrollHeight;
+    },30);
+  }
+  function tlSetPct(val){
+    if(fillEl)fillEl.style.width=val+'%';
+    if(pctEl)pctEl.textContent=val+'%';
   }
 
-  catDefs.forEach(cat=>{
-    const t=setTimeout(()=>{
-      if(!alive())return;
-      const sf=document.getElementById('tlsf'+cat.segIdx);
-      if(sf)sf.style.width='100%';
-      _animCatPct(cat.idx,cat.dur,performance.now());
-    },cat.delay);
-    _ldgTimers.push(t);
-  });
+  const _timers=[];
+  const _t=(fn,ms)=>{const id=setTimeout(fn,ms);_timers.push(id);return id;};
+  const _killTimers=()=>_timers.forEach(clearTimeout);
 
-  // Status text changes
-  const statusSteps=[
-    {delay:400, t:'анализирую питание'},
-    {delay:900, t:'смотрю активность и сон'},
-    {delay:1500,t:'запрос к Groq AI'},
-    {delay:2100,t:'создаю карточки'},
+  // --- Phase 1: scripted log lines (timing aligns with real API call) ---
+  const phase1=[
+    {delay:0,    pfx:'▸', cls:'tl-pfx-run',  txt:'инициализация анализа данных',   tCls:'',    pct:5},
+    {delay:450,  pfx:'▸', cls:'tl-pfx-run',  txt:'читаю профиль пользователя...',  tCls:'',    pct:12},
+    {delay:900,  pfx:'✓', cls:'tl-pfx-ok',   txt:'профиль загружен',               tCls:'ok',  pct:20},
+    {delay:1300, pfx:'▸', cls:'tl-pfx-run',  txt:'анализирую питание и воду',      tCls:'',    pct:32},
+    {delay:1750, pfx:'i', cls:'tl-pfx-info', txt:'питание · вода · последние 7 дней', tCls:'dim', pct:44},
+    {delay:2150, pfx:'▸', cls:'tl-pfx-run',  txt:'смотрю активность и сон',        tCls:'',    pct:56},
+    {delay:2600, pfx:'✓', cls:'tl-pfx-ok',   txt:'данные собраны',                 tCls:'ok',  pct:68},
+    {delay:3000, pfx:'◆', cls:'tl-pfx-ai',   txt:'отправляю запрос groq api',      tCls:'tl-ai',  pct:78},
   ];
-  statusSteps.forEach(s=>{
-    const t=setTimeout(()=>{
-      if(!alive()||!statusEl)return;
-      statusEl.style.opacity='0';
-      setTimeout(()=>{if(statusEl&&alive()){statusEl.textContent=s.t;statusEl.style.opacity='1';}},180);
+
+  phase1.forEach(s=>{
+    _t(()=>{
+      if(!alive())return;
+      tlSetPct(s.pct);
+      tlAddLine(s.pfx,s.cls,s.txt,s.tCls);
     },s.delay);
-    _ldgTimers.push(t);
   });
 
+  // thinking indicator appears at 3.4s
+  _t(()=>{
+    if(alive()&&thinkEl){
+      thinkEl.style.display='';   // clear inline override
+      thinkEl.classList.add('show');
+    }
+    tlSetPct(82);
+  },3400);
+
+  // --- Kick off real API call in parallel ---
   const apiKey=_tifiGetKey();
   const userData=_tifiGetUserData();
-  const minDelay=new Promise(r=>setTimeout(r,2600));
+  const minDelay=new Promise(r=>setTimeout(r,3800)); // minimum visible time
   let apiResult=null,apiError=null;
 
   try{
@@ -7060,37 +7206,46 @@ async function tifiStartScreen(){
   }catch(e){apiError=e;}
 
   await minDelay;
-  _ldgTimers.forEach(t=>clearTimeout(t));
+  _killTimers();
 
   if(!alive()){
     if(apiResult){tifiCards=apiResult;tifiLoaded=true;}
     return;
   }
 
+  // hide thinking — убираем немедленно, не ждём transition
+  if(thinkEl){thinkEl.classList.remove('show');thinkEl.style.display='none';}
+
   if(apiError&&!apiResult){
-    if(statusEl)statusEl.textContent='ошибка соединения';
+    // error path
     const isKey=apiError.message&&(apiError.message.toLowerCase().includes('invalid api key')||apiError.message.toLowerCase().includes('401'));
-    if(isKey&&statusEl){statusEl.innerHTML='неверный ключ · <span style="color:#FF8040;cursor:pointer" onclick="popPage();setTimeout(()=>{pushPage(\'pp-tifi-key\');_populateTifiKey();},280)">изменить</span>';}
+    tlSetPct(100);
+    if(liveEl){liveEl.textContent='error';liveEl.style.color='#F45C5C';}
+    if(isKey){
+      tlAddLine('✗','tl-pfx-warn','неверный ключ groq api','warn');
+      tlAddLine('→','tl-pfx-info','нажми изменить в заголовке','dim');
+    }else{
+      tlAddLine('✗','tl-pfx-warn','ошибка соединения · использую кэш','warn');
+    }
     tifiCards=_tifiGetCards();
-    await new Promise(r=>setTimeout(r,isKey?2000:1400));
+    await new Promise(r=>setTimeout(r,isKey?2200:1600));
   }else{
+    // success path
     tifiCards=apiResult;
-    if(statusEl){statusEl.style.opacity='0';setTimeout(()=>{if(statusEl)statusEl.textContent='готово';statusEl.style.opacity='1';},180);}
+    const n=Array.isArray(tifiCards)?tifiCards.length:0;
+    tlAddLine('✓','tl-pfx-ok',`получен ответ groq api`,'ok');
+    tlSetPct(90);
+    await new Promise(r=>setTimeout(r,320));
+    if(!alive())return;
+    tlAddLine('✓','tl-pfx-ok',`${n} карточек создано · готово`,'ok');
+    tlSetPct(100);
+    if(liveEl){liveEl.textContent='done';liveEl.style.color='#3DCC72';}
+    await new Promise(r=>setTimeout(r,480));
   }
 
   if(!alive())return;
 
-  // Ensure all segments reach 100% visually
-  [0,1,2,3].forEach(i=>{
-    const sf=document.getElementById('tlsf'+i);const cf=document.getElementById('tlcf'+i);
-    const cp=document.getElementById('tlcp'+i);const lc=document.getElementById('tlc'+i);
-    if(sf)sf.style.width='100%';if(cf)cf.style.width='100%';
-    if(cp)cp.textContent='100%';if(lc)lc.classList.add('done');
-  });
-
-  await new Promise(r=>setTimeout(r,420));
-  if(!alive())return;
-
+  // fade out terminal, show carousel
   ldg.style.opacity='0';
   setTimeout(()=>{
     if(!alive())return;
@@ -7098,9 +7253,8 @@ async function tifiStartScreen(){
     tifiBuildCarousel();
     car.classList.add('visible');
     tifiLoaded=true;
-    // Schedule mid-day cards after initial load
     _tifiScheduleMidday();
-  },350);
+  },380);
 }
 
 /* вызывается из _populatePP */
