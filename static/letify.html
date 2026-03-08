@@ -1683,7 +1683,8 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 #pp-tifi .pp-subtitle{color:rgba(255,255,255,.35)}
 #pp-tifi .pp-back{background:rgba(255,255,255,.08) !important;color:#F5F4F2 !important}
 /* Content area below header */
-#tifi-body{flex:1;min-height:0;position:relative;overflow:hidden;background:#0A0A0C}
+#tifi-body{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;background:#0A0A0C;padding:12px 14px calc(var(--sb,0px) + 24px)}
+#tifi-body::-webkit-scrollbar{display:none}
 .tifi-cc-custom-badge{font-size:8px}
 
 /* ── кнопка тифи на главном — без shimmer-анимации (вызывает постоянные GPU repaints) ── */
@@ -1846,47 +1847,29 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 }
 
 /* ── focus carousel ── */
-#tifi-carousel{position:absolute;inset:0;opacity:0;transition:opacity .4s ease;pointer-events:none}
+#tifi-carousel{display:flex;flex-direction:column;gap:12px;opacity:0;transition:opacity .4s ease;pointer-events:none}
 #tifi-carousel.visible{opacity:1;pointer-events:all}
-/* progress segments at top */
-.tifi-prog{display:flex;gap:3px;padding:10px 16px 0;position:absolute;top:0;left:0;right:0;z-index:8}
-.tifi-prog-seg{flex:1;height:2px;border-radius:99px;background:rgba(255,255,255,.09);overflow:hidden}
-.tifi-prog-fill{height:100%;border-radius:99px;width:0%;transition:width .18s ease}
-/* cat label row */
-.tifi-cat-row{position:absolute;top:20px;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:0 18px;z-index:8;pointer-events:none}
-.tifi-cat-lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.3);transition:color .18s}
-.tifi-cat-cnt{font-size:10px;font-weight:700;color:rgba(255,255,255,.25)}
-/* card stage */
-.tifi-ctrack-vp{position:absolute;top:40px;left:0;right:0;bottom:46px;overflow:hidden}
-/* Cards — instant swap */
+/* progress segments — hidden in vertical layout */
+.tifi-prog{display:none}
+.tifi-prog-seg,.tifi-prog-fill{display:none}
+/* cat label row — hidden in vertical layout */
+.tifi-cat-row{display:none}
+.tifi-cat-lbl,.tifi-cat-cnt{display:none}
+/* card stage — vertical flow */
+.tifi-ctrack-vp{display:contents}
+/* Cards — vertical flow, auto height */
 .tifi-ccard{
-  position:absolute;top:0;bottom:0;left:14px;right:14px;
+  position:relative;
   border-radius:22px;overflow:hidden;
   display:flex;flex-direction:column;
-  will-change:transform,opacity;
-  backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  min-height:260px;
 }
-.tifi-ccard.state-current{transform:translate3d(0,0,0);opacity:1;z-index:3}
-.tifi-ccard.state-prev{transform:translate3d(-106%,0,0);opacity:0;z-index:1}
-.tifi-ccard.state-next{transform:translate3d(106%,0,0);opacity:0;z-index:1}
-/* dots at bottom */
-.tifi-cdots{
-  position:absolute;bottom:26px;left:0;right:0;
-  display:flex;justify-content:center;align-items:center;gap:4px;z-index:8;padding:0 20px;flex-wrap:wrap;
-}
-.tifi-cdot{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.14);transition:width .18s,background .18s,border-radius .18s;flex-shrink:0}
-.tifi-cdot.on{width:14px;border-radius:2px}
-/* counter */
-.tifi-counter-pill{
-  position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
-  font-size:10px;font-weight:700;letter-spacing:.03em;
-  color:rgba(255,255,255,.22);
-  white-space:nowrap;
-  pointer-events:none;z-index:10;
-  white-space:nowrap;
-}
+/* state classes — no-op in vertical layout */
+.tifi-ccard.state-current,.tifi-ccard.state-prev,.tifi-ccard.state-next{transform:none;opacity:1;z-index:auto}
+/* dots and counter — hidden in vertical layout */
+.tifi-cdots,.tifi-counter-pill{display:none !important}
 
-.tifi-cc-scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.tifi-cc-scroll{flex:1;overflow:visible}
 .tifi-cc-scroll::-webkit-scrollbar{display:none}
 .tifi-cc-body{padding:20px;display:flex;flex-direction:column;position:relative;z-index:1}
 .tifi-cc-counter{position:absolute;top:14px;right:14px;font-size:11px;font-weight:800;color:rgba(255,255,255,.22);z-index:4;pointer-events:none}
@@ -1900,6 +1883,22 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tifi-cc-purple{background:#131020;border:1px solid rgba(157,133,242,.11)}
 .tifi-cc-orange{background:#181008;border:1px solid rgba(var(--sun-rgb),.11)}
 .tifi-cc-teal{background:#0E1A1A;border:1px solid rgba(61,204,114,.10)}
+.tifi-cc-score{background:#0C0F0C;border:1px solid rgba(61,204,114,.14)}
+.tifi-cc-score-wrap{display:flex;align-items:flex-end;gap:16px;margin-top:8px}
+.tifi-cc-score-num{font-size:58px;font-weight:900;letter-spacing:-.05em;line-height:1}
+.tifi-cc-score-metrics{flex:1;display:flex;flex-direction:column;gap:7px;padding-bottom:6px}
+.tifi-cc-score-row{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11px;color:rgba(255,255,255,.38);font-weight:600}
+.tifi-cc-score-row span:first-child{flex-shrink:0;min-width:56px}
+.tifi-cc-score-row span:last-child{flex-shrink:0;white-space:nowrap}
+.tifi-cc-score-bar{height:3px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden;margin-top:2px}
+.tifi-cc-score-bar-f{height:100%;border-radius:99px}
+.tifi-cc-insight-glow{position:absolute;top:-20px;right:-20px;width:130px;height:130px;border-radius:50%;filter:blur(35px);pointer-events:none;z-index:0}
+/* filter row — removed */
+.tifi-filter-row{display:none !important}
+.tifi-filter-row::-webkit-scrollbar{display:none}
+.tifi-fchip{flex-shrink:0;padding:6px 12px;border-radius:10px;font-size:11px;font-weight:700;letter-spacing:-.01em;border:1px solid;cursor:pointer;display:flex;align-items:center;gap:5px;-webkit-tap-highlight-color:transparent;transition:opacity .12s}
+.tifi-fchip:active{opacity:.75}
+.tifi-fchip svg{width:12px;height:12px;flex-shrink:0}
 
 /* tags */
 .tifi-cc-tag{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:6px;margin-bottom:14px;align-self:flex-start;flex-shrink:0}
@@ -1959,12 +1958,8 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tifi-cc-scroll{display:flex;flex-direction:column}
 .tifi-cc-body{flex:1}
 /* нижний фейд для карточек — маскирует пустое пространство */
-.tifi-ccard::after{
-  content:'';pointer-events:none;z-index:2;
-  position:absolute;left:0;right:0;bottom:0;height:80px;
-  background:linear-gradient(to top,rgba(0,0,0,.35),transparent);
-  border-radius:0 0 24px 24px;
-}
+/* bottom fade removed — cards are auto-height in vertical layout */
+.tifi-ccard::after{display:none}
 .tifi-ccard.cc-divider::after{display:none}
 
 /* ── divider card ── */
@@ -1973,6 +1968,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   align-items:center;justify-content:center;
   overflow:hidden;cursor:default;
   background:#0E0E10;border:1px solid rgba(255,255,255,.06);
+  min-height:100px !important;
 }
 .tifi-div-bg{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none}
 
@@ -2049,26 +2045,11 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 /* ── ключ ввод (pp-tifi-key) ── */
 .tifi-key-input-lbl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--hint);margin-bottom:5px}
-.tifi-key-input-wrap{
-  position:relative;border-radius:13px;overflow:hidden;
-}
-.tifi-key-input-wrap::before,.tifi-key-input-wrap::after{
-  content:'';position:absolute;top:0;bottom:0;width:52px;z-index:2;pointer-events:none;
-  transition:opacity .2s;
-}
-.tifi-key-input-wrap::before{
-  left:0;
-  background:linear-gradient(to right, var(--bg) 0%, transparent 100%);
-}
-.tifi-key-input-wrap::after{
-  right:0;
-  background:linear-gradient(to left, var(--bg) 0%, transparent 100%);
-}
 .tifi-key-input{
-  width:100%;padding:14px;border-radius:13px;
+  width:100%;padding:14px 4px;border-radius:13px;
   background:var(--bg3);border:1.5px solid rgba(255,255,255,.07);
   color:var(--text);font-family:monospace;font-size:13px;font-weight:600;
-  outline:none;-webkit-appearance:none;letter-spacing:.03em;
+  outline:none;-webkit-appearance:none;letter-spacing:0;
   transition:border-color .2s,background .2s;
   user-select:text;-webkit-user-select:text;
 }
@@ -2511,9 +2492,11 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
         </div>
       </div>
       <div id="tifi-key-field-block">
-        <button class="tifi-key-save-btn ready" id="tifi-key-save-btn" onclick="tifiSaveKeyAndOpen()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-          вставить ключ из буфера
+        <div class="tifi-key-input-lbl">API ключ Groq</div>
+        <input class="tifi-key-input" id="tifi-key-input" type="text" placeholder="gsk_..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="tifiOnKeyInput(this)">
+        <button class="tifi-key-save-btn" id="tifi-key-save-btn" onclick="tifiSaveKeyAndOpen()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          сохранить и открыть тифи
         </button>
       </div>
     </div>
@@ -2585,21 +2568,10 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       </div>
     </div>
 
-    <!-- Focus carousel -->
+    <!-- Vertical card list -->
     <div id="tifi-carousel">
-      <!-- progress segments (one per card) -->
-      <div class="tifi-prog" id="tifi-prog"></div>
-      <!-- cat label + in-category counter -->
-      <div class="tifi-cat-row">
-        <div class="tifi-cat-lbl" id="tifi-cat-lbl"></div>
-        <div class="tifi-cat-cnt" id="tifi-cat-cnt"></div>
-      </div>
-      <!-- card stage -->
+      <!-- card track — vertical flow -->
       <div class="tifi-ctrack-vp" id="tifi-ctrack"></div>
-      <!-- dots -->
-      <div class="tifi-cdots" id="tifi-cdots"></div>
-      <!-- page counter -->
-      <div class="tifi-counter-pill" id="tifi-counter">1 / 1</div>
     </div>
 
   </div><!-- /tifi-body -->
@@ -6368,6 +6340,13 @@ document.addEventListener('DOMContentLoaded',async()=>{
    ТИФИ — полная реализация
 ══════════════════════════════════════ */
 
+/* ── глобальные переменные тифи ── */
+let tifiLoaded   = false;   // true после успешной загрузки карточек
+let tifiCards    = [];       // массив карточек от API
+let tifiCur      = 0;        // индекс текущей карточки в карусели
+let tifiCardEls  = [];       // DOM-элементы карточек
+let _tifiToken   = 0;        // cancellation token для async tifiStartScreen
+
 function _tifiGetKey(){return lsGet('groq_key')||'';}
 function _tifiSetKey(k){lsSet('groq_key',k);}
 function _tifiMaskKey(k){if(!k||k.length<8)return k;return k.slice(0,8)+'•••••••••'+k.slice(-4);}
@@ -6401,6 +6380,7 @@ function _populateTifiKey(){
   const savedWrap=document.getElementById('tifi-key-saved-wrap');
   const fieldBlock=document.getElementById('tifi-key-field-block');
   const maskedDisplay=document.getElementById('tifi-key-masked-display');
+  const inp=document.getElementById('tifi-key-input');
   if(k){
     if(savedWrap)savedWrap.style.display='block';
     if(fieldBlock)fieldBlock.style.display='none';
@@ -6408,52 +6388,35 @@ function _populateTifiKey(){
   } else {
     if(savedWrap)savedWrap.style.display='none';
     if(fieldBlock)fieldBlock.style.display='';
+    if(inp){inp.value='';document.getElementById('tifi-key-save-btn')?.classList.remove('ready');}
   }
 }
 
-/* ── вставить ключ из буфера и открыть тифи ── */
-function tifiSaveKeyAndOpen(){
+/* ── input ── */
+function tifiOnKeyInput(inp){
   const btn=document.getElementById('tifi-key-save-btn');
+  if(btn){btn.classList.toggle('ready',inp.value.trim().length>10);}
+}
 
-  function _apply(k){
-    k=(k||'').trim();
-    if(!k||k.length<10){
-      if(btn){
-        const orig=btn.innerHTML;
-        btn.innerHTML='<span style="font-size:13px">в буфере нет ключа</span>';
-        setTimeout(()=>{btn.innerHTML=orig;},2000);
-      }
-      return;
-    }
-    _tifiSetKey(k);
-    _tifiUpdateOtherStatus();
-    tg?.HapticFeedback?.notificationOccurred('success');
-    popPage();
-    setTimeout(()=>{pushPage('pp-tifi');tifiStartScreen();},280);
-  }
-
-  // Telegram WebApp native API — без разрешений и без клавиатуры
-  if(window.Telegram?.WebApp?.readTextFromClipboard){
-    window.Telegram.WebApp.readTextFromClipboard(_apply);
-    return;
-  }
-
-  // fallback для браузера (если открыто вне Telegram)
-  if(navigator.clipboard?.readText){
-    navigator.clipboard.readText().then(_apply).catch(()=>{
-      if(btn){
-        const orig=btn.innerHTML;
-        btn.innerHTML='<span style="font-size:13px">открой в Telegram</span>';
-        setTimeout(()=>{btn.innerHTML=orig;},2000);
-      }
-    });
-    return;
-  }
+/* ── сохранить и открыть тифи ── */
+function tifiSaveKeyAndOpen(){
+  const inp=document.getElementById('tifi-key-input');
+  const k=(inp?.value||'').trim();
+  if(!k||k.length<10)return;
+  _tifiSetKey(k);
+  inp.value='';
+  document.getElementById('tifi-key-save-btn')?.classList.remove('ready');
+  _tifiUpdateOtherStatus();
+  tg?.HapticFeedback?.notificationOccurred('success');
+  popPage();
+  setTimeout(()=>{pushPage('pp-tifi');tifiStartScreen();},280);
 }
 
 /* ── удалить ключ ── */
 function tifiDeleteKey(){
   _tifiSetKey('');
+  tifiLoaded=false; // сбрасываем чтобы при следующем открытии запросило ключ
+  tifiCards=[];
   _populateTifiKey();
   _tifiUpdateOtherStatus();
   tg?.HapticFeedback?.notificationOccurred('success');
@@ -6573,8 +6536,8 @@ function _tifiGetUserData(){
 
 /* Нормализует ответ ИИ: исправляет префиксы классов, убирает неизвестные поля */
 function _tifiNormalizeCards(raw){
-  const VALID_TYPES=new Set(['tifi-cc-warm','tifi-cc-dark','tifi-cc-blue','tifi-cc-orange','tifi-cc-teal','tifi-cc-purple','tifi-cc-green']);
-  const TYPE_MAP={'warm':'tifi-cc-warm','dark':'tifi-cc-dark','blue':'tifi-cc-blue','orange':'tifi-cc-orange','teal':'tifi-cc-teal','purple':'tifi-cc-purple','green':'tifi-cc-green','cc-warm':'tifi-cc-warm','cc-dark':'tifi-cc-dark','cc-blue':'tifi-cc-blue','cc-orange':'tifi-cc-orange','cc-teal':'tifi-cc-teal','cc-purple':'tifi-cc-purple','cc-green':'tifi-cc-green'};
+  const VALID_TYPES=new Set(['tifi-cc-warm','tifi-cc-dark','tifi-cc-blue','tifi-cc-orange','tifi-cc-teal','tifi-cc-purple','tifi-cc-green','tifi-cc-score','tifi-cc-insight','tifi-cc-action','tifi-cc-forecast']);
+  const TYPE_MAP={'warm':'tifi-cc-warm','dark':'tifi-cc-dark','blue':'tifi-cc-blue','orange':'tifi-cc-orange','teal':'tifi-cc-teal','purple':'tifi-cc-purple','green':'tifi-cc-green','score':'tifi-cc-score','insight':'tifi-cc-insight','action':'tifi-cc-action','forecast':'tifi-cc-forecast','cc-warm':'tifi-cc-warm','cc-dark':'tifi-cc-dark','cc-blue':'tifi-cc-blue','cc-orange':'tifi-cc-orange','cc-teal':'tifi-cc-teal','cc-purple':'tifi-cc-purple','cc-green':'tifi-cc-green','cc-score':'tifi-cc-score','cc-insight':'tifi-cc-insight','cc-action':'tifi-cc-action','cc-forecast':'tifi-cc-forecast'};
   const TAG_MAP={'orange':'tifi-tag-orange','blue':'tifi-tag-blue','green':'tifi-tag-green','purple':'tifi-tag-purple','red':'tifi-tag-red','cc-tag-orange':'tifi-tag-orange','cc-tag-blue':'tifi-tag-blue','cc-tag-green':'tifi-tag-green','cc-tag-purple':'tifi-tag-purple','cc-tag-red':'tifi-tag-red'};
   const VALID_SVG=new Set(['moon','activity','droplet','droplets','sunrise','utensils','check','arrowRight','spark']);
   const result=[];
@@ -6602,8 +6565,12 @@ function _tifiNormalizeCards(raw){
     let todo=c.todo;
     if(Array.isArray(todo))todo=todo.filter(i=>i&&i.t).map(i=>({...i,svg:VALID_SVG.has(i.svg)?i.svg:'check',ico:i.ico||'bg:rgba(255,107,53,.14);color:var(--sun)'}));
     // Validate nums/macros/rows/chips/meals/bar/ingredients
+    // Normalize cat name
+    const CAT_REMAP={'overview':'обзор','score':'обзор','обзор дня':'обзор','insights':'инсайты','инсайт':'инсайты','паттерн':'инсайты','actions':'задачи','action':'задачи','action_plan':'задачи','план':'задачи','план дня':'задачи','forecast':'прогноз','прогноз дня':'прогноз','progress':'прогноз','nutrition':'питание','food':'питание','activity':'активность','sleep':'активность','tips':'советы'};
+    const rawCat=(c.cat||'инсайты').toLowerCase().trim();
+    const normCat=CAT_REMAP[rawCat]||c.cat||'инсайты';
     const card={
-      cat:c.cat||'советы',
+      cat:normCat,
       type:t,
       glow:c.glow===true,
       custom:true,
@@ -6620,6 +6587,9 @@ function _tifiNormalizeCards(raw){
     if(todo&&todo.length)card.todo=todo.slice(0,4);
     if(Array.isArray(c.meals)&&c.meals.length)card.meals=c.meals.slice(0,4).map(m=>({ico:String(m.ico||'🍽'),name:String(m.name||''),sub:String(m.sub||''),kcal:+(m.kcal||0),clr:m.clr||'var(--sun)'}));
     if(Array.isArray(c.ingredients))card.ingredients=c.ingredients.slice(0,6).map(String);
+    if(typeof c.score==='number')card.score=Math.min(100,Math.max(0,Math.round(c.score)));
+    if(c.score_clr)card.score_clr=c.score_clr;
+    if(Array.isArray(c.metrics)&&c.metrics.length)card.metrics=c.metrics.slice(0,4).map(m=>({l:String(m.l||''),v:String(m.v||''),w:Math.min(100,Math.max(0,+(m.w||0))),clr:m.clr||'#3DCC72'}));
     if(curDivider)result.push(curDivider);
     curDivider=null;
     result.push(card);
@@ -6645,38 +6615,42 @@ async function _tifiCallGroq(apiKey, userData){
   const u=userData;
   const goalWord=u.goalType==='lose'?'похудение':'набор массы';
 
-  // ── SYSTEM PROMPT — ТИФИ ГЛАВНЫЙ ТРЕНЕР ──
-  const systemPrompt=`Ты — ТИФИ, главный персональный тренер и наставник в фитнес-приложении letify. Ты не просто аналитик — ты тот, кто реально направляет человека к его цели, замечаешь детали, честен и мотивируешь. Говоришь на "ты", тепло но конкретно, без воды.
+  // ── SYSTEM PROMPT — концепт тифи 2.0 ──
+  const systemPrompt=`Ты — Тифи, персональный AI-аналитик в фитнес-приложении letify. Отвечаешь ТОЛЬКО валидным JSON массивом. Никаких объяснений, никакого markdown, никакого текста вне массива.
 
-Отвечаешь ТОЛЬКО валидным JSON-массивом. Никакого текста вне массива, никакого markdown.
+Создай нарратив дня из 7 карточек по 4 слоям: Обзор → Инсайты → Задачи → Прогноз.
 
-Создай 10 персональных карточек: 3 блока (советы 3шт, питание 4шт, активность 3шт), перед каждым — divider. Используй РЕАЛЬНЫЕ числа из данных. Будь честен — если план провален, скажи. Рацион — только доступные продукты российского рынка с высоким белком (курица, яйца, творог, гречка, рыба консервированная, бобовые).
+СЛОЙ 1 — ОБЗОР (1 карточка, cat:"обзор"):
+Скор 0-100 (считай из питания 35% + сон 35% + активность 30%). Карточка с большим числом.
+
+СЛОЙ 2 — ИНСАЙТЫ (3 карточки, cat:"инсайты"):
+Конкретные паттерны с реальными числами. Не "ты мало пьёшь" а "утром выпиваешь 20% нормы — паттерн 5 дней из 7".
+
+СЛОЙ 3 — ЗАДАЧИ (1 карточка, cat:"задачи"):
+Ровно 3 конкретных действия на сегодня. Каждое — с цветным dot-маркером.
+
+СЛОЙ 4 — ПРОГНОЗ (2 карточки, cat:"прогноз"):
+Тренд веса + прогноз достижения цели с конкретной датой.
 
 ТОЧНАЯ СХЕМА:
 [
-  {"divider":true,"cat":"советы","count":3},
-  {"cat":"советы","type":"warm","tag":{"cls":"orange","text":"инсайт дня"},"title":"заголовок до 55 символов","sub":"1-2 предложения конкретно и по делу","nums":[{"v":"74%","l":"план выполнен","clr":"#FF6B35"},{"v":"7дн","l":"серия"}]},
-  {"cat":"советы","type":"dark","tag":{"cls":"purple","text":"паттерны"},"title":"тифи заметил кое-что","sub":"твои поведенческие паттерны за неделю","list":[{"ico":"bg:rgba(157,133,242,.12);color:#9D85F2","svg":"moon","t":"заголовок","s":"конкретное наблюдение"},{"ico":"bg:rgba(61,204,114,.12);color:#3DCC72","svg":"activity","t":"заголовок","s":"конкретное наблюдение"},{"ico":"bg:rgba(78,174,229,.12);color:#4EAEE5","svg":"droplet","t":"заголовок","s":"конкретное наблюдение"}]},
-  {"cat":"советы","type":"dark","tag":{"cls":"orange","text":"совет тренера"},"title":"конкретный совет","sub":"почему это важно именно сейчас","chips":[{"t":"действие 1","cls":"accent"},{"t":"действие 2","cls":"accent"},{"t":"действие 3","cls":"accent"}]},
-  {"divider":true,"cat":"питание","count":4},
-  {"cat":"питание","type":"blue","tag":{"cls":"blue","text":"вода"},"title":"выпил X из Y мл","sub":"темп воды и рекомендация","bar":{"w":45,"clr":"linear-gradient(90deg,#4EAEE5,#38BDF8)"},"chips":[{"t":"нужно ускориться","cls":"warn"}]},
-  {"cat":"питание","type":"orange","tag":{"cls":"orange","text":"калории"},"title":"X из Y ккал","sub":"анализ питания за день","nums":[{"v":"X","l":"ккал съедено","clr":"#FF6B35"},{"v":"Y","l":"норма"}]},
-  {"cat":"питание","type":"teal","tag":{"cls":"green","text":"рацион"},"title":"план на сегодня","sub":"под норму X ккал · б Y г","meals":[{"ico":"🌅","name":"творог с бананом и мёдом","sub":"завтрак · 08:00","kcal":380,"clr":"#FF8040"},{"ico":"☀️","name":"куриная грудка с гречкой","sub":"обед · 13:00","kcal":520,"clr":"#4EAEE5"},{"ico":"🍎","name":"яйца вкрутую + огурец","sub":"перекус · 16:00","kcal":180,"clr":"#3DCC72"},{"ico":"🌙","name":"рыба запечённая с рисом","sub":"ужин · 19:00","kcal":480,"clr":"#9D85F2"}]},
-  {"cat":"питание","type":"purple","tag":{"cls":"purple","text":"белок"},"title":"белок: X г из Y г","sub":"белок — ключ к твоей цели","macros":[{"v":"X","l":"ккал","clr":"#9D85F2"},{"v":"Xг","l":"белок","clr":"#4EAEE5"},{"v":"Xг","l":"жиры"},{"v":"Xг","l":"углев","clr":"#3DCC72"}]},
-  {"divider":true,"cat":"активность","count":3},
-  {"cat":"активность","type":"purple","tag":{"cls":"purple","text":"сон"},"title":"X ч — оценка","sub":"анализ сна и влияние на цель","nums":[{"v":"X ч","l":"эта ночь","clr":"#9D85F2"},{"v":"Y ч","l":"средн. нед","clr":"#9D85F2"}]},
-  {"cat":"активность","type":"green","tag":{"cls":"green","text":"к цели"},"title":"до цели X недель","sub":"прогноз при текущем темпе","rows":[{"l":"сейчас","v":"X кг"},{"l":"цель","v":"Y кг","clr":"#3DCC72"},{"l":"темп","v":"-X кг/нед"},{"l":"прогноз","v":"~дата","clr":"#3DCC72"}]},
-  {"cat":"активность","type":"orange","tag":{"cls":"orange","text":"план тренера"},"title":"задачи на сегодня","sub":"выбрал тифи специально под тебя","todo":[{"ico":"bg:rgba(78,174,229,.14);color:#4EAEE5","svg":"droplets","t":"выпить X мл воды за день"},{"ico":"bg:rgba(255,128,64,.14);color:#FF8040","svg":"sunrise","t":"белковый завтрак до 10:00"},{"ico":"bg:rgba(61,204,114,.14);color:#3DCC72","svg":"activity","t":"30 мин активности сегодня"},{"ico":"bg:rgba(157,133,242,.14);color:#9D85F2","svg":"moon","t":"лечь до 23:00 — восстановление"}]}
+  { "cat": "обзор", "type": "score", "tag": { "cls": "green", "text": "обзор дня" }, "title": "хороший день", "sub": "из 100 · описание одной строкой", "score": 74, "score_clr": "#3DCC72", "metrics": [{"l":"питание","v":"68%","w":68,"clr":"#4EAEE5"},{"l":"активность","v":"90%","w":90,"clr":"#3DCC72"},{"l":"сон","v":"75%","w":75,"clr":"#9D85F2"}] },
+  { "cat": "инсайты", "type": "insight", "tag": { "cls": "purple", "text": "паттерн" }, "title": "конкретное наблюдение с числами", "sub": "почему это важно — 1-2 предложения", "rows": [{"l":"факт 1","v":"значение"},{"l":"факт 2","v":"значение","clr":"#3DCC72"},{"l":"факт 3","v":"значение","clr":"#F45C5C"}] },
+  { "cat": "инсайты", "type": "insight", "tag": { "cls": "blue", "text": "вода" }, "title": "название инсайта", "sub": "описание", "bar": {"w": 45, "clr": "linear-gradient(90deg,#4EAEE5,#38BDF8)"}, "chips": [{"t":"наблюдение","cls":"warn"}] },
+  { "cat": "инсайты", "type": "insight", "tag": { "cls": "orange", "text": "питание" }, "title": "название инсайта", "sub": "описание", "nums": [{"v":"X","l":"метрика 1","clr":"#FF6B35"},{"v":"Y","l":"метрика 2"}] },
+  { "cat": "задачи", "type": "action", "tag": { "cls": "orange", "text": "план тифи · сегодня" }, "title": "3 действия на сегодня", "sub": "подобрал под твой прогресс", "todo": [{"ico":"bg:rgba(78,174,229,.14);color:#4EAEE5","svg":"droplets","t":"конкретное действие 1"},{"ico":"bg:rgba(255,171,64,.14);color:#FFAB40","svg":"sunrise","t":"конкретное действие 2"},{"ico":"bg:rgba(61,204,114,.14);color:#3DCC72","svg":"activity","t":"конкретное действие 3"}] },
+  { "cat": "прогноз", "type": "forecast", "tag": { "cls": "blue", "text": "тренд веса" }, "title": "X кг — направление", "sub": "анализ за 7 дней", "rows": [{"l":"сейчас","v":"X кг"},{"l":"неделю назад","v":"Y кг"},{"l":"темп","v":"±X кг/нед"},{"l":"к цели","v":"~N недель","clr":"#3DCC72"}] },
+  { "cat": "прогноз", "type": "forecast", "tag": { "cls": "green", "text": "к цели" }, "title": "достигнешь X кг в ~дата", "sub": "при текущем темпе", "rows": [{"l":"стартовый вес","v":"X кг"},{"l":"текущий вес","v":"Y кг"},{"l":"цель","v":"Z кг","clr":"#3DCC72"},{"l":"прогресс","v":"N%","clr":"#3DCC72"}], "chips": [{"t":"что ускорит","cls":"accent"}] }
 ]
 
-ПРАВИЛА:
-1. type ТОЛЬКО: "warm","dark","blue","orange","teal","purple","green"
-2. tag.cls ТОЛЬКО: "orange","blue","green","purple","red"  
-3. svg ТОЛЬКО: "moon","activity","droplet","droplets","sunrise","utensils","check","arrowRight","spark"
-4. НЕ используй: image, icon, illustration, bg_image, photo, picture, avatar
-5. Рацион: дешёвые доступные продукты РФ с высоким белком (творог, яйца, курица, гречка, скумбрия, чечевица, кефир)
-6. title макс 60 символов, sub макс 120 символов
-7. Обращайся на "ты", честно и по делу — ты тренер, не подхалим`;
+СТРОГИЕ ПРАВИЛА:
+1. "type" ТОЛЬКО: "score","insight","action","forecast","warm","dark","blue","orange","teal","purple","green"
+2. "tag.cls" ТОЛЬКО: "orange","blue","green","purple","red"
+3. "svg" ТОЛЬКО: "moon","activity","droplet","droplets","sunrise","utensils","check","arrowRight","spark"
+4. НЕ используй: image, icon, illustration, header, bg_image, photo, picture, avatar
+5. Скор считай честно из реальных данных. 0 ккал = 0 очков за питание
+6. title — макс 55 символов, sub — макс 100 символов
+7. Обращайся на "ты", конкретно — ты тренер, не подхалим`;
 
   const userPrompt=`Имя: ${u.name} | Время: ${u.timeOfDay} | Цель: ${goalWord}
 Вес: ${u.startWeight}→${u.currentWeight}→${u.goalWeight} кг | Прогресс: ${u.progressPct}% | За 7 дней: ${u.weightDelta7d>0?'+':''}${u.weightDelta7d} кг
@@ -6706,11 +6680,12 @@ async function _tifiCallGroq(apiKey, userData){
   const data=await resp.json();
   const text=(data.choices?.[0]?.message?.content||'').trim();
 
-  // Extract JSON array robustly
-  let jsonStr=text.replace(/^```(?:json)?[\s\S]{0,2}/i,'').replace(/[\s\S]{0,2}```$/,'').trim();
-  const s=jsonStr.indexOf('['),e=jsonStr.lastIndexOf(']');
+  // Extract JSON array — search directly in raw text, don't rely on regex fence-stripping
+  const s=text.indexOf('['),e=text.lastIndexOf(']');
   if(s===-1||e===-1)throw new Error('No JSON array in response');
-  const cards=JSON.parse(jsonStr.slice(s,e+1));
+  let cards;
+  try{cards=JSON.parse(text.slice(s,e+1));}
+  catch(pe){throw new Error('JSON parse error: '+pe.message);}
   if(!Array.isArray(cards)||cards.length===0)throw new Error('Empty cards');
 
   // Normalize + validate
@@ -6737,106 +6712,41 @@ const TIFI_SVGS={
 function tifiMkSvg(k){return`<svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${TIFI_SVGS[k]||''}</svg>`}
 
 const TIFI_CATS={
-  советы:    {clr:'#FF8040', rgb:'255,128,64',  icon:'solar:stars-bold',      bg:'rgba(255,128,64,.08)', brd:'rgba(255,128,64,.18)',  dotClr:'#FF8040'},
-  питание:   {clr:'#4EAEE5', rgb:'78,174,229',  icon:'solar:leaf-bold',        bg:'rgba(78,174,229,.08)', brd:'rgba(78,174,229,.18)',  dotClr:'#4EAEE5'},
-  активность:{clr:'#3DCC72', rgb:'61,204,114',  icon:'solar:dumbbell-bold',    bg:'rgba(61,204,114,.08)', brd:'rgba(61,204,114,.18)',  dotClr:'#3DCC72'},
+  обзор:     {clr:'#3DCC72', rgb:'61,204,114',  icon:'solar:chart-bold',       bg:'rgba(61,204,114,.08)', brd:'rgba(61,204,114,.18)',  dotClr:'#3DCC72',  svg:'<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>'},
+  инсайты:   {clr:'#9D85F2', rgb:'157,133,242', icon:'solar:stars-bold',       bg:'rgba(157,133,242,.08)',brd:'rgba(157,133,242,.18)', dotClr:'#9D85F2',  svg:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>'},
+  задачи:    {clr:'#FFAB40', rgb:'255,171,64',  icon:'solar:checklist-bold',   bg:'rgba(255,171,64,.08)', brd:'rgba(255,171,64,.18)',  dotClr:'#FFAB40',  svg:'<polyline points="20 6 9 17 4 12"/>'},
+  прогноз:   {clr:'#4EAEE5', rgb:'78,174,229',  icon:'solar:chart-2-bold',     bg:'rgba(78,174,229,.08)', brd:'rgba(78,174,229,.18)',  dotClr:'#4EAEE5',  svg:'<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>'},
+  советы:    {clr:'#FF8040', rgb:'255,128,64',  icon:'solar:stars-bold',       bg:'rgba(255,128,64,.08)', brd:'rgba(255,128,64,.18)',  dotClr:'#FF8040',  svg:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>'},
+  питание:   {clr:'#4EAEE5', rgb:'78,174,229',  icon:'solar:leaf-bold',        bg:'rgba(78,174,229,.08)', brd:'rgba(78,174,229,.18)',  dotClr:'#4EAEE5',  svg:'<path d="M12 2a9 9 0 0 0 9 9 9 9 0 0 0-9 9 9 9 0 0 0-9-9 9 9 0 0 0 9-9z"/>'},
+  активность:{clr:'#3DCC72', rgb:'61,204,114',  icon:'solar:dumbbell-bold',    bg:'rgba(61,204,114,.08)', brd:'rgba(61,204,114,.18)',  dotClr:'#3DCC72',  svg:'<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>'},
 };
 
 function _tifiGetCards(){
-  const daysLeft=(()=>{
-    const now=new Date(),summer=new Date(now.getFullYear(),5,1);
-    if(now>=summer)summer.setFullYear(summer.getFullYear()+1);
-    return Math.ceil((summer-now)/864e5);
-  })();
-  const summerPct=Math.round((1-(daysLeft/92))*100);
+  // Fallback cards when API is unavailable — match concept schema
+  const u=C&&C.user?C.user:{};
+  const wd=gWD?gWD():{total:0};
+  const cd=gCD?gCD():{};
+  const calToday=Object.values(cd).reduce((a,b)=>a+(+b||0),0);
+  const calGoal=u.cal_goal||2000;
+  const waterToday=wd.total||0;
+  const waterGoal=u.water_goal||2000;
+  const sl=gSL?gSL():[];
+  const avgSleep=sl.length?(sl.slice(-7).reduce((s,r)=>s+r.hours,0)/Math.min(7,sl.length)).toFixed(1):0;
+  const calPct=calGoal>0?Math.round(calToday/calGoal*100):0;
+  const waterPct=waterGoal>0?Math.round(waterToday/waterGoal*100):0;
+  const sleepPct=avgSleep>0?Math.min(100,Math.round((+avgSleep/8)*100)):50;
+  const score=Math.round(calPct*0.35+sleepPct*0.35+50*0.30);
+  const scoreClr=score>=75?'#3DCC72':score>=50?'#FFAB40':'#F45C5C';
+  const wl=gWL?gWL():[];
+  const curW=wl.length?wl[wl.length-1].weight:u.start_weight||0;
+  const goalW=u.goal_weight||curW;
   return [
-    /* до лета */
-    {cat:'советы',type:'tifi-cc-warm',glow:true,
-     tag:{cls:'tifi-tag-orange',text:'до лета'},
-     title:`до лета ${daysLeft} дней`,
-     sub:'ты успеваешь — план идёт хорошо. к июню будет виден результат',
-     nums:[{v:daysLeft+'д',l:'до лета',clr:'var(--sun)'},{v:'-1.2 кг',l:'2 нед',clr:'var(--green)'},{v:'~65',l:'к лету',clr:'var(--sun)'}],
-     bar:{w:summerPct,clr:'linear-gradient(90deg,var(--sun),var(--sun2))'}},
-    /* советы */
-    {divider:true,cat:'советы',count:3},
-    {cat:'советы',type:'tifi-cc-warm',glow:true,
-     tag:{cls:'tifi-tag-orange',text:'инсайт дня'},
-     title:'ты в хорошем темпе',
-     sub:'за 7 дней план выполнен на 74% — выше среднего за месяц',
-     nums:[{v:'74%',l:'план'},{v:'−1,2 кг',l:'2 недели'},{v:'7 дн',l:'streak'}]},
-    {cat:'советы',type:'tifi-cc-dark',
-     tag:{cls:'tifi-tag-purple',text:'паттерны'},
-     title:'тифи заметил кое-что',
-     sub:'наблюдения за последнюю неделю',
-     list:[
-      {ico:'bg:rgba(157,133,242,.12);color:#9D85F2',svg:'moon',t:'поздние перекусы',s:'3 из 7 дней ела после 22:00 — мешает сну'},
-      {ico:'bg:rgba(61,204,114,.12);color:var(--green)',svg:'activity',t:'лучшее время активности',s:'ты активнее в 18–20:00 — идеальный слот'},
-      {ico:'bg:rgba(78,174,229,.12);color:#4EAEE5',svg:'droplet',t:'мало воды по утрам',s:'до 12:00 выпиваешь лишь 20% нормы'},
-     ]},
-    {cat:'советы',type:'tifi-cc-dark',
-     tag:{cls:'tifi-tag-orange',text:'совет дня'},
-     title:'добавь белок к завтраку',
-     sub:'в первой половине дня стабильно не хватает белка — попробуй',
-     chips:[{t:'яйца',cls:'accent'},{t:'творог',cls:'accent'},{t:'йогурт',cls:'accent'},{t:'омлет',cls:'accent'}]},
-    /* питание */
-    {divider:true,cat:'питание',count:4},
-    {cat:'питание',type:'tifi-cc-blue',
-     tag:{cls:'tifi-tag-blue',text:'вода'},
-     title:'выпила 500 из 2000 мл',
-     sub:'к 10:15 обычно уже 700 мл — сегодня немного отстаёшь',
-     bar:{w:25,clr:'linear-gradient(90deg,#4EAEE5,#38BDF8)'},
-     chips:[{t:'нужно ускориться',cls:'warn'},{t:'следующий в 10:30',cls:''}]},
-    {cat:'питание',type:'tifi-cc-orange',
-     tag:{cls:'tifi-tag-orange',text:'питание'},
-     title:'завтрак ещё не добавлен',
-     sub:'обычно ты завтракаешь в 09:00 — сейчас 10:15, не пропускай',
-     nums:[{v:'0',l:'ккал съедено',clr:'var(--sun)'},{v:'2000',l:'норма',clr:'var(--sun)'}]},
-    {cat:'питание',type:'tifi-cc-teal',
-     tag:{cls:'tifi-tag-green',text:'рацион на сегодня'},
-     title:'рацион на сегодня',
-     sub:'под норму 2000 ккал · белок 150 г · бюджетно',
-     meals:[
-      {ico:'🌅',name:'творог 5% + банан + мёд',sub:'завтрак · 08:00',kcal:360,clr:'var(--sun)'},
-      {ico:'☀️',name:'куриная грудка с гречкой',sub:'обед · 13:00',kcal:520,clr:'#4EAEE5'},
-      {ico:'🍎',name:'яйца вкрутую 3шт + огурец',sub:'перекус · 16:00',kcal:210,clr:'#3DCC72'},
-      {ico:'🌙',name:'скумбрия запечённая с рисом',sub:'ужин · 19:00',kcal:480,clr:'#9D85F2'},
-     ]},
-    {cat:'питание',type:'tifi-cc-purple',
-     tag:{cls:'tifi-tag-purple',text:'рецепт ужина'},
-     title:'скумбрия запечённая с рисом',
-     sub:'~150 руб порция · 38 г белка · просто и сытно',
-     macros:[{v:'480',l:'ккал',clr:'#9D85F2'},{v:'38 г',l:'белок',clr:'#4EAEE5'},{v:'18 г',l:'жиры'},{v:'45 г',l:'углев',clr:'#3DCC72'}],
-     ingredients:['скумбрия б/г 200 г','рис варёный 100 г','лимон + чеснок','зелень по вкусу'],
-     bar:{w:24,clr:'linear-gradient(90deg,#9D85F2,#C4B5FD)'}},
-    /* активность */
-    {divider:true,cat:'активность',count:3},
-    {cat:'активность',type:'tifi-cc-purple',
-     tag:{cls:'tifi-tag-purple',text:'сон'},
-     title:'7,5 ч — хорошо',
-     sub:'прошлой ночью чуть больше нормы — сегодня больше энергии',
-     nums:[{v:'7,5 ч',l:'эта ночь',clr:'#9D85F2'},{v:'7,1 ч',l:'среднее нед',clr:'#9D85F2'}]},
-    {cat:'активность',type:'tifi-cc-green',
-     tag:{cls:'tifi-tag-green',text:'прогноз'},
-     title:'до цели ≈ 6 недель',
-     sub:'при темпе −0,6 кг в неделю достигнешь 65 кг к 20 апреля',
-     rows:[{l:'сейчас',v:'72 кг'},{l:'цель',v:'65 кг',clr:'var(--green)'},{l:'темп',v:'−0,6 кг / нед'},{l:'прогноз',v:'~20 апреля',clr:'var(--green)'}]},
-    {cat:'активность',type:'tifi-cc-orange',
-     tag:{cls:'tifi-tag-orange',text:'план тифи'},
-     title:'важное на сегодня',
-     sub:'4 задачи которые тифи добавил в твой план',
-     todo:[
-      {ico:'bg:rgba(78,174,229,.14);color:#4EAEE5',svg:'droplets',t:'выпить 2000 мл воды за день'},
-      {ico:'bg:rgba(var(--sun-rgb),.14);color:var(--sun)',svg:'sunrise',t:'завтрак с белком до 11:00'},
-      {ico:'bg:rgba(61,204,114,.14);color:var(--green)',svg:'activity',t:'кардио 30 мин в 18:00'},
-      {ico:'bg:rgba(157,133,242,.14);color:#9D85F2',svg:'moon',t:'лечь до 23:00 · нет еды после 21:00'},
-     ]},
+    {cat:'обзор',type:'tifi-cc-score',custom:true,tag:{cls:'tifi-tag-green',text:'обзор дня'},title:'данные без ИИ',sub:'из 100 · подключи ключ Groq для анализа',score:score,score_clr:scoreClr,metrics:[{l:'питание',v:calPct+'%',w:calPct,clr:'#4EAEE5'},{l:'вода',v:waterPct+'%',w:waterPct,clr:'#3DCC72'},{l:'сон',v:sleepPct+'%',w:sleepPct,clr:'#9D85F2'}]},
+    {cat:'инсайты',type:'tifi-cc-insight',custom:true,tag:{cls:'tifi-tag-purple',text:'нет ключа'},title:'нужен ключ Groq API',sub:'тифи не может проанализировать данные без ключа',chips:[{t:'настройки',cls:'accent'}]},
+    {cat:'задачи',type:'tifi-cc-action',custom:true,tag:{cls:'tifi-tag-orange',text:'базовый план'},title:'стандартные задачи',sub:'базовые задачи без персонализации',todo:[{ico:'bg:rgba(78,174,229,.14);color:#4EAEE5',svg:'droplets',t:'выпить '+waterGoal+' мл воды за день'},{ico:'bg:rgba(255,171,64,.14);color:#FFAB40',svg:'sunrise',t:'белковый завтрак до 10:00'},{ico:'bg:rgba(61,204,114,.14);color:#3DCC72',svg:'moon',t:'лечь спать до 23:00'}]},
+    {cat:'прогноз',type:'tifi-cc-forecast',custom:true,tag:{cls:'tifi-tag-blue',text:'прогноз'},title:'цель: '+goalW+' кг',sub:'при текущем темпе',rows:[{l:'сейчас',v:curW+' кг'},{l:'цель',v:goalW+' кг',clr:'#3DCC72'},{l:'ИИ анализ',v:'недоступен',clr:'#F45C5C'}]},
   ];
 }
-
-let tifiCards=[],tifiCardEls=[],tifiCur=0,tifiLoaded=false;
-/* Токен отмены для tifiStartScreen — инкрементируется при каждом новом запуске
-   и при закрытии страницы, чтобы оборвать висящие async-колбэки */
-let _tifiToken=0;
 
 function tifiBuildDivider(data){
   const cat=TIFI_CATS[data.cat]||TIFI_CATS['советы'];
@@ -6875,13 +6785,35 @@ function tifiBuildDivider(data){
 
 function tifiBuildCard(data,idx){
   const el=document.createElement('div');
-  el.className='tifi-ccard state-next '+data.type;
+  // map new semantic types to existing CSS backgrounds
+  const TYPE_BG_MAP={'tifi-cc-score':'tifi-cc-score','tifi-cc-insight':'tifi-cc-purple','tifi-cc-action':'tifi-cc-orange','tifi-cc-forecast':'tifi-cc-blue'};
+  const cssType=TYPE_BG_MAP[data.type]||data.type;
+  el.className='tifi-ccard state-next '+cssType;
   if(data.glow){const g=document.createElement('div');g.className='tifi-cc-warm-glow';el.appendChild(g);}
+  // insight glow
+  if(data.type==='tifi-cc-insight'){
+    const cat=TIFI_CATS[data.cat]||TIFI_CATS['инсайты']||TIFI_CATS['советы'];
+    const g=document.createElement('div');g.className='tifi-cc-insight-glow';
+    g.style.background=`rgba(${cat.rgb},.08)`;el.appendChild(g);
+  }
   const scroll=document.createElement('div');scroll.className='tifi-cc-scroll';
   let h=`<div class="tifi-cc-body">`;
   if(data.custom)h+=`<div class="tifi-cc-custom-badge">✦ создано тифи</div>`;
   const _tag=data.tag||{cls:'tifi-tag-orange',text:'тифи'};
   h+=`<div class="tifi-cc-tag ${_tag.cls||'tifi-tag-orange'}">${_tag.text||'тифи'}</div>`;
+  // SCORE card — big number layout
+  if(typeof data.score==='number'){
+    const scoreClr=data.score_clr||(data.score>=75?'#3DCC72':data.score>=50?'#FFAB40':'#F45C5C');
+    h+=`<div class="tifi-cc-score-wrap">`;
+    h+=`<div><div class="tifi-cc-score-num" style="color:${scoreClr}">${data.score}</div><div class="tifi-cc-s" style="margin-top:6px">${data.sub||''}</div></div>`;
+    if(data.metrics&&data.metrics.length){
+      h+=`<div class="tifi-cc-score-metrics">`;
+      data.metrics.forEach(m=>{h+=`<div class="tifi-cc-score-row"><span>${m.l}</span><span style="color:${m.clr};font-weight:700">${m.v}</span></div><div class="tifi-cc-score-bar"><div class="tifi-cc-score-bar-f" style="width:${m.w}%;background:${m.clr}"></div></div>`;});
+      h+=`</div>`;
+    }
+    h+=`</div>`;
+    h+=`</div>`;scroll.innerHTML=h;el.appendChild(scroll);return el;
+  }
   h+=`<div class="tifi-cc-h">${data.title}</div>`;
   h+=`<div class="tifi-cc-s">${data.sub}</div>`;
   if(data.nums){h+=`<div class="tifi-cc-bignums">`;data.nums.forEach(n=>{h+=`<div class="tifi-cc-num"><div class="tifi-cc-num-v"${n.clr?` style="color:${n.clr}"`:''}>${n.v}</div><div class="tifi-cc-num-l">${n.l}</div></div>`});h+=`</div>`;}
@@ -6896,153 +6828,59 @@ function tifiBuildCard(data,idx){
   h+=`</div>`;scroll.innerHTML=h;el.appendChild(scroll);return el;
 }
 
+let _tifiActiveFilter='все';
+
 function tifiBuildCarousel(){
   const track=document.getElementById('tifi-ctrack');
-  const dotsEl=document.getElementById('tifi-cdots');
-  const progEl=document.getElementById('tifi-prog');
-  if(!track||!dotsEl||!progEl)return;
-
-  // Filter out divider cards — focus UI handles categories via top label
-  const cards=tifiCards.filter(d=>!d.divider);
-  tifiCardEls=[];
+  if(!track)return;
   track.innerHTML='';
-  dotsEl.innerHTML='';
-  progEl.innerHTML='';
+  tifiCardEls=[];
+  tifiCur=0;
 
-  cards.forEach((data,i)=>{
-    // card element
-    const el=tifiBuildCard(data,i);
-    el.className='tifi-ccard '+(data.type||'tifi-cc-dark')+' '+(i===0?'state-current':'state-next');
-    if(data.glow){const g=document.createElement('div');g.className='tifi-cc-warm-glow';el.prepend(g);}
-    track.appendChild(el);
-    tifiCardEls.push(el);
-
-    // progress segment
-    const seg=document.createElement('div');
-    seg.className='tifi-prog-seg';
-    const fill=document.createElement('div');
-    fill.className='tifi-prog-fill';
-    fill.id='tpf'+i;
-    const cat=TIFI_CATS[data.cat]||TIFI_CATS['советы'];
-    fill.style.background=cat.clr;
-    fill.style.width=i===0?'100%':'0%';
-    seg.appendChild(fill);
-    progEl.appendChild(seg);
-
-    // dot
-    const dot=document.createElement('div');
-    const on=i===0;
-    dot.className='tifi-cdot'+(on?' on':'');
-    dot.style.background=on?cat.dotClr:'rgba(255,255,255,.14)';
-    dot._catClr=cat.dotClr;
-    dotsEl.appendChild(dot);
-  });
-
-  // Store filtered cards reference
-  tifiCards._display=cards;
-
-  const ctr=document.getElementById('tifi-counter');
-  if(ctr)ctr.textContent='1 / '+cards.length;
-
-  _tifiUpdateTopBar(0);
-
-  // Single click handler — tap left 35% = prev, right 35% = next
-  // Middle 30% = safe zone. Todo items stop propagation.
-  const stage=document.getElementById('tifi-ctrack');
-  stage.onclick=function(e){
-    // check if tap is on interactive element (todo, chip, button)
-    if(e.target.closest('.tifi-cc-todo-item,.tifi-cc-chip,.tifi-div-enter-btn,button,a')){return;}
-    const rect=stage.getBoundingClientRect();
-    const x=e.clientX-rect.left;
-    const third=rect.width*0.35;
-    if(x<third) tifiPrevCard();
-    else if(x>rect.width-third) tifiNextCard();
-  };
-}
-
-function _tifiUpdateTopBar(idx){
-  const cards=tifiCards._display||tifiCards.filter(d=>!d.divider);
-
-  // progress fills
-  cards.forEach((_,i)=>{
-    const f=document.getElementById('tpf'+i);
-    if(f)f.style.width=i<=idx?'100%':'0%';
-  });
-
-  // dots
-  document.querySelectorAll('.tifi-cdot').forEach((d,i)=>{
-    const on=i===idx;
-    d.classList.toggle('on',on);
-    d.style.background=on?(d._catClr||'rgba(255,255,255,.5)'):'rgba(255,255,255,.14)';
-  });
-
-  // cat label + in-category counter
-  const d=cards[idx];
-  if(d){
-    const cat=TIFI_CATS[d.cat]||TIFI_CATS['советы'];
-    const lbl=document.getElementById('tifi-cat-lbl');
-    const cnt=document.getElementById('tifi-cat-cnt');
-    if(lbl){lbl.textContent=d.cat;lbl.style.color=cat.clr;}
-    if(cnt){
-      const catCards=cards.filter(c=>c.cat===d.cat);
-      let pos=0;for(let i=0;i<idx;i++){if(cards[i].cat===d.cat)pos++;}
-      cnt.textContent=(pos+1)+' / '+catCards.length;
+  // Include divider cards as section headers in vertical scroll
+  tifiCards.forEach((data,i)=>{
+    let el;
+    if(data.divider){
+      el=tifiBuildDivider(data);
+    }else{
+      el=tifiBuildCard(data,i);
+      const TYPE_BG_MAP={'tifi-cc-score':'tifi-cc-score','tifi-cc-insight':'tifi-cc-purple','tifi-cc-action':'tifi-cc-orange','tifi-cc-forecast':'tifi-cc-blue'};
+      const cssType=TYPE_BG_MAP[data.type]||data.type||'tifi-cc-dark';
+      el.className='tifi-ccard '+cssType;
     }
-  }
-
-  // global counter
-  const ctr=document.getElementById('tifi-counter');
-  if(ctr)ctr.textContent=(idx+1)+' / '+cards.length;
-}
-
-function _tifiPlace(el,pos){
-  el.style.transition='none';
-  if(pos==='cur'){el.style.transform='translate3d(0,0,0)';el.style.opacity='1';el.style.zIndex='3';}
-  else if(pos==='prev'){el.style.transform='translate3d(-106%,0,0)';el.style.opacity='0';el.style.zIndex='1';}
-  else{el.style.transform='translate3d(106%,0,0)';el.style.opacity='0';el.style.zIndex='1';}
-}
-
-function tifiGoTo(newIdx){
-  if(newIdx===tifiCur||newIdx<0)return;
-  const cards=tifiCards._display||tifiCards.filter(d=>!d.divider);
-  if(newIdx>=cards.length)return;
-  const oldIdx=tifiCur;
-  tifiCur=newIdx;
-  tifiCardEls.forEach((el,i)=>{
-    if(i===oldIdx||i===newIdx)return;
-    _tifiPlace(el,i<newIdx?'prev':'next');
+    track.appendChild(el);
+    if(!data.divider)tifiCardEls.push(el);
   });
-  _tifiPlace(tifiCardEls[oldIdx],oldIdx<newIdx?'prev':'next');
-  _tifiPlace(tifiCardEls[newIdx],'cur');
-  _tifiUpdateTopBar(newIdx);
 }
 
-function tifiNextCard(){
-  const cards=tifiCards._display||tifiCards.filter(d=>!d.divider);
-  tifiGoTo(Math.min(tifiCur+1,cards.length-1));
-}
-function tifiPrevCard(){
-  tifiGoTo(Math.max(tifiCur-1,0));
-}
-
-function tifiUpdateStates(idx){
-  tifiCur=idx||0;
-  tifiCardEls.forEach((el,i)=>{_tifiPlace(el,i===tifiCur?'cur':i<tifiCur?'prev':'next');});
-  _tifiUpdateTopBar(tifiCur);
-}
+/* stubs — no-op in vertical layout */
+function _tifiBuildFilterChips(){}
+function _tifiSetFilter(){}
+function _tifiRenderCards(){}
+function _tifiUpdateTopBar(){}
+function _tifiPlace(){}
+function tifiGoTo(){}
+function tifiNextCard(){}
+function tifiPrevCard(){}
+function tifiUpdateStates(){}
 
 /* ── добавление новой карточки в течение дня (тифи-планировщик) ── */
 function tifiAddCard(data){
   if(!tifiLoaded||!tifiCards||!tifiCards.length)return;
-  data.custom=true; // метка «создано тифи»
+  data.custom=true;
   tifiCards.push(data);
-  // rebuild with new card appended
-  tifiBuildCarousel();
-  // stay on same index
-  const cards=tifiCards._display||tifiCards.filter(d=>!d.divider);
-  const newCardIdx=cards.length-1;
-  tifiUpdateStates(tifiCur); // keep position
-  // show badge in header
+  // append to track without full rebuild
+  const track=document.getElementById('tifi-ctrack');
+  if(!track)return;
+  const el=tifiBuildCard(data,tifiCards.length-1);
+  const TYPE_BG_MAP={'tifi-cc-score':'tifi-cc-score','tifi-cc-insight':'tifi-cc-purple','tifi-cc-action':'tifi-cc-orange','tifi-cc-forecast':'tifi-cc-blue'};
+  const cssType=TYPE_BG_MAP[data.type]||data.type||'tifi-cc-dark';
+  el.className='tifi-ccard '+cssType;
+  // entrance animation
+  el.style.opacity='0';el.style.transform='translateY(12px)';el.style.transition='opacity .3s ease,transform .3s ease';
+  track.appendChild(el);
+  tifiCardEls.push(el);
+  requestAnimationFrame(()=>{el.style.opacity='1';el.style.transform='none';});
   _tifiShowNewCardBadge();
 }
 
@@ -7252,6 +7090,7 @@ async function tifiStartScreen(){
   // hide thinking — убираем немедленно, не ждём transition
   if(thinkEl){thinkEl.classList.remove('show');thinkEl.style.display='none';}
 
+  let _tifiUsedFallback=false;
   if(apiError&&!apiResult){
     // error path
     const isKey=apiError.message&&(apiError.message.toLowerCase().includes('invalid api key')||apiError.message.toLowerCase().includes('401')||apiError.message.toLowerCase().includes('no api key')||apiError.message.toLowerCase().includes('invalid_api_key')||!apiKey);
@@ -7264,6 +7103,7 @@ async function tifiStartScreen(){
       tlAddLine('✗','tl-pfx-warn','ошибка соединения · использую кэш','warn');
     }
     tifiCards=_tifiGetCards();
+    _tifiUsedFallback=true;
     await new Promise(r=>setTimeout(r,isKey?2200:1600));
   }else{
     // success path
@@ -7288,8 +7128,8 @@ async function tifiStartScreen(){
     ldg.style.display='none';
     tifiBuildCarousel();
     car.classList.add('visible');
-    tifiLoaded=true;
-    _tifiScheduleMidday();
+    if(!_tifiUsedFallback){tifiLoaded=true;_tifiScheduleMidday();}
+    else{tifiLoaded=false;}
   },380);
 }
 
