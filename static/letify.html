@@ -1969,46 +1969,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tifi-cc-meal-sub{font-size:10px;color:rgba(255,255,255,.35);font-weight:500;margin-top:1px}
 .tifi-cc-meal-kcal{font-size:14px;font-weight:900;flex-shrink:0}
 .tifi-cc-meal-unit{font-size:9px;color:rgba(255,255,255,.3);font-weight:600;text-align:right;margin-top:1px}
-
-/* ── recipe card ── */
-.tifi-cc-recipe{background:#13100A;border:1px solid rgba(255,128,64,.13)}
-.tifi-cc-cost{display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-size:12px;font-weight:700;color:rgba(255,255,255,.5);background:rgba(255,255,255,.05);padding:5px 10px;border-radius:8px}
-.tifi-cc-cost-val{color:#3DCC72;font-weight:800}
-.tifi-cc-steps{margin-top:12px;display:flex;flex-direction:column;gap:6px}
-.tifi-cc-step{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:rgba(255,255,255,.6);line-height:1.4}
-.tifi-cc-step-num{width:18px;height:18px;border-radius:5px;background:rgba(255,128,64,.15);color:#FF8040;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
-
-/* ── compare card ── */
-.tifi-cc-compare{background:#0D0E18;border:1px solid rgba(192,132,252,.12)}
-.tifi-cc-cmp-rows{margin-top:12px;display:flex;flex-direction:column;gap:0}
-.tifi-cc-cmp-row{display:grid;grid-template-columns:1fr 60px 60px 48px;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:11px}
-.tifi-cc-cmp-row:last-child{border-bottom:none}
-.tifi-cc-cmp-l{color:rgba(255,255,255,.38);font-weight:600}
-.tifi-cc-cmp-prev{color:rgba(255,255,255,.28);font-weight:600;text-align:right}
-.tifi-cc-cmp-cur{color:#fff;font-weight:800;text-align:right}
-.tifi-cc-cmp-d{font-weight:800;text-align:right;font-size:10px}
-.tifi-cc-cmp-head{display:grid;grid-template-columns:1fr 60px 60px 48px;padding:0 0 6px;font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:rgba(255,255,255,.2);border-bottom:1px solid rgba(255,255,255,.06)}
-
-/* ── week strip card ── */
-.tifi-cc-week{background:#0E0E14;border:1px solid rgba(139,127,212,.12)}
-.tifi-cc-week-strip{display:flex;gap:4px;margin-top:12px}
-.tifi-cc-week-day{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
-.tifi-cc-week-bar-wrap{width:100%;height:48px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden;display:flex;align-items:flex-end}
-.tifi-cc-week-bar-f{width:100%;border-radius:4px;transition:height .3s ease}
-.tifi-cc-week-lbl{font-size:8px;font-weight:700;color:rgba(255,255,255,.25)}
-.tifi-cc-week-val{font-size:9px;font-weight:800;color:rgba(255,255,255,.5)}
-
-/* ── budget/shopping card ── */
-.tifi-cc-budget{background:#0A1410;border:1px solid rgba(52,211,153,.11)}
-.tifi-cc-shop-list{margin-top:12px;display:flex;flex-direction:column;gap:0}
-.tifi-cc-shop-row{display:grid;grid-template-columns:1fr 52px 52px;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px}
-.tifi-cc-shop-row:last-child{border-bottom:none}
-.tifi-cc-shop-name{color:#F5F4F2;font-weight:600}
-.tifi-cc-shop-price{color:#34D399;font-weight:800;text-align:right}
-.tifi-cc-shop-prot{color:rgba(78,174,229,.8);font-weight:700;text-align:right;font-size:10px}
-.tifi-cc-shop-total{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,.07);font-size:12px}
-.tifi-cc-shop-total-l{color:rgba(255,255,255,.4);font-weight:600}
-.tifi-cc-shop-total-v{color:#34D399;font-weight:900;font-size:15px}
 .tifi-cc-custom-badge{display:inline-flex;align-items:center;gap:5px;font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;background:linear-gradient(135deg,var(--sun),var(--sun2));color:#fff;padding:3px 8px;border-radius:6px;margin-bottom:10px;align-self:flex-start}
 /* каждая карточка: тянем scroll во всю высоту, body не сжимается */
 .tifi-cc-scroll{display:flex;flex-direction:column}
@@ -6606,31 +6566,10 @@ function _tifiGetUserData(){
 
 /* Нормализует ответ ИИ: исправляет префиксы классов, убирает неизвестные поля */
 function _tifiNormalizeCards(raw){
-  const VALID_TYPES=new Set(['tifi-cc-warm','tifi-cc-dark','tifi-cc-blue','tifi-cc-orange','tifi-cc-teal','tifi-cc-purple','tifi-cc-green','tifi-cc-score','tifi-cc-insight','tifi-cc-action','tifi-cc-forecast','tifi-cc-recipe','tifi-cc-menu','tifi-cc-compare','tifi-cc-sleep']);
-  const TYPE_MAP={
-    'warm':'tifi-cc-warm','dark':'tifi-cc-dark','blue':'tifi-cc-blue','orange':'tifi-cc-orange','teal':'tifi-cc-teal','purple':'tifi-cc-purple','green':'tifi-cc-green',
-    'score':'tifi-cc-score','insight':'tifi-cc-insight','action':'tifi-cc-action','forecast':'tifi-cc-forecast',
-    'recipe':'tifi-cc-recipe','menu':'tifi-cc-menu','compare':'tifi-cc-compare','sleep':'tifi-cc-sleep',
-    'cc-warm':'tifi-cc-warm','cc-dark':'tifi-cc-dark','cc-blue':'tifi-cc-blue','cc-orange':'tifi-cc-orange','cc-teal':'tifi-cc-teal','cc-purple':'tifi-cc-purple','cc-green':'tifi-cc-green',
-    'cc-score':'tifi-cc-score','cc-insight':'tifi-cc-insight','cc-action':'tifi-cc-action','cc-forecast':'tifi-cc-forecast',
-    'cc-recipe':'tifi-cc-recipe','cc-menu':'tifi-cc-menu','cc-compare':'tifi-cc-compare','cc-sleep':'tifi-cc-sleep',
-  };
+  const VALID_TYPES=new Set(['tifi-cc-warm','tifi-cc-dark','tifi-cc-blue','tifi-cc-orange','tifi-cc-teal','tifi-cc-purple','tifi-cc-green','tifi-cc-score','tifi-cc-insight','tifi-cc-action','tifi-cc-forecast']);
+  const TYPE_MAP={'warm':'tifi-cc-warm','dark':'tifi-cc-dark','blue':'tifi-cc-blue','orange':'tifi-cc-orange','teal':'tifi-cc-teal','purple':'tifi-cc-purple','green':'tifi-cc-green','score':'tifi-cc-score','insight':'tifi-cc-insight','action':'tifi-cc-action','forecast':'tifi-cc-forecast','cc-warm':'tifi-cc-warm','cc-dark':'tifi-cc-dark','cc-blue':'tifi-cc-blue','cc-orange':'tifi-cc-orange','cc-teal':'tifi-cc-teal','cc-purple':'tifi-cc-purple','cc-green':'tifi-cc-green','cc-score':'tifi-cc-score','cc-insight':'tifi-cc-insight','cc-action':'tifi-cc-action','cc-forecast':'tifi-cc-forecast'};
   const TAG_MAP={'orange':'tifi-tag-orange','blue':'tifi-tag-blue','green':'tifi-tag-green','purple':'tifi-tag-purple','red':'tifi-tag-red','cc-tag-orange':'tifi-tag-orange','cc-tag-blue':'tifi-tag-blue','cc-tag-green':'tifi-tag-green','cc-tag-purple':'tifi-tag-purple','cc-tag-red':'tifi-tag-red'};
-  const VALID_SVG=new Set(['moon','activity','droplet','droplets','sunrise','utensils','check','arrowRight','spark','flame','scale','calendar','cart','brain','dumbbell','timer','trending','leaf']);
-  const CAT_REMAP={
-    'overview':'обзор','score':'обзор','обзор дня':'обзор',
-    'insights':'инсайты','инсайт':'инсайты','паттерн':'инсайты',
-    'actions':'задачи','action':'задачи','action_plan':'задачи','план':'задачи','план дня':'задачи',
-    'forecast':'прогноз','прогноз дня':'прогноз','progress':'прогноз',
-    'nutrition':'питание','food':'питание',
-    'activity':'активность',
-    'sleep':'сон',
-    'tips':'советы',
-    'recipe':'рецепты','recipes':'рецепты','рецепт':'рецепты',
-    'menu':'меню','daily_menu':'меню','meal_plan':'меню','план питания':'меню',
-    'analysis':'анализ','макросы':'анализ','macro':'анализ','compare':'анализ','comparison':'анализ','сравнение':'анализ',
-    'budget':'бюджет','shopping':'бюджет','покупки':'бюджет',
-  };
+  const VALID_SVG=new Set(['moon','activity','droplet','droplets','sunrise','utensils','check','arrowRight','spark']);
   const result=[];
   let curDivider=null,curCatCards=0;
   for(const c of raw){
@@ -6640,187 +6579,133 @@ function _tifiNormalizeCards(raw){
       curCatCards=0;
       continue;
     }
+    // Normalize type
     let t=(c.type||'tifi-cc-dark').toString();
     if(!VALID_TYPES.has(t))t=TYPE_MAP[t]||TYPE_MAP[t.replace('tifi-','')]||'tifi-cc-dark';
+    // Normalize tag
     let tag=c.tag;
     if(!tag||typeof tag!=='object')tag={cls:'tifi-tag-orange',text:'тифи'};
     let tagCls=(tag.cls||'').toString();
     if(!tagCls.startsWith('tifi-tag-'))tagCls=TAG_MAP[tagCls]||TAG_MAP[tagCls.replace('tifi-tag-','')]||'tifi-tag-orange';
-    const tagText=(tag.text||'тифи').toString().slice(0,24);
+    const tagText=(tag.text||'тифи').toString().slice(0,20);
+    // Validate list SVGs
     let list=c.list;
     if(Array.isArray(list))list=list.filter(i=>i&&i.t).map(i=>({...i,svg:VALID_SVG.has(i.svg)?i.svg:'check',ico:i.ico||'bg:rgba(255,107,53,.14);color:var(--sun)'}));
+    // Validate todo SVGs
     let todo=c.todo;
     if(Array.isArray(todo))todo=todo.filter(i=>i&&i.t).map(i=>({...i,svg:VALID_SVG.has(i.svg)?i.svg:'check',ico:i.ico||'bg:rgba(255,107,53,.14);color:var(--sun)'}));
+    // Validate nums/macros/rows/chips/meals/bar/ingredients
+    // Normalize cat name
+    const CAT_REMAP={'overview':'обзор','score':'обзор','обзор дня':'обзор','insights':'инсайты','инсайт':'инсайты','паттерн':'инсайты','actions':'задачи','action':'задачи','action_plan':'задачи','план':'задачи','план дня':'задачи','forecast':'прогноз','прогноз дня':'прогноз','progress':'прогноз','nutrition':'питание','food':'питание','activity':'активность','sleep':'активность','tips':'советы'};
     const rawCat=(c.cat||'инсайты').toLowerCase().trim();
     const normCat=CAT_REMAP[rawCat]||c.cat||'инсайты';
     const card={
-      cat:normCat,type:t,glow:c.glow===true,custom:true,
+      cat:normCat,
+      type:t,
+      glow:c.glow===true,
+      custom:true,
       tag:{cls:tagCls,text:tagText},
       title:(c.title||'...').toString().slice(0,80),
       sub:(c.sub||'').toString().slice(0,200),
     };
-    if(Array.isArray(c.nums)&&c.nums.length)card.nums=c.nums.slice(0,4).map(n=>({v:String(n.v||''),l:String(n.l||''),clr:n.clr||''}));
+    if(Array.isArray(c.nums)&&c.nums.length)card.nums=c.nums.slice(0,3).map(n=>({v:String(n.v||''),l:String(n.l||''),clr:n.clr||''}));
     if(Array.isArray(c.macros)&&c.macros.length)card.macros=c.macros.slice(0,4).map(m=>({v:String(m.v||''),l:String(m.l||''),clr:m.clr||''}));
     if(c.bar&&typeof c.bar.w==='number')card.bar={w:Math.min(100,Math.max(0,c.bar.w)),clr:c.bar.clr||'linear-gradient(90deg,var(--sun),var(--sun2))'};
     if(Array.isArray(c.chips)&&c.chips.length)card.chips=c.chips.slice(0,6).map(ch=>({t:String(ch.t||''),cls:ch.cls||''}));
-    if(list&&list.length)card.list=list.slice(0,5);
-    if(Array.isArray(c.rows)&&c.rows.length)card.rows=c.rows.slice(0,6).map(r=>({l:String(r.l||''),v:String(r.v||''),clr:r.clr||''}));
-    if(todo&&todo.length)card.todo=todo.slice(0,5);
-    if(Array.isArray(c.meals)&&c.meals.length)card.meals=c.meals.slice(0,6).map(m=>({ico:String(m.ico||'🍽'),name:String(m.name||''),sub:String(m.sub||''),kcal:+(m.kcal||0),clr:m.clr||'var(--sun)'}));
-    if(Array.isArray(c.ingredients))card.ingredients=c.ingredients.slice(0,8).map(String);
+    if(list&&list.length)card.list=list.slice(0,4);
+    if(Array.isArray(c.rows)&&c.rows.length)card.rows=c.rows.slice(0,5).map(r=>({l:String(r.l||''),v:String(r.v||''),clr:r.clr||''}));
+    if(todo&&todo.length)card.todo=todo.slice(0,4);
+    if(Array.isArray(c.meals)&&c.meals.length)card.meals=c.meals.slice(0,4).map(m=>({ico:String(m.ico||'🍽'),name:String(m.name||''),sub:String(m.sub||''),kcal:+(m.kcal||0),clr:m.clr||'var(--sun)'}));
+    if(Array.isArray(c.ingredients))card.ingredients=c.ingredients.slice(0,6).map(String);
     if(typeof c.score==='number')card.score=Math.min(100,Math.max(0,Math.round(c.score)));
     if(c.score_clr)card.score_clr=c.score_clr;
-    if(Array.isArray(c.metrics)&&c.metrics.length)card.metrics=c.metrics.slice(0,5).map(m=>({l:String(m.l||''),v:String(m.v||''),w:Math.min(100,Math.max(0,+(m.w||0))),clr:m.clr||'#3DCC72'}));
-    // new fields
-    if(c.cost)card.cost=String(c.cost).slice(0,30);
-    if(c.protein)card.protein=String(c.protein).slice(0,20);
-    if(Array.isArray(c.steps)&&c.steps.length)card.steps=c.steps.slice(0,5).map(s=>String(s).slice(0,80));
-    if(Array.isArray(c.compare_rows)&&c.compare_rows.length)card.compare_rows=c.compare_rows.slice(0,5).map(r=>({l:String(r.l||''),prev:String(r.prev||''),cur:String(r.cur||''),delta:String(r.delta||''),up:r.up!==false}));
-    if(Array.isArray(c.week_days)&&c.week_days.length)card.week_days=c.week_days.slice(0,7).map(d=>({d:String(d.d||''),v:String(d.v||''),clr:d.clr||'rgba(255,255,255,.3)'}));
-    if(Array.isArray(c.shopping)&&c.shopping.length)card.shopping=c.shopping.slice(0,8).map(s=>({name:String(s.name||''),price:String(s.price||''),protein:String(s.protein||'')}));
+    if(Array.isArray(c.metrics)&&c.metrics.length)card.metrics=c.metrics.slice(0,4).map(m=>({l:String(m.l||''),v:String(m.v||''),w:Math.min(100,Math.max(0,+(m.w||0))),clr:m.clr||'#3DCC72'}));
     if(curDivider)result.push(curDivider);
     curDivider=null;
     result.push(card);
     curCatCards++;
+    // If divider not sent yet, auto-create one for first card of new cat
   }
   if(curDivider)result.push({...curDivider,count:curCatCards});
+  // Fix divider counts by scanning the actual result
   const fixedResult=[];
   for(let i=0;i<result.length;i++){
     const c=result[i];
     if(c.divider){
       let cnt=0;for(let j=i+1;j<result.length;j++){if(result[j].divider)break;cnt++;}
       fixedResult.push({...c,count:cnt});
-    }else{fixedResult.push(c);}
+    } else {
+      fixedResult.push(c);
+    }
   }
-  return fixedResult.length>1?fixedResult:null;
+  return fixedResult.length>0?fixedResult:null;
 }
 
 async function _tifiCallGroq(apiKey, userData){
   const u=userData;
   const goalWord=u.goalType==='lose'?'похудение':'набор массы';
 
-  // ── SYSTEM PROMPT — тифи без лимитов ──
-  const systemPrompt=`Ты — ТИФИ, персональный AI-тренер в приложении letify. Отвечаешь ТОЛЬКО валидным JSON массивом. Никаких объяснений, никакого markdown, никакого текста вне массива.
+  // ── SYSTEM PROMPT — концепт тифи 2.0 ──
+  const systemPrompt=`Ты — ТИФИ, персональный AI-тренер в приложении letify. Отвечай ТОЛЬКО валидным JSON массивом без markdown и без текста вне массива.
 
-ТЫ ПОЛНОСТЬЮ СВОБОДЕН В ВЫБОРЕ:
-— сколько карточек создать (минимум 8, нет максимума — создавай столько, сколько нужно)
-— какие категории использовать
-— какую информацию показывать
+ЗАДАЧА: Создай столько карточек, сколько нужно для полного анализа (минимум 8). Тифи сам решает что важно показать.
 
-ДОСТУПНЫЕ КАТЕГОРИИ (cat):
-"обзор" — общий скор дня
-"инсайты" — паттерны и наблюдения
-"задачи" — конкретные действия
-"прогноз" — тренды и цели
-"питание" — детальный анализ еды
-"рецепты" — конкретные рецепты с шагами
-"меню" — план питания на день/неделю
-"анализ" — сравнение с прошлой неделей, макросы
-"активность" — анализ нагрузки
-"сон" — анализ сна
-"бюджет" — бюджетный список покупок
-"советы" — персональные инсайты
+ДОСТУПНЫЕ КАТЕГОРИИ (поле "cat"): "обзор", "инсайты", "задачи", "прогноз", "питание", "рецепты", "меню", "анализ", "активность", "сон", "бюджет", "советы"
 
-ДОСТУПНЫЕ ТИПЫ КАРТОЧЕК (type):
-"score" — большое число + метрики (для обзора дня)
-"insight" — паттерн с данными  
-"action" — список задач с иконками
-"forecast" — строки прогноза
-"recipe" — рецепт с шагами и КБЖУ
-"menu" — план приёмов пищи
-"compare" — сравнение неделя к неделе
-"warm","dark","blue","orange","teal","purple","green" — универсальные
+ДОСТУПНЫЕ ТИПЫ (поле "type"): "score", "insight", "action", "forecast", "recipe", "menu", "compare", "warm", "dark", "blue", "orange", "teal", "purple", "green"
 
-ДОСТУПНЫЕ ПОЛЯ:
-title, sub, tag{cls,text}, score, score_clr, metrics[{l,v,w,clr}],
-nums[{v,l,clr}], macros[{v,l,clr}], rows[{l,v,clr}], bar{w,clr},
-chips[{t,cls}], list[{t,s,ico,svg}], todo[{t,ico,svg}],
-meals[{ico,name,sub,kcal,clr}], ingredients[], steps[],
-cost, compare_rows[{l,prev,cur,delta,up}],
-week_days[{d,v,clr}], shopping[{name,price,protein}]
+ПОЛЯ КАРТОЧКИ:
+- title (обязательно, макс 60 символов)
+- sub (макс 120 символов)  
+- tag: {"cls": "orange"|"blue"|"green"|"purple"|"red", "text": "название тега"}
+- score: число 0-100 (только для обзора)
+- score_clr: цвет числа (только для обзора)
+- metrics: [{"l":"название","v":"значение","w":процент_0-100,"clr":"цвет"}] (полоски под score)
+- nums: [{"v":"значение","l":"подпись","clr":"цвет"}] (большие числа)
+- macros: [{"v":"значение","l":"кБ/Ж/У","clr":"цвет"}] (нутриенты)
+- rows: [{"l":"левый текст","v":"правый текст","clr":"цвет"}] (строки данных)
+- bar: {"w":процент,"clr":"css-цвет или градиент"} (прогресс-бар)
+- chips: [{"t":"текст","cls":"accent"|"warn"|"ok"|"blue"|""}] (чипы-теги)
+- list: [{"t":"заголовок","s":"подпись","ico":"bg:rgba(255,107,53,.14);color:#FF6B35","svg":"иконка"}] (список)
+- todo: [{"t":"задача","ico":"bg:rgba(78,174,229,.14);color:#4EAEE5","svg":"иконка"}] (задачи)
+- meals: [{"ico":"эмодзи","name":"блюдо","sub":"время","kcal":число,"clr":"цвет"}] (приёмы пищи)
+- ingredients: ["ингредиент 1", "ингредиент 2"] (для рецептов)
+- steps: ["шаг 1", "шаг 2"] (для рецептов)
+- cost: "~150 ₽" (стоимость порции)
+- compare_rows: [{"l":"метрика","prev":"прошлое","cur":"текущее","delta":"+N","up":true}] (сравнение недель)
+- week_days: [{"d":"пн","v":"85","clr":"#4EAEE5"}] (бар-чарт по дням, v=процент 0-100)
+- shopping: [{"name":"продукт","price":"цена числом","protein":"Nг белка"}] (список покупок)
 
-SVG иконки (только эти): "moon","activity","droplet","droplets","sunrise","utensils","check","arrowRight","spark","flame","scale","calendar","cart","brain","dumbbell","timer","trending","leaf"
-
-tag.cls: "orange","blue","green","purple","red"
-
-ПРИМЕРЫ КАРТОЧЕК:
-
-// 1. Обзор дня
-{"cat":"обзор","type":"score","tag":{"cls":"green","text":"обзор дня"},"title":"хороший день","sub":"из 100 · конкретная оценка одной строкой","score":74,"score_clr":"#3DCC72","metrics":[{"l":"питание","v":"68%","w":68,"clr":"#4EAEE5"},{"l":"активность","v":"90%","w":90,"clr":"#3DCC72"},{"l":"сон","v":"75%","w":75,"clr":"#9D85F2"},{"l":"вода","v":"50%","w":50,"clr":"#38BDF8"}]}
-
-// 2. Рецепт
-{"cat":"рецепты","type":"recipe","tag":{"cls":"orange","text":"рецепт · ужин"},"title":"скумбрия с гречкой","sub":"38г белка · 480 ккал · ~150 руб","ingredients":["скумбрия б/г 200г","гречка варёная 150г","лимон 1/4","чеснок 2 зуб","зелень","соль, перец"],"macros":[{"v":"480","l":"ккал","clr":"#FF8040"},{"v":"38г","l":"белок","clr":"#4EAEE5"},{"v":"18г","l":"жиры"},{"v":"45г","l":"углев","clr":"#3DCC72"}],"steps":["Скумбрию посолить, поперчить, полить лимоном","Запекать при 200°C 20 минут","Гречку сварить, подать как гарнир"],"cost":"~150 ₽"}
-
-// 3. Меню на день
-{"cat":"меню","type":"menu","tag":{"cls":"green","text":"меню · сегодня"},"title":"рацион на сегодня","sub":"под норму 2000 ккал · белок 150г · бюджетно","meals":[{"ico":"🌅","name":"творог 5% + банан + мёд","sub":"завтрак · 08:00","kcal":360,"clr":"#FF8040"},{"ico":"☀️","name":"куриная грудка с гречкой","sub":"обед · 13:00","kcal":520,"clr":"#4EAEE5"},{"ico":"🍎","name":"яйца вкрутую 3шт + огурец","sub":"перекус · 16:00","kcal":210,"clr":"#3DCC72"},{"ico":"🌙","name":"скумбрия запечённая с рисом","sub":"ужин · 19:00","kcal":480,"clr":"#9D85F2"}]}
-
-// 4. Сравнение с прошлой неделей
-{"cat":"анализ","type":"compare","tag":{"cls":"purple","text":"сравнение · 2 недели"},"title":"эта неделя vs прошлая","sub":"динамика по ключевым метрикам","compare_rows":[{"l":"калории/день","prev":"1640","cur":"1820","delta":"+180","up":true},{"l":"белок/день","prev":"95г","cur":"118г","delta":"+23г","up":true},{"l":"вода/день","prev":"1400мл","cur":"1750мл","delta":"+350","up":true},{"l":"сон","prev":"6.8ч","cur":"7.2ч","delta":"+0.4ч","up":true},{"l":"вес","prev":"72.4кг","cur":"71.8кг","delta":"−0.6","up":false}]}
-
-// 5. Анализ по дням (бар-чарт)
-{"cat":"анализ","type":"teal","tag":{"cls":"blue","text":"калории · 7 дней"},"title":"динамика питания за неделю","sub":"ккал по дням — норма 2000","week_days":[{"d":"пн","v":"85","clr":"#4EAEE5"},{"d":"вт","v":"60","clr":"#F45C5C"},{"d":"ср","v":"92","clr":"#3DCC72"},{"d":"чт","v":"78","clr":"#4EAEE5"},{"d":"пт","v":"55","clr":"#F45C5C"},{"d":"сб","v":"88","clr":"#3DCC72"},{"d":"вс","v":"95","clr":"#3DCC72"}]}
-
-// 6. Бюджетный список покупок
-{"cat":"бюджет","type":"dark","tag":{"cls":"green","text":"список покупок · неделя"},"title":"бюджетный белок на неделю","sub":"максимум белка за минимум денег — российский рынок","shopping":[{"name":"куриное филе 1кг","price":"280","protein":"220г белка"},{"name":"яйца С1 10шт","price":"100","protein":"60г белка"},{"name":"творог 5% 400г","price":"90","protein":"72г белка"},{"name":"скумбрия б/г 400г","price":"120","protein":"80г белка"},{"name":"гречка 1кг","price":"70","protein":"13г белка"},{"name":"горбуша консерва","price":"110","protein":"40г белка"}]}
-
-// 7. Паттерн из инсайтов
-{"cat":"инсайты","type":"insight","tag":{"cls":"purple","text":"паттерн · сон"},"title":"поздний ужин убивает сон","sub":"последние 5 из 7 дней ужин после 21:00 — качество сна падает на 0.8ч","rows":[{"l":"средний ужин","v":"21:47"},{"l":"цель (до)","v":"19:30","clr":"#3DCC72"},{"l":"потеря сна","v":"−0.8ч","clr":"#F45C5C"},{"l":"дней из 7","v":"5 дней","clr":"#FFAB40"}]}
-
-// 8. Макросы
-{"cat":"питание","type":"blue","tag":{"cls":"blue","text":"макросы · сегодня"},"title":"белок в дефиците","sub":"на 40г меньше нормы — основная проблема","macros":[{"v":"95г","l":"белок","clr":"#F45C5C"},{"v":"135г","l":"норма","clr":"#3DCC72"},{"v":"65г","l":"жиры","clr":"#FFAB40"},{"v":"180г","l":"углеводы","clr":"#4EAEE5"}],"chips":[{"t":"дефицит белка","cls":"warn"},{"t":"добавь яйца","cls":"accent"}]}
-
-// 9. Анализ сна
-{"cat":"сон","type":"purple","tag":{"cls":"purple","text":"анализ сна"},"title":"7.2ч — хорошо","sub":"этой ночью чуть выше нормы — сегодня больше энергии","nums":[{"v":"7.2ч","l":"эта ночь","clr":"#9D85F2"},{"v":"6.8ч","l":"средн. 7 дней","clr":"#9D85F2"},{"v":"4/5","l":"качество","clr":"#3DCC72"}],"bar":{"w":88,"clr":"linear-gradient(90deg,#9D85F2,#C4B5FD)"}}
-
-// 10. Задачи
-{"cat":"задачи","type":"action","tag":{"cls":"orange","text":"план тифи · сегодня"},"title":"5 действий на сегодня","sub":"тифи подобрал под твой прогресс","todo":[{"ico":"bg:rgba(78,174,229,.14);color:#4EAEE5","svg":"droplets","t":"выпить 2000мл воды — осталось 1500мл"},{"ico":"bg:rgba(255,171,64,.14);color:#FFAB40","svg":"sunrise","t":"белковый завтрак до 10:00 — творог или яйца"},{"ico":"bg:rgba(61,204,114,.14);color:#3DCC72","svg":"dumbbell","t":"кардио 30 мин в 18:00"},{"ico":"bg:rgba(157,133,242,.14);color:#9D85F2","svg":"moon","t":"ужин до 20:00, лечь до 23:00"},{"ico":"bg:rgba(255,107,53,.14);color:#FF6B35","svg":"utensils","t":"добавить белок к каждому приёму пищи"}]}
+SVG иконки (только из списка): "moon","activity","droplet","droplets","sunrise","utensils","check","arrowRight","spark","flame","scale","calendar","cart","brain","dumbbell","timer","trending","leaf"
 
 ПРАВИЛА:
-1. Используй РЕАЛЬНЫЕ числа из данных пользователя
-2. Если данных за день мало — анализируй 7-дневную историю
-3. Обращайся на "ты", конкретно и честно — ты тренер, а не подхалим
-4. Рецепты — только доступные продукты российского рынка
-5. Создавай СТОЛЬКО карточек, сколько нужно чтобы картина была полной
-6. Скор честно считай: питание×0.35 + сон×0.35 + активность×0.30
-7. title — макс 60 символов, sub — макс 120 символов`;
+1. Используй РЕАЛЬНЫЕ числа из данных — не придумывай
+2. Если данных 0 — честно скажи в sub что данных нет
+3. Рецепты — только продукты российского рынка, цены реальные
+4. Обращайся на "ты", будь конкретным — ты тренер, не льстец
+5. Скор = питание×0.35 + сон×0.35 + активность×0.30
+6. Обязательно создай: 1 обзор дня, инсайты по паттернам, задачи на сегодня, прогноз к цели
+7. Дополнительно добавляй по данным: рецепты, меню, сравнение недель, анализ макросов, бюджет`;
 
-  const userPrompt=`=== ДАННЫЕ ПОЛЬЗОВАТЕЛЯ ===
-Имя: ${u.name} | Пол: ${u.gender==='male'?'муж':'жен'} | Возраст: ${u.age} | Рост: ${u.height} см
-Цель: ${goalWord} | Время суток: ${u.timeOfDay}
+    const userPrompt=`ИМЯ: ${u.name} | ПОЛ: ${u.gender==='male'?'муж':'жен'} | ВОЗРАСТ: ${u.age} | РОСТ: ${u.height}см | ВРЕМЯ: ${u.timeOfDay}
+ЦЕЛЬ: ${goalWord} | СТРИК: ${u.streak} дней | ДО ЛЕТА: ${u.daysToSummer} дней
 
-=== ВЕС И ПРОГРЕСС ===
-Старт: ${u.startWeight} кг → Сейчас: ${u.currentWeight} кг → Цель: ${u.goalWeight} кг
-Прогресс к цели: ${u.progressPct}% | За 7 дней: ${u.weightDelta7d>0?'+':''}${u.weightDelta7d} кг
-До лета: ${u.daysToSummer} дней
+ВЕС: старт ${u.startWeight}кг → сейчас ${u.currentWeight}кг → цель ${u.goalWeight}кг (прогресс ${u.progressPct}%) | За 7 дней: ${u.weightDelta7d>0?'+':''}${u.weightDelta7d}кг
 
-=== ПИТАНИЕ СЕГОДНЯ ===
-Калории: ${u.calToday} / ${u.calGoal} ккал (${u.calPct}%)
-Приёмы: ${u.mealBreakdown}
-Макросы: ${u.macros}
+ПИТАНИЕ СЕГОДНЯ: ${u.calToday}/${u.calGoal} ккал (${u.calPct}%) | ${u.mealBreakdown||'ничего не записано'}
+МАКРОСЫ: ${u.macros}
+ВОДА: ${u.waterToday}/${u.waterGoal} мл (${u.waterPct}%)
 
-=== ВОДА ===
-${u.waterToday} / ${u.waterGoal} мл (${u.waterPct}%)
-
-=== СОН ===
-Средний за 7 дней: ${u.avgSleep} ч | Качество последней ночи: ${u.lastSleepQuality}/5
-
-=== АКТИВНОСТЬ ===
-Задачи: ${u.actsDone} / ${u.actsTotal} выполнено
-Список: ${u.actsList}
-
-=== СТРИК ===
-${u.streak} дней подряд
-
-=== ИНСТРУКЦИЯ ===
-Создай МАКСИМАЛЬНО полезный набор карточек. Используй ВСЕ доступные типы: рецепты, меню, сравнения, бюджет, анализ — если данных достаточно. Не ограничивай себя.`;
+СОН: среднее ${u.avgSleep}ч за 7 дней | качество ${u.lastSleepQuality}/5
+ЗАДАЧИ: ${u.actsDone}/${u.actsTotal} | ${u.actsList||'нет задач'}`;
 
   const resp=await fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
     body:JSON.stringify({
       model:'llama-3.3-70b-versatile',
-      max_tokens:8000,
-      temperature:0.7,
+      max_tokens:6000,
+      temperature:0.6,
       messages:[{role:'system',content:systemPrompt},{role:'user',content:userPrompt}]
     })
   });
@@ -6833,17 +6718,47 @@ ${u.streak} дней подряд
   const data=await resp.json();
   const text=(data.choices?.[0]?.message?.content||'').trim();
 
-  // Extract JSON array — search directly in raw text, don't rely on regex fence-stripping
-  const s=text.indexOf('['),e=text.lastIndexOf(']');
-  if(s===-1||e===-1)throw new Error('No JSON array in response');
-  let cards;
-  try{cards=JSON.parse(text.slice(s,e+1));}
-  catch(pe){throw new Error('JSON parse error: '+pe.message);}
-  if(!Array.isArray(cards)||cards.length===0)throw new Error('Empty cards');
+  // Multi-strategy JSON extraction
+  let cards=null;
+  const strategies=[
+    // 1. Clean markdown fences then parse
+    ()=>{
+      const clean=text.replace(/^```(?:json)?\s*/i,'').replace(/\s*```\s*$/,'').trim();
+      const s=clean.indexOf('['),e=clean.lastIndexOf(']');
+      if(s===-1||e===-1)return null;
+      return JSON.parse(clean.slice(s,e+1));
+    },
+    // 2. Find first valid JSON array anywhere in text
+    ()=>{
+      const s=text.indexOf('['),e=text.lastIndexOf(']');
+      if(s===-1||e===-1)return null;
+      return JSON.parse(text.slice(s,e+1));
+    },
+    // 3. Fix truncated JSON — find last complete object
+    ()=>{
+      const s=text.indexOf('[');
+      if(s===-1)return null;
+      let fragment=text.slice(s);
+      // find last closing brace of last complete card
+      let depth=0,lastGoodEnd=-1;
+      for(let i=0;i<fragment.length;i++){
+        if(fragment[i]==='{')depth++;
+        else if(fragment[i]==='}'){depth--;if(depth===0)lastGoodEnd=i;}
+      }
+      if(lastGoodEnd===-1)return null;
+      const fixed=fragment.slice(0,lastGoodEnd+1)+']';
+      return JSON.parse(fixed);
+    },
+  ];
+  for(const fn of strategies){
+    try{const r=fn();if(Array.isArray(r)&&r.length>0){cards=r;break;}}
+    catch(e){/* try next */}
+  }
+  if(!cards||cards.length===0)throw new Error('Не удалось разобрать ответ Groq. Текст: '+text.slice(0,120));
 
   // Normalize + validate
   const normalized=_tifiNormalizeCards(cards);
-  if(!normalized)throw new Error('Normalization failed');
+  if(!normalized)throw new Error('Нормализация не удалась (карточек: '+cards.length+')');
   return normalized;
 }
 
@@ -6861,15 +6776,6 @@ const TIFI_SVGS={
   check:`<polyline points="20 6 9 17 4 12"/>`,
   arrowRight:`<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>`,
   spark:`<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>`,
-  flame:`<path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 3z"/>`,
-  scale:`<path d="M16 16l3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1z"/><path d="M2 16l3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>`,
-  calendar:`<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>`,
-  cart:`<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/>`,
-  brain:`<path d="M9.5 2A2.5 2.5 0 0112 4.5v15a2.5 2.5 0 01-4.96-.46 2.5 2.5 0 01-1.07-4.89 3 3 0 01.34-5.58 2.5 2.5 0 013.19-3.07zM14.5 2a2.5 2.5 0 00-2.5 2.5v15a2.5 2.5 0 004.96-.46 2.5 2.5 0 001.07-4.89 3 3 0 00-.34-5.58A2.5 2.5 0 0014.5 2z"/>`,
-  dumbbell:`<path d="M6.5 6.5h11"/><path d="M6.5 17.5h11"/><line x1="12" y1="6.5" x2="12" y2="17.5"/><path d="M3 9.5v5"/><path d="M21 9.5v5"/><path d="M1.5 8.5v7a1 1 0 001 1h1a1 1 0 001-1v-7a1 1 0 00-1-1h-1a1 1 0 00-1 1zm18 0v7a1 1 0 001 1h1a1 1 0 001-1v-7a1 1 0 00-1-1h-1a1 1 0 00-1 1z"/>`,
-  timer:`<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>`,
-  trending:`<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>`,
-  leaf:`<path d="M2 22c5.523 0 10-4.477 10-10V2s-8 2-10 10v10z"/><path d="M16 8c-2.5 2.5-4 5.5-4 8"/>`,
 };
 function tifiMkSvg(k){return`<svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${TIFI_SVGS[k]||''}</svg>`}
 
@@ -6881,11 +6787,6 @@ const TIFI_CATS={
   советы:    {clr:'#FF8040', rgb:'255,128,64',  icon:'solar:stars-bold',       bg:'rgba(255,128,64,.08)', brd:'rgba(255,128,64,.18)',  dotClr:'#FF8040',  svg:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>'},
   питание:   {clr:'#4EAEE5', rgb:'78,174,229',  icon:'solar:leaf-bold',        bg:'rgba(78,174,229,.08)', brd:'rgba(78,174,229,.18)',  dotClr:'#4EAEE5',  svg:'<path d="M12 2a9 9 0 0 0 9 9 9 9 0 0 0-9 9 9 9 0 0 0-9-9 9 9 0 0 0 9-9z"/>'},
   активность:{clr:'#3DCC72', rgb:'61,204,114',  icon:'solar:dumbbell-bold',    bg:'rgba(61,204,114,.08)', brd:'rgba(61,204,114,.18)',  dotClr:'#3DCC72',  svg:'<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>'},
-  рецепты:   {clr:'#FF8040', rgb:'255,128,64',  icon:'solar:chef-hat-bold',    bg:'rgba(255,128,64,.08)', brd:'rgba(255,128,64,.18)',  dotClr:'#FF8040',  svg:'<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><path d="M7 2v20"/>'},
-  меню:      {clr:'#52C177', rgb:'82,193,119',  icon:'solar:menu-bold',        bg:'rgba(82,193,119,.08)', brd:'rgba(82,193,119,.18)',  dotClr:'#52C177',  svg:'<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><path d="M7 2v20"/>'},
-  анализ:    {clr:'#C084FC', rgb:'192,132,252',  icon:'solar:graph-bold',      bg:'rgba(192,132,252,.08)',brd:'rgba(192,132,252,.18)', dotClr:'#C084FC',  svg:'<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>'},
-  сон:       {clr:'#8B7FD4', rgb:'139,127,212',  icon:'solar:moon-bold',       bg:'rgba(139,127,212,.08)',brd:'rgba(139,127,212,.18)', dotClr:'#8B7FD4',  svg:'<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>'},
-  бюджет:    {clr:'#34D399', rgb:'52,211,153',   icon:'solar:wallet-bold',     bg:'rgba(52,211,153,.08)', brd:'rgba(52,211,153,.18)',  dotClr:'#34D399',  svg:'<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/>'},
 };
 
 function _tifiGetCards(){
@@ -6992,38 +6893,6 @@ function tifiBuildCard(data,idx){
   if(data.rows){h+=`<div class="tifi-cc-rows">`;data.rows.forEach(r=>{h+=`<div class="tifi-cc-row"><div class="tifi-cc-row-l">${r.l}</div><div class="tifi-cc-row-v"${r.clr?` style="color:${r.clr}"`:''}>${r.v}</div></div>`});h+=`</div>`;}
   if(data.todo){h+=`<div class="tifi-cc-todo">`;data.todo.forEach(item=>{const[bg,clr]=item.ico.split(';color:'),bgV=bg.replace('bg:','');h+=`<div class="tifi-cc-todo-item"><div class="tifi-cc-todo-ico" style="background:${bgV};color:${clr}">${tifiMkSvg(item.svg)}</div><span>${item.t}</span></div>`;});h+=`</div>`;}
   if(data.meals){h+=`<div class="tifi-cc-meal-list">`;data.meals.forEach(m=>{h+=`<div class="tifi-cc-meal-row"><div class="tifi-cc-meal-ico">${m.ico}</div><div class="tifi-cc-meal-info"><div class="tifi-cc-meal-name">${m.name}</div><div class="tifi-cc-meal-sub">${m.sub}</div></div><div><div class="tifi-cc-meal-kcal" style="color:${m.clr}">${m.kcal}</div><div class="tifi-cc-meal-unit">ккал</div></div></div>`;});h+=`</div>`;}
-  // recipe steps
-  if(data.steps&&data.steps.length){h+=`<div class="tifi-cc-steps">`;data.steps.forEach((s,i)=>{h+=`<div class="tifi-cc-step"><div class="tifi-cc-step-num">${i+1}</div><span>${s}</span></div>`;});h+=`</div>`;}
-  // cost badge
-  if(data.cost){h+=`<div class="tifi-cc-cost">порция · <span class="tifi-cc-cost-val">${data.cost}</span></div>`;}
-  // compare rows
-  if(data.compare_rows&&data.compare_rows.length){
-    h+=`<div class="tifi-cc-cmp-rows"><div class="tifi-cc-cmp-head"><span>метрика</span><span style="text-align:right">прошлая</span><span style="text-align:right">эта</span><span style="text-align:right">δ</span></div>`;
-    data.compare_rows.forEach(r=>{
-      const dClr=r.up?'#3DCC72':'#F45C5C';
-      h+=`<div class="tifi-cc-cmp-row"><span class="tifi-cc-cmp-l">${r.l}</span><span class="tifi-cc-cmp-prev">${r.prev}</span><span class="tifi-cc-cmp-cur">${r.cur}</span><span class="tifi-cc-cmp-d" style="color:${dClr}">${r.delta}</span></div>`;
-    });
-    h+=`</div>`;
-  }
-  // week strip (bar chart per day)
-  if(data.week_days&&data.week_days.length){
-    h+=`<div class="tifi-cc-week-strip">`;
-    data.week_days.forEach(d=>{
-      const pct=Math.min(100,Math.max(4,parseInt(d.v)||0));
-      h+=`<div class="tifi-cc-week-day"><div class="tifi-cc-week-bar-wrap"><div class="tifi-cc-week-bar-f" style="height:${pct}%;background:${d.clr}"></div></div><div class="tifi-cc-week-lbl">${d.d}</div><div class="tifi-cc-week-val">${d.v.replace('%','')}</div></div>`;
-    });
-    h+=`</div>`;
-  }
-  // shopping list
-  if(data.shopping&&data.shopping.length){
-    h+=`<div class="tifi-cc-shop-list">`;
-    let total=0;
-    data.shopping.forEach(s=>{
-      const p=parseFloat(s.price)||0;total+=p;
-      h+=`<div class="tifi-cc-shop-row"><span class="tifi-cc-shop-name">${s.name}</span><span class="tifi-cc-shop-price">${s.price} ₽</span><span class="tifi-cc-shop-prot">${s.protein}</span></div>`;
-    });
-    h+=`</div><div class="tifi-cc-shop-total"><span class="tifi-cc-shop-total-l">итого</span><span class="tifi-cc-shop-total-v">~${Math.round(total)} ₽</span></div>`;
-  }
   h+=`</div>`;scroll.innerHTML=h;el.appendChild(scroll);return el;
 }
 
@@ -7315,15 +7184,14 @@ async function tifiStartScreen(){
 
   // --- Phase 1: scripted log lines (timing aligns with real API call) ---
   const phase1=[
-    {delay:0,    pfx:'▸', cls:'tl-pfx-run',  txt:'инициализация анализа данных',      tCls:'',    pct:4},
-    {delay:400,  pfx:'▸', cls:'tl-pfx-run',  txt:'читаю профиль пользователя...',     tCls:'',    pct:10},
-    {delay:800,  pfx:'✓', cls:'tl-pfx-ok',   txt:'профиль загружен',                  tCls:'ok',  pct:16},
-    {delay:1200, pfx:'▸', cls:'tl-pfx-run',  txt:'анализирую питание и воду',         tCls:'',    pct:24},
-    {delay:1600, pfx:'i', cls:'tl-pfx-info', txt:'питание · вода · 7 дней истории',   tCls:'dim', pct:32},
-    {delay:2000, pfx:'▸', cls:'tl-pfx-run',  txt:'смотрю активность и сон',           tCls:'',    pct:42},
-    {delay:2400, pfx:'✓', cls:'tl-pfx-ok',   txt:'данные собраны',                    tCls:'ok',  pct:52},
-    {delay:2800, pfx:'▸', cls:'tl-pfx-run',  txt:'строю рецепты и меню...',           tCls:'',    pct:60},
-    {delay:3200, pfx:'◆', cls:'tl-pfx-ai',   txt:'отправляю запрос groq api',         tCls:'tl-ai',pct:70},
+    {delay:0,    pfx:'▸', cls:'tl-pfx-run',  txt:'инициализация анализа данных',   tCls:'',    pct:5},
+    {delay:450,  pfx:'▸', cls:'tl-pfx-run',  txt:'читаю профиль пользователя...',  tCls:'',    pct:12},
+    {delay:900,  pfx:'✓', cls:'tl-pfx-ok',   txt:'профиль загружен',               tCls:'ok',  pct:20},
+    {delay:1300, pfx:'▸', cls:'tl-pfx-run',  txt:'анализирую питание и воду',      tCls:'',    pct:32},
+    {delay:1750, pfx:'i', cls:'tl-pfx-info', txt:'питание · вода · последние 7 дней', tCls:'dim', pct:44},
+    {delay:2150, pfx:'▸', cls:'tl-pfx-run',  txt:'смотрю активность и сон',        tCls:'',    pct:56},
+    {delay:2600, pfx:'✓', cls:'tl-pfx-ok',   txt:'данные собраны',                 tCls:'ok',  pct:68},
+    {delay:3000, pfx:'◆', cls:'tl-pfx-ai',   txt:'отправляю запрос groq api',      tCls:'tl-ai',  pct:78},
   ];
 
   phase1.forEach(s=>{
@@ -7381,7 +7249,9 @@ async function tifiStartScreen(){
       tlAddLine('✗','tl-pfx-warn','неверный ключ groq api','warn');
       tlAddLine('→','tl-pfx-info','нажми изменить в заголовке','dim');
     }else{
-      tlAddLine('✗','tl-pfx-warn','ошибка соединения · использую кэш','warn');
+      const errMsg=(apiError?.message||'unknown').slice(0,60).toLowerCase();
+      tlAddLine('✗','tl-pfx-warn','ошибка: '+errMsg,'warn');
+      tlAddLine('→','tl-pfx-info','загружаю базовые карточки','dim');
     }
     tifiCards=_tifiGetCards();
     _tifiUsedFallback=true;
