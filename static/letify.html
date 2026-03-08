@@ -6412,32 +6412,43 @@ function _populateTifiKey(){
 }
 
 /* ── вставить ключ из буфера и открыть тифи ── */
-async function tifiSaveKeyAndOpen(){
+function tifiSaveKeyAndOpen(){
   const btn=document.getElementById('tifi-key-save-btn');
-  let k='';
-  try{
-    k=(await navigator.clipboard.readText()||'').trim();
-  }catch(e){
-    if(btn){
-      const orig=btn.innerHTML;
-      btn.innerHTML='<span style="font-size:13px">разреши доступ к буферу</span>';
-      setTimeout(()=>{btn.innerHTML=orig;},2000);
+
+  function _apply(k){
+    k=(k||'').trim();
+    if(!k||k.length<10){
+      if(btn){
+        const orig=btn.innerHTML;
+        btn.innerHTML='<span style="font-size:13px">в буфере нет ключа</span>';
+        setTimeout(()=>{btn.innerHTML=orig;},2000);
+      }
+      return;
     }
+    _tifiSetKey(k);
+    _tifiUpdateOtherStatus();
+    tg?.HapticFeedback?.notificationOccurred('success');
+    popPage();
+    setTimeout(()=>{pushPage('pp-tifi');tifiStartScreen();},280);
+  }
+
+  // Telegram WebApp native API — без разрешений и без клавиатуры
+  if(window.Telegram?.WebApp?.readTextFromClipboard){
+    window.Telegram.WebApp.readTextFromClipboard(_apply);
     return;
   }
-  if(!k||k.length<10){
-    if(btn){
-      const orig=btn.innerHTML;
-      btn.innerHTML='<span style="font-size:13px">буфер пустой или ключ слишком короткий</span>';
-      setTimeout(()=>{btn.innerHTML=orig;},2000);
-    }
+
+  // fallback для браузера (если открыто вне Telegram)
+  if(navigator.clipboard?.readText){
+    navigator.clipboard.readText().then(_apply).catch(()=>{
+      if(btn){
+        const orig=btn.innerHTML;
+        btn.innerHTML='<span style="font-size:13px">открой в Telegram</span>';
+        setTimeout(()=>{btn.innerHTML=orig;},2000);
+      }
+    });
     return;
   }
-  _tifiSetKey(k);
-  _tifiUpdateOtherStatus();
-  tg?.HapticFeedback?.notificationOccurred('success');
-  popPage();
-  setTimeout(()=>{pushPage('pp-tifi');tifiStartScreen();},280);
 }
 
 /* ── удалить ключ ── */
