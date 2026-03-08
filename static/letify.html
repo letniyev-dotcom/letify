@@ -1659,6 +1659,195 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .lc-zoom{position:absolute;bottom:calc(max(env(safe-area-inset-bottom,24px),24px) + 36px);left:50%;transform:translateX(-50%);background:rgba(0,0,0,.75);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:5px 14px;z-index:11;font-size:11px;font-weight:700;color:rgba(255,255,255,.55);pointer-events:none;white-space:nowrap;opacity:0;transition:opacity .2s}
 .lc-zoom.visible{opacity:1}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* ══════════════════════════════════════════
+   ТИФИ — полный экран (pp-tifi)
+══════════════════════════════════════════ */
+
+/* ── тифи хедер ── */
+#pp-tifi .pp-hdr{position:relative;z-index:10;background:var(--bg)}
+#pp-tifi{overflow:hidden}
+
+/* ── shimmer на кнопке тифи (главная) ── */
+.tifi-home-shimmer{
+  position:absolute;inset:0;border-radius:18px;
+  background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.04) 50%,transparent 70%);
+  animation:tifi-shimmer-idle 3.5s linear infinite;pointer-events:none;
+}
+@keyframes tifi-shimmer-idle{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+
+/* ── loading ── */
+#tifi-loading{
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:32px 36px calc(var(--sb)+80px);
+  transition:opacity .4s;z-index:5;background:var(--bg);
+}
+.brain-wrap{position:relative;width:80px;height:80px;margin-bottom:32px}
+.brain-ring{position:absolute;top:0;left:0;right:0;bottom:0;border-radius:50%;border:2px solid rgba(var(--sun-rgb),.12)}
+.brain-arc{position:absolute;top:0;left:0;right:0;bottom:0;border-radius:50%;border:2.5px solid transparent;border-top-color:var(--sun);border-right-color:rgba(var(--sun2-rgb),.4);animation:tifi-sp 1.1s linear infinite}
+.brain-arc2{position:absolute;top:10px;left:10px;right:10px;bottom:10px;border-radius:50%;border:2px solid transparent;border-bottom-color:rgba(var(--sun2-rgb),.5);border-left-color:rgba(var(--sun-rgb),.2);animation:tifi-sp 1.7s linear infinite reverse}
+@keyframes tifi-sp{to{transform:rotate(360deg)}}
+.brain-center{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center}
+.brain-center svg{width:28px;height:28px;color:var(--sun);opacity:.85}
+.tifi-load-h{font-size:18px;font-weight:800;text-align:center;margin-bottom:6px}
+.tifi-load-s{font-size:13px;color:var(--hint);font-weight:500;line-height:1.5;text-align:center;margin-bottom:28px}
+.tifi-load-list{width:100%;max-width:260px;display:flex;flex-direction:column;gap:11px}
+.tifi-ls{display:flex;align-items:center;gap:11px;font-size:13px;font-weight:600;color:var(--hint);transition:color .25s}
+.tifi-ls.on{color:var(--sun)}.tifi-ls.ok{color:var(--text)}
+.tifi-ls-dot{width:20px;height:20px;border-radius:50%;flex-shrink:0;background:var(--bg3);border:1.5px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;transition:background .25s,border-color .25s}
+.tifi-ls.on .tifi-ls-dot{background:rgba(var(--sun-rgb),.12);border-color:var(--sun);animation:tifi-pdot 1s ease infinite}
+.tifi-ls.ok .tifi-ls-dot{background:var(--green);border-color:var(--green)}
+@keyframes tifi-pdot{0%,100%{box-shadow:0 0 0 0 rgba(var(--sun-rgb),.35)}50%{box-shadow:0 0 0 5px rgba(var(--sun-rgb),0)}}
+.tifi-load-bar{margin-top:24px;width:100%;max-width:260px;height:2px;background:var(--bg3);border-radius:99px;overflow:hidden}
+.tifi-load-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--sun),var(--sun2));border-radius:99px;transition:width .5s}
+
+/* ── carousel dots ── */
+.tifi-cdots{
+  position:absolute;top:calc(var(--st) + 58px);left:0;right:0;
+  display:flex;justify-content:center;align-items:center;gap:5px;z-index:5;padding:0 20px;flex-wrap:wrap;
+}
+.tifi-cdot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.18);transition:width .25s,background .25s,border-radius .25s,height .25s;flex-shrink:0}
+.tifi-cdot.on{width:18px;border-radius:3px}
+.tifi-cdot.div-dot{width:20px;height:4px;border-radius:2px;opacity:.5}
+.tifi-cdot.div-dot.on{opacity:1;width:28px}
+
+/* ── carousel ── */
+#tifi-carousel{position:absolute;top:0;left:0;right:0;bottom:0;opacity:0;transition:opacity .45s;pointer-events:none}
+#tifi-carousel.visible{opacity:1;pointer-events:all}
+.tifi-ctrack-vp{
+  position:absolute;
+  top:calc(var(--st) + 84px);
+  left:0;right:0;
+  bottom:calc(var(--sb) + 56px);
+  overflow:hidden;
+}
+.tifi-ccard{
+  position:absolute;top:0;bottom:0;left:16px;right:16px;
+  border-radius:24px;overflow:hidden;
+  display:flex;flex-direction:column;
+  transition:transform .38s cubic-bezier(.4,0,.2,1),opacity .38s ease;
+  will-change:transform,opacity;
+}
+.tifi-ccard.state-current{transform:translateX(0);opacity:1;z-index:3}
+.tifi-ccard.state-prev{transform:translateX(-112%);opacity:0;z-index:1}
+.tifi-ccard.state-next{transform:translateX(112%);opacity:0;z-index:1}
+
+.tifi-cc-scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.tifi-cc-scroll::-webkit-scrollbar{display:none}
+.tifi-cc-body{padding:20px;display:flex;flex-direction:column;position:relative;z-index:1}
+.tifi-cc-counter{position:absolute;top:14px;right:14px;font-size:11px;font-weight:800;color:rgba(255,255,255,.22);z-index:4;pointer-events:none}
+
+/* card backgrounds */
+.tifi-cc-warm{background:rgba(28,22,18,.72);border:1px solid rgba(var(--sun-rgb),.18);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+.tifi-cc-warm-glow{position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse 80% 60% at 85% 5%,rgba(var(--sun-rgb),.1),transparent 65%),radial-gradient(ellipse 60% 50% at 15% 90%,rgba(var(--sun2-rgb),.06),transparent 65%);pointer-events:none;z-index:0}
+.tifi-cc-dark{background:rgba(22,22,24,.75);border:1px solid rgba(255,255,255,.07);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+.tifi-cc-blue{background:rgba(18,26,38,.75);border:1px solid rgba(78,174,229,.14);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+.tifi-cc-green{background:rgba(16,28,22,.76);border:1px solid rgba(61,204,114,.13);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+.tifi-cc-purple{background:rgba(22,18,34,.76);border:1px solid rgba(157,133,242,.13);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+.tifi-cc-orange{background:rgba(28,20,14,.74);border:1px solid rgba(var(--sun-rgb),.13);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+.tifi-cc-teal{background:rgba(16,26,28,.76);border:1px solid rgba(61,204,114,.12);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+
+/* tags */
+.tifi-cc-tag{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;padding:5px 10px;border-radius:8px;margin-bottom:12px;align-self:flex-start;flex-shrink:0}
+.tifi-tag-orange{background:rgba(var(--sun-rgb),.14);color:var(--sun)}
+.tifi-tag-blue{background:rgba(78,174,229,.14);color:var(--water)}
+.tifi-tag-green{background:rgba(61,204,114,.14);color:var(--green)}
+.tifi-tag-purple{background:rgba(157,133,242,.14);color:#9D85F2}
+.tifi-tag-red{background:rgba(244,92,92,.12);color:var(--red)}
+
+.tifi-cc-h{font-size:22px;font-weight:900;letter-spacing:-.02em;line-height:1.2;color:#F5F4F2}
+.tifi-cc-s{font-size:13px;font-weight:500;line-height:1.55;margin-top:7px;color:rgba(255,255,255,.45)}
+.tifi-cc-bignums{display:flex;gap:8px;margin-top:15px}
+.tifi-cc-num{flex:1;min-width:0;border-radius:13px;padding:11px 10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06)}
+.tifi-cc-num-v{font-size:19px;font-weight:900;letter-spacing:-.02em;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tifi-cc-num-l{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.35);margin-top:4px}
+.tifi-cc-macros{display:flex;gap:6px;margin-top:13px}
+.tifi-cc-macro{flex:1;min-width:0;border-radius:11px;padding:9px 6px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);text-align:center}
+.tifi-cc-macro-v{font-size:13px;font-weight:900;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tifi-cc-macro-l{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:rgba(255,255,255,.35);margin-top:3px}
+.tifi-cc-ingredients{margin-top:10px;display:flex;flex-wrap:wrap;gap:5px}
+.tifi-cc-ingr{padding:4px 9px;border-radius:7px;font-size:11px;font-weight:600;background:rgba(255,255,255,.04);color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.06)}
+.tifi-cc-bar{height:5px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin-top:13px}
+.tifi-cc-bar-fill{height:100%;border-radius:99px}
+.tifi-cc-list{margin-top:13px;display:flex;flex-direction:column}
+.tifi-cc-li{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.tifi-cc-li:last-child{border-bottom:none;padding-bottom:0}
+.tifi-cc-li-ico{width:34px;height:34px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.tifi-cc-li-ico svg{width:16px;height:16px}
+.tifi-cc-li-t{font-size:13px;font-weight:700;line-height:1.3;color:#F5F4F2}
+.tifi-cc-li-s{font-size:11px;color:rgba(255,255,255,.38);font-weight:500;margin-top:2px}
+.tifi-cc-rows{margin-top:12px;display:flex;flex-direction:column}
+.tifi-cc-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.tifi-cc-row:last-child{border-bottom:none}
+.tifi-cc-row-l{font-size:13px;font-weight:600;color:rgba(255,255,255,.38)}
+.tifi-cc-row-v{font-size:14px;font-weight:800;color:#F5F4F2}
+.tifi-cc-todo{display:flex;flex-direction:column;gap:9px;margin-top:12px}
+.tifi-cc-todo-item{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;line-height:1.35;color:#F5F4F2}
+.tifi-cc-todo-ico{width:28px;height:28px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.tifi-cc-todo-ico svg{width:14px;height:14px}
+.tifi-cc-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.tifi-cc-chip{padding:6px 11px;border-radius:20px;font-size:12px;font-weight:600;background:rgba(255,255,255,.05);color:rgba(255,255,255,.38);border:1px solid rgba(255,255,255,.08)}
+.tifi-cc-chip.accent{background:rgba(var(--sun-rgb),.1);color:var(--sun);border-color:rgba(var(--sun-rgb),.2)}
+.tifi-cc-chip.warn{background:rgba(244,92,92,.08);color:var(--red);border-color:rgba(244,92,92,.15)}
+.tifi-cc-chip.ok{background:rgba(61,204,114,.09);color:var(--green);border-color:rgba(61,204,114,.18)}
+.tifi-cc-chip.blue{background:rgba(78,174,229,.09);color:var(--water);border-color:rgba(78,174,229,.18)}
+.tifi-cc-meal-list{margin-top:12px;display:flex;flex-direction:column}
+.tifi-cc-meal-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.tifi-cc-meal-row:last-child{border-bottom:none;padding-bottom:0}
+.tifi-cc-meal-ico{font-size:18px;width:26px;text-align:center;flex-shrink:0}
+.tifi-cc-meal-info{flex:1;min-width:0}
+.tifi-cc-meal-name{font-size:12px;font-weight:700;line-height:1.2;color:#F5F4F2}
+.tifi-cc-meal-sub{font-size:10px;color:rgba(255,255,255,.35);font-weight:500;margin-top:1px}
+.tifi-cc-meal-kcal{font-size:14px;font-weight:900;flex-shrink:0}
+.tifi-cc-meal-unit{font-size:9px;color:rgba(255,255,255,.3);font-weight:600;text-align:right;margin-top:1px}
+.tifi-cc-custom-badge{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;background:linear-gradient(135deg,var(--sun),var(--sun2));color:#fff;padding:3px 8px;border-radius:6px;margin-bottom:10px;align-self:flex-start}
+
+/* divider card */
+.tifi-ccard.cc-divider{display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;cursor:default}
+.tifi-div-bg{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none}
+.tifi-div-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;padding:40px 24px;gap:0}
+.tifi-div-ico-wrap{width:80px;height:80px;border-radius:28px;display:flex;align-items:center;justify-content:center;font-size:38px;margin-bottom:20px;position:relative}
+.tifi-div-ico-glow{position:absolute;inset:-8px;border-radius:36px;opacity:.3;filter:blur(16px);pointer-events:none}
+.tifi-div-cat-name{font-size:36px;font-weight:900;letter-spacing:-.04em;text-align:center;line-height:1;margin-bottom:8px}
+.tifi-div-cat-sub{font-size:13px;font-weight:600;color:rgba(255,255,255,.4);text-align:center;margin-bottom:32px}
+.tifi-div-enter-btn{display:flex;align-items:center;gap:10px;padding:12px 22px;border-radius:16px;font-size:14px;font-weight:800;color:#fff;cursor:pointer;transition:transform .15s cubic-bezier(.34,1.56,.64,1),opacity .15s;border:none;font-family:inherit}
+.tifi-div-enter-btn:active{transform:scale(.93);opacity:.8}
+.tifi-div-enter-btn svg{width:18px;height:18px}
+
+/* carousel nav */
+.tifi-carousel-nav{position:absolute;bottom:calc(var(--sb)+14px);left:0;right:0;display:flex;align-items:center;justify-content:center;z-index:10;pointer-events:none}
+.tifi-nav-center{font-size:11px;font-weight:700;color:var(--hint);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:5px 12px;pointer-events:none}
+
+/* ── ключ ввод (pp-tifi-key) ── */
+.tifi-key-input-lbl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--hint);margin-bottom:5px}
+.tifi-key-input{
+  width:100%;padding:14px;border-radius:13px;
+  background:var(--bg3);border:1.5px solid rgba(255,255,255,.07);
+  color:var(--text);font-family:monospace;font-size:13px;font-weight:600;
+  outline:none;-webkit-appearance:none;letter-spacing:.03em;
+  transition:border-color .2s,background .2s;
+  user-select:text;-webkit-user-select:text;
+}
+.tifi-key-input:focus{border-color:rgba(var(--sun-rgb),.4);background:rgba(var(--sun-rgb),.05)}
+.tifi-key-input::placeholder{color:var(--hint);font-family:'Onest',sans-serif;font-size:13px;font-weight:500;letter-spacing:0}
+.tifi-key-save-btn{
+  width:100%;margin-top:10px;padding:15px;border-radius:14px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,var(--sun),var(--sun2));
+  color:#fff;font-family:'Onest',inherit;font-size:14px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  box-shadow:0 4px 16px rgba(var(--sun-rgb),.3);
+  opacity:.4;pointer-events:none;
+  transition:opacity .15s,transform .14s;
+}
+.tifi-key-save-btn.ready{opacity:1;pointer-events:all}
+.tifi-key-save-btn:active{transform:scale(.97)}
+.tifi-key-del-btn{
+  width:100%;margin-top:8px;padding:11px;border-radius:12px;border:1px solid rgba(244,92,92,.18);
+  background:transparent;color:var(--red);font-family:'Onest',inherit;font-size:12px;font-weight:700;
+  cursor:pointer;transition:background .14s;
+}
+.tifi-key-del-btn:active{background:rgba(244,92,92,.1)}
 </style>
 </head>
 <body>
@@ -2023,7 +2212,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   </div>
   <div class="pp-body">
     <div class="pf-list-card" style="margin-bottom:10px">
-      <div class="pf-list-row" onclick="pushPage('pp-tifi-key')">
+      <div class="pf-list-row" onclick="openTifiOrKey()">
         <div class="pf-list-row-ic" style="background:rgba(var(--sun-rgb),.12)">
           <iconify-icon icon="solar:stars-bold" style="font-size:15px;color:var(--sun)"></iconify-icon>
         </div>
@@ -2044,99 +2233,104 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       Сбросить все данные
     </button>
 
-<!-- PP: тифи — ключ -->
+  </div>
+</div>
+
+<!-- PP: тифи — добавить ключ -->
 <div class="push-page" id="pp-tifi-key">
   <div class="pp-hdr">
     <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
     <div>
       <div class="pp-title">тифи</div>
-      <div class="pp-subtitle">AI · Groq</div>
+      <div class="pp-subtitle">Ai</div>
     </div>
   </div>
   <div class="pp-body">
 
-    <!-- hero: статус ключа -->
-    <div id="tifi-key-status-card" style="
-      background:var(--bg2);border-radius:20px;
-      border:1px solid var(--brd);padding:20px 18px;
-      margin-bottom:14px;
-      display:flex;align-items:center;gap:14px;
-      box-shadow:var(--sh);
-    ">
-      <!-- иконка тифи -->
-      <div style="width:48px;height:48px;border-radius:15px;flex-shrink:0;background:linear-gradient(135deg,var(--sun),var(--sun2));display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(var(--sun-rgb),.3);position:relative">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-        <div id="tifi-status-dot" style="position:absolute;width:10px;height:10px;border-radius:50%;background:var(--hint);border:2px solid var(--bg2);bottom:-2px;right:-2px;transition:background .3s ease"></div>
+    <!-- hero -->
+    <div style="background:linear-gradient(135deg,rgba(var(--sun-rgb),.08),rgba(var(--sun2-rgb),.04));border-radius:20px;border:1px solid rgba(var(--sun-rgb),.14);padding:20px 18px;margin-bottom:16px;display:flex;align-items:center;gap:14px">
+      <div style="width:52px;height:52px;border-radius:16px;flex-shrink:0;background:linear-gradient(135deg,var(--sun),var(--sun2));display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(var(--sun-rgb),.35)">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
       </div>
-      <div style="flex:1;min-width:0">
-        <div id="tifi-status-title" style="font-size:15px;font-weight:800;color:var(--text)">ключ не добавлен</div>
-        <div id="tifi-status-sub" style="font-size:12px;font-weight:500;color:var(--hint);margin-top:3px;line-height:1.4">вставь ключ Groq чтобы активировать тифи</div>
+      <div>
+        <div style="font-size:18px;font-weight:900;letter-spacing:-.02em">тифи</div>
+        <div style="font-size:12px;color:var(--hint);font-weight:500;margin-top:2px;line-height:1.4">персональный Ai-аналитик твоего дня</div>
       </div>
     </div>
 
-    <!-- маска сохранённого ключа -->
-    <div id="tifi-key-saved-wrap" style="display:none;margin-bottom:14px">
-      <div style="
-        background:rgba(var(--sun-rgb),.06);border-radius:14px;padding:12px 16px;
-        font-size:12px;font-weight:600;color:var(--hint);
-        font-family:monospace;letter-spacing:.04em;word-break:break-all;
-        border:1px solid rgba(var(--sun-rgb),.15);
-        display:flex;align-items:center;gap:10px;
-      ">
-        <iconify-icon icon="solar:key-bold" style="font-size:16px;color:var(--sun);flex-shrink:0"></iconify-icon>
-        <span id="tifi-key-masked-display" style="flex:1"></span>
-        <button onclick="tifiDeleteKey()" style="background:none;border:none;color:var(--hint);cursor:pointer;padding:0;font-size:12px;font-weight:700;flex-shrink:0;font-family:inherit">удалить</button>
+    <!-- ключ -->
+    <div class="m3-card">
+      <div id="tifi-key-saved-wrap" style="display:none;margin-bottom:14px">
+        <div style="background:rgba(var(--sun-rgb),.06);border-radius:12px;padding:11px 14px;font-size:12px;font-weight:600;color:var(--hint);font-family:monospace;letter-spacing:.04em;word-break:break-all;border:1px solid rgba(var(--sun-rgb),.15);display:flex;align-items:center;gap:10px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--sun)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="8" cy="15" r="4"/><path d="M12 15h8"/><path d="M16 11v8"/><path d="M20 11v8"/></svg>
+          <span id="tifi-key-masked-display" style="flex:1"></span>
+          <button onclick="tifiDeleteKey()" style="background:none;border:none;color:var(--hint);cursor:pointer;padding:0;font-size:12px;font-weight:700;flex-shrink:0;font-family:inherit">удалить</button>
+        </div>
+      </div>
+      <div id="tifi-key-field-block">
+        <div class="tifi-key-input-lbl">API ключ Groq</div>
+        <input class="tifi-key-input" id="tifi-key-input" type="text" placeholder="gsk_..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="tifiOnKeyInput(this)">
+        <button class="tifi-key-save-btn" id="tifi-key-save-btn" onclick="tifiSaveKeyAndOpen()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          сохранить и открыть тифи
+        </button>
       </div>
     </div>
 
-    <!-- одна кнопка вставки -->
-    <button id="tifi-paste-btn" onclick="tifiPasteKey()" style="
-      width:100%;padding:18px 20px;border-radius:18px;border:none;cursor:pointer;
-      background:linear-gradient(135deg,var(--sun),var(--sun2));
-      color:#fff;font-size:16px;font-weight:800;font-family:inherit;
-      display:flex;align-items:center;justify-content:center;gap:10px;
-      box-shadow:0 6px 20px rgba(var(--sun-rgb),.35);
-      transition:transform .12s ease,opacity .12s ease,box-shadow .12s ease;
-      -webkit-tap-highlight-color:transparent;
-    " ontouchstart="this.style.transform='scale(.97)';this.style.opacity='.88'" ontouchend="this.style.transform='';this.style.opacity=''">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-      вставить ключ из буфера
-    </button>
-
-    <!-- индикатор проверки / результат -->
-    <div id="tifi-check-row" style="
-      display:none;align-items:center;gap:12px;
-      margin-top:12px;padding:14px 16px;
-      background:var(--bg3);border-radius:14px;
-      border:1px solid var(--brd);
-      transition:background .3s;
-    ">
-      <div id="tifi-check-spinner" style="
-        width:18px;height:18px;flex-shrink:0;
-        border:2.5px solid rgba(var(--sun-rgb),.2);
-        border-top-color:var(--sun);
-        border-radius:50%;
-        animation:spin 0.8s linear infinite;
-        display:none;
-      "></div>
-      <div id="tifi-check-icon" style="font-size:18px;display:none;flex-shrink:0"></div>
-      <div id="tifi-check-text" style="font-size:13px;font-weight:700;color:var(--text)">проверяю ключ…</div>
-    </div>
-
-    <!-- подсказка как получить ключ -->
-    <div style="margin-top:16px;padding:16px;background:var(--bg3);border-radius:16px;border:1px solid var(--brd)">
-      <div style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:10px">как получить ключ</div>
-      <div style="font-size:12px;font-weight:500;color:var(--hint);line-height:1.7">
+    <!-- как получить -->
+    <div class="m3-sec">как получить ключ</div>
+    <div style="padding:14px;background:var(--bg3);border-radius:14px;border:1px solid var(--brd)">
+      <div style="font-size:12px;font-weight:500;color:var(--hint);line-height:1.75">
         1. зайди на <span style="color:var(--sun);font-weight:700">console.groq.com</span><br>
         2. зарегистрируйся бесплатно<br>
-        3. нажми <span style="font-weight:700;color:var(--text)">API Keys → Create API Key</span><br>
-        4. скопируй ключ — затем нажми кнопку выше
+        3. нажми <b style="color:var(--text)">API Keys → Create API Key</b><br>
+        4. скопируй ключ и вставь в поле выше
       </div>
     </div>
 
+  </div>
+</div>
 
+<!-- PP: тифи — полный экран -->
+<div class="push-page" id="pp-tifi">
+  <div class="pp-hdr" style="position:absolute;z-index:10;background:var(--bg);width:100%">
+    <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <div>
+      <div class="pp-title" style="background:linear-gradient(105deg,var(--sun),var(--sun2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">тифи</div>
+      <div class="pp-subtitle">Ai · letify</div>
+    </div>
+    <div style="width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,var(--sun),var(--sun2));display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(var(--sun-rgb),.3);cursor:pointer;flex-shrink:0" onclick="tifiRefresh()" title="обновить анализ">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+    </div>
+  </div>
 
+  <!-- loading screen -->
+  <div id="tifi-loading">
+    <div class="brain-wrap">
+      <div class="brain-ring"></div><div class="brain-arc"></div><div class="brain-arc2"></div>
+      <div class="brain-center"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+    </div>
+    <div class="tifi-load-h">тифи думает</div>
+    <div class="tifi-load-s">Groq AI анализирует твои данные<br>и создаёт персональные карточки</div>
+    <div class="tifi-load-list">
+      <div class="tifi-ls" id="tifi-ls1"><div class="tifi-ls-dot"></div>читаю профиль и цели</div>
+      <div class="tifi-ls" id="tifi-ls2"><div class="tifi-ls-dot"></div>анализирую питание и вес</div>
+      <div class="tifi-ls" id="tifi-ls3"><div class="tifi-ls-dot"></div>отправляю запрос в Groq AI</div>
+      <div class="tifi-ls" id="tifi-ls4"><div class="tifi-ls-dot"></div>создаю персональные карточки</div>
+      <div class="tifi-ls" id="tifi-ls5"><div class="tifi-ls-dot"></div>готовлю советы и рекомендации</div>
+    </div>
+    <div class="tifi-load-bar"><div class="tifi-load-bar-fill" id="tifi-lpf"></div></div>
+  </div>
 
+  <!-- dots -->
+  <div class="tifi-cdots" id="tifi-cdots"></div>
+
+  <!-- carousel -->
+  <div id="tifi-carousel">
+    <div class="tifi-ctrack-vp" id="tifi-ctrack"></div>
+    <div class="tifi-carousel-nav" id="tifi-carousel-nav">
+      <div class="tifi-nav-center" id="tifi-nav-info"></div>
+    </div>
   </div>
 </div>
 
@@ -3425,6 +3619,7 @@ function popPage(doRender=true){
 function _populatePP(id){
   const u=gU();
   if(id==='pp-tifi-key'){_populateTifiKey();}
+  if(id==='pp-tifi'){tifiStartScreen();}
   if(id==='pp-other'){_tifiUpdateOtherStatus();}
   if(id==='pp-weight-chart'){_populateWeightChart();}
   if(id==='pp-start-weight'){
@@ -4650,7 +4845,7 @@ function renderHomeClassic(){
 <div class="pad" style="display:flex;align-items:flex-start;justify-content:space-between;padding-top:2px">
   <div><div class="t1">привет, <span class="grad">${u.name||'—'}</span></div><div class="t5" style="margin-top:3px">${dateStr}</div></div>
 </div>
-<div class="pad gap" onclick="pushPage('pp-tifi-key')" style="cursor:pointer">
+<div class="pad gap" onclick="openTifiOrKey()" style="cursor:pointer">
   <div style="background:var(--bg2);border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:13px;box-shadow:var(--sh);border:1px solid rgba(var(--sun-rgb),.12);overflow:hidden;position:relative;transition:opacity .12s" ontouchstart="this.style.opacity='.7'" ontouchend="this.style.opacity=''">
     <div style="position:absolute;inset:0;background:linear-gradient(110deg,rgba(var(--sun-rgb),.05),rgba(var(--sun2-rgb),.02));pointer-events:none"></div>
     <div style="width:42px;height:42px;border-radius:13px;flex-shrink:0;background:linear-gradient(135deg,var(--sun),var(--sun2));display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(var(--sun-rgb),.3)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
@@ -4702,7 +4897,7 @@ function renderHomeLinear(){
     <div><div class="hl-greeting">привет, <span class="grad">${u.name||'—'}</span></div><div class="t5" style="margin-top:3px">${dateStr}</div></div>
   </div>
   <!-- тифи card -->
-  <div onclick="pushPage('pp-tifi-key')" style="background:var(--bg2);border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:11px;box-shadow:var(--sh);border:1px solid rgba(var(--sun-rgb),.12);overflow:hidden;position:relative;cursor:pointer;flex-shrink:0;transition:opacity .12s" ontouchstart="this.style.opacity='.7'" ontouchend="this.style.opacity=''">
+  <div onclick="openTifiOrKey()" style="background:var(--bg2);border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:11px;box-shadow:var(--sh);border:1px solid rgba(var(--sun-rgb),.12);overflow:hidden;position:relative;cursor:pointer;flex-shrink:0;transition:opacity .12s" ontouchstart="this.style.opacity='.7'" ontouchend="this.style.opacity=''">
     <div style="position:absolute;inset:0;background:linear-gradient(110deg,rgba(var(--sun-rgb),.05),rgba(var(--sun2-rgb),.02));pointer-events:none"></div>
     <div style="width:36px;height:36px;border-radius:11px;flex-shrink:0;background:linear-gradient(135deg,var(--sun),var(--sun2));display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(var(--sun-rgb),.28)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
     <div style="flex:1;min-width:0"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(var(--sun-rgb),.7)">AI</div><div style="font-size:13px;font-weight:800">тифи</div></div>
@@ -4770,7 +4965,7 @@ function renderHomeBento(){
   </div>
   <div class="hb-grid">
     <!-- тифи card (full width) -->
-    <div class="hb-full" onclick="pushPage('pp-tifi-key')" style="background:var(--bg2);border-radius:16px;padding:11px 14px;display:flex;align-items:center;gap:11px;border:1px solid rgba(var(--sun-rgb),.12);overflow:hidden;position:relative;cursor:pointer;flex-shrink:0;transition:opacity .12s;box-shadow:var(--sh)" ontouchstart="this.style.opacity='.7'" ontouchend="this.style.opacity=''">
+    <div class="hb-full" onclick="openTifiOrKey()" style="background:var(--bg2);border-radius:16px;padding:11px 14px;display:flex;align-items:center;gap:11px;border:1px solid rgba(var(--sun-rgb),.12);overflow:hidden;position:relative;cursor:pointer;flex-shrink:0;transition:opacity .12s;box-shadow:var(--sh)" ontouchstart="this.style.opacity='.7'" ontouchend="this.style.opacity=''">
       <div style="position:absolute;inset:0;background:linear-gradient(110deg,rgba(var(--sun-rgb),.06),rgba(var(--sun2-rgb),.02));pointer-events:none"></div>
       <div style="width:34px;height:34px;border-radius:10px;flex-shrink:0;background:linear-gradient(135deg,var(--sun),var(--sun2));display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(var(--sun-rgb),.28)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
       <div style="flex:1;min-width:0"><div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(var(--sun-rgb),.7)">AI</div><div style="font-size:13px;font-weight:800">тифи</div></div>
@@ -5882,181 +6077,592 @@ document.addEventListener('DOMContentLoaded',async()=>{
 });
 
 /* ══════════════════════════════════════
-   ТИФИ — управление ключом
+   ТИФИ — полная реализация
 ══════════════════════════════════════ */
 
-/* ── helpers ── */
-function _tifiMaskKey(k){
-  if(!k||k.length<8)return k;
-  return k.slice(0,8)+'•••••••••'+k.slice(-4);
-}
 function _tifiGetKey(){return lsGet('groq_key')||'';}
 function _tifiSetKey(k){lsSet('groq_key',k);}
+function _tifiMaskKey(k){if(!k||k.length<8)return k;return k.slice(0,8)+'•••••••••'+k.slice(-4);}
 
-/* ── обновить статус-карточку ── */
-function _tifiUpdateStatusCard(state){
-  const dot=document.getElementById('tifi-status-dot');
-  const title=document.getElementById('tifi-status-title');
-  const sub=document.getElementById('tifi-status-sub');
-  if(!dot)return;
-  const states={
-    empty:   {bg:'var(--hint)',  t:'ключ не добавлен',     s:'вставь ключ Groq чтобы активировать тифи'},
-    ok:      {bg:'var(--green)', t:'тифи активен ✓',       s:'AI подключён и готов к работе'},
-    invalid: {bg:'var(--red)',   t:'ключ не подходит',     s:'проверь правильность ключа и попробуй снова'},
-    checking:{bg:'var(--sun)',   t:'проверяю ключ…',       s:'соединяюсь с сервером Groq'},
-  };
-  const s=states[state]||states.empty;
-  dot.style.background=s.bg;
-  title.textContent=s.t;
-  sub.textContent=s.s;
-}
-
-/* ── обновить подпись в списке pp-other ── */
+/* ── обновить статус в pp-other ── */
 function _tifiUpdateOtherStatus(){
   const el=document.getElementById('pp-other-tifi-status');
   if(!el)return;
-  const k=_tifiGetKey();
-  el.textContent=k?'AI · ключ добавлен':'AI · ключ не добавлен';
+  el.textContent=_tifiGetKey()?'Ai · ключ добавлен':'Ai · ключ не добавлен';
 }
 
-/* ── открытие экрана pp-tifi-key (вызывается через _populatePP) ── */
+/* ── открытие с главной ── */
+function openTifiOrKey(){
+  if(_tifiGetKey()){
+    pushPage('pp-tifi');
+    tifiStartScreen();
+  } else {
+    pushPage('pp-tifi-key');
+    _populateTifiKey();
+  }
+}
+
+/* ── открытие pp-tifi-key ── */
 function _populateTifiKey(){
   const k=_tifiGetKey();
   const savedWrap=document.getElementById('tifi-key-saved-wrap');
+  const fieldBlock=document.getElementById('tifi-key-field-block');
   const maskedDisplay=document.getElementById('tifi-key-masked-display');
-  const checkRow=document.getElementById('tifi-check-row');
-  /* сброс UI */
-  if(checkRow)checkRow.style.display='none';
+  const inp=document.getElementById('tifi-key-input');
   if(k){
-    _tifiUpdateStatusCard('ok');
     if(savedWrap)savedWrap.style.display='block';
+    if(fieldBlock)fieldBlock.style.display='none';
     if(maskedDisplay)maskedDisplay.textContent=_tifiMaskKey(k);
   } else {
-    _tifiUpdateStatusCard('empty');
     if(savedWrap)savedWrap.style.display='none';
+    if(fieldBlock)fieldBlock.style.display='';
+    if(inp){inp.value='';document.getElementById('tifi-key-save-btn')?.classList.remove('ready');}
   }
+}
+
+/* ── input ── */
+function tifiOnKeyInput(inp){
+  const btn=document.getElementById('tifi-key-save-btn');
+  if(btn){btn.classList.toggle('ready',inp.value.trim().length>10);}
+}
+
+/* ── сохранить и открыть тифи ── */
+function tifiSaveKeyAndOpen(){
+  const inp=document.getElementById('tifi-key-input');
+  const k=(inp?.value||'').trim();
+  if(!k||k.length<10)return;
+  _tifiSetKey(k);
+  inp.value='';
+  _tifiUpdateOtherStatus();
+  tg?.HapticFeedback?.notificationOccurred('success');
+  /* закрыть key страницу, открыть тифи */
+  popPage();
+  setTimeout(()=>{pushPage('pp-tifi');tifiStartScreen();},280);
 }
 
 /* ── удалить ключ ── */
 function tifiDeleteKey(){
   _tifiSetKey('');
-  const savedWrap=document.getElementById('tifi-key-saved-wrap');
-  const checkRow=document.getElementById('tifi-check-row');
-  if(savedWrap)savedWrap.style.display='none';
-  if(checkRow)checkRow.style.display='none';
-  _tifiUpdateStatusCard('empty');
+  _populateTifiKey();
   _tifiUpdateOtherStatus();
   tg?.HapticFeedback?.notificationOccurred('success');
 }
 
-/* ── legacy stubs ── */
-function tifiKeyOnInput(){}
-async function tifiSaveKey(){}
-function _tifiShowCheckResult(ok,msg){
-  const checkRow=document.getElementById('tifi-check-row');
-  const checkSpinner=document.getElementById('tifi-check-spinner');
-  const checkIcon=document.getElementById('tifi-check-icon');
-  const checkText=document.getElementById('tifi-check-text');
-  if(!checkRow)return;
-  checkRow.style.display='flex';
-  if(checkSpinner)checkSpinner.style.display='none';
-  if(checkIcon){
-    checkIcon.style.display='block';
-    checkIcon.textContent=ok?'✓':'✗';
-    checkIcon.style.color=ok?'var(--green)':'var(--red)';
-  }
-  if(checkText){
-    checkText.textContent=msg||'';
-    checkText.style.color=ok?'var(--green)':'var(--red)';
-  }
-  checkRow.style.background=ok?'rgba(82,193,119,.08)':'rgba(244,92,92,.08)';
-  checkRow.style.borderColor=ok?'rgba(82,193,119,.2)':'rgba(244,92,92,.2)';
+/* ── обновить (перезагенерировать карточки) ── */
+function tifiRefresh(){
+  tifiLoaded=false;
+  tg?.HapticFeedback?.impactOccurred('light');
+  tifiStartScreen();
 }
 
-/* ── вставить и автоматически проверить ── */
-async function tifiPasteKey(){
-  let key='';
-  try{
-    const text=await navigator.clipboard.readText();
-    key=(text||'').trim();
-  }catch(e){
-    /* clipboard недоступен — показываем нативный prompt */
-    const entered=prompt('Вставьте ключ Groq:');
-    key=(entered||'').trim();
-  }
-  if(!key||key.length<10){
-    _tifiShowCheckResult(false,'буфер пустой или ключ слишком короткий');
-    return;
-  }
-  await _tifiDoVerify(key);
+/* ══════════════════════════════════════
+   ТИФИ — сборка данных пользователя
+══════════════════════════════════════ */
+function _tifiGetUserData(){
+  const u=C.user||{};
+  const wl=gWL();
+  const sl=gSL();
+  const wd=gWD();
+  const cd=gCD();
+  const mac=C.macros||{};
+  const acts=gActs();
+  const today=TODAY;
+
+  // Weight trend
+  const lastWeights=wl.slice(-7).map(r=>r.weight);
+  const curWeight=lastWeights.length?lastWeights[lastWeights.length-1]:u.start_weight||0;
+  const weekAgoWeight=lastWeights.length>1?lastWeights[0]:curWeight;
+  const weightDelta=lastWeights.length>1?+(curWeight-weekAgoWeight).toFixed(1):0;
+
+  // Sleep avg
+  const lastSleep=sl.slice(-7);
+  const avgSleep=lastSleep.length?(lastSleep.reduce((s,r)=>s+r.hours,0)/lastSleep.length).toFixed(1):0;
+
+  // Calories today
+  const calToday=Object.values(cd).reduce((a,b)=>a+(+b||0),0);
+  const calGoal=u.cal_goal||2000;
+  const calPct=calGoal>0?Math.round(calToday/calGoal*100):0;
+
+  // Water today
+  const waterToday=wd.total||0;
+  const waterGoal=u.water_goal||2000;
+  const waterPct=waterGoal>0?Math.round(waterToday/waterGoal*100):0;
+
+  // Days to summer
+  const daysLeft=(()=>{
+    const n=new Date(),s=new Date(n.getFullYear(),5,1);
+    if(n>=s)s.setFullYear(s.getFullYear()+1);
+    return Math.ceil((s-n)/864e5);
+  })();
+
+  // Progress to goal
+  const startW=u.start_weight||curWeight;
+  const goalW=u.goal_weight||curWeight;
+  const totalDelta=Math.abs(startW-goalW);
+  const doneDelta=Math.abs(startW-curWeight);
+  const progressPct=totalDelta>0?Math.min(100,Math.round(doneDelta/totalDelta*100)):0;
+
+  // Activities
+  const actsDone=acts.filter(a=>a.completed).length;
+  const actsTotal=acts.length;
+  const actsList=acts.map(a=>`${a.name} (${a.type}, ${a.time}, ${a.completed?'выполнено':'не выполнено'})`).join('; ')||'нет задач';
+
+  // Meals breakdown
+  const meals=[];
+  if(cd.breakfast>0)meals.push(`завтрак: ${cd.breakfast} ккал`);
+  if(cd.lunch>0)meals.push(`обед: ${cd.lunch} ккал`);
+  if(cd.dinner>0)meals.push(`ужин: ${cd.dinner} ккал`);
+  if(cd.snack>0)meals.push(`перекус: ${cd.snack} ккал`);
+
+  const now=new Date();
+  const hour=now.getHours();
+  const timeOfDay=hour<12?'утро':hour<17?'день':hour<21?'вечер':'ночь';
+
+  return {
+    name: u.name||'пользователь',
+    gender: u.gender||'female',
+    height: u.height||0,
+    age: u.age||0,
+    goalType: u.goal_type||'lose',
+    startWeight: startW,
+    goalWeight: goalW,
+    currentWeight: curWeight,
+    weightDelta7d: weightDelta,
+    progressPct,
+    calToday,
+    calGoal,
+    calPct,
+    mealBreakdown: meals.join(', ')||'ничего не записано',
+    macros: `белок: ${mac.prot||0}г, жиры: ${mac.fat||0}г, углеводы: ${mac.carb||0}г`,
+    waterToday,
+    waterGoal,
+    waterPct,
+    avgSleep,
+    lastSleepQuality: lastSleep.length?lastSleep[lastSleep.length-1].quality:0,
+    streak: gStreak(),
+    actsTotal,
+    actsDone,
+    actsList,
+    daysToSummer: daysLeft,
+    timeOfDay,
+    date: today,
+  };
 }
 
-/* ── основная логика проверки и сохранения ── */
-async function _tifiDoVerify(key){
-  const checkRow=document.getElementById('tifi-check-row');
-  const checkSpinner=document.getElementById('tifi-check-spinner');
-  const checkIcon=document.getElementById('tifi-check-icon');
-  const checkText=document.getElementById('tifi-check-text');
-  const pasteBtn=document.getElementById('tifi-paste-btn');
+/* ══════════════════════════════════════
+   ТИФИ — вызов Groq API
+══════════════════════════════════════ */
+async function _tifiCallGroq(apiKey, userData){
+  const u=userData;
+  const genderWord=u.gender==='male'?'он':'она';
+  const goalWord=u.goalType==='lose'?'похудение':'набор массы';
 
-  /* показываем состояние проверки */
-  if(checkRow){checkRow.style.display='flex';checkRow.style.background='var(--bg3)';checkRow.style.borderColor='var(--brd)';}
-  if(checkSpinner){checkSpinner.style.display='block';}
-  if(checkIcon){checkIcon.style.display='none';}
-  if(checkText){checkText.textContent='проверяю ключ…';checkText.style.color='var(--text)';}
-  if(pasteBtn){pasteBtn.style.opacity='.5';pasteBtn.style.pointerEvents='none';}
-  _tifiUpdateStatusCard('checking');
-  tg?.HapticFeedback?.selectionChanged();
+  const systemPrompt=`Ты — Тифи (Tifi), персональный AI-аналитик здоровья внутри приложения letify. Ты говоришь на русском языке, тепло, по-дружески, как умный коуч. Обращайся к пользователю на "ты".
 
-  let ok=false;
-  let networkErr=false;
-  try{
-    const resp=await fetch('https://api.groq.com/openai/v1/models',{
-      method:'GET',
-      headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json'},
-      signal:AbortSignal.timeout(10000),
-    });
-    if(resp.ok){ok=true;}
-    else if(resp.status===401||resp.status===403){ok=false;}
-    else{networkErr=true;} /* другие статусы — считаем сетевой сбой */
-  }catch(e){
-    networkErr=true; /* CORS, fetch blocked, timeout — сохраняем ключ без проверки */
+Ты должен создать ровно 10-12 карточек анализа в формате JSON. Верни ТОЛЬКО валидный JSON массив, без каких-либо пояснений, markdown или текста вне массива.
+
+Каждая карточка — объект со следующими полями:
+- cat: "советы" | "питание" | "активность"
+- type: "tifi-cc-warm" | "tifi-cc-dark" | "tifi-cc-blue" | "tifi-cc-orange" | "tifi-cc-teal" | "tifi-cc-purple" | "tifi-cc-green"
+- glow: true/false (только для тёплых карточек)
+- custom: true (всегда true — это твои персональные карточки)
+- tag: { cls: "tifi-tag-orange"|"tifi-tag-blue"|"tifi-tag-green"|"tifi-tag-purple"|"tifi-tag-red", text: "короткий тег" }
+- title: "заголовок карточки"
+- sub: "подзаголовок / объяснение (1-2 предложения)"
+
+Опциональные поля (используй 1-2 на карточку, не больше):
+- nums: [ {v: "значение", l: "подпись", clr: "var(--sun)|var(--green)|#4EAEE5|#9D85F2|var(--red)"} ] — максимум 3 элемента
+- macros: [ {v: "значение", l: "подпись", clr?: "цвет"} ] — 3-4 макронутриента
+- bar: { w: 0-100, clr: "linear-gradient(90deg,...)" }
+- chips: [ {t: "текст", cls: ""| "accent"|"warn"|"ok"|"blue"} ] — теги/советы
+- list: [ {ico: "bg:rgba(R,G,B,.14);color:#HEX", svg: "moon"|"activity"|"droplet"|"droplets"|"sunrise"|"utensils"|"check"|"arrowRight"|"spark", t: "текст", s: "подтекст"} ]
+- rows: [ {l: "ключ", v: "значение", clr?: "цвет"} ] — таблица
+- todo: [ {ico: "bg:rgba(R,G,B,.14);color:#HEX", svg: "...", t: "задача"} ]
+- meals: [ {ico: "эмодзи", name: "название блюда", sub: "приём · время", kcal: число, clr: "цвет"} ]
+
+СТРУКТУРА (обязательно вставь разделители между категориями):
+Перед первой карточкой категории вставь divider: { "divider": true, "cat": "советы", "count": N }
+Затем N карточек категории советы.
+Затем divider: { "divider": true, "cat": "питание", "count": N }
+Затем N карточек питания.
+Затем divider: { "divider": true, "cat": "активность", "count": N }
+Затем N карточек активности.
+
+Правила:
+- Используй РЕАЛЬНЫЕ данные пользователя, не придумывай числа
+- Если данных нет (0 ккал, 0 воды) — замечай это и мотивируй начать
+- Будь конкретным: называй реальные цифры, прогресс, отставание
+- Советы должны быть практичными и персональными
+- Карточки питания: рацион на сегодня, вода, макронутриенты, рекомендации по блюдам
+- Карточки активности: сон, прогресс к цели, план на день
+- Для рациона придумай реальный план питания под норму калорий пользователя`;
+
+  const userPrompt=`Данные пользователя:
+Имя: ${u.name}
+Время суток: ${u.timeOfDay}
+Цель: ${goalWord}
+
+Вес: старт ${u.startWeight} кг → сейчас ${u.currentWeight} кг → цель ${u.goalWeight} кг
+Прогресс к цели: ${u.progressPct}%
+Изменение за 7 дней: ${u.weightDelta7d>0?'+':''}${u.weightDelta7d} кг
+
+Калории сегодня: ${u.calToday} из ${u.calGoal} ккал (${u.calPct}%)
+Приёмы пищи: ${u.mealBreakdown}
+Макросы: ${u.macros}
+
+Вода сегодня: ${u.waterToday} из ${u.waterGoal} мл (${u.waterPct}%)
+Стрик: ${u.streak} дней
+
+Средний сон за неделю: ${u.avgSleep} ч
+Качество сна: ${u.lastSleepQuality}/5
+
+Задачи сегодня (${u.actsDone}/${u.actsTotal} выполнено): ${u.actsList}
+
+До лета: ${u.daysToSummer} дней`;
+
+  const resp=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'Authorization':'Bearer '+apiKey
+    },
+    body:JSON.stringify({
+      model:'llama-3.3-70b-versatile',
+      max_tokens:4000,
+      temperature:0.7,
+      messages:[
+        {role:'system',content:systemPrompt},
+        {role:'user',content:userPrompt}
+      ]
+    })
+  });
+
+  if(!resp.ok){
+    const err=await resp.json().catch(()=>({}));
+    throw new Error(err?.error?.message||'Groq API error: '+resp.status);
   }
 
-  /* восстанавливаем кнопку */
-  if(pasteBtn){pasteBtn.style.opacity='';pasteBtn.style.pointerEvents='';}
+  const data=await resp.json();
+  const text=data.choices?.[0]?.message?.content||'';
 
-  if(ok){
-    _tifiSetKey(key);
-    _tifiFinalizeKeyUI(key);
-    _tifiShowCheckResult(true,'ключ подтверждён — тифи активирован ✓');
-    tg?.HapticFeedback?.notificationOccurred('success');
-  }else if(networkErr){
-    /* сеть недоступна / CORS — сохраняем, предупреждаем */
-    _tifiSetKey(key);
-    _tifiFinalizeKeyUI(key);
-    _tifiShowCheckResult(true,'ключ сохранён (проверка в браузере недоступна)');
-    tg?.HapticFeedback?.notificationOccurred('success');
+  // Extract JSON array from response
+  let jsonStr=text.trim();
+  // Strip possible markdown code fences
+  jsonStr=jsonStr.replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'').trim();
+  // Find array boundaries robustly
+  const start=jsonStr.indexOf('[');
+  const end=jsonStr.lastIndexOf(']');
+  if(start===-1||end===-1)throw new Error('No JSON array in response');
+  jsonStr=jsonStr.slice(start,end+1);
+
+  const cards=JSON.parse(jsonStr);
+  if(!Array.isArray(cards)||cards.length===0)throw new Error('Empty cards array');
+  return cards;
+}
+
+/* ══════════════════════════════════════
+   ТИФИ — карусель
+══════════════════════════════════════ */
+
+const TIFI_SVGS={
+  moon:`<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>`,
+  activity:`<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>`,
+  droplet:`<path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/>`,
+  droplets:`<path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"/><path d="M12.56 6.6A10.97 10.97 0 0014 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 01-11.91 4.97"/>`,
+  sunrise:`<path d="M17 18a5 5 0 00-10 0"/><line x1="12" y1="2" x2="12" y2="9"/><line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/><line x1="1" y1="18" x2="3" y2="18"/><line x1="21" y1="18" x2="23" y2="18"/><line x1="18.36" y1="11.64" x2="19.78" y2="10.22"/>`,
+  utensils:`<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 00-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>`,
+  check:`<polyline points="20 6 9 17 4 12"/>`,
+  arrowRight:`<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>`,
+  spark:`<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>`,
+};
+function tifiMkSvg(k){return`<svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${TIFI_SVGS[k]||''}</svg>`}
+
+const TIFI_CATS={
+  советы:    {clr:'var(--sun)',   rgb:'255,107,53',  icon:'💡', bg:'rgba(255,107,53,.08)',  brd:'rgba(255,107,53,.18)',  dotClr:'var(--sun)'},
+  питание:   {clr:'#4EAEE5',     rgb:'78,174,229',   icon:'🥗', bg:'rgba(78,174,229,.08)',  brd:'rgba(78,174,229,.18)',  dotClr:'#4EAEE5'},
+  активность:{clr:'var(--green)',rgb:'61,204,114',  icon:'🏃', bg:'rgba(61,204,114,.08)',  brd:'rgba(61,204,114,.18)', dotClr:'var(--green)'},
+};
+
+function _tifiGetCards(){
+  const daysLeft=(()=>{
+    const now=new Date(),summer=new Date(now.getFullYear(),5,1);
+    if(now>=summer)summer.setFullYear(summer.getFullYear()+1);
+    return Math.ceil((summer-now)/864e5);
+  })();
+  const summerPct=Math.round((1-(daysLeft/92))*100);
+  return [
+    /* до лета */
+    {cat:'советы',type:'tifi-cc-warm',glow:true,
+     tag:{cls:'tifi-tag-orange',text:'до лета'},
+     title:`до лета ${daysLeft} дней`,
+     sub:'ты успеваешь — план идёт хорошо. к июню будет виден результат',
+     nums:[{v:daysLeft+'д',l:'до лета',clr:'var(--sun)'},{v:'-1.2 кг',l:'2 нед',clr:'var(--green)'},{v:'~65',l:'к лету',clr:'var(--sun)'}],
+     bar:{w:summerPct,clr:'linear-gradient(90deg,var(--sun),var(--sun2))'}},
+    /* советы */
+    {divider:true,cat:'советы',count:3},
+    {cat:'советы',type:'tifi-cc-warm',glow:true,
+     tag:{cls:'tifi-tag-orange',text:'инсайт дня'},
+     title:'ты в хорошем темпе',
+     sub:'за 7 дней план выполнен на 74% — выше среднего за месяц',
+     nums:[{v:'74%',l:'план'},{v:'−1,2 кг',l:'2 недели'},{v:'7 дн',l:'streak'}]},
+    {cat:'советы',type:'tifi-cc-dark',
+     tag:{cls:'tifi-tag-purple',text:'паттерны'},
+     title:'тифи заметил кое-что',
+     sub:'наблюдения за последнюю неделю',
+     list:[
+      {ico:'bg:rgba(157,133,242,.12);color:#9D85F2',svg:'moon',t:'поздние перекусы',s:'3 из 7 дней ела после 22:00 — мешает сну'},
+      {ico:'bg:rgba(61,204,114,.12);color:var(--green)',svg:'activity',t:'лучшее время активности',s:'ты активнее в 18–20:00 — идеальный слот'},
+      {ico:'bg:rgba(78,174,229,.12);color:#4EAEE5',svg:'droplet',t:'мало воды по утрам',s:'до 12:00 выпиваешь лишь 20% нормы'},
+     ]},
+    {cat:'советы',type:'tifi-cc-dark',
+     tag:{cls:'tifi-tag-orange',text:'совет дня'},
+     title:'добавь белок к завтраку',
+     sub:'в первой половине дня стабильно не хватает белка — попробуй',
+     chips:[{t:'яйца',cls:'accent'},{t:'творог',cls:'accent'},{t:'йогурт',cls:'accent'},{t:'омлет',cls:'accent'}]},
+    /* питание */
+    {divider:true,cat:'питание',count:4},
+    {cat:'питание',type:'tifi-cc-blue',
+     tag:{cls:'tifi-tag-blue',text:'вода'},
+     title:'выпила 500 из 2000 мл',
+     sub:'к 10:15 обычно уже 700 мл — сегодня немного отстаёшь',
+     bar:{w:25,clr:'linear-gradient(90deg,#4EAEE5,#38BDF8)'},
+     chips:[{t:'нужно ускориться',cls:'warn'},{t:'следующий в 10:30',cls:''}]},
+    {cat:'питание',type:'tifi-cc-orange',
+     tag:{cls:'tifi-tag-orange',text:'питание'},
+     title:'завтрак ещё не добавлен',
+     sub:'обычно ты завтракаешь в 09:00 — сейчас 10:15, не пропускай',
+     nums:[{v:'0',l:'ккал съедено',clr:'var(--sun)'},{v:'2000',l:'норма',clr:'var(--sun)'}]},
+    {cat:'питание',type:'tifi-cc-teal',
+     tag:{cls:'tifi-tag-green',text:'рацион на сегодня'},
+     title:'рацион на сегодня',
+     sub:'под норму 2000 ккал · б 120 г · ж 65 г · у 210 г',
+     meals:[
+      {ico:'🌅',name:'овсянка с черникой и яйца',sub:'завтрак · 07:30',kcal:480,clr:'var(--sun)'},
+      {ico:'☀️',name:'куриная грудка с гречкой',sub:'обед · 12:00',kcal:620,clr:'#4EAEE5'},
+      {ico:'🍎',name:'орехи и натуральный йогурт',sub:'перекус · 16:00',kcal:320,clr:'var(--green)'},
+      {ico:'🌙',name:'лосось с рисом и брокколи',sub:'ужин · 19:00',kcal:580,clr:'#9D85F2'},
+     ]},
+    {cat:'питание',type:'tifi-cc-purple',
+     tag:{cls:'tifi-tag-purple',text:'ужин · 19:00'},
+     title:'лосось с рисом и брокколи',
+     sub:'лёгкий белковый ужин для хорошего восстановления',
+     macros:[{v:'580',l:'ккал',clr:'#9D85F2'},{v:'42 г',l:'белок',clr:'#4EAEE5'},{v:'52 г',l:'угл',clr:'var(--green)'},{v:'22 г',l:'жиры'}],
+     ingredients:['лосось 180 г','рис 80 г','брокколи 150 г','лимон · специи','масло 1 ч.л.'],
+     bar:{w:29,clr:'linear-gradient(90deg,#9D85F2,#C4B5FD)'}},
+    /* активность */
+    {divider:true,cat:'активность',count:3},
+    {cat:'активность',type:'tifi-cc-purple',
+     tag:{cls:'tifi-tag-purple',text:'сон'},
+     title:'7,5 ч — хорошо',
+     sub:'прошлой ночью чуть больше нормы — сегодня больше энергии',
+     nums:[{v:'7,5 ч',l:'эта ночь',clr:'#9D85F2'},{v:'7,1 ч',l:'среднее нед',clr:'#9D85F2'}]},
+    {cat:'активность',type:'tifi-cc-green',
+     tag:{cls:'tifi-tag-green',text:'прогноз'},
+     title:'до цели ≈ 6 недель',
+     sub:'при темпе −0,6 кг в неделю достигнешь 65 кг к 20 апреля',
+     rows:[{l:'сейчас',v:'72 кг'},{l:'цель',v:'65 кг',clr:'var(--green)'},{l:'темп',v:'−0,6 кг / нед'},{l:'прогноз',v:'~20 апреля',clr:'var(--green)'}]},
+    {cat:'активность',type:'tifi-cc-orange',
+     tag:{cls:'tifi-tag-orange',text:'план тифи'},
+     title:'важное на сегодня',
+     sub:'4 задачи которые тифи добавил в твой план',
+     todo:[
+      {ico:'bg:rgba(78,174,229,.14);color:#4EAEE5',svg:'droplets',t:'выпить 2000 мл воды за день'},
+      {ico:'bg:rgba(var(--sun-rgb),.14);color:var(--sun)',svg:'sunrise',t:'завтрак с белком до 11:00'},
+      {ico:'bg:rgba(61,204,114,.14);color:var(--green)',svg:'activity',t:'кардио 30 мин в 18:00'},
+      {ico:'bg:rgba(157,133,242,.14);color:#9D85F2',svg:'moon',t:'лечь до 23:00 · нет еды после 21:00'},
+     ]},
+  ];
+}
+
+let tifiCards=[],tifiCardEls=[],tifiCur=0,tifiLoaded=false;
+
+function tifiBuildDivider(data){
+  const cat=TIFI_CATS[data.cat];
+  const el=document.createElement('div');
+  el.className='tifi-ccard cc-divider state-next';
+  el.style.cssText=`background:${cat.bg};border:1px solid ${cat.brd}`;
+  el.innerHTML=`
+    <div class="tifi-div-bg" style="background:radial-gradient(ellipse 100% 70% at 50% 20%,rgba(${cat.rgb},.18),transparent 65%),radial-gradient(ellipse 60% 50% at 50% 90%,rgba(${cat.rgb},.08),transparent 60%)"></div>
+    <div class="tifi-div-content">
+      <div class="tifi-div-ico-wrap" style="background:rgba(${cat.rgb},.12)">
+        <div class="tifi-div-ico-glow" style="background:${cat.clr}"></div>
+        <span style="position:relative;z-index:1">${cat.icon}</span>
+      </div>
+      <div class="tifi-div-cat-name" style="color:${cat.clr}">${data.cat}</div>
+      <div class="tifi-div-cat-sub">${data.count} карточки с анализом</div>
+      <button class="tifi-div-enter-btn" onclick="tifiNextCard()" style="background:linear-gradient(135deg,rgba(${cat.rgb},.9),rgba(${cat.rgb},.6));box-shadow:0 4px 20px rgba(${cat.rgb},.3)">
+        смотреть
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+    </div>`;
+  return el;
+}
+
+function tifiBuildCard(data,idx){
+  const el=document.createElement('div');
+  el.className='tifi-ccard state-next '+data.type;
+  const ctr=document.createElement('div');
+  ctr.className='tifi-cc-counter';ctr.textContent=(idx+1)+' / '+tifiCards.length;
+  el.appendChild(ctr);
+  if(data.glow){const g=document.createElement('div');g.className='tifi-cc-warm-glow';el.appendChild(g);}
+  const scroll=document.createElement('div');scroll.className='tifi-cc-scroll';
+  let h=`<div class="tifi-cc-body">`;
+  if(data.custom)h+=`<div class="tifi-cc-custom-badge">${tifiMkSvg('spark')} создано тифи</div>`;
+  h+=`<div class="tifi-cc-tag ${data.tag.cls}">${data.tag.text}</div>`;
+  h+=`<div class="tifi-cc-h">${data.title}</div>`;
+  h+=`<div class="tifi-cc-s">${data.sub}</div>`;
+  if(data.nums){h+=`<div class="tifi-cc-bignums">`;data.nums.forEach(n=>{h+=`<div class="tifi-cc-num"><div class="tifi-cc-num-v"${n.clr?` style="color:${n.clr}"`:''}>${n.v}</div><div class="tifi-cc-num-l">${n.l}</div></div>`});h+=`</div>`;}
+  if(data.macros){h+=`<div class="tifi-cc-macros">`;data.macros.forEach(m=>{h+=`<div class="tifi-cc-macro"><div class="tifi-cc-macro-v"${m.clr?` style="color:${m.clr}"`:''}>${m.v}</div><div class="tifi-cc-macro-l">${m.l}</div></div>`});h+=`</div>`;}
+  if(data.ingredients){h+=`<div class="tifi-cc-ingredients">`;data.ingredients.forEach(i=>{h+=`<div class="tifi-cc-ingr">${i}</div>`});h+=`</div>`;}
+  if(data.bar)h+=`<div class="tifi-cc-bar"><div class="tifi-cc-bar-fill" style="width:${data.bar.w}%;background:${data.bar.clr}"></div></div>`;
+  if(data.chips){h+=`<div class="tifi-cc-chips">`;data.chips.forEach(c=>{h+=`<div class="tifi-cc-chip ${c.cls}">${c.t}</div>`});h+=`</div>`;}
+  if(data.list){h+=`<div class="tifi-cc-list">`;data.list.forEach(item=>{const[bg,clr]=item.ico.split(';color:'),bgV=bg.replace('bg:','');h+=`<div class="tifi-cc-li"><div class="tifi-cc-li-ico" style="background:${bgV};color:${clr}">${tifiMkSvg(item.svg)}</div><div><div class="tifi-cc-li-t">${item.t}</div><div class="tifi-cc-li-s">${item.s}</div></div></div>`;});h+=`</div>`;}
+  if(data.rows){h+=`<div class="tifi-cc-rows">`;data.rows.forEach(r=>{h+=`<div class="tifi-cc-row"><div class="tifi-cc-row-l">${r.l}</div><div class="tifi-cc-row-v"${r.clr?` style="color:${r.clr}"`:''}>${r.v}</div></div>`});h+=`</div>`;}
+  if(data.todo){h+=`<div class="tifi-cc-todo">`;data.todo.forEach(item=>{const[bg,clr]=item.ico.split(';color:'),bgV=bg.replace('bg:','');h+=`<div class="tifi-cc-todo-item"><div class="tifi-cc-todo-ico" style="background:${bgV};color:${clr}">${tifiMkSvg(item.svg)}</div><span>${item.t}</span></div>`;});h+=`</div>`;}
+  if(data.meals){h+=`<div class="tifi-cc-meal-list">`;data.meals.forEach(m=>{h+=`<div class="tifi-cc-meal-row"><div class="tifi-cc-meal-ico">${m.ico}</div><div class="tifi-cc-meal-info"><div class="tifi-cc-meal-name">${m.name}</div><div class="tifi-cc-meal-sub">${m.sub}</div></div><div><div class="tifi-cc-meal-kcal" style="color:${m.clr}">${m.kcal}</div><div class="tifi-cc-meal-unit">ккал</div></div></div>`;});h+=`</div>`;}
+  h+=`</div>`;scroll.innerHTML=h;el.appendChild(scroll);return el;
+}
+
+function tifiBuildCarousel(){
+  const track=document.getElementById('tifi-ctrack');
+  const dotsEl=document.getElementById('tifi-cdots');
+  if(!track||!dotsEl)return;
+  track.innerHTML='';dotsEl.innerHTML='';tifiCardEls=[];
+  tifiCards.forEach((data,i)=>{
+    const el=data.divider?tifiBuildDivider(data):tifiBuildCard(data,i);
+    track.appendChild(el);tifiCardEls.push(el);
+    const dot=document.createElement('div');
+    const cat=TIFI_CATS[data.cat]||TIFI_CATS['советы'];
+    if(data.divider){dot.className='tifi-cdot div-dot'+(i===0?' on':'');dot.style.background=cat.dotClr;}
+    else{dot.className='tifi-cdot'+(i===0?' on':'');dot.style.background=i===0?cat.dotClr:'rgba(255,255,255,.18)';dot._catClr=cat.dotClr;}
+    dotsEl.appendChild(dot);
+  });
+  tifiUpdateStates(0);
+  /* swipe */
+  let t0=null,y0=null;
+  track.parentElement.addEventListener('touchstart',e=>{t0=e.touches[0].clientX;y0=e.touches[0].clientY},{passive:true});
+  track.parentElement.addEventListener('touchend',e=>{
+    if(t0===null)return;
+    const dx=e.changedTouches[0].clientX-t0,dy=Math.abs(e.changedTouches[0].clientY-y0);
+    if(Math.abs(dx)>44&&dy<60){dx<0?tifiNextCard():tifiPrevCard();}
+    t0=null;y0=null;
+  },{passive:true});
+}
+
+function tifiUpdateStates(newIdx){
+  tifiCur=newIdx;
+  const data=tifiCards[newIdx];
+  tifiCardEls.forEach((el,i)=>{
+    el.classList.remove('state-current','state-prev','state-next');
+    if(i===newIdx)el.classList.add('state-current');
+    else if(i<newIdx)el.classList.add('state-prev');
+    else el.classList.add('state-next');
+  });
+  document.querySelectorAll('.tifi-cdot').forEach((d,i)=>{
+    const isOn=i===newIdx;d.classList.toggle('on',isOn);
+    if(!tifiCards[i]?.divider)d.style.background=isOn?(d._catClr||'var(--sun)'):'rgba(255,255,255,.18)';
+  });
+  const inf=document.getElementById('tifi-nav-info');
+  if(!inf)return;
+  if(data.divider){inf.style.display='none';}
+  else{
+    inf.style.display='';
+    const catCards=tifiCards.filter(c=>!c.divider&&c.cat===data.cat);
+    const pos=catCards.findIndex(c=>tifiCards.indexOf(c)===newIdx)+1;
+    inf.textContent=`${pos} / ${catCards.length}`;
+  }
+}
+
+function tifiNextCard(){if(tifiCur<tifiCards.length-1)tifiUpdateStates(tifiCur+1);}
+function tifiPrevCard(){if(tifiCur>0)tifiUpdateStates(tifiCur-1);}
+
+/* ── запуск тифи-экрана ── */
+async function tifiStartScreen(){
+  const ldg=document.getElementById('tifi-loading');
+  const car=document.getElementById('tifi-carousel');
+  if(!ldg||!car)return;
+
+  ldg.style.display='flex';ldg.style.opacity='1';
+  car.classList.remove('visible');
+  tifiCur=0;tifiLoaded=false;
+
+  const steps=[
+    {id:'tifi-ls1',delay:260,pct:20},{id:'tifi-ls2',delay:700,pct:40},
+    {id:'tifi-ls3',delay:1200,pct:60},{id:'tifi-ls4',delay:1700,pct:80},
+    {id:'tifi-ls5',delay:2200,pct:100},
+  ];
+  const bar=document.getElementById('tifi-lpf');
+  const chk=`<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+  /* сброс шагов */
+  steps.forEach(s=>{const el=document.getElementById(s.id);if(el){el.className='tifi-ls';el.querySelector('.tifi-ls-dot').innerHTML=''}});
+  if(bar)bar.style.width='0%';
+
+  // Запускаем анимацию шагов
+  steps.forEach((s,i)=>{
+    setTimeout(()=>{
+      if(i>0){const p=document.getElementById(steps[i-1].id);if(p){p.classList.remove('on');p.classList.add('ok');p.querySelector('.tifi-ls-dot').innerHTML=chk;}}
+      const el=document.getElementById(s.id);if(el)el.classList.add('on');
+      if(bar)bar.style.width=s.pct+'%';
+    },s.delay);
+  });
+
+  // Обновляем заголовок экрана загрузки
+  const loadH=ldg.querySelector('.tifi-load-h');
+  const loadS=ldg.querySelector('.tifi-load-s');
+
+  // Параллельно: минимальная задержка анимации + запрос к Groq
+  const apiKey=_tifiGetKey();
+  const userData=_tifiGetUserData();
+
+  const minDelay=new Promise(r=>setTimeout(r,2700));
+  let apiResult=null;
+  let apiError=null;
+
+  try{
+    apiResult=await Promise.race([
+      _tifiCallGroq(apiKey,userData),
+      new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),25000))
+    ]);
+  }catch(e){
+    apiError=e;
+  }
+
+  // Ждём минимальную задержку
+  await minDelay;
+
+  // Завершаем последний шаг
+  const l=document.getElementById('tifi-ls5');
+  if(l){l.classList.remove('on');l.classList.add('ok');l.querySelector('.tifi-ls-dot').innerHTML=chk;}
+
+  if(apiError&&!apiResult){
+    // Показать ошибку и использовать fallback
+    if(loadH)loadH.textContent='ошибка';
+    if(loadS){
+      const isKey=apiError.message&&apiError.message.toLowerCase().includes('invalid api key')||apiError.message.toLowerCase().includes('401');
+      loadS.innerHTML=isKey
+        ?'Неверный ключ Groq.<br><span style="color:var(--sun);cursor:pointer;font-weight:700" onclick="popPage();setTimeout(()=>{pushPage(\'pp-tifi-key\');_populateTifiKey();},280)">изменить ключ →</span>'
+        :'Не удалось связаться с Groq.<br>Показываю примерные данные';
+    }
+    tifiCards=_tifiGetCards();
+    await new Promise(r=>setTimeout(r,apiError.message&&apiError.message.toLowerCase().includes('401')?2000:1500));
   }else{
-    _tifiUpdateStatusCard('invalid');
-    _tifiShowCheckResult(false,'ключ не подошёл — проверь и попробуй снова');
-    tg?.HapticFeedback?.notificationOccurred('error');
+    tifiCards=apiResult;
+    if(loadH)loadH.textContent='готово ✓';
   }
+
+  setTimeout(()=>{
+    ldg.style.opacity='0';
+    setTimeout(()=>{
+      ldg.style.display='none';
+      tifiBuildCarousel();
+      car.classList.add('visible');
+      tifiLoaded=true;
+    },340);
+  },380);
 }
 
-/* ── обновить UI после сохранения ── */
-function _tifiFinalizeKeyUI(key){
-  const savedWrap=document.getElementById('tifi-key-saved-wrap');
-  const maskedDisplay=document.getElementById('tifi-key-masked-display');
-  if(savedWrap)savedWrap.style.display='block';
-  if(maskedDisplay)maskedDisplay.textContent=_tifiMaskKey(key);
-  _tifiUpdateStatusCard('ok');
-  _tifiUpdateOtherStatus();
-}
-
-/* ── legacy stubs ── */
-function tifiKeyOnInput(){}
-async function tifiSaveKey(){}
+/* вызывается из _populatePP */
+function _populateTifiKey_pp(){_populateTifiKey();}
 </script>
 
 <!-- ── AVATAR CROP SCREEN ── -->
