@@ -2049,6 +2049,21 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 
 /* ── ключ ввод (pp-tifi-key) ── */
 .tifi-key-input-lbl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--hint);margin-bottom:5px}
+.tifi-key-input-wrap{
+  position:relative;border-radius:13px;overflow:hidden;
+}
+.tifi-key-input-wrap::before,.tifi-key-input-wrap::after{
+  content:'';position:absolute;top:0;bottom:0;width:52px;z-index:2;pointer-events:none;
+  transition:opacity .2s;
+}
+.tifi-key-input-wrap::before{
+  left:0;
+  background:linear-gradient(to right, var(--bg) 0%, transparent 100%);
+}
+.tifi-key-input-wrap::after{
+  right:0;
+  background:linear-gradient(to left, var(--bg) 0%, transparent 100%);
+}
 .tifi-key-input{
   width:100%;padding:14px;border-radius:13px;
   background:var(--bg3);border:1.5px solid rgba(255,255,255,.07);
@@ -2496,11 +2511,9 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
         </div>
       </div>
       <div id="tifi-key-field-block">
-        <div class="tifi-key-input-lbl">API ключ Groq</div>
-        <input class="tifi-key-input" id="tifi-key-input" type="text" placeholder="gsk_..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="tifiOnKeyInput(this)">
-        <button class="tifi-key-save-btn" id="tifi-key-save-btn" onclick="tifiSaveKeyAndOpen()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          сохранить и открыть тифи
+        <button class="tifi-key-save-btn ready" id="tifi-key-save-btn" onclick="tifiSaveKeyAndOpen()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          вставить ключ из буфера
         </button>
       </div>
     </div>
@@ -6388,7 +6401,6 @@ function _populateTifiKey(){
   const savedWrap=document.getElementById('tifi-key-saved-wrap');
   const fieldBlock=document.getElementById('tifi-key-field-block');
   const maskedDisplay=document.getElementById('tifi-key-masked-display');
-  const inp=document.getElementById('tifi-key-input');
   if(k){
     if(savedWrap)savedWrap.style.display='block';
     if(fieldBlock)fieldBlock.style.display='none';
@@ -6396,23 +6408,32 @@ function _populateTifiKey(){
   } else {
     if(savedWrap)savedWrap.style.display='none';
     if(fieldBlock)fieldBlock.style.display='';
-    if(inp){inp.value='';document.getElementById('tifi-key-save-btn')?.classList.remove('ready');}
   }
 }
 
-/* ── input ── */
-function tifiOnKeyInput(inp){
+/* ── вставить ключ из буфера и открыть тифи ── */
+async function tifiSaveKeyAndOpen(){
   const btn=document.getElementById('tifi-key-save-btn');
-  if(btn){btn.classList.toggle('ready',inp.value.trim().length>10);}
-}
-
-/* ── сохранить и открыть тифи ── */
-function tifiSaveKeyAndOpen(){
-  const inp=document.getElementById('tifi-key-input');
-  const k=(inp?.value||'').trim();
-  if(!k||k.length<10)return;
+  let k='';
+  try{
+    k=(await navigator.clipboard.readText()||'').trim();
+  }catch(e){
+    if(btn){
+      const orig=btn.innerHTML;
+      btn.innerHTML='<span style="font-size:13px">разреши доступ к буферу</span>';
+      setTimeout(()=>{btn.innerHTML=orig;},2000);
+    }
+    return;
+  }
+  if(!k||k.length<10){
+    if(btn){
+      const orig=btn.innerHTML;
+      btn.innerHTML='<span style="font-size:13px">буфер пустой или ключ слишком короткий</span>';
+      setTimeout(()=>{btn.innerHTML=orig;},2000);
+    }
+    return;
+  }
   _tifiSetKey(k);
-  inp.value='';
   _tifiUpdateOtherStatus();
   tg?.HapticFeedback?.notificationOccurred('success');
   popPage();
