@@ -1698,7 +1698,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tifi-home-btn:active{transform:scale(0.975) translateZ(0);}
 
 
-/* ── loading — SVG comet ring ── */
+/* ── loading — clean arc ring ── */
 #tifi-loading{
   position:absolute;inset:0;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -1707,14 +1707,14 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   background:#0A0A0C;
 }
 .tifi-ring-wrap{
-  position:relative;width:72px;height:72px;
+  position:relative;width:80px;height:80px;
   margin-bottom:26px;flex-shrink:0;
 }
 .tifi-ring-svg{
-  width:72px;height:72px;
-  animation:tifi-orbit 1.1s linear infinite;
+  width:80px;height:80px;
+  animation:tifi-orbit 1.2s linear infinite;
   will-change:transform;
-  overflow:visible;
+  display:block;
 }
 @keyframes tifi-orbit{to{transform:rotate(360deg)}}
 
@@ -2457,36 +2457,33 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     <div id="tifi-loading">
       <div class="tifi-ring-wrap">
         <!--
-          r=30, cx=cy=36, circumference = 2π×30 ≈ 188.5
-          Comet arc ~80° = 80/360×188.5 ≈ 41.9  (dim tail)
-          Mid   arc ~50° = 50/360×188.5 ≈ 26.2  (medium, offset -15.7 so it ends at same head point)
-          Head  arc ~20° = 20/360×188.5 ≈ 10.5  (bright, at tip)
-          All start from 12 o'clock (transform rotate -90 36 36 baked in, SVG rotates via CSS)
+          viewBox 0 0 80 80 · cx=cy=40 · r=34
+          circumference = 2π×34 ≈ 213.6
+          Arc 90° = 213.6/4 ≈ 53.4  gap = 160.2
+          Tail fade via linearGradient on stroke (userSpaceOnUse).
+          Single arc with rounded caps = zero fill artifacts.
+          rotate(-90 40 40) → head starts at 12 o'clock.
         -->
-        <svg class="tifi-ring-svg" viewBox="0 0 72 72" fill="none">
+        <svg class="tifi-ring-svg" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <!-- Gradient runs left→right across the arc at 12 o'clock position:
+                 tail ≈ x=22 (10:30), head ≈ x=40 (12:00) -->
+            <linearGradient id="tifi-arc-grad" gradientUnits="userSpaceOnUse"
+              x1="22" y1="6" x2="40" y2="6">
+              <stop offset="0%" stop-color="#FF8040" stop-opacity="0"/>
+              <stop offset="100%" stop-color="#FFAB40" stop-opacity="1"/>
+            </linearGradient>
+          </defs>
           <!-- track -->
-          <circle cx="36" cy="36" r="30"
-            stroke="rgba(255,255,255,.06)" stroke-width="3"/>
-          <!-- tail — long, very dim -->
-          <circle cx="36" cy="36" r="30"
-            stroke="rgba(255,107,53,.18)" stroke-width="3"
+          <circle fill="none" cx="40" cy="40" r="34"
+            stroke="rgba(255,255,255,.07)" stroke-width="4"/>
+          <!-- comet arc — single element, rounded caps, gradient stroke -->
+          <circle fill="none" cx="40" cy="40" r="34"
+            stroke="url(#tifi-arc-grad)"
+            stroke-width="4"
             stroke-linecap="round"
-            stroke-dasharray="41.9 146.6"
-            transform="rotate(-90 36 36)"/>
-          <!-- mid — shorter, brighter -->
-          <circle cx="36" cy="36" r="30"
-            stroke="rgba(255,140,60,.55)" stroke-width="3"
-            stroke-linecap="round"
-            stroke-dasharray="26.2 162.3"
-            transform="rotate(-90 36 36)"/>
-          <!-- head — short, full brightness + glow -->
-          <circle cx="36" cy="36" r="30"
-            stroke="#FFAB40" stroke-width="3.5"
-            stroke-linecap="round"
-            stroke-dasharray="10.5 178"
-            transform="rotate(-90 36 36)">
-            <animate attributeName="stroke-opacity" values="1;.7;1" dur=".9s" repeatCount="indefinite"/>
-          </circle>
+            stroke-dasharray="53.4 160.2"
+            transform="rotate(-90 40 40)"/>
         </svg>
       </div>
       <div class="tifi-load-label">тифи</div>
