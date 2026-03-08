@@ -1665,8 +1665,11 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 ══════════════════════════════════════════ */
 
 /* ── тифи хедер ── */
-#pp-tifi .pp-hdr{position:relative;z-index:10;background:var(--bg)}
-#pp-tifi{overflow:hidden}
+#pp-tifi{overflow:hidden;background:#0A0A0C !important}
+#pp-tifi .pp-hdr{position:relative;z-index:10;background:#0A0A0C;border-bottom-color:rgba(255,255,255,.07)}
+#pp-tifi .pp-title{color:#F5F4F2}
+#pp-tifi .pp-subtitle{color:rgba(255,255,255,.38)}
+.tifi-cc-custom-badge svg{width:10px !important;height:10px !important;flex-shrink:0}
 
 /* ── shimmer на кнопке тифи (главная) ── */
 .tifi-home-shimmer{
@@ -2294,10 +2297,10 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 <!-- PP: тифи — полный экран -->
 <div class="push-page" id="pp-tifi">
   <div class="pp-hdr" style="position:absolute;z-index:10;background:var(--bg);width:100%">
-    <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <button class="pp-back" style="background:rgba(255,255,255,.08);color:#F5F4F2" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
     <div>
       <div class="pp-title" style="background:linear-gradient(105deg,var(--sun),var(--sun2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">тифи</div>
-      <div class="pp-subtitle">Ai · letify</div>
+      <div class="pp-subtitle" style="color:rgba(255,255,255,.38)">Ai · letify</div>
     </div>
     <div style="width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,var(--sun),var(--sun2));display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(var(--sun-rgb),.3);cursor:pointer;flex-shrink:0" onclick="tifiRefresh()" title="обновить анализ">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
@@ -6252,88 +6255,130 @@ function _tifiGetUserData(){
 /* ══════════════════════════════════════
    ТИФИ — вызов Groq API
 ══════════════════════════════════════ */
+
+/* Нормализует ответ ИИ: исправляет префиксы классов, убирает неизвестные поля */
+function _tifiNormalizeCards(raw){
+  const VALID_TYPES=new Set(['tifi-cc-warm','tifi-cc-dark','tifi-cc-blue','tifi-cc-orange','tifi-cc-teal','tifi-cc-purple','tifi-cc-green']);
+  const TYPE_MAP={'warm':'tifi-cc-warm','dark':'tifi-cc-dark','blue':'tifi-cc-blue','orange':'tifi-cc-orange','teal':'tifi-cc-teal','purple':'tifi-cc-purple','green':'tifi-cc-green','cc-warm':'tifi-cc-warm','cc-dark':'tifi-cc-dark','cc-blue':'tifi-cc-blue','cc-orange':'tifi-cc-orange','cc-teal':'tifi-cc-teal','cc-purple':'tifi-cc-purple','cc-green':'tifi-cc-green'};
+  const TAG_MAP={'orange':'tifi-tag-orange','blue':'tifi-tag-blue','green':'tifi-tag-green','purple':'tifi-tag-purple','red':'tifi-tag-red','cc-tag-orange':'tifi-tag-orange','cc-tag-blue':'tifi-tag-blue','cc-tag-green':'tifi-tag-green','cc-tag-purple':'tifi-tag-purple','cc-tag-red':'tifi-tag-red'};
+  const VALID_SVG=new Set(['moon','activity','droplet','droplets','sunrise','utensils','check','arrowRight','spark']);
+  const result=[];
+  let curDivider=null,curCatCards=0;
+  for(const c of raw){
+    if(c.divider===true){
+      if(curDivider)result.push({...curDivider,count:curCatCards});
+      curDivider={divider:true,cat:c.cat||'советы',count:0};
+      curCatCards=0;
+      continue;
+    }
+    // Normalize type
+    let t=(c.type||'tifi-cc-dark').toString();
+    if(!VALID_TYPES.has(t))t=TYPE_MAP[t]||TYPE_MAP[t.replace('tifi-','')]||'tifi-cc-dark';
+    // Normalize tag
+    let tag=c.tag;
+    if(!tag||typeof tag!=='object')tag={cls:'tifi-tag-orange',text:'тифи'};
+    let tagCls=(tag.cls||'').toString();
+    if(!tagCls.startsWith('tifi-tag-'))tagCls=TAG_MAP[tagCls]||TAG_MAP[tagCls.replace('tifi-tag-','')]||'tifi-tag-orange';
+    const tagText=(tag.text||'тифи').toString().slice(0,20);
+    // Validate list SVGs
+    let list=c.list;
+    if(Array.isArray(list))list=list.filter(i=>i&&i.t).map(i=>({...i,svg:VALID_SVG.has(i.svg)?i.svg:'check',ico:i.ico||'bg:rgba(255,107,53,.14);color:var(--sun)'}));
+    // Validate todo SVGs
+    let todo=c.todo;
+    if(Array.isArray(todo))todo=todo.filter(i=>i&&i.t).map(i=>({...i,svg:VALID_SVG.has(i.svg)?i.svg:'check',ico:i.ico||'bg:rgba(255,107,53,.14);color:var(--sun)'}));
+    // Validate nums/macros/rows/chips/meals/bar/ingredients
+    const card={
+      cat:c.cat||'советы',
+      type:t,
+      glow:c.glow===true,
+      custom:true,
+      tag:{cls:tagCls,text:tagText},
+      title:(c.title||'...').toString().slice(0,80),
+      sub:(c.sub||'').toString().slice(0,200),
+    };
+    if(Array.isArray(c.nums)&&c.nums.length)card.nums=c.nums.slice(0,3).map(n=>({v:String(n.v||''),l:String(n.l||''),clr:n.clr||''}));
+    if(Array.isArray(c.macros)&&c.macros.length)card.macros=c.macros.slice(0,4).map(m=>({v:String(m.v||''),l:String(m.l||''),clr:m.clr||''}));
+    if(c.bar&&typeof c.bar.w==='number')card.bar={w:Math.min(100,Math.max(0,c.bar.w)),clr:c.bar.clr||'linear-gradient(90deg,var(--sun),var(--sun2))'};
+    if(Array.isArray(c.chips)&&c.chips.length)card.chips=c.chips.slice(0,6).map(ch=>({t:String(ch.t||''),cls:ch.cls||''}));
+    if(list&&list.length)card.list=list.slice(0,4);
+    if(Array.isArray(c.rows)&&c.rows.length)card.rows=c.rows.slice(0,5).map(r=>({l:String(r.l||''),v:String(r.v||''),clr:r.clr||''}));
+    if(todo&&todo.length)card.todo=todo.slice(0,4);
+    if(Array.isArray(c.meals)&&c.meals.length)card.meals=c.meals.slice(0,4).map(m=>({ico:String(m.ico||'🍽'),name:String(m.name||''),sub:String(m.sub||''),kcal:+(m.kcal||0),clr:m.clr||'var(--sun)'}));
+    if(Array.isArray(c.ingredients))card.ingredients=c.ingredients.slice(0,6).map(String);
+    if(curDivider)result.push(curDivider);
+    curDivider=null;
+    result.push(card);
+    curCatCards++;
+    // If divider not sent yet, auto-create one for first card of new cat
+  }
+  if(curDivider)result.push({...curDivider,count:curCatCards});
+  // Fix divider counts by scanning the actual result
+  const fixedResult=[];
+  for(let i=0;i<result.length;i++){
+    const c=result[i];
+    if(c.divider){
+      let cnt=0;for(let j=i+1;j<result.length;j++){if(result[j].divider)break;cnt++;}
+      fixedResult.push({...c,count:cnt});
+    } else {
+      fixedResult.push(c);
+    }
+  }
+  return fixedResult.length>1?fixedResult:null;
+}
+
 async function _tifiCallGroq(apiKey, userData){
   const u=userData;
-  const genderWord=u.gender==='male'?'он':'она';
   const goalWord=u.goalType==='lose'?'похудение':'набор массы';
 
-  const systemPrompt=`Ты — Тифи (Tifi), персональный AI-аналитик здоровья внутри приложения letify. Ты говоришь на русском языке, тепло, по-дружески, как умный коуч. Обращайся к пользователю на "ты".
+  // ── SYSTEM PROMPT (краткий, точный, с примером) ──
+  const systemPrompt=`Ты — Тифи, персональный AI-аналитик в фитнес-приложении. Отвечаешь ТОЛЬКО валидным JSON массивом. Никаких объяснений, никакого markdown, никакого текста вне массива.
 
-Ты должен создать ровно 10-12 карточек анализа в формате JSON. Верни ТОЛЬКО валидный JSON массив, без каких-либо пояснений, markdown или текста вне массива.
+Создай персональные карточки анализа на основе данных пользователя. Структура: 3 блока — советы (3 карточки), питание (4 карточки), активность (3 карточки). Перед каждым блоком — divider.
 
-Каждая карточка — объект со следующими полями:
-- cat: "советы" | "питание" | "активность"
-- type: "tifi-cc-warm" | "tifi-cc-dark" | "tifi-cc-blue" | "tifi-cc-orange" | "tifi-cc-teal" | "tifi-cc-purple" | "tifi-cc-green"
-- glow: true/false (только для тёплых карточек)
-- custom: true (всегда true — это твои персональные карточки)
-- tag: { cls: "tifi-tag-orange"|"tifi-tag-blue"|"tifi-tag-green"|"tifi-tag-purple"|"tifi-tag-red", text: "короткий тег" }
-- title: "заголовок карточки"
-- sub: "подзаголовок / объяснение (1-2 предложения)"
+ТОЧНАЯ СХЕМА МАССИВА:
+[
+  { "divider": true, "cat": "советы", "count": 3 },
+  { "cat": "советы", "type": "warm", "tag": { "cls": "orange", "text": "инсайт" }, "title": "заголовок", "sub": "описание 1-2 предложения", "nums": [{"v":"74%","l":"план","clr":"#FF6B35"},{"v":"7дн","l":"streak"}] },
+  { "cat": "советы", "type": "dark", "tag": { "cls": "purple", "text": "паттерны" }, "title": "...", "sub": "...", "list": [{"ico":"bg:rgba(157,133,242,.12);color:#9D85F2","svg":"moon","t":"заголовок пункта","s":"описание"},{"ico":"bg:rgba(61,204,114,.12);color:#3DCC72","svg":"activity","t":"...","s":"..."}] },
+  { "cat": "советы", "type": "dark", "tag": { "cls": "orange", "text": "совет" }, "title": "...", "sub": "...", "chips": [{"t":"яйца","cls":"accent"},{"t":"творог","cls":"accent"}] },
+  { "divider": true, "cat": "питание", "count": 4 },
+  { "cat": "питание", "type": "blue", "tag": { "cls": "blue", "text": "вода" }, "title": "выпил X из Y мл", "sub": "...", "bar": {"w": 45, "clr": "linear-gradient(90deg,#4EAEE5,#38BDF8)"}, "chips": [{"t":"нужно ускориться","cls":"warn"}] },
+  { "cat": "питание", "type": "orange", "tag": { "cls": "orange", "text": "калории" }, "title": "...", "sub": "...", "nums": [{"v":"1200","l":"ккал съедено","clr":"#FF6B35"},{"v":"2000","l":"норма"}] },
+  { "cat": "питание", "type": "teal", "tag": { "cls": "green", "text": "рацион" }, "title": "рацион на сегодня", "sub": "план под норму X ккал", "meals": [{"ico":"🌅","name":"овсянка с яйцами","sub":"завтрак · 08:00","kcal":480,"clr":"#FF6B35"},{"ico":"☀️","name":"куриная грудка с гречкой","sub":"обед · 13:00","kcal":620,"clr":"#4EAEE5"},{"ico":"🍎","name":"орехи и йогурт","sub":"перекус · 16:00","kcal":320,"clr":"#3DCC72"},{"ico":"🌙","name":"лосось с рисом","sub":"ужин · 19:00","kcal":580,"clr":"#9D85F2"}] },
+  { "cat": "питание", "type": "purple", "tag": { "cls": "purple", "text": "макросы" }, "title": "...", "sub": "...", "macros": [{"v":"1200","l":"ккал","clr":"#9D85F2"},{"v":"80г","l":"белок","clr":"#4EAEE5"},{"v":"45г","l":"жиры"},{"v":"150г","l":"углев","clr":"#3DCC72"}] },
+  { "divider": true, "cat": "активность", "count": 3 },
+  { "cat": "активность", "type": "purple", "tag": { "cls": "purple", "text": "сон" }, "title": "X ч — ...", "sub": "...", "nums": [{"v":"X ч","l":"эта ночь","clr":"#9D85F2"},{"v":"Y ч","l":"среднее","clr":"#9D85F2"}] },
+  { "cat": "активность", "type": "green", "tag": { "cls": "green", "text": "прогресс" }, "title": "...", "sub": "...", "rows": [{"l":"сейчас","v":"X кг"},{"l":"цель","v":"Y кг","clr":"#3DCC72"},{"l":"темп","v":"-0.X кг/нед"},{"l":"прогноз","v":"~дата","clr":"#3DCC72"}] },
+  { "cat": "активность", "type": "orange", "tag": { "cls": "orange", "text": "план дня" }, "title": "важное на сегодня", "sub": "...", "todo": [{"ico":"bg:rgba(78,174,229,.14);color:#4EAEE5","svg":"droplets","t":"выпить 2000 мл воды"},{"ico":"bg:rgba(255,107,53,.14);color:#FF6B35","svg":"sunrise","t":"завтрак с белком"},{"ico":"bg:rgba(61,204,114,.14);color:#3DCC72","svg":"activity","t":"кардио 30 мин"},{"ico":"bg:rgba(157,133,242,.14);color:#9D85F2","svg":"moon","t":"лечь до 23:00"}] }
+]
 
-Опциональные поля (используй 1-2 на карточку, не больше):
-- nums: [ {v: "значение", l: "подпись", clr: "var(--sun)|var(--green)|#4EAEE5|#9D85F2|var(--red)"} ] — максимум 3 элемента
-- macros: [ {v: "значение", l: "подпись", clr?: "цвет"} ] — 3-4 макронутриента
-- bar: { w: 0-100, clr: "linear-gradient(90deg,...)" }
-- chips: [ {t: "текст", cls: ""| "accent"|"warn"|"ok"|"blue"} ] — теги/советы
-- list: [ {ico: "bg:rgba(R,G,B,.14);color:#HEX", svg: "moon"|"activity"|"droplet"|"droplets"|"sunrise"|"utensils"|"check"|"arrowRight"|"spark", t: "текст", s: "подтекст"} ]
-- rows: [ {l: "ключ", v: "значение", clr?: "цвет"} ] — таблица
-- todo: [ {ico: "bg:rgba(R,G,B,.14);color:#HEX", svg: "...", t: "задача"} ]
-- meals: [ {ico: "эмодзи", name: "название блюда", sub: "приём · время", kcal: число, clr: "цвет"} ]
+СТРОГИЕ ПРАВИЛА:
+1. Значения "type" ТОЛЬКО: "warm","dark","blue","orange","teal","purple","green"
+2. Значения "tag.cls" ТОЛЬКО: "orange","blue","green","purple","red"
+3. SVG ТОЛЬКО: "moon","activity","droplet","droplets","sunrise","utensils","check","arrowRight","spark"
+4. НЕ используй поля: image, icon, illustration, header, bg_image, photo, picture, avatar
+5. Используй РЕАЛЬНЫЕ числа из данных пользователя
+6. Если данных нет (0 ккал) — пиши об этом честно и мотивируй
+7. title — макс 60 символов, sub — макс 120 символов
+8. Обращайся на "ты", тепло и по делу`;
 
-СТРУКТУРА (обязательно вставь разделители между категориями):
-Перед первой карточкой категории вставь divider: { "divider": true, "cat": "советы", "count": N }
-Затем N карточек категории советы.
-Затем divider: { "divider": true, "cat": "питание", "count": N }
-Затем N карточек питания.
-Затем divider: { "divider": true, "cat": "активность", "count": N }
-Затем N карточек активности.
-
-Правила:
-- Используй РЕАЛЬНЫЕ данные пользователя, не придумывай числа
-- Если данных нет (0 ккал, 0 воды) — замечай это и мотивируй начать
-- Будь конкретным: называй реальные цифры, прогресс, отставание
-- Советы должны быть практичными и персональными
-- Карточки питания: рацион на сегодня, вода, макронутриенты, рекомендации по блюдам
-- Карточки активности: сон, прогресс к цели, план на день
-- Для рациона придумай реальный план питания под норму калорий пользователя`;
-
-  const userPrompt=`Данные пользователя:
-Имя: ${u.name}
-Время суток: ${u.timeOfDay}
-Цель: ${goalWord}
-
-Вес: старт ${u.startWeight} кг → сейчас ${u.currentWeight} кг → цель ${u.goalWeight} кг
-Прогресс к цели: ${u.progressPct}%
-Изменение за 7 дней: ${u.weightDelta7d>0?'+':''}${u.weightDelta7d} кг
-
-Калории сегодня: ${u.calToday} из ${u.calGoal} ккал (${u.calPct}%)
-Приёмы пищи: ${u.mealBreakdown}
+  const userPrompt=`Имя: ${u.name} | Время: ${u.timeOfDay} | Цель: ${goalWord}
+Вес: ${u.startWeight}→${u.currentWeight}→${u.goalWeight} кг | Прогресс: ${u.progressPct}% | За 7 дней: ${u.weightDelta7d>0?'+':''}${u.weightDelta7d} кг
+Калории: ${u.calToday}/${u.calGoal} ккал (${u.calPct}%) | Приёмы: ${u.mealBreakdown}
 Макросы: ${u.macros}
-
-Вода сегодня: ${u.waterToday} из ${u.waterGoal} мл (${u.waterPct}%)
-Стрик: ${u.streak} дней
-
-Средний сон за неделю: ${u.avgSleep} ч
-Качество сна: ${u.lastSleepQuality}/5
-
-Задачи сегодня (${u.actsDone}/${u.actsTotal} выполнено): ${u.actsList}
-
+Вода: ${u.waterToday}/${u.waterGoal} мл (${u.waterPct}%) | Стрик: ${u.streak} дней
+Сон (сред): ${u.avgSleep} ч | Качество: ${u.lastSleepQuality}/5
+Задачи (${u.actsDone}/${u.actsTotal}): ${u.actsList}
 До лета: ${u.daysToSummer} дней`;
 
   const resp=await fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',
-    headers:{
-      'Content-Type':'application/json',
-      'Authorization':'Bearer '+apiKey
-    },
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
     body:JSON.stringify({
       model:'llama-3.3-70b-versatile',
-      max_tokens:4000,
-      temperature:0.7,
-      messages:[
-        {role:'system',content:systemPrompt},
-        {role:'user',content:userPrompt}
-      ]
+      max_tokens:3500,
+      temperature:0.65,
+      messages:[{role:'system',content:systemPrompt},{role:'user',content:userPrompt}]
     })
   });
 
@@ -6343,21 +6388,21 @@ async function _tifiCallGroq(apiKey, userData){
   }
 
   const data=await resp.json();
-  const text=data.choices?.[0]?.message?.content||'';
+  const text=(data.choices?.[0]?.message?.content||'').trim();
 
-  // Extract JSON array from response
-  let jsonStr=text.trim();
-  // Strip possible markdown code fences
-  jsonStr=jsonStr.replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'').trim();
-  // Find array boundaries robustly
-  const start=jsonStr.indexOf('[');
-  const end=jsonStr.lastIndexOf(']');
-  if(start===-1||end===-1)throw new Error('No JSON array in response');
-  jsonStr=jsonStr.slice(start,end+1);
+  // Extract JSON array robustly
+  let jsonStr=text.replace(/^```(?:json)?
+?/i,'').replace(/
+?```$/,'').trim();
+  const s=jsonStr.indexOf('['),e=jsonStr.lastIndexOf(']');
+  if(s===-1||e===-1)throw new Error('No JSON array in response');
+  const cards=JSON.parse(jsonStr.slice(s,e+1));
+  if(!Array.isArray(cards)||cards.length===0)throw new Error('Empty cards');
 
-  const cards=JSON.parse(jsonStr);
-  if(!Array.isArray(cards)||cards.length===0)throw new Error('Empty cards array');
-  return cards;
+  // Normalize + validate
+  const normalized=_tifiNormalizeCards(cards);
+  if(!normalized)throw new Error('Normalization failed');
+  return normalized;
 }
 
 /* ══════════════════════════════════════
@@ -6477,7 +6522,7 @@ function _tifiGetCards(){
 let tifiCards=[],tifiCardEls=[],tifiCur=0,tifiLoaded=false;
 
 function tifiBuildDivider(data){
-  const cat=TIFI_CATS[data.cat];
+  const cat=TIFI_CATS[data.cat]||TIFI_CATS['советы'];
   const el=document.createElement('div');
   el.className='tifi-ccard cc-divider state-next';
   el.style.cssText=`background:${cat.bg};border:1px solid ${cat.brd}`;
@@ -6489,7 +6534,7 @@ function tifiBuildDivider(data){
         <span style="position:relative;z-index:1">${cat.icon}</span>
       </div>
       <div class="tifi-div-cat-name" style="color:${cat.clr}">${data.cat}</div>
-      <div class="tifi-div-cat-sub">${data.count} карточки с анализом</div>
+      <div class="tifi-div-cat-sub">${data.count} ${data.count===1?"карточка":data.count<5?"карточки":"карточек"} с анализом</div>
       <button class="tifi-div-enter-btn" onclick="tifiNextCard()" style="background:linear-gradient(135deg,rgba(${cat.rgb},.9),rgba(${cat.rgb},.6));box-shadow:0 4px 20px rgba(${cat.rgb},.3)">
         смотреть
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
@@ -6502,13 +6547,14 @@ function tifiBuildCard(data,idx){
   const el=document.createElement('div');
   el.className='tifi-ccard state-next '+data.type;
   const ctr=document.createElement('div');
-  ctr.className='tifi-cc-counter';ctr.textContent=(idx+1)+' / '+tifiCards.length;
+  ctr.className='tifi-cc-counter';const _total=tifiCards.filter(c=>!c.divider).length;const _pos=tifiCards.slice(0,idx+1).filter(c=>!c.divider).length;ctr.textContent=_pos+' / '+_total;
   el.appendChild(ctr);
   if(data.glow){const g=document.createElement('div');g.className='tifi-cc-warm-glow';el.appendChild(g);}
   const scroll=document.createElement('div');scroll.className='tifi-cc-scroll';
   let h=`<div class="tifi-cc-body">`;
-  if(data.custom)h+=`<div class="tifi-cc-custom-badge">${tifiMkSvg('spark')} создано тифи</div>`;
-  h+=`<div class="tifi-cc-tag ${data.tag.cls}">${data.tag.text}</div>`;
+  if(data.custom)h+=`<div class="tifi-cc-custom-badge">✦ создано тифи</div>`;
+  const _tag=data.tag||{cls:'tifi-tag-orange',text:'тифи'};
+  h+=`<div class="tifi-cc-tag ${_tag.cls||'tifi-tag-orange'}">${_tag.text||'тифи'}</div>`;
   h+=`<div class="tifi-cc-h">${data.title}</div>`;
   h+=`<div class="tifi-cc-s">${data.sub}</div>`;
   if(data.nums){h+=`<div class="tifi-cc-bignums">`;data.nums.forEach(n=>{h+=`<div class="tifi-cc-num"><div class="tifi-cc-num-v"${n.clr?` style="color:${n.clr}"`:''}>${n.v}</div><div class="tifi-cc-num-l">${n.l}</div></div>`});h+=`</div>`;}
