@@ -1845,20 +1845,16 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
   box-shadow:0 0 6px rgba(255,171,64,.9);
 }
 
-/* ── focus carousel ── */
+/* ── PILLS + FEED SYSTEM ── */
 #tifi-carousel{position:absolute;inset:0;opacity:0;transition:opacity .4s ease;pointer-events:none}
 #tifi-carousel.visible{opacity:1;pointer-events:all}
-/* progress segments at top */
-.tifi-prog{display:flex;gap:3px;padding:10px 16px 0;position:absolute;top:0;left:0;right:0;z-index:8}
-.tifi-prog-seg{flex:1;height:2px;border-radius:99px;background:rgba(255,255,255,.09);overflow:hidden}
+.tifi-prog{display:flex;gap:2px;padding:10px 14px 0;position:absolute;top:0;left:0;right:0;z-index:8}
+.tifi-prog-seg{flex:1;height:4px;border-radius:99px;background:rgba(255,255,255,.09);overflow:hidden;transition:opacity .2s}
 .tifi-prog-fill{height:100%;border-radius:99px;width:0%;transition:width .18s ease}
-/* cat label row */
-.tifi-cat-row{position:absolute;top:20px;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:0 18px;z-index:8;pointer-events:none}
-.tifi-cat-lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.3);transition:color .18s}
+.tifi-cat-row{position:absolute;top:22px;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:8;pointer-events:none}
+.tifi-cat-lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.3);transition:color .2s}
 .tifi-cat-cnt{font-size:10px;font-weight:700;color:rgba(255,255,255,.25)}
-/* card stage */
-.tifi-ctrack-vp{position:absolute;top:40px;left:0;right:0;bottom:46px;overflow:hidden}
-/* Cards — instant swap */
+.tifi-ctrack-vp{position:absolute;top:42px;left:0;right:0;bottom:46px;overflow:hidden}
 .tifi-ccard{
   position:absolute;top:0;bottom:0;left:14px;right:14px;
   border-radius:22px;overflow:hidden;
@@ -1869,27 +1865,233 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tifi-ccard.state-current{transform:translate3d(0,0,0);opacity:1;z-index:3}
 .tifi-ccard.state-prev{transform:translate3d(-106%,0,0);opacity:0;z-index:1}
 .tifi-ccard.state-next{transform:translate3d(106%,0,0);opacity:0;z-index:1}
-/* dots at bottom */
 .tifi-cdots{
   position:absolute;bottom:26px;left:0;right:0;
   display:flex;justify-content:center;align-items:center;gap:4px;z-index:8;padding:0 20px;flex-wrap:wrap;
 }
 .tifi-cdot{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.14);transition:width .18s,background .18s,border-radius .18s;flex-shrink:0}
 .tifi-cdot.on{width:14px;border-radius:2px}
-/* counter */
 .tifi-counter-pill{
   position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
   font-size:10px;font-weight:700;letter-spacing:.03em;
-  color:rgba(255,255,255,.22);
-  white-space:nowrap;
-  pointer-events:none;z-index:10;
-  white-space:nowrap;
+  color:rgba(255,255,255,.22);white-space:nowrap;pointer-events:none;z-index:10;
 }
-
 .tifi-cc-scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
 .tifi-cc-scroll::-webkit-scrollbar{display:none}
 .tifi-cc-body{padding:20px;display:flex;flex-direction:column;position:relative;z-index:1}
-.tifi-cc-counter{position:absolute;top:14px;right:14px;font-size:11px;font-weight:800;color:rgba(255,255,255,.22);z-index:4;pointer-events:none}
+
+
+/* ══════════════════════════════════════════
+   12 CARD TYPES — ALL DARK THEMED
+══════════════════════════════════════════ */
+
+/* Base card */
+.tf-card{
+  border-radius:20px;padding:18px;position:relative;overflow:hidden;
+  display:flex;flex-direction:column;
+  font-family:'Onest',sans-serif;color:#F2F0EC;
+}
+
+/* Backgrounds */
+.tf-bg-warm{background:#191410;border:1px solid rgba(255,107,53,.16)}
+.tf-bg-dark{background:#111118;border:1px solid rgba(255,255,255,.07)}
+.tf-bg-blue{background:#0E1620;border:1px solid rgba(78,174,229,.14)}
+.tf-bg-green{background:#0D1A12;border:1px solid rgba(61,204,114,.13)}
+.tf-bg-purple{background:#12102A;border:1px solid rgba(157,133,242,.13)}
+.tf-bg-red{background:#1A0F0E;border:1px solid rgba(244,92,92,.14)}
+.tf-bg-gold{background:#1A1508;border:1px solid rgba(255,171,64,.14)}
+.tf-bg-sleep{background:#100E1E;border:1px solid rgba(139,127,212,.13)}
+
+/* Glow */
+.tf-glow{position:absolute;border-radius:50%;pointer-events:none;z-index:0;filter:blur(60px)}
+
+/* Card header */
+.tf-hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px;position:relative;z-index:1}
+.tf-tag{display:inline-flex;align-items:center;gap:5px;font-size:8px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border-radius:6px;flex-shrink:0;margin-bottom:10px}
+.tf-tag-o{background:rgba(255,107,53,.12);color:#FF8040}
+.tf-tag-b{background:rgba(78,174,229,.12);color:#4EAEE5}
+.tf-tag-g{background:rgba(61,204,114,.11);color:#3DCC72}
+.tf-tag-p{background:rgba(157,133,242,.11);color:#9D85F2}
+.tf-tag-r{background:rgba(244,92,92,.1);color:#F45C5C}
+.tf-tag-a{background:rgba(255,171,64,.11);color:#FFAB40}
+.tf-tag-s{background:rgba(139,127,212,.1);color:#8B7FD4}
+
+.tf-hdr-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.tf-body{position:relative;z-index:1}
+.tf-title{font-size:18px;font-weight:900;letter-spacing:-.03em;line-height:1.15;margin-bottom:5px}
+.tf-sub{font-size:12px;font-weight:400;color:rgba(255,255,255,.42);line-height:1.6;margin-bottom:0}
+
+/* ── TYPE: SCORE ── */
+.tf-score-wrap{display:flex;align-items:flex-end;gap:16px;margin-top:14px}
+.tf-score-big{font-size:54px;font-weight:900;letter-spacing:-.04em;line-height:1}
+.tf-score-bars{flex:1;display:flex;flex-direction:column;gap:8px;padding-bottom:2px}
+.tf-sbar-row{display:flex;justify-content:space-between;font-size:10px;margin-bottom:3px}
+.tf-sbar-lbl{color:rgba(255,255,255,.38);font-weight:600}
+.tf-sbar-val{font-weight:800}
+.tf-sbar-track{height:3px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden}
+.tf-sbar-fill{height:100%;border-radius:99px}
+.tf-mood{display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-size:12px;font-weight:600;color:rgba(255,255,255,.45);background:rgba(255,255,255,.04);padding:7px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.06)}
+
+/* ── TYPE: RECIPE ── */
+.tf-ingr-wrap{margin-top:12px}
+.tf-ingr-lbl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.25);margin-bottom:7px}
+.tf-ingr-chips{display:flex;flex-wrap:wrap;gap:5px}
+.tf-ingr-chip{font-size:10px;font-weight:600;padding:4px 9px;border-radius:7px;background:rgba(255,107,53,.08);color:rgba(255,107,53,.85);border:1px solid rgba(255,107,53,.15)}
+.tf-steps{display:flex;flex-direction:column;gap:7px;margin-top:12px}
+.tf-step{display:flex;align-items:flex-start;gap:9px;font-size:12px;color:rgba(255,255,255,.6);line-height:1.5}
+.tf-step-n{width:20px;height:20px;border-radius:6px;background:rgba(255,128,64,.14);color:#FF8040;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.tf-macros{display:flex;gap:6px;margin-top:12px}
+.tf-macro{flex:1;background:rgba(255,255,255,.04);border-radius:10px;padding:8px;text-align:center;border:1px solid rgba(255,255,255,.06)}
+.tf-macro-v{font-size:14px;font-weight:900;line-height:1}
+.tf-macro-l{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:rgba(255,255,255,.3);margin-top:3px}
+.tf-cost{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:11px;color:rgba(255,255,255,.38);background:rgba(255,255,255,.04);padding:5px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.06)}
+.tf-cost strong{color:#3DCC72}
+
+/* ── TYPE: COMPARE ── */
+.tf-cmp-head{display:grid;grid-template-columns:1fr 54px 54px 56px;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.22);padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06);margin-top:14px}
+.tf-cmp-r{display:grid;grid-template-columns:1fr 54px 54px 56px;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px}
+.tf-cmp-r:last-child{border-bottom:none}
+.tf-cmp-rl{color:rgba(255,255,255,.38);font-weight:500}
+.tf-cmp-rp{color:rgba(255,255,255,.65);font-weight:700;text-align:right}
+.tf-cmp-rc{color:#fff;font-weight:800;text-align:right}
+.tf-cmp-rd{font-weight:900;text-align:right;font-size:12px;color:#3DCC72}
+.tf-verdict{display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-size:12px;font-weight:700;padding:9px 13px;border-radius:10px;background:rgba(61,204,114,.08);color:#3DCC72;border:1px solid rgba(61,204,114,.14)}
+
+/* ── TYPE: WEEK BAR ── */
+.tf-week{display:flex;gap:5px;margin-top:14px}
+.tf-wday{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.tf-wbw{width:100%;height:52px;background:rgba(255,255,255,.05);border-radius:6px;overflow:hidden;display:flex;align-items:flex-end}
+.tf-wbf{width:100%;border-radius:6px;min-height:3px;transition:height .3s ease}
+.tf-wday-l{font-size:8px;font-weight:700;color:rgba(255,255,255,.22)}
+.tf-wday-v{font-size:9px;font-weight:800;color:rgba(255,255,255,.35)}
+.tf-wday.today .tf-wbf{box-shadow:0 0 8px currentColor}
+.tf-wday.today .tf-wday-l{color:rgba(255,107,53,.8)}
+.tf-wavg{display:inline-flex;align-items:center;gap:5px;margin-top:10px;font-size:11px;color:rgba(255,255,255,.35);background:rgba(255,255,255,.04);padding:5px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.06)}
+
+/* ── TYPE: TIP ── */
+.tf-tip-ico-wrap{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:14px;flex-shrink:0}
+.tf-tip-body{font-size:13px;font-weight:500;line-height:1.65;color:rgba(255,255,255,.7);margin-top:8px}
+.tf-tip-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.tf-tip-chip{padding:5px 10px;border-radius:8px;font-size:11px;font-weight:600;background:rgba(255,255,255,.05);color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.08)}
+.tf-tip-btn{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:14px;padding:12px;border-radius:12px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;border:none;font-family:'Onest',sans-serif;background:rgba(255,255,255,.08);transition:transform .1s,opacity .1s;-webkit-tap-highlight-color:transparent}
+.tf-tip-btn:active{transform:scale(.97);opacity:.85}
+
+/* ── TYPE: WARNING ── */
+.tf-warn-alert{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:12px;background:rgba(244,92,92,.1);border:1px solid rgba(244,92,92,.2);margin-top:14px}
+.tf-warn-dot{width:7px;height:7px;border-radius:50%;background:#F45C5C;flex-shrink:0;animation:tf-blink 1.5s ease-in-out infinite}
+@keyframes tf-blink{0%,100%{opacity:1}50%{opacity:.15}}
+.tf-warn-metric-big{font-size:48px;font-weight:900;letter-spacing:-.04em;line-height:1;color:#F45C5C;margin-top:10px}
+.tf-warn-metric-sub{font-size:11px;color:rgba(244,92,92,.6);font-weight:600;margin-top:3px}
+.tf-warn-bar{height:6px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden;margin-top:12px}
+.tf-warn-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#F45C5C,#FF8040)}
+.tf-warn-action{font-size:12px;font-weight:600;color:rgba(255,107,53,.7);margin-top:10px;line-height:1.5}
+
+/* ── TYPE: PROGRESS ── */
+.tf-ring-wrap{display:flex;align-items:center;gap:16px;margin-top:14px}
+.tf-ring-svg{width:80px;height:80px;flex-shrink:0}
+.tf-ring-stats{flex:1;display:flex;flex-direction:column;gap:8px}
+.tf-ring-stat{display:flex;justify-content:space-between;font-size:12px}
+.tf-ring-stat-l{color:rgba(255,255,255,.35);font-weight:600}
+.tf-ring-stat-v{font-weight:800}
+.tf-on-track{display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-size:11px;font-weight:700;padding:6px 11px;border-radius:8px}
+.tf-on-track.yes{background:rgba(61,204,114,.09);color:#3DCC72;border:1px solid rgba(61,204,114,.18)}
+.tf-on-track.no{background:rgba(244,92,92,.08);color:#F45C5C;border:1px solid rgba(244,92,92,.15)}
+
+/* ── TYPE: MILESTONE ── */
+.tf-ms-badge-wrap{display:flex;flex-direction:column;align-items:center;padding:16px;border-radius:14px;margin-bottom:12px}
+.tf-ms-ico{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.tf-ms-badge-sub{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#FFAB40;margin-bottom:4px}
+.tf-ms-badge-title{font-size:16px;font-weight:900;letter-spacing:-.02em}
+.tf-ms-sub{font-size:12px;color:rgba(255,255,255,.4);text-align:center;margin-bottom:11px;line-height:1.5}
+.tf-ms-stats{display:flex;gap:5px;margin-top:2px}
+.tf-ms-stat{flex:1;background:rgba(255,255,255,.04);border-radius:9px;padding:9px 6px;text-align:center;border:1px solid rgba(255,255,255,.05)}
+.tf-ms-stat-v{font-size:16px;font-weight:900;line-height:1;letter-spacing:-.02em}
+.tf-ms-stat-l{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:rgba(255,255,255,.3);margin-top:3px}
+.tf-ms-next{margin-top:9px;font-size:11px;color:rgba(255,255,255,.35);text-align:center;padding:7px 11px;border-radius:8px;background:rgba(255,255,255,.03)}
+
+/* ── TYPE: SLEEP ANALYSIS ── */
+.tf-sleep-nums{display:flex;gap:8px;margin-top:14px}
+.tf-sleep-num{flex:1;background:rgba(139,127,212,.06);border-radius:12px;padding:11px;text-align:center;border:1px solid rgba(139,127,212,.12)}
+.tf-sleep-num-v{font-size:18px;font-weight:900;line-height:1;color:#8B7FD4}
+.tf-sleep-num-l{font-size:9px;color:rgba(139,127,212,.5);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:4px}
+.tf-sleep-segs{display:flex;gap:3px;margin-top:12px;height:8px;border-radius:99px;overflow:hidden}
+.tf-sleep-seg{flex:1;min-width:0;border-radius:99px}
+.tf-sleep-rec{margin-top:10px;font-size:12px;color:rgba(255,255,255,.5);line-height:1.55;background:rgba(255,255,255,.03);padding:9px 11px;border-radius:10px;border:1px solid rgba(255,255,255,.06)}
+
+/* ── TYPE: CHALLENGE ── */
+.tf-chal-top{display:flex;align-items:flex-start;gap:12px;margin-top:4px}
+.tf-chal-ico{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.tf-chal-info{flex:1}
+.tf-chal-title{font-size:16px;font-weight:800;letter-spacing:-.02em;line-height:1.2}
+.tf-chal-diff{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;padding:3px 8px;border-radius:5px;margin-top:5px;text-transform:uppercase;letter-spacing:.06em}
+.tf-chal-diff.easy{background:rgba(61,204,114,.1);color:#3DCC72}
+.tf-chal-diff.medium{background:rgba(255,171,64,.1);color:#FFAB40}
+.tf-chal-diff.hard{background:rgba(244,92,92,.1);color:#F45C5C}
+.tf-chal-progress{margin-top:14px}
+.tf-chal-pbar{height:7px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden;margin-top:6px}
+.tf-chal-pbar-fill{height:100%;border-radius:99px}
+.tf-chal-plbl{display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.35);font-weight:600}
+.tf-chal-btn{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:14px;padding:12px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:'Onest',sans-serif;transition:transform .1s,opacity .1s;-webkit-tap-highlight-color:transparent}
+.tf-chal-btn:active{transform:scale(.97);opacity:.85}
+
+/* ── TYPE: SHOPPING ── */
+.tf-sh-row{display:grid;grid-template-columns:1fr 46px 52px;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px}
+.tf-sh-row:last-child{border-bottom:none}
+.tf-sh-n{font-weight:600;color:rgba(255,255,255,.75)}
+.tf-sh-p{color:#3DCC72;font-weight:800;text-align:right}
+.tf-sh-pr{color:rgba(78,174,229,.75);font-weight:700;text-align:right;font-size:10px}
+.tf-sh-total{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:9px;border-top:1px solid rgba(255,255,255,.08);font-size:13px}
+.tf-sh-total-l{color:rgba(255,255,255,.35);font-weight:600}
+.tf-sh-total-v{color:#3DCC72;font-weight:900;font-size:18px}
+
+/* ── TYPE: MEAL PLAN ── */
+.tf-mp-meal{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.tf-mp-meal:last-child{border-bottom:none}
+.tf-mp-meal-ico{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.tf-mp-meal-info{flex:1;min-width:0}
+.tf-mp-meal-name{font-size:12px;font-weight:700;line-height:1.2;color:#F2F0EC;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tf-mp-meal-time{font-size:10px;color:rgba(255,255,255,.3);font-weight:500;margin-top:1px}
+.tf-mp-meal-kcal{font-size:14px;font-weight:900;flex-shrink:0}
+.tf-mp-meal-done{width:20px;height:20px;border-radius:6px;background:rgba(61,204,114,.15);border:1.5px solid rgba(61,204,114,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tf-mp-rem{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:11px;font-weight:700;color:rgba(255,107,53,.8);background:rgba(255,107,53,.07);padding:6px 11px;border-radius:8px;border:1px solid rgba(255,107,53,.15)}
+
+/* ── TYPE: INSIGHT ── */
+.tf-insight-chart{display:flex;gap:5px;margin-top:14px;height:44px}
+.tf-insight-bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px}
+.tf-insight-bw{width:100%;border-radius:5px;min-height:2px}
+.tf-insight-bl{font-size:7px;font-weight:700;color:rgba(255,255,255,.22);text-align:center}
+.tf-finding{margin-top:12px;font-size:13px;font-weight:500;line-height:1.6;color:rgba(255,255,255,.65)}
+.tf-conclusion{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:11px;font-weight:700;padding:6px 12px;border-radius:8px;background:rgba(157,133,242,.09);color:#9D85F2;border:1px solid rgba(157,133,242,.18)}
+
+/* ── CARD NUMS (shared) ── */
+.tf-nums{display:flex;gap:8px;margin-top:13px}
+.tf-num{flex:1;border-radius:12px;padding:11px 10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);text-align:center}
+.tf-num-v{font-size:18px;font-weight:900;letter-spacing:-.02em;line-height:1}
+.tf-num-l{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:rgba(255,255,255,.3);margin-top:4px}
+
+/* ── BAR (shared) ── */
+.tf-bar{height:5px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin-top:12px}
+.tf-bar-fill{height:100%;border-radius:99px}
+
+/* ── ROWS (shared) ── */
+.tf-rows{display:flex;flex-direction:column;margin-top:12px}
+.tf-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.tf-row:last-child{border-bottom:none}
+.tf-row-l{font-size:13px;font-weight:600;color:rgba(255,255,255,.35)}
+.tf-row-v{font-size:13px;font-weight:800}
+
+/* ── CHIPS (shared) ── */
+.tf-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.tf-chip{padding:5px 10px;border-radius:8px;font-size:11px;font-weight:600;background:rgba(255,255,255,.05);color:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.08)}
+.tf-chip.c-g{background:rgba(61,204,114,.09);color:#3DCC72;border-color:rgba(61,204,114,.18)}
+.tf-chip.c-r{background:rgba(244,92,92,.08);color:#F45C5C;border-color:rgba(244,92,92,.15)}
+.tf-chip.c-b{background:rgba(78,174,229,.09);color:#4EAEE5;border-color:rgba(78,174,229,.18)}
+.tf-chip.c-p{background:rgba(157,133,242,.09);color:#9D85F2;border-color:rgba(157,133,242,.18)}
+.tf-chip.c-a{background:rgba(255,107,53,.1);color:#FF8040;border-color:rgba(255,107,53,.2)}
+.tf-chip.c-w{background:rgba(255,171,64,.09);color:#FFAB40;border-color:rgba(255,171,64,.18)}
+
+iconify-icon{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle}
+
 
 /* card backgrounds — no backdrop-filter (GPU lag) */
 .tifi-cc-warm{background:#1A1410;border:1px solid rgba(var(--sun-rgb),.14)}
@@ -1900,21 +2102,6 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
 .tifi-cc-purple{background:#131020;border:1px solid rgba(157,133,242,.11)}
 .tifi-cc-orange{background:#181008;border:1px solid rgba(var(--sun-rgb),.11)}
 .tifi-cc-teal{background:#0E1A1A;border:1px solid rgba(61,204,114,.10)}
-.tifi-cc-score{background:#0C0F0C;border:1px solid rgba(61,204,114,.14)}
-.tifi-cc-score-wrap{display:flex;align-items:flex-end;gap:16px;margin-top:8px}
-.tifi-cc-score-num{font-size:58px;font-weight:900;letter-spacing:-.05em;line-height:1}
-.tifi-cc-score-metrics{flex:1;display:flex;flex-direction:column;gap:7px;padding-bottom:6px}
-.tifi-cc-score-row{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11px;color:rgba(255,255,255,.38);font-weight:600}
-.tifi-cc-score-row span:first-child{flex-shrink:0;min-width:58px}
-.tifi-cc-score-row span:last-child{flex-shrink:0;white-space:nowrap}
-.tifi-cc-score-bar{height:3px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden;margin-top:2px}
-.tifi-cc-score-bar-f{height:100%;border-radius:99px}
-.tifi-cc-insight-glow{position:absolute;top:-20px;right:-20px;width:130px;height:130px;border-radius:50%;filter:blur(35px);pointer-events:none;z-index:0}
-.tifi-filter-row{display:none !important}
-.tifi-filter-row::-webkit-scrollbar{display:none}
-.tifi-fchip{display:none}
-.tifi-fchip:active{opacity:.75}
-.tifi-fchip svg{width:12px;height:12px;flex-shrink:0}
 
 /* tags */
 .tifi-cc-tag{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:6px;margin-bottom:14px;align-self:flex-start;flex-shrink:0}
@@ -2587,7 +2774,7 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
       </div>
     </div>
 
-    <!-- Focus carousel -->
+    <!-- Carousel view -->
     <div id="tifi-carousel">
       <!-- progress segments (one per card) -->
       <div class="tifi-prog" id="tifi-prog"></div>
@@ -2812,16 +2999,16 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
         <!-- Meal type tabs -->
         <div class="ve-s3-meals">
           <button class="ve-s3-meal on" id="ve-meal-breakfast" onclick="setMealE('breakfast',this)">
-            <span>🌅</span><div>завтрак</div>
+            <span><iconify-icon icon="solar:sunrise-bold-duotone" style="font-size:20px;vertical-align:middle"></iconify-icon></span><div>завтрак</div>
           </button>
           <button class="ve-s3-meal" id="ve-meal-lunch" onclick="setMealE('lunch',this)">
-            <span>☀️</span><div>обед</div>
+            <span><iconify-icon icon="solar:sun-bold-duotone" style="font-size:20px;vertical-align:middle"></iconify-icon></span><div>обед</div>
           </button>
           <button class="ve-s3-meal" id="ve-meal-dinner" onclick="setMealE('dinner',this)">
-            <span>🌙</span><div>ужин</div>
+            <span><iconify-icon icon="solar:moon-bold-duotone" style="font-size:20px;vertical-align:middle"></iconify-icon></span><div>ужин</div>
           </button>
           <button class="ve-s3-meal" id="ve-meal-snack" onclick="setMealE('snack',this)">
-            <span>🍑</span><div>перекус</div>
+            <span><iconify-icon icon="solar:apple-bold-duotone" style="font-size:20px;vertical-align:middle"></iconify-icon></span><div>перекус</div>
           </button>
         </div>
       </div>
@@ -2844,24 +3031,19 @@ html,body{height:100%;overflow:hidden;font-family:'Onest',system-ui,sans-serif;b
     <div class="md-hero">
       <div class="md-ring-wrap">
         <svg viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <filter id="glow-p"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-            <filter id="glow-f"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-            <filter id="glow-c"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-          </defs>
           <circle cx="90" cy="90" r="72" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="20"/>
           <circle id="md-arc-c" cx="90" cy="90" r="72" fill="none" stroke="#8B7FD4" stroke-width="20"
             stroke-dasharray="0 452.4" stroke-dashoffset="113.1"
-            stroke-linecap="round" filter="url(#glow-c)"/>
+            stroke-linecap="round"/>
           <circle id="md-arc-p" cx="90" cy="90" r="72" fill="none" stroke="#52C177" stroke-width="20"
             stroke-dasharray="0 452.4" stroke-dashoffset="113.1"
-            stroke-linecap="round" filter="url(#glow-p)"/>
+            stroke-linecap="round"/>
           <circle id="md-arc-f" cx="90" cy="90" r="72" fill="none" stroke="var(--sun)" stroke-width="20"
             stroke-dasharray="0 452.4" stroke-dashoffset="113.1"
-            stroke-linecap="round" filter="url(#glow-f)"/>
+            stroke-linecap="round"/>
         </svg>
         <div class="md-ring-center">
-          <div class="md-ring-ico" id="md-ico">🌅</div>
+          <div class="md-ring-ico" id="md-ico"><iconify-icon icon="solar:sunrise-bold-duotone"></iconify-icon></div>
           <div class="md-ring-kcal" id="md-kcal">0</div>
           <div class="md-ring-lbl">ккал</div>
         </div>
@@ -3868,10 +4050,8 @@ function popPage(doRender=true){
     if(wrap)wrap.innerHTML='';
   }
   // При закрытии pp-tifi: немедленно убираем .visible с карусели
-  // (иначе pointer-events:all на ней блокирует весь экран после закрытия)
-  // и инкрементируем токен чтобы оборвать любой текущий tifiStartScreen
   if(curPushPage==='pp-tifi'){
-    _tifiToken++; // отменяем все pending async-колбэки
+    _tifiToken++;
     const car=document.getElementById('tifi-carousel');
     if(car){car.classList.remove('visible');car.style.pointerEvents='none';}
   }
@@ -3901,7 +4081,6 @@ function _populatePP(id){
   const u=gU();
   if(id==='pp-tifi'){
     if(tifiLoaded){
-      // карточки уже есть — сразу показываем без нового запроса
       const ldg=document.getElementById('tifi-loading');
       const car=document.getElementById('tifi-carousel');
       if(ldg){ldg.style.display='none';}
@@ -4192,11 +4371,11 @@ function getMealEntries(mealType){
 }
 function openMealDetail(mealType){
   _currentMealKey=mealType;
-  const MEALS={breakfast:{i:'🌅',n:'завтрак'},lunch:{i:'☀️',n:'обед'},dinner:{i:'🌙',n:'ужин'},snack:{i:'🍑',n:'перекус'}};
+  const MEALS={breakfast:{i:'solar:sunrise-bold-duotone',n:'завтрак'},lunch:{i:'solar:sun-bold-duotone',n:'обед'},dinner:{i:'solar:moon-bold-duotone',n:'ужин'},snack:{i:'solar:apple-bold-duotone',n:'перекус'}};
   const m=MEALS[mealType]||{i:'🍽',n:mealType};
-  T('md-title',m.i+' '+m.n);
+  T('md-title',m.n);
   T('md-subtitle','сегодня');
-  const el=$('md-ico');if(el)el.textContent=m.i;
+  const el=$('md-ico');if(el)el.innerHTML=`<iconify-icon icon="${m.i}" style="font-size:28px"></iconify-icon>`;
   pushPage('pp-meal-detail');
   // Render after page animation starts to avoid jank
   requestAnimationFrame(()=>requestAnimationFrame(()=>renderMealDetail()));
@@ -4940,7 +5119,7 @@ const ACCENT_THEMES={
     // Летняя гроза: насыщенный сапфировый → мягкий дымчато-голубой
     sun:'#3868C8',sun2:'#78A8E8',cal:'#2858B8',
     r:'56',g:'104',b:'200', r2:'120',g2:'168',b2:'232',
-    water:'#E87840',wr:'232',wg2:'120',wb:'64',
+    water:'#A868E8',wr:'168',wg2:'104',wb:'232',
     navLight:'rgba(244,248,255,.96)',navDark:'rgba(4,8,20,.96)'
   },
   olive: {
@@ -4954,21 +5133,21 @@ const ACCENT_THEMES={
     // Петроль: глубокий нефтяной сине-зелёный (185°) → бирюзовый
     sun:'#0D7A8A',sun2:'#28AABB',cal:'#0C6878',
     r:'13',g:'122',b:'138', r2:'40',g2:'170',b2:'187',
-    water:'#E07838',wr:'224',wg2:'120',wb:'56',
+    water:'#38C8D0',wr:'56',wg2:'200',wb:'208',
     navLight:'rgba(240,252,254,.96)',navDark:'rgba(1,12,16,.96)'
   },
   indigo: {
     // Индиго: глубокий синий индиго (233°) → мягкий лавандово-синий
     sun:'#3C52C8',sun2:'#7090E0',cal:'#3048B8',
     r:'60',g:'82',b:'200', r2:'112',g2:'144',b2:'224',
-    water:'#E07838',wr:'224',wg2:'120',wb:'56',
+    water:'#7068E8',wr:'112',wg2:'104',wb:'232',
     navLight:'rgba(242,244,255,.96)',navDark:'rgba(4,6,22,.96)'
   },
   plum: {
     // Слива: насыщенный сливово-пурпурный (279°) → нежный лиловый
     sun:'#9038C0',sun2:'#C070E0',cal:'#8030B0',
     r:'144',g:'56',b:'192', r2:'192',g2:'112',b2:'224',
-    water:'#38C078',wr:'56',wg2:'192',wb:'120',
+    water:'#5870E8',wr:'88',wg2:'112',wb:'232',
     navLight:'rgba(250,244,255,.96)',navDark:'rgba(12,4,20,.96)'
   },
   mauve: {
@@ -4996,7 +5175,7 @@ const ACCENT_THEMES={
     // Фуксия: яркий пурпурно-розовый (305°) → насыщенный лиловато-розовый
     sun:'#C028A0',sun2:'#E870D0',cal:'#B01890',
     r:'192',g:'40',b:'160', r2:'232',g2:'112',b2:'208',
-    water:'#40B878',wr:'64',wg2:'184',wb:'120',
+    water:'#6850D8',wr:'104',wg2:'80',wb:'216',
     navLight:'rgba(255,243,253,.96)',navDark:'rgba(18,2,18,.96)'
   },
   matcha: {
@@ -5050,6 +5229,56 @@ function setAccentTheme(id){
     _updateDesignVal();
   });
 }
+
+/* ── Smooth pointer-slide for color grid ──
+   Uses pointer capture so the user can slide a finger across swatches
+   without the grid scrolling or laggy onclick fires. */
+(function(){
+  let _lastId=null,_tid=null;
+  function _pickFromPoint(x,y){
+    // use elementFromPoint to find which cg-item is under finger
+    const el=document.elementFromPoint(x,y);
+    if(!el)return;
+    const item=el.closest('[data-id]');
+    if(!item)return;
+    const id=item.dataset.id;
+    if(!id||id===_lastId||!ACCENT_THEMES[id])return;
+    _lastId=id;
+    // Throttle: apply immediately for visual, debounce haptic+save
+    applyAccentTheme(id);
+    _syncColorRow(id);
+    Object.keys(ACCENT_THEMES).forEach(k=>{
+      const eg=document.getElementById('cg-'+k);
+      if(eg)eg.classList.toggle('on',k===id);
+    });
+    clearTimeout(_tid);
+    _tid=setTimeout(()=>{
+      tg?.HapticFeedback?.selectionChanged();
+      lsSet('accent_theme',id);
+      _updateDesignVal();
+    },60);
+  }
+  document.addEventListener('DOMContentLoaded',()=>{
+    const grid=document.getElementById('cg-grid');
+    if(!grid)return;
+    let _active=false;
+    grid.addEventListener('pointerdown',e=>{
+      _active=true;_lastId=null;
+      grid.setPointerCapture(e.pointerId);
+      _pickFromPoint(e.clientX,e.clientY);
+    },{passive:true});
+    grid.addEventListener('pointermove',e=>{
+      if(!_active)return;
+      _pickFromPoint(e.clientX,e.clientY);
+    },{passive:true});
+    grid.addEventListener('pointerup',()=>{_active=false;},{passive:true});
+    grid.addEventListener('pointercancel',()=>{_active=false;},{passive:true});
+    // remove individual onclick to avoid double-fires
+    grid.querySelectorAll('[data-id]').forEach(el=>{
+      el.removeAttribute('onclick');
+    });
+  });
+})();
 
 function _syncColorRow(id){
   const t=ACCENT_THEMES[id]||ACCENT_THEMES.sunset;
@@ -5326,21 +5555,22 @@ function renderCal(){
   T('c-remain',Math.max(0,cg-ct));
   const m=C.macros||{prot:0,fat:0,carb:0};
   T('c-prot',(m.prot||0)+'г');T('c-fat',(m.fat||0)+'г');T('c-carb',(m.carb||0)+'г');
-  const MEALS=[{k:'breakfast',i:'🌅',n:'завтрак',col:'#FFAB40',bg:'rgba(var(--sun2-rgb),.12)'},{k:'lunch',i:'☀️',n:'обед',col:'#FF6B35',bg:'rgba(var(--sun-rgb),.12)'},{k:'dinner',i:'🌙',n:'ужин',col:'#8B7FD4',bg:'rgba(139,127,212,.12)'},{k:'snack',i:'🍑',n:'перекус',col:'#52C177',bg:'rgba(82,193,119,.1)'}];
+  const MEALS=[{k:'breakfast',i:'solar:sunrise-bold-duotone',n:'завтрак',col:'#FFAB40',bg:'rgba(var(--sun2-rgb),.12)'},{k:'lunch',i:'solar:sun-bold-duotone',n:'обед',col:'#FF6B35',bg:'rgba(var(--sun-rgb),.12)'},{k:'dinner',i:'solar:moon-bold-duotone',n:'ужин',col:'#8B7FD4',bg:'rgba(139,127,212,.12)'},{k:'snack',i:'solar:apple-bold-duotone',n:'перекус',col:'#52C177',bg:'rgba(82,193,119,.1)'}];
   H('c-meals',MEALS.map(m=>{
     const entries=getMealEntries(m.k);
     const kcal=entries.reduce((s,e)=>s+(e.kcal||0),0);
     const cnt=entries.length;
     const pct=ct>0?Math.min(100,Math.round(kcal/ct*100)):0;
+    const icoHtml=`<iconify-icon icon="${m.i}" style="font-size:18px;color:${m.col}"></iconify-icon>`;
     if(!cnt)return`<div class="cal-meal-tile" style="opacity:.48;display:flex;align-items:center;gap:10px" onclick="openMealDetail('${m.k}')">
-      <div class="cal-meal-ico" style="background:${m.bg}">${m.i}</div>
+      <div class="cal-meal-ico" style="background:${m.bg}">${icoHtml}</div>
       <div class="cal-meal-name">${m.n}</div>
       <div style="color:rgba(255,255,255,.18);font-size:13px;font-weight:900">—</div>
       <div style="width:22px;height:22px;border-radius:50%;border:1.5px dashed rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.25);font-size:14px;flex-shrink:0">+</div>
     </div>`;
     return`<div class="cal-meal-tile" onclick="openMealDetail('${m.k}')">
       <div class="cal-meal-tile-top">
-        <div class="cal-meal-ico" style="background:${m.bg}">${m.i}</div>
+        <div class="cal-meal-ico" style="background:${m.bg}">${icoHtml}</div>
         <div>
           <div class="cal-meal-name">${m.n}</div>
           <div class="cal-meal-cnt">${cnt} ${cnt===1?'блюдо':cnt<5?'блюда':'блюд'}</div>
@@ -6370,13 +6600,6 @@ document.addEventListener('DOMContentLoaded',async()=>{
    ТИФИ — полная реализация
 ══════════════════════════════════════ */
 
-/* ── глобальные переменные тифи ── */
-let tifiLoaded   = false;   // true после успешной загрузки карточек
-let tifiCards    = [];       // массив карточек от API
-let tifiCur      = 0;        // индекс текущей карточки в карусели
-let tifiCardEls  = [];       // DOM-элементы карточек
-let _tifiToken   = 0;        // cancellation token для async tifiStartScreen
-
 function _tifiGetKey(){return lsGet('groq_key')||'';}
 function _tifiSetKey(k){lsSet('groq_key',k);}
 function _tifiMaskKey(k){if(!k||k.length<8)return k;return k.slice(0,8)+'•••••••••'+k.slice(-4);}
@@ -6566,146 +6789,139 @@ function _tifiGetUserData(){
 
 /* Нормализует ответ ИИ: исправляет префиксы классов, убирает неизвестные поля */
 function _tifiNormalizeCards(raw){
-  const VALID_TYPES=new Set(['tifi-cc-warm','tifi-cc-dark','tifi-cc-blue','tifi-cc-orange','tifi-cc-teal','tifi-cc-purple','tifi-cc-green','tifi-cc-score','tifi-cc-insight','tifi-cc-action','tifi-cc-forecast']);
-  const TYPE_MAP={'warm':'tifi-cc-warm','dark':'tifi-cc-dark','blue':'tifi-cc-blue','orange':'tifi-cc-orange','teal':'tifi-cc-teal','purple':'tifi-cc-purple','green':'tifi-cc-green','score':'tifi-cc-score','insight':'tifi-cc-insight','action':'tifi-cc-action','forecast':'tifi-cc-forecast','cc-warm':'tifi-cc-warm','cc-dark':'tifi-cc-dark','cc-blue':'tifi-cc-blue','cc-orange':'tifi-cc-orange','cc-teal':'tifi-cc-teal','cc-purple':'tifi-cc-purple','cc-green':'tifi-cc-green','cc-score':'tifi-cc-score','cc-insight':'tifi-cc-insight','cc-action':'tifi-cc-action','cc-forecast':'tifi-cc-forecast'};
-  const TAG_MAP={'orange':'tifi-tag-orange','blue':'tifi-tag-blue','green':'tifi-tag-green','purple':'tifi-tag-purple','red':'tifi-tag-red','cc-tag-orange':'tifi-tag-orange','cc-tag-blue':'tifi-tag-blue','cc-tag-green':'tifi-tag-green','cc-tag-purple':'tifi-tag-purple','cc-tag-red':'tifi-tag-red'};
-  const VALID_SVG=new Set(['moon','activity','droplet','droplets','sunrise','utensils','check','arrowRight','spark']);
-  const result=[];
-  let curDivider=null,curCatCards=0;
-  for(const c of raw){
-    if(c.divider===true){
-      if(curDivider)result.push({...curDivider,count:curCatCards});
-      curDivider={divider:true,cat:c.cat||'советы',count:0};
-      curCatCards=0;
-      continue;
-    }
-    // Normalize type
-    let t=(c.type||'tifi-cc-dark').toString();
-    if(!VALID_TYPES.has(t))t=TYPE_MAP[t]||TYPE_MAP[t.replace('tifi-','')]||'tifi-cc-dark';
-    // Normalize tag
-    let tag=c.tag;
-    if(!tag||typeof tag!=='object')tag={cls:'tifi-tag-orange',text:'тифи'};
-    let tagCls=(tag.cls||'').toString();
-    if(!tagCls.startsWith('tifi-tag-'))tagCls=TAG_MAP[tagCls]||TAG_MAP[tagCls.replace('tifi-tag-','')]||'tifi-tag-orange';
-    const tagText=(tag.text||'тифи').toString().slice(0,20);
-    // Validate list SVGs
-    let list=c.list;
-    if(Array.isArray(list))list=list.filter(i=>i&&i.t).map(i=>({...i,svg:VALID_SVG.has(i.svg)?i.svg:'check',ico:i.ico||'bg:rgba(255,107,53,.14);color:var(--sun)'}));
-    // Validate todo SVGs
-    let todo=c.todo;
-    if(Array.isArray(todo))todo=todo.filter(i=>i&&i.t).map(i=>({...i,svg:VALID_SVG.has(i.svg)?i.svg:'check',ico:i.ico||'bg:rgba(255,107,53,.14);color:var(--sun)'}));
-    // Validate nums/macros/rows/chips/meals/bar/ingredients
-    // Normalize cat name
-    const CAT_REMAP={'overview':'обзор','score':'обзор','обзор дня':'обзор','insights':'инсайты','инсайт':'инсайты','паттерн':'инсайты','actions':'задачи','action':'задачи','action_plan':'задачи','план':'задачи','план дня':'задачи','forecast':'прогноз','прогноз дня':'прогноз','progress':'прогноз','nutrition':'питание','food':'питание','activity':'активность','sleep':'активность','tips':'советы'};
-    const rawCat=(c.cat||'инсайты').toLowerCase().trim();
-    const normCat=CAT_REMAP[rawCat]||c.cat||'инсайты';
-    const card={
-      cat:normCat,
-      type:t,
-      glow:c.glow===true,
-      custom:true,
-      tag:{cls:tagCls,text:tagText},
+  // New v4 schema: {cards:[], categories:[]}
+  // Also supports legacy flat array for backward compatibility
+  let cards=[], categories=[];
+  if(raw && Array.isArray(raw.cards)){
+    cards=raw.cards;
+    categories=Array.isArray(raw.categories)?raw.categories:[];
+  } else if(Array.isArray(raw)){
+    // Legacy — convert to new format
+    cards=raw.filter(c=>!c.divider);
+    const cats=[];const seen=new Set();
+    cards.forEach(c=>{if(c.cat&&!seen.has(c.cat)){seen.add(c.cat);cats.push({id:c.cat,label:c.cat,icon:'solar:star-bold-duotone'});}});
+    categories=[{id:'all',label:'Все',icon:'solar:layers-bold-duotone'},{id:'ai',label:'ИИ',icon:'solar:stars-bold-duotone'},...cats];
+  }
+  if(!cards.length) return null;
+
+  const VALID_TYPES=new Set(['score','recipe','compare','tip','warning','progress','meal_plan','shopping','insight','sleep_analysis','challenge','milestone','week_bar']);
+  const VALID_BG=new Set(['warm','dark','blue','green','purple','red','gold','sleep']);
+  const VALID_TAG_CLR=new Set(['o','b','g','p','r','a','s']);
+
+  const norm=cards.map((c,i)=>{
+    const type=VALID_TYPES.has(c.type)?c.type:'tip';
+    const bg=VALID_BG.has(c.bg_theme)?c.bg_theme:
+      type==='score'?'green':type==='recipe'||type==='meal_plan'||type==='shopping'?'warm':
+      type==='warning'?'red':type==='progress'||type==='milestone'?'green':
+      type==='sleep_analysis'||type==='challenge'?'sleep':
+      type==='compare'||type==='week_bar'||type==='insight'?'purple':'dark';
+    const tagClr=VALID_TAG_CLR.has(c.tag_color)?c.tag_color:'o';
+    return {
+      ...c,
+      _idx:i,
+      type,
+      bg_theme:bg,
+      tag_color:tagClr,
+      tag_icon:c.tag_icon||'solar:star-bold-duotone',
+      tag_text:(c.tag_text||type).toString().slice(0,22),
       title:(c.title||'...').toString().slice(0,80),
-      sub:(c.sub||'').toString().slice(0,200),
+      subtitle:(c.subtitle||c.sub||'').toString().slice(0,200),
+      category:c.category||'all',
+      priority:+(c.priority||50),
     };
-    if(Array.isArray(c.nums)&&c.nums.length)card.nums=c.nums.slice(0,3).map(n=>({v:String(n.v||''),l:String(n.l||''),clr:n.clr||''}));
-    if(Array.isArray(c.macros)&&c.macros.length)card.macros=c.macros.slice(0,4).map(m=>({v:String(m.v||''),l:String(m.l||''),clr:m.clr||''}));
-    if(c.bar&&typeof c.bar.w==='number')card.bar={w:Math.min(100,Math.max(0,c.bar.w)),clr:c.bar.clr||'linear-gradient(90deg,var(--sun),var(--sun2))'};
-    if(Array.isArray(c.chips)&&c.chips.length)card.chips=c.chips.slice(0,6).map(ch=>({t:String(ch.t||''),cls:ch.cls||''}));
-    if(list&&list.length)card.list=list.slice(0,4);
-    if(Array.isArray(c.rows)&&c.rows.length)card.rows=c.rows.slice(0,5).map(r=>({l:String(r.l||''),v:String(r.v||''),clr:r.clr||''}));
-    if(todo&&todo.length)card.todo=todo.slice(0,4);
-    if(Array.isArray(c.meals)&&c.meals.length)card.meals=c.meals.slice(0,4).map(m=>({ico:String(m.ico||'🍽'),name:String(m.name||''),sub:String(m.sub||''),kcal:+(m.kcal||0),clr:m.clr||'var(--sun)'}));
-    if(Array.isArray(c.ingredients))card.ingredients=c.ingredients.slice(0,6).map(String);
-    if(typeof c.score==='number')card.score=Math.min(100,Math.max(0,Math.round(c.score)));
-    if(c.score_clr)card.score_clr=c.score_clr;
-    if(Array.isArray(c.metrics)&&c.metrics.length)card.metrics=c.metrics.slice(0,4).map(m=>({l:String(m.l||''),v:String(m.v||''),w:Math.min(100,Math.max(0,+(m.w||0))),clr:m.clr||'#3DCC72'}));
-    if(curDivider)result.push(curDivider);
-    curDivider=null;
-    result.push(card);
-    curCatCards++;
-    // If divider not sent yet, auto-create one for first card of new cat
-  }
-  if(curDivider)result.push({...curDivider,count:curCatCards});
-  // Fix divider counts by scanning the actual result
-  const fixedResult=[];
-  for(let i=0;i<result.length;i++){
-    const c=result[i];
-    if(c.divider){
-      let cnt=0;for(let j=i+1;j<result.length;j++){if(result[j].divider)break;cnt++;}
-      fixedResult.push({...c,count:cnt});
-    } else {
-      fixedResult.push(c);
-    }
-  }
-  return fixedResult.length>0?fixedResult:null;
+  });
+
+  // Sort by priority desc
+  norm.sort((a,b)=>b.priority-a.priority);
+
+  // Ensure categories always has all+ai first
+  const haAll=categories.find(c=>c.id==='all');
+  const haAI=categories.find(c=>c.id==='ai');
+  const rest=categories.filter(c=>c.id!=='all'&&c.id!=='ai');
+  const finalCats=[
+    haAll||{id:'all',label:'Все',icon:'solar:layers-bold-duotone'},
+    haAI||{id:'ai',label:'ИИ',icon:'solar:stars-bold-duotone'},
+    ...rest
+  ];
+
+  return {cards:norm,categories:finalCats};
 }
 
 async function _tifiCallGroq(apiKey, userData){
   const u=userData;
   const goalWord=u.goalType==='lose'?'похудение':'набор массы';
 
-  // ── SYSTEM PROMPT — концепт тифи 2.0 ──
-  const systemPrompt=`Ты — ТИФИ, персональный AI-тренер в приложении letify. Отвечай ТОЛЬКО валидным JSON массивом без markdown и без текста вне массива.
+  const systemPrompt=`Ты — Тифи, персональный AI-аналитик здоровья в приложении letify.
+Возвращай ТОЛЬКО валидный JSON. Никаких объяснений, никакого markdown, никакого текста вне JSON.
 
-ЗАДАЧА: Создай столько карточек, сколько нужно для полного анализа (минимум 8). Тифи сам решает что важно показать.
+СХЕМА ОТВЕТА:
+{
+  "cards": [ <массив карточек> ],
+  "categories": [
+    {"id":"all","label":"Все","icon":"solar:layers-bold-duotone"},
+    {"id":"ai","label":"ИИ","icon":"solar:stars-bold-duotone"},
+    {"id":"food","label":"Питание","icon":"solar:dish-bold-duotone"},
+    {"id":"analysis","label":"Анализ","icon":"solar:chart-bold-duotone"},
+    {"id":"recovery","label":"Восстановление","icon":"solar:sleeping-bold-duotone"},
+    {"id":"tips","label":"Советы","icon":"solar:lightbulb-bold-duotone"},
+    {"id":"progress","label":"Прогресс","icon":"solar:graph-up-bold-duotone"}
+  ]
+}
 
-ДОСТУПНЫЕ КАТЕГОРИИ (поле "cat"): "обзор", "инсайты", "задачи", "прогноз", "питание", "рецепты", "меню", "анализ", "активность", "сон", "бюджет", "советы"
+ТИПЫ КАРТОЧЕК (поле "type"):
+1. "score" — дневной обзор. Поля: score(0-100), mood(строка), sub_scores:{nutrition,activity,sleep,water}(0-100 каждый)
+2. "recipe" — рецепт. Поля: ingredients(string[]), steps(string[3]), macros:{kcal,prot,fat,carb}, cost_rub(число), time_min(число)
+3. "compare" — сравнение недель. Поля: rows:[{label,prev,curr,delta,positive}], verdict(строка)
+4. "tip" — совет. Поля: body(текст), action_label(строка), chips(string[])
+5. "warning" — предупреждение (priority>=85). Поля: metric(строка), current(строка), goal(строка), pct(число 0-100), action(строка)
+6. "progress" — прогресс цели. Поля: pct(0-100), start(число), now(число), target(число), pace(строка), weeks_left(число), on_track(bool)
+7. "meal_plan" — план питания. Поля: meals:[{time,icon_solar,name,kcal,prot,done}], remaining_kcal(число)
+8. "shopping" — список покупок. Поля: items:[{name,prot_per100,price_rub}], total_rub(число)
+9. "insight" — инсайт. Поля: finding(текст), data_points:[{label,value,pct(0-100)}], conclusion(строка)
+10. "sleep_analysis" — анализ сна. Поля: avg_hours(число), quality(1-5), avg_bedtime(строка), segments:[{label,quality(1-5)}], recommendation(текст)
+11. "challenge" — вызов. Поля: difficulty("easy"|"medium"|"hard"), progress_current(число), progress_goal(число), action_label(строка)
+12. "milestone" — достижение. Поля: badge_icon(solar icon), badge_name(строка), badge_title(строка), stats:[{v,l}], next_milestone(строка)
+13. "week_bar" — гистограмма недели. Поля: metric_name(строка), days:[{label,value,pct(0-100),today(bool)}], avg(число|строка), goal(число|строка)
 
-ДОСТУПНЫЕ ТИПЫ (поле "type"): "score", "insight", "action", "forecast", "recipe", "menu", "compare", "warm", "dark", "blue", "orange", "teal", "purple", "green"
-
-ПОЛЯ КАРТОЧКИ:
-- title (обязательно, макс 60 символов)
-- sub (макс 120 символов)  
-- tag: {"cls": "orange"|"blue"|"green"|"purple"|"red", "text": "название тега"}
-- score: число 0-100 (только для обзора)
-- score_clr: цвет числа (только для обзора)
-- metrics: [{"l":"название","v":"значение","w":процент_0-100,"clr":"цвет"}] (полоски под score)
-- nums: [{"v":"значение","l":"подпись","clr":"цвет"}] (большие числа)
-- macros: [{"v":"значение","l":"кБ/Ж/У","clr":"цвет"}] (нутриенты)
-- rows: [{"l":"левый текст","v":"правый текст","clr":"цвет"}] (строки данных)
-- bar: {"w":процент,"clr":"css-цвет или градиент"} (прогресс-бар)
-- chips: [{"t":"текст","cls":"accent"|"warn"|"ok"|"blue"|""}] (чипы-теги)
-- list: [{"t":"заголовок","s":"подпись","ico":"bg:rgba(255,107,53,.14);color:#FF6B35","svg":"иконка"}] (список)
-- todo: [{"t":"задача","ico":"bg:rgba(78,174,229,.14);color:#4EAEE5","svg":"иконка"}] (задачи)
-- meals: [{"ico":"эмодзи","name":"блюдо","sub":"время","kcal":число,"clr":"цвет"}] (приёмы пищи)
-- ingredients: ["ингредиент 1", "ингредиент 2"] (для рецептов)
-- steps: ["шаг 1", "шаг 2"] (для рецептов)
-- cost: "~150 ₽" (стоимость порции)
-- compare_rows: [{"l":"метрика","prev":"прошлое","cur":"текущее","delta":"+N","up":true}] (сравнение недель)
-- week_days: [{"d":"пн","v":"85","clr":"#4EAEE5"}] (бар-чарт по дням, v=процент 0-100)
-- shopping: [{"name":"продукт","price":"цена числом","protein":"Nг белка"}] (список покупок)
-
-SVG иконки (только из списка): "moon","activity","droplet","droplets","sunrise","utensils","check","arrowRight","spark","flame","scale","calendar","cart","brain","dumbbell","timer","trending","leaf"
+БАЗОВЫЕ ПОЛЯ каждой карточки:
+{
+  "type": "<тип из списка>",
+  "category": "<id из categories>",
+  "priority": <1-100>,
+  "bg_theme": "<warm|dark|blue|green|purple|red|gold|sleep>",
+  "tag_icon": "solar:...-bold-duotone",
+  "tag_color": "<o|b|g|p|r|a|s>",
+  "tag_text": "<короткий текст>",
+  "title": "<заголовок>",
+  "subtitle": "<описание>"
+}
 
 ПРАВИЛА:
-1. Используй РЕАЛЬНЫЕ числа из данных — не придумывай
-2. Если данных 0 — честно скажи в sub что данных нет
-3. Рецепты — только продукты российского рынка, цены реальные
-4. Обращайся на "ты", будь конкретным — ты тренер, не льстец
-5. Скор = питание×0.35 + сон×0.35 + активность×0.30
-6. Обязательно создай: 1 обзор дня, инсайты по паттернам, задачи на сегодня, прогноз к цели
-7. Дополнительно добавляй по данным: рецепты, меню, сравнение недель, анализ макросов, бюджет`;
+- cards[0] ВСЕГДА type:"score"
+- priority 90+ = критично (только если реально критично: вода <40% или белок <50%)
+- category совпадает с id из categories[]
+- только категории, для которых есть карточки
+- используй РЕАЛЬНЫЕ числа из данных
+- обращайся на "ты", конкретно и тепло
+- минимум 8 карточек, максимум неограничен
+- tag_icon ТОЛЬКО solar: иконки (bold-duotone вариант)
+- ТОЛЬКО JSON, без markdown`;
 
-    const userPrompt=`ИМЯ: ${u.name} | ПОЛ: ${u.gender==='male'?'муж':'жен'} | ВОЗРАСТ: ${u.age} | РОСТ: ${u.height}см | ВРЕМЯ: ${u.timeOfDay}
-ЦЕЛЬ: ${goalWord} | СТРИК: ${u.streak} дней | ДО ЛЕТА: ${u.daysToSummer} дней
-
-ВЕС: старт ${u.startWeight}кг → сейчас ${u.currentWeight}кг → цель ${u.goalWeight}кг (прогресс ${u.progressPct}%) | За 7 дней: ${u.weightDelta7d>0?'+':''}${u.weightDelta7d}кг
-
-ПИТАНИЕ СЕГОДНЯ: ${u.calToday}/${u.calGoal} ккал (${u.calPct}%) | ${u.mealBreakdown||'ничего не записано'}
-МАКРОСЫ: ${u.macros}
-ВОДА: ${u.waterToday}/${u.waterGoal} мл (${u.waterPct}%)
-
-СОН: среднее ${u.avgSleep}ч за 7 дней | качество ${u.lastSleepQuality}/5
-ЗАДАЧИ: ${u.actsDone}/${u.actsTotal} | ${u.actsList||'нет задач'}`;
+  const userPrompt=`Имя: ${u.name} | Время: ${u.timeOfDay} | Цель: ${goalWord}
+Вес: ${u.startWeight}→${u.currentWeight}→${u.goalWeight} кг | За 7 дней: ${u.weightDelta7d>0?'+':''}${u.weightDelta7d} кг
+Калории: ${u.calToday}/${u.calGoal} ккал (${u.calPct}%) | Приёмы: ${u.mealBreakdown}
+Макросы: ${u.macros}
+Вода: ${u.waterToday}/${u.waterGoal} мл (${u.waterPct}%) | Стрик: ${u.streak} дней
+Сон (средний): ${u.avgSleep} ч | Качество: ${u.lastSleepQuality}/5
+До цели: ${u.daysToSummer} дней`;
 
   const resp=await fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
     body:JSON.stringify({
       model:'llama-3.3-70b-versatile',
-      max_tokens:6000,
-      temperature:0.6,
+      max_tokens:4000,
+      temperature:0.65,
       messages:[{role:'system',content:systemPrompt},{role:'user',content:userPrompt}]
     })
   });
@@ -6718,47 +6934,29 @@ SVG иконки (только из списка): "moon","activity","droplet","
   const data=await resp.json();
   const text=(data.choices?.[0]?.message?.content||'').trim();
 
-  // Multi-strategy JSON extraction
-  let cards=null;
-  const strategies=[
-    // 1. Clean markdown fences then parse
-    ()=>{
-      const clean=text.replace(/^```(?:json)?\s*/i,'').replace(/\s*```\s*$/,'').trim();
-      const s=clean.indexOf('['),e=clean.lastIndexOf(']');
-      if(s===-1||e===-1)return null;
-      return JSON.parse(clean.slice(s,e+1));
-    },
-    // 2. Find first valid JSON array anywhere in text
-    ()=>{
-      const s=text.indexOf('['),e=text.lastIndexOf(']');
-      if(s===-1||e===-1)return null;
-      return JSON.parse(text.slice(s,e+1));
-    },
-    // 3. Fix truncated JSON — find last complete object
-    ()=>{
-      const s=text.indexOf('[');
-      if(s===-1)return null;
-      let fragment=text.slice(s);
-      // find last closing brace of last complete card
-      let depth=0,lastGoodEnd=-1;
-      for(let i=0;i<fragment.length;i++){
-        if(fragment[i]==='{')depth++;
-        else if(fragment[i]==='}'){depth--;if(depth===0)lastGoodEnd=i;}
-      }
-      if(lastGoodEnd===-1)return null;
-      const fixed=fragment.slice(0,lastGoodEnd+1)+']';
-      return JSON.parse(fixed);
-    },
-  ];
-  for(const fn of strategies){
-    try{const r=fn();if(Array.isArray(r)&&r.length>0){cards=r;break;}}
-    catch(e){/* try next */}
+  // Try {cards:[],categories:[]} format first
+  let parsed=null;
+  const objS=text.indexOf('{'),objE=text.lastIndexOf('}');
+  if(objS!==-1&&objE!==-1){
+    try{
+      const obj=JSON.parse(text.slice(objS,objE+1));
+      if(obj&&Array.isArray(obj.cards)&&obj.cards.length>0)parsed=obj;
+    }catch(e){/*fall through*/}
   }
-  if(!cards||cards.length===0)throw new Error('Не удалось разобрать ответ Groq. Текст: '+text.slice(0,120));
+  // Fallback: try legacy flat array
+  if(!parsed){
+    const s=text.indexOf('['),e=text.lastIndexOf(']');
+    if(s!==-1&&e!==-1){
+      try{
+        const arr=JSON.parse(text.slice(s,e+1));
+        if(Array.isArray(arr)&&arr.length>0)parsed=arr;
+      }catch(pe){throw new Error('JSON parse error: '+pe.message);}
+    }
+  }
+  if(!parsed)throw new Error('No JSON in response');
 
-  // Normalize + validate
-  const normalized=_tifiNormalizeCards(cards);
-  if(!normalized)throw new Error('Нормализация не удалась (карточек: '+cards.length+')');
+  const normalized=_tifiNormalizeCards(parsed);
+  if(!normalized)throw new Error('Normalization failed');
   return normalized;
 }
 
@@ -6780,209 +6978,474 @@ const TIFI_SVGS={
 function tifiMkSvg(k){return`<svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${TIFI_SVGS[k]||''}</svg>`}
 
 const TIFI_CATS={
-  обзор:     {clr:'#3DCC72', rgb:'61,204,114',  icon:'solar:chart-bold',       bg:'rgba(61,204,114,.08)', brd:'rgba(61,204,114,.18)',  dotClr:'#3DCC72',  svg:'<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>'},
-  инсайты:   {clr:'#9D85F2', rgb:'157,133,242', icon:'solar:stars-bold',       bg:'rgba(157,133,242,.08)',brd:'rgba(157,133,242,.18)', dotClr:'#9D85F2',  svg:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>'},
-  задачи:    {clr:'#FFAB40', rgb:'255,171,64',  icon:'solar:checklist-bold',   bg:'rgba(255,171,64,.08)', brd:'rgba(255,171,64,.18)',  dotClr:'#FFAB40',  svg:'<polyline points="20 6 9 17 4 12"/>'},
-  прогноз:   {clr:'#4EAEE5', rgb:'78,174,229',  icon:'solar:chart-2-bold',     bg:'rgba(78,174,229,.08)', brd:'rgba(78,174,229,.18)',  dotClr:'#4EAEE5',  svg:'<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>'},
-  советы:    {clr:'#FF8040', rgb:'255,128,64',  icon:'solar:stars-bold',       bg:'rgba(255,128,64,.08)', brd:'rgba(255,128,64,.18)',  dotClr:'#FF8040',  svg:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>'},
-  питание:   {clr:'#4EAEE5', rgb:'78,174,229',  icon:'solar:leaf-bold',        bg:'rgba(78,174,229,.08)', brd:'rgba(78,174,229,.18)',  dotClr:'#4EAEE5',  svg:'<path d="M12 2a9 9 0 0 0 9 9 9 9 0 0 0-9 9 9 9 0 0 0-9-9 9 9 0 0 0 9-9z"/>'},
-  активность:{clr:'#3DCC72', rgb:'61,204,114',  icon:'solar:dumbbell-bold',    bg:'rgba(61,204,114,.08)', brd:'rgba(61,204,114,.18)',  dotClr:'#3DCC72',  svg:'<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>'},
+  советы:    {clr:'#FF8040', rgb:'255,128,64',  icon:'solar:stars-bold',      bg:'rgba(255,128,64,.08)', brd:'rgba(255,128,64,.18)',  dotClr:'#FF8040'},
+  питание:   {clr:'#4EAEE5', rgb:'78,174,229',  icon:'solar:leaf-bold',        bg:'rgba(78,174,229,.08)', brd:'rgba(78,174,229,.18)',  dotClr:'#4EAEE5'},
+  активность:{clr:'#3DCC72', rgb:'61,204,114',  icon:'solar:dumbbell-bold',    bg:'rgba(61,204,114,.08)', brd:'rgba(61,204,114,.18)',  dotClr:'#3DCC72'},
 };
 
 function _tifiGetCards(){
-  // Fallback cards when API is unavailable — match concept schema
-  const u=C&&C.user?C.user:{};
-  const wd=gWD?gWD():{total:0};
-  const cd=gCD?gCD():{};
-  const calToday=Object.values(cd).reduce((a,b)=>a+(+b||0),0);
-  const calGoal=u.cal_goal||2000;
-  const waterToday=wd.total||0;
-  const waterGoal=u.water_goal||2000;
-  const sl=gSL?gSL():[];
-  const avgSleep=sl.length?(sl.slice(-7).reduce((s,r)=>s+r.hours,0)/Math.min(7,sl.length)).toFixed(1):0;
-  const calPct=calGoal>0?Math.round(calToday/calGoal*100):0;
-  const waterPct=waterGoal>0?Math.round(waterToday/waterGoal*100):0;
-  const sleepPct=avgSleep>0?Math.min(100,Math.round((+avgSleep/8)*100)):50;
-  const score=Math.round(calPct*0.35+sleepPct*0.35+50*0.30);
-  const scoreClr=score>=75?'#3DCC72':score>=50?'#FFAB40':'#F45C5C';
-  const wl=gWL?gWL():[];
-  const curW=wl.length?wl[wl.length-1].weight:u.start_weight||0;
-  const goalW=u.goal_weight||curW;
-  return [
-    {cat:'обзор',type:'tifi-cc-score',custom:true,tag:{cls:'tifi-tag-green',text:'обзор дня'},title:'данные без ИИ',sub:'из 100 · подключи ключ Groq для анализа',score:score,score_clr:scoreClr,metrics:[{l:'питание',v:calPct+'%',w:calPct,clr:'#4EAEE5'},{l:'вода',v:waterPct+'%',w:waterPct,clr:'#3DCC72'},{l:'сон',v:sleepPct+'%',w:sleepPct,clr:'#9D85F2'}]},
-    {cat:'инсайты',type:'tifi-cc-insight',custom:true,tag:{cls:'tifi-tag-purple',text:'нет ключа'},title:'нужен ключ Groq API',sub:'тифи не может проанализировать данные без ключа',chips:[{t:'настройки',cls:'accent'}]},
-    {cat:'задачи',type:'tifi-cc-action',custom:true,tag:{cls:'tifi-tag-orange',text:'базовый план'},title:'стандартные задачи',sub:'базовые задачи без персонализации',todo:[{ico:'bg:rgba(78,174,229,.14);color:#4EAEE5',svg:'droplets',t:'выпить '+waterGoal+' мл воды за день'},{ico:'bg:rgba(255,171,64,.14);color:#FFAB40',svg:'sunrise',t:'белковый завтрак до 10:00'},{ico:'bg:rgba(61,204,114,.14);color:#3DCC72',svg:'moon',t:'лечь спать до 23:00'}]},
-    {cat:'прогноз',type:'tifi-cc-forecast',custom:true,tag:{cls:'tifi-tag-blue',text:'прогноз'},title:'цель: '+goalW+' кг',sub:'при текущем темпе',rows:[{l:'сейчас',v:curW+' кг'},{l:'цель',v:goalW+' кг',clr:'#3DCC72'},{l:'ИИ анализ',v:'недоступен',clr:'#F45C5C'}]},
-  ];
+  const daysLeft=(()=>{
+    const now=new Date(),summer=new Date(now.getFullYear(),5,1);
+    if(now>=summer)summer.setFullYear(summer.getFullYear()+1);
+    return Math.ceil((summer-now)/864e5);
+  })();
+  const today=new Date().getDay();
+  return {
+    categories:[
+      {id:'советы',label:'Советы',icon:'solar:stars-bold-duotone'},
+      {id:'питание',label:'Питание',icon:'solar:chef-hat-bold-duotone'},
+      {id:'активность',label:'Активность',icon:'solar:running-bold-duotone'},
+      {id:'сон',label:'Сон',icon:'solar:moon-bold-duotone'},
+    ],
+    cards:[
+      /* WARNING — высокий приоритет */
+      {type:'warning',category:'питание',priority:95,bg_theme:'red',
+       tag_icon:'solar:danger-bold-duotone',tag_color:'r',tag_text:'дефицит белка',
+       title:'мало белка сегодня',subtitle:'к обеду уже отставание от нормы',
+       alert_text:'белок ниже нормы на 40%',
+       metric_value:'32г',metric_sub:'из 150г суточной нормы',
+       bar_value:21,
+       action_text:'добавь белковый перекус — яйца, творог или протеиновый коктейль'},
+      /* SCORE */
+      {type:'score',category:'советы',priority:90,bg_theme:'warm',
+       tag_icon:'solar:chart-bold-duotone',tag_color:'o',tag_text:'дневной балл',
+       title:'ты в хорошем темпе',subtitle:'план этой недели выполняется выше нормы',
+       score:74,score_color:'#FF8040',
+       bars:[
+        {label:'питание',value:80,color:'#FF8040'},
+        {label:'вода',value:40,color:'#4EAEE5'},
+        {label:'активность',value:70,color:'#3DCC72'},
+        {label:'сон',value:85,color:'#9D85F2'},
+       ],
+       mood:'хорошо · энергия стабильная'},
+      /* SLEEP */
+      {type:'sleep_analysis',category:'сон',priority:88,bg_theme:'sleep',
+       tag_icon:'solar:sleeping-bold-duotone',tag_color:'s',tag_text:'анализ сна · 7 ночей',
+       title:'сон за неделю',subtitle:'среднее 7.1ч · качество 3.8/5',
+       nums:[{v:'7.1',l:'ср. часов'},{v:'3.8',l:'качество'},{v:'22:48',l:'укладка'}],
+       segments:[
+        {color:'rgba(139,127,212,.3)',flex:1},{color:'rgba(139,127,212,.4)',flex:1},
+        {color:'rgba(139,127,212,.6)',flex:1},{color:'rgba(139,127,212,.5)',flex:1},
+        {color:'rgba(139,127,212,.68)',flex:1},{color:'rgba(139,127,212,.75)',flex:1},
+        {color:'rgba(139,127,212,.9)',flex:1},
+       ],
+       days:['Пн','Вт','Ср','Чт','Пт','Сб','Вс'],
+       recommendation:'разброс укладки 1.5ч — стабильное время улучшит качество сна на 20%'},
+      /* PROGRESS */
+      {type:'progress',category:'активность',priority:85,bg_theme:'green',
+       tag_icon:'solar:target-bold-duotone',tag_color:'g',tag_text:'цель · вес',
+       title:`похудение: −5 кг`,subtitle:'75кг → 70кг · идёшь в графике',
+       ring_pct:50,ring_color:'#3DCC72',
+       stats:[{label:'начало',value:'75.0 кг'},{label:'сейчас',value:'72.5 кг'},{label:'цель',value:'70.0 кг'},{label:'темп',value:'−0.4 кг/нед',color:'#3DCC72'}],
+       chips:[{text:'в графике',cls:'c-g',icon:'solar:check-circle-bold-duotone'},{text:'ещё ~6 недель',cls:''}]},
+      /* MEAL PLAN */
+      {type:'meal_plan',category:'питание',priority:85,bg_theme:'dark',
+       tag_icon:'solar:notebook-bold-duotone',tag_color:'o',tag_text:'план питания',
+       title:'питание на сегодня',subtitle:'1 960 ккал · 145г белка',
+       stats_line:'1 960 ккал · 145г белка · съел 1 240',
+       meals:[
+        {icon:'solar:sunrise-bold-duotone',icon_bg:'rgba(255,171,64,.1)',icon_color:'#FFAB40',name:'Овсянка с творогом',sub:'380 ккал · 24г белка',time:'08:00',done:true},
+        {icon:'solar:sun-bold-duotone',icon_bg:'rgba(255,107,53,.1)',icon_color:'#FF8040',name:'Курица с рисом',sub:'520 ккал · 42г белка',time:'13:00',done:true},
+        {icon:'solar:apple-bold-duotone',icon_bg:'rgba(255,255,255,.06)',icon_color:'rgba(255,255,255,.4)',name:'Творог + банан',sub:'220 ккал · 18г белка',time:'16:00',pending:true},
+        {icon:'solar:moon-bold-duotone',icon_bg:'rgba(139,127,212,.1)',icon_color:'#8B7FD4',name:'Скумбрия с гречкой',sub:'490 ккал · 41г белка',time:'19:00',pending:true},
+       ],
+       remaining:'720 ккал'},
+      /* TIP */
+      {type:'tip',category:'советы',priority:83,bg_theme:'dark',
+       tag_icon:'solar:lightbulb-bold-duotone',tag_color:'a',tag_text:'совет дня',
+       title:'добавь белок к завтраку',subtitle:'стабильно не хватает в первой половине дня',
+       tip_icon:'solar:egg-bold-duotone',tip_icon_bg:'rgba(255,107,53,.12)',tip_icon_color:'#FF8040',
+       tip_body:'белок с утра снижает тягу к сладкому и держит сытость до обеда — попробуй один из вариантов',
+       chips:['яйца','творог','йогурт','омлет'],
+       action:'добавить в план'},
+      /* WEEK BAR */
+      {type:'week_bar',category:'активность',priority:80,bg_theme:'dark',
+       tag_icon:'solar:calendar-bold-duotone',tag_color:'b',tag_text:'активность 7 дней',
+       title:'неделя активности',subtitle:'среднее выше прошлой недели на 12%',
+       days:[
+        {label:'пн',value:85,today:today===1},{label:'вт',value:60,today:today===2},
+        {label:'ср',value:92,today:today===3},{label:'чт',value:45,today:today===4},
+        {label:'пт',value:78,today:today===5},{label:'сб',value:30,today:today===6},
+        {label:'вс',value:0,today:today===0},
+       ],
+       avg:'65%',goal:'80%'},
+      /* CHALLENGE */
+      {type:'challenge',category:'активность',priority:78,bg_theme:'green',
+       tag_icon:'solar:medal-bold-duotone',tag_color:'g',tag_text:'вызов',
+       title:'5000 шагов сегодня',subtitle:'3 дня подряд выполнял — не останавливайся',
+       chal_icon:'solar:running-bold-duotone',chal_icon_bg:'rgba(61,204,114,.14)',chal_icon_color:'#3DCC72',
+       difficulty:'medium',
+       progress_pct:45,progress_left:'2 250 шагов выполнено',progress_right:'45%',
+       btn_text:'отследить прогресс',btn_color:'#3DCC72',btn_bg:'rgba(61,204,114,.14)'},
+      /* INSIGHT */
+      {type:'insight',category:'советы',priority:76,bg_theme:'purple',
+       tag_icon:'solar:magnifer-bold-duotone',tag_color:'p',tag_text:'инсайт · корреляция',
+       title:'сон влияет на белок',subtitle:'анализ за 4 недели показал зависимость',
+       bars:[
+        {label:'пн',value:85,color:'rgba(157,133,242,.5)'},{label:'вт',value:70,color:'rgba(157,133,242,.5)'},
+        {label:'ср',value:38,color:'rgba(157,133,242,.3)'},{label:'чт',value:88,color:'rgba(157,133,242,.5)'},
+        {label:'пт',value:40,color:'rgba(157,133,242,.3)'},{label:'сб',value:82,color:'rgba(157,133,242,.5)'},
+        {label:'вс',value:92,color:'rgba(157,133,242,.6)'},
+       ],
+       finding:'когда спишь ≤6.5ч — белок на следующий день падает на 18%. Посчитали за 4 недели.',
+       note:'сон ≤6.5ч → белок 82г. Сон норм → 118г. Разница 44% — не случайность.',
+       conclusion:'8ч сна = +44г белка/день'},
+      /* RECIPE */
+      {type:'recipe',category:'питание',priority:75,bg_theme:'warm',
+       tag_icon:'solar:chef-hat-bold-duotone',tag_color:'o',tag_text:'рецепт ужина',
+       title:'скумбрия запечённая с рисом',subtitle:'~150 руб · 38г белка · просто и сытно',
+       ingredients:['скумбрия б/г 200г','рис варёный 100г','лимон + чеснок','зелень по вкусу'],
+       steps:['замаринуй рыбу лимоном и чесноком на 15 мин','запекай 25 мин при 200°C','подай с рисом и зеленью'],
+       macros:[{v:'480',l:'ккал',color:'#FF8040'},{v:'38г',l:'белок',color:'#4EAEE5'},{v:'18г',l:'жиры'},{v:'45г',l:'углев',color:'#3DCC72'}],
+       cost:'~150 руб'},
+      /* COMPARE */
+      {type:'compare',category:'питание',priority:72,bg_theme:'blue',
+       tag_icon:'solar:scale-bold-duotone',tag_color:'b',tag_text:'сравнение',
+       title:'что выбрать на обед',subtitle:'сравнение вариантов по целям',
+       head:['','гречка','рис','лучше'],
+       rows:[
+        {label:'ккал',a:'320',b:'380',winner:'А'},
+        {label:'белок',a:'12г',b:'7г',winner:'А'},
+        {label:'гликемич.',a:'низк.',b:'высок.',winner:'А'},
+        {label:'цена',a:'30р',b:'25р',winner:'Б'},
+       ],
+       verdict:'гречка лучше для похудения'},
+      /* MILESTONE */
+      {type:'milestone',category:'советы',priority:70,bg_theme:'gold',
+       tag_icon:'solar:cup-star-bold-duotone',tag_color:'a',tag_text:'достижение',
+       title:'7 дней подряд!',subtitle:'ты трекаешь данные без перерыва — это уже привычка.',
+       badge_icon:'solar:fire-bold-duotone',badge_bg:'rgba(255,171,64,.09)',badge_color:'#FFAB40',
+       badge_sub:'серия дней',
+       stats:[{v:'7',l:'дней',color:'#FFAB40'},{v:'−1.2кг',l:'с начала',color:'#3DCC72'},{v:'74%',l:'выполнено',color:'#4EAEE5'}],
+       next:'следующая веха — 14 дней'},
+      /* SHOPPING */
+      {type:'shopping',category:'питание',priority:68,bg_theme:'green',
+       tag_icon:'solar:cart-large-4-bold-duotone',tag_color:'g',tag_text:'список покупок',
+       title:'закупка на неделю',subtitle:'~2 400р · оптимально по белку',
+       items:[
+        {name:'куриная грудка 1кг',protein:'31г/100',price:'290р'},
+        {name:'творог 5% 400г',protein:'18г/100',price:'185р'},
+        {name:'яйца С1 10шт',protein:'13г/100',price:'120р'},
+        {name:'скумбрия б/г 800г',protein:'19г/100',price:'340р'},
+        {name:'гречка 900г',protein:'13г/100',price:'110р'},
+       ],
+       total:'1 045р'},
+    ]
+  };
 }
 
-function tifiBuildDivider(data){
-  const cat=TIFI_CATS[data.cat]||TIFI_CATS['советы'];
-  const cnt=data.count;
-  const cntLabel=cnt===1?'1 карточка':cnt<5?`${cnt} карточки`:`${cnt} карточек`;
-  const catDescr={
-    'советы':'персональный анализ и инсайты',
-    'питание':'что есть и как достичь цели',
-    'активность':'движение, сон и восстановление',
-  };
+let tifiCards={cards:[],categories:[]},tifiLoaded=false;
+let tifiCardEls=[],tifiCur=0;
+let _tifiToken=0;
+
+/* ── Рендер одной карточки — дизайн концепт v7 ── */
+function tifiRenderCard(card){
   const el=document.createElement('div');
-  el.className='tifi-ccard cc-divider state-next';
-  el.innerHTML=`
-    <div class="tifi-div-bg" style="background:
-      radial-gradient(ellipse 65% 40% at 50% 10%, rgba(${cat.rgb},.07), transparent 65%)">
-    </div>
-    <div class="tifi-div-content">
-      <div class="tifi-div-ico-wrap" style="background:rgba(${cat.rgb},.10);border-color:rgba(${cat.rgb},.16)">
-        <iconify-icon icon="${cat.icon}" style="font-size:26px;color:${cat.clr}"></iconify-icon>
-      </div>
-      <div class="tifi-div-badge">${cntLabel}</div>
-      <div class="tifi-div-cat-name" style="color:rgba(255,255,255,.88)">${data.cat}</div>
-      <div class="tifi-div-cat-sub">${catDescr[data.cat]||'анализ и рекомендации'}</div>
-      <button class="tifi-div-enter-btn" onclick="tifiNextCard()"
-        style="background:rgba(${cat.rgb},.12);border:1px solid rgba(${cat.rgb},.2);color:${cat.clr}">
-        смотреть
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-          stroke-linecap="round" stroke-linejoin="round">
-          <line x1="5" y1="12" x2="19" y2="12"/>
-          <polyline points="12 5 19 12 12 19"/>
-        </svg>
-      </button>
-    </div>`;
+  el.className='tifi-ccard state-next tf-bg-'+(card.bg_theme||'dark');
+
+  // glow
+  const glowClr={warm:'#FF8040',dark:'rgba(255,255,255,.3)',blue:'#4EAEE5',green:'#3DCC72',purple:'#9D85F2',red:'#F45C5C',gold:'#FFAB40',sleep:'#8B7FD4'};
+  const gc=glowClr[card.bg_theme||'dark']||'rgba(255,255,255,.3)';
+
+  const scroll=document.createElement('div');scroll.className='tifi-cc-scroll';
+  const body=document.createElement('div');body.className='tifi-cc-body';
+
+  const t=card.type;
+  const tagClr={'o':'o','b':'b','g':'g','p':'p','r':'r','a':'a','s':'s'};
+  const tc=tagClr[card.tag_color]||'o';
+
+  let h='';
+
+  // glow layer
+  h+=`<div style="position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;filter:blur(60px);pointer-events:none;z-index:0;opacity:.3;background:${gc}"></div>`;
+
+  // custom badge
+  if(card.custom)h+=`<div class="tifi-cc-custom-badge">✦ создано тифи</div>`;
+
+  // score & recipe get a meta label top-right
+  const hasMeta=(t==='recipe'||t==='score');
+
+  // tag row
+  if(hasMeta){
+    h+=`<div style="display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:1">`;
+    h+=`<div class="tf-tag tf-tag-${tc}"><iconify-icon icon="${card.tag_icon||'solar:star-bold-duotone'}"></iconify-icon>${card.tag_text||'тифи'}</div>`;
+    if(t==='recipe'&&card.meta)h+=`<div style="font-size:9px;font-weight:600;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:.06em;margin-top:4px">${card.meta}</div>`;
+    if(t==='score'&&card.meta)h+=`<div style="font-size:9px;font-weight:600;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:.06em;margin-top:4px">${card.meta}</div>`;
+    h+=`</div>`;
+  } else {
+    h+=`<div style="position:relative;z-index:1"><div class="tf-tag tf-tag-${tc}"><iconify-icon icon="${card.tag_icon||'solar:star-bold-duotone'}"></iconify-icon>${card.tag_text||'тифи'}</div></div>`;
+  }
+
+  // title + subtitle (most cards)
+  if(t!=='challenge'&&t!=='milestone'){
+    h+=`<div style="position:relative;z-index:1"><div class="tf-title">${card.title||''}</div><div class="tf-sub">${card.subtitle||''}</div></div>`;
+  }
+
+  /* ── SCORE ── */
+  if(t==='score'){
+    const clr=card.score_color||'#3DCC72';
+    h+=`<div class="tf-score-wrap">`;
+    h+=`<div><div class="tf-score-big" style="color:${clr}">${card.score||0}</div><div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:4px;font-weight:500">из 100</div></div>`;
+    h+=`<div class="tf-score-bars">`;
+    (card.bars||[]).forEach(b=>{h+=`<div><div class="tf-sbar-row"><span class="tf-sbar-lbl">${b.label}</span><span class="tf-sbar-val" style="color:${b.color||clr}">${b.value}%</span></div><div class="tf-sbar-track"><div class="tf-sbar-fill" style="width:${b.value}%;background:${b.color||clr}"></div></div></div>`;});
+    h+=`</div></div>`;
+    if(card.mood)h+=`<div class="tf-mood"><iconify-icon icon="solar:check-circle-bold-duotone" style="color:${clr}"></iconify-icon>${card.mood}</div>`;
+  }
+
+  /* ── RECIPE ── */
+  else if(t==='recipe'){
+    h+=`<div class="tf-ingr-wrap"><div class="tf-ingr-lbl">ингредиенты</div><div class="tf-ingr-chips">`;
+    (card.ingredients||[]).forEach(i=>{h+=`<span class="tf-ingr-chip">${i}</span>`;});
+    h+=`</div></div>`;
+    h+=`<div class="tf-steps">`;
+    (card.steps||[]).forEach((s,i)=>{h+=`<div class="tf-step"><div class="tf-step-n">${i+1}</div><span>${s}</span></div>`;});
+    h+=`</div>`;
+    h+=`<div class="tf-macros">`;
+    (card.macros||[]).forEach(m=>{h+=`<div class="tf-macro"><div class="tf-macro-v" style="${m.color?`color:${m.color}`:'color:#FF8040'}">${m.v}</div><div class="tf-macro-l">${m.l}</div></div>`;});
+    h+=`</div>`;
+    if(card.time||card.cost)h+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.05);font-size:11px;color:rgba(255,255,255,.35);font-weight:600">${card.cost?`<span>порция · <strong style="color:#3DCC72">${card.cost}</strong></span>`:'<span></span>'}${card.time?`<span style="display:flex;align-items:center;gap:4px"><iconify-icon icon="solar:clock-circle-bold-duotone"></iconify-icon>${card.time}</span>`:'<span></span>'}</div>`;
+  }
+
+  /* ── COMPARE ── */
+  else if(t==='compare'){
+    const heads=card.head||['','А','Б','лучше'];
+    h+=`<div class="tf-cmp-head">${heads.map(hd=>`<div>${hd}</div>`).join('')}</div>`;
+    (card.rows||[]).forEach(r=>{h+=`<div class="tf-cmp-r"><span class="tf-cmp-rl">${r.label}</span><span class="tf-cmp-rp">${r.a}</span><span class="tf-cmp-rc">${r.b}</span><span class="tf-cmp-rd">${r.winner}</span></div>`;});
+    if(card.verdict)h+=`<div class="tf-verdict"><iconify-icon icon="solar:stars-bold-duotone"></iconify-icon>${card.verdict}</div>`;
+  }
+
+  /* ── WEEK BAR ── */
+  else if(t==='week_bar'){
+    const maxV=Math.max(...(card.days||[]).map(d=>d.value||0),1);
+    h+=`<div class="tf-week" style="align-items:flex-end;height:60px">`;
+    (card.days||[]).forEach(d=>{
+      const pct=Math.round((d.value/maxV)*100);
+      const clr=d.today?'rgba(78,174,229,.9)':'rgba(78,174,229,.5)';
+      h+=`<div class="${'tf-wday'+(d.today?' today':'')}"><div class="tf-wbw"><div class="tf-wbf" style="height:${pct}%;background:${clr}"></div></div><div class="tf-wday-l">${d.label}</div></div>`;
+    });
+    h+=`</div>`;
+    const chips=[];
+    if(card.today_note)chips.push(`<span class="tf-chip c-r"><iconify-icon icon="solar:arrow-down-bold"></iconify-icon>${card.today_note}</span>`);
+    if(card.avg)chips.push(`<span class="tf-chip c-g">ср. выполнение ${card.avg}</span>`);
+    if(chips.length)h+=`<div class="tf-chips">${chips.join('')}</div>`;
+  }
+
+  /* ── TIP ── */
+  else if(t==='tip'){
+    const iclr=card.tip_icon_color||'#4EAEE5';
+    const ibg=card.tip_icon_bg||'rgba(78,174,229,.1)';
+    h+=`<div class="tf-tip-ico-wrap" style="background:${ibg};border:1px solid ${iclr}22"><iconify-icon icon="${card.tip_icon||'solar:lightbulb-bold-duotone'}" style="font-size:22px;color:${iclr}"></iconify-icon></div>`;
+    if(card.tip_body)h+=`<div class="tf-tip-body">${card.tip_body}</div>`;
+    if((card.chips||[]).length){h+=`<div class="tf-tip-chips">`;(card.chips||[]).forEach(ch=>{h+=`<span class="tf-tip-chip" style="background:${iclr}11;color:${iclr};border-color:${iclr}22">${ch}</span>`;});h+=`</div>`;}
+    if(card.action)h+=`<button class="tf-tip-btn" style="background:${iclr}11;color:${iclr};border:1px solid ${iclr}22" onclick="void 0"><iconify-icon icon="solar:bell-bold-duotone" style="font-size:14px"></iconify-icon>${card.action}</button>`;
+  }
+
+  /* ── WARNING ── */
+  else if(t==='warning'){
+    h+=`<div class="tf-warn-alert"><div class="tf-warn-dot"></div><div style="font-size:12px;font-weight:700;color:#F45C5C">${card.alert_text||'внимание'}</div></div>`;
+    if(card.metric_value){
+      h+=`<div style="display:flex;align-items:baseline;gap:8px;margin-top:12px">`;
+      h+=`<div class="tf-warn-metric-big">${card.metric_value}</div>`;
+      if(card.metric_sub)h+=`<div class="tf-warn-metric-sub">${card.metric_sub}</div>`;
+      h+=`</div>`;
+    }
+    if(card.bar_value!=null)h+=`<div class="tf-warn-bar"><div class="tf-warn-bar-fill" style="width:${card.bar_value}%"></div></div>`;
+    if(card.action_text)h+=`<div class="tf-warn-action"><iconify-icon icon="solar:arrow-right-circle-bold-duotone" style="color:#F45C5C;vertical-align:middle;margin-right:4px"></iconify-icon>${card.action_text}</div>`;
+  }
+
+  /* ── PROGRESS ── */
+  else if(t==='progress'){
+    const pct=Math.min(100,Math.max(0,card.ring_pct||0));
+    const clr=card.ring_color||'#3DCC72';
+    const r=35,circ=2*Math.PI*r,offset=circ*(1-(pct/100));
+    h+=`<div class="tf-ring-wrap">`;
+    h+=`<div class="tf-ring-svg" style="position:relative;flex-shrink:0">`;
+    h+=`<svg width="84" height="84" viewBox="0 0 84 84"><circle cx="42" cy="42" r="${r}" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="5.5"/><circle cx="42" cy="42" r="${r}" fill="none" stroke="${clr}" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${offset.toFixed(1)}" transform="rotate(-90 42 42)"/></svg>`;
+    h+=`<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-size:19px;font-weight:900;letter-spacing:-.02em;line-height:1;color:${clr}">${pct}%</div><div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.3);margin-top:2px">цель</div></div>`;
+    h+=`</div>`;
+    h+=`<div class="tf-ring-stats">`;
+    (card.stats||[]).forEach(s=>{h+=`<div class="tf-ring-stat"><span class="tf-ring-stat-l">${s.label}</span><span class="tf-ring-stat-v" ${s.color?`style="color:${s.color}"`:''}>${s.value}</span></div>`;});
+    h+=`</div></div>`;
+    if(card.chips){h+=`<div class="tf-chips">`;(card.chips||[]).forEach(ch=>{h+=`<span class="tf-chip ${ch.cls||'c-g'}"><iconify-icon icon="${ch.icon||'solar:check-circle-bold-duotone'}"></iconify-icon>${ch.text}</span>`;});h+=`</div>`;}
+    else if(card.on_track!=null){
+      const ok=card.on_track;
+      h+=`<div class="tf-on-track ${ok?'yes':'no'}"><iconify-icon icon="solar:${ok?'check':'danger'}-circle-bold-duotone"></iconify-icon>${card.on_track_text||''}</div>`;
+    }
+  }
+
+  /* ── MILESTONE ── */
+  else if(t==='milestone'){
+    const mclr=card.badge_color||'#FFAB40';
+    const mbg=card.badge_bg||`rgba(255,171,64,.09)`;
+    const mbc=card.badge_border||`rgba(255,171,64,.16)`;
+    h+=`<div class="tf-ms-badge-wrap" style="background:linear-gradient(135deg,${mbg},rgba(255,107,53,.04));border:1px solid ${mbc}">`;
+    h+=`<div class="tf-ms-ico" style="background:${mclr}18;border:1px solid ${mclr}28"><iconify-icon icon="${card.badge_icon||'solar:fire-bold-duotone'}" style="font-size:24px;color:${mclr}"></iconify-icon></div>`;
+    if(card.badge_sub)h+=`<div class="tf-ms-badge-sub">${card.badge_sub}</div>`;
+    h+=`<div class="tf-ms-badge-title">${card.title||''}</div>`;
+    h+=`</div>`;
+    if(card.subtitle)h+=`<div class="tf-ms-sub">${card.subtitle}</div>`;
+    if((card.stats||[]).length){h+=`<div class="tf-ms-stats">`;(card.stats||[]).forEach(s=>{h+=`<div class="tf-ms-stat"><div class="tf-ms-stat-v" style="${s.color?`color:${s.color}`:`color:${mclr}`}">${s.v}</div><div class="tf-ms-stat-l">${s.l}</div></div>`;});h+=`</div>`;}
+    if(card.next)h+=`<div class="tf-ms-next">${card.next} <iconify-icon icon="solar:target-bold-duotone" style="vertical-align:middle"></iconify-icon></div>`;
+  }
+
+  /* ── SLEEP ANALYSIS ── */
+  else if(t==='sleep_analysis'){
+    h+=`<div class="tf-sleep-nums">`;
+    (card.nums||[]).forEach(n=>{h+=`<div class="tf-sleep-num"><div class="tf-sleep-num-v">${n.v}</div><div class="tf-sleep-num-l">${n.l}</div></div>`;});
+    h+=`</div>`;
+    if((card.segments||[]).length){
+      h+=`<div class="tf-sleep-segs" style="margin-top:12px">`;
+      (card.segments||[]).forEach(s=>{h+=`<div class="tf-sleep-seg" style="flex:${s.flex||1};background:${s.color}"></div>`;});
+      h+=`</div>`;
+    }
+    if((card.days||[]).length){
+      h+=`<div style="display:flex;justify-content:space-between;margin-top:4px">`;
+      (card.days||[]).forEach(d=>{h+=`<span style="font-size:8px;font-weight:600;color:rgba(255,255,255,.2);flex:1;text-align:center">${d}</span>`;});
+      h+=`</div>`;
+    }
+    if(card.recommendation)h+=`<div class="tf-sleep-rec"><iconify-icon icon="solar:lightbulb-bold-duotone" style="vertical-align:middle;margin-right:4px;color:#8B7FD4"></iconify-icon>${card.recommendation}</div>`;
+  }
+
+  /* ── CHALLENGE ── */
+  else if(t==='challenge'){
+    const iclr=card.chal_icon_color||'#3DCC72';
+    const ibg=card.chal_icon_bg||'rgba(61,204,114,.09)';
+    const diff=card.difficulty||'medium';
+    const diffCfg={easy:{cls:'easy',lbl:'лёгкий'},medium:{cls:'medium',lbl:'средний'},hard:{cls:'hard',lbl:'сложно'}};
+    const dc=diffCfg[diff]||diffCfg.medium;
+    h+=`<div class="tf-chal-top">`;
+    h+=`<div class="tf-chal-ico" style="background:${ibg};border:1px solid ${iclr}22"><iconify-icon icon="${card.chal_icon||'solar:walking-bold-duotone'}" style="color:${iclr};font-size:22px"></iconify-icon></div>`;
+    h+=`<div class="tf-chal-info"><div class="tf-chal-title">${card.title||''}</div><span class="tf-chal-diff ${dc.cls}"><iconify-icon icon="solar:bolt-bold-duotone"></iconify-icon>${dc.lbl} вызов</span></div>`;
+    h+=`</div>`;
+    if(card.subtitle)h+=`<div class="tf-sub" style="margin-top:10px">${card.subtitle}</div>`;
+    h+=`<div class="tf-chal-progress">`;
+    h+=`<div class="tf-chal-plbl"><span>${card.progress_left||'прогресс'}</span><span style="color:${iclr}">${card.progress_right||''}</span></div>`;
+    h+=`<div class="tf-chal-pbar"><div class="tf-chal-pbar-fill" style="width:${card.progress_pct||0}%;background:linear-gradient(90deg,${iclr},${iclr}aa)"></div></div>`;
+    h+=`</div>`;
+    if(card.btn_text)h+=`<button class="tf-chal-btn" style="background:${ibg};color:${iclr};border:1px solid ${iclr}22" onclick="void 0"><iconify-icon icon="solar:running-bold-duotone" style="font-size:15px"></iconify-icon>${card.btn_text}</button>`;
+  }
+
+  /* ── SHOPPING ── */
+  else if(t==='shopping'){
+    if((card.items||[]).length){
+      h+=`<div style="display:grid;grid-template-columns:1fr 50px 60px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.2);padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.05);margin-top:13px"><span>продукт</span><span style="text-align:right">белок</span><span style="text-align:right">цена</span></div>`;
+      card.items.forEach((item,i)=>{
+        const last=i===card.items.length-1;
+        h+=`<div class="tf-sh-row"${last?' style="border-bottom:none"':''}><span class="tf-sh-n">${item.name}</span><span class="tf-sh-pr">${item.protein||item.store||''}</span><span class="tf-sh-p">${item.price}</span></div>`;
+      });
+    }
+    if(card.total)h+=`<div class="tf-sh-total"><span class="tf-sh-total-l">итого за неделю</span><span class="tf-sh-total-v">${card.total}</span></div>`;
+  }
+
+  /* ── MEAL PLAN ── */
+  else if(t==='meal_plan'){
+    if(card.stats_line)h+=`<div style="font-size:11px;color:rgba(255,255,255,.35);margin-bottom:11px;margin-top:-2px">${card.stats_line}</div>`;
+    (card.meals||[]).forEach(m=>{
+      const done=m.done;
+      const icon_bg=m.icon_bg||'rgba(255,107,53,.1)';
+      const icon_clr=m.icon_color||'#FF8040';
+      h+=`<div class="tf-mp-meal" ${m.pending?'style="opacity:.5"':''}>`;
+      h+=`<span style="font-size:10px;font-weight:700;color:rgba(255,255,255,.25);min-width:38px;letter-spacing:.03em">${m.time||''}</span>`;
+      h+=`<div class="tf-mp-meal-ico" style="background:${icon_bg}"><iconify-icon icon="${m.icon||'solar:dish-bold-duotone'}" style="font-size:14px;color:${icon_clr}"></iconify-icon></div>`;
+      h+=`<div class="tf-mp-meal-info"><div class="tf-mp-meal-name">${m.name}</div><div class="tf-mp-meal-time">${m.sub||''}</div></div>`;
+      if(done)h+=`<iconify-icon icon="solar:check-circle-bold-duotone" style="color:#3DCC72;font-size:16px;flex-shrink:0"></iconify-icon>`;
+      else h+=`<iconify-icon icon="solar:arrow-right-bold" style="color:rgba(255,255,255,.18);font-size:13px;flex-shrink:0"></iconify-icon>`;
+      h+=`</div>`;
+    });
+    if(card.remaining)h+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding:7px 10px;border-radius:8px;background:rgba(255,255,255,.04)"><span style="font-size:11px;color:rgba(255,255,255,.35);font-weight:500">осталось на вечер</span><span style="font-size:12px;font-weight:900;color:#FF8040">${card.remaining}</span></div>`;
+  }
+
+  /* ── INSIGHT ── */
+  else if(t==='insight'){
+    const maxV=Math.max(...(card.bars||[]).map(b=>b.value||0),1);
+    h+=`<div class="tf-insight-chart">`;
+    (card.bars||[]).forEach(b=>{const pct=Math.round((b.value/maxV)*100);h+=`<div class="tf-insight-bar"><div class="tf-insight-bw" style="height:${pct}%;background:${b.color||'rgba(157,133,242,.5)'}"></div><div class="tf-insight-bl">${b.label}</div></div>`;});
+    h+=`</div>`;
+    if(card.finding)h+=`<div class="tf-finding">${card.finding}</div>`;
+    if(card.note)h+=`<div style="margin-top:11px;padding:9px 11px;border-radius:9px;font-size:12px;font-weight:600;line-height:1.55;background:rgba(157,133,242,.07);border:1px solid rgba(157,133,242,.13);color:rgba(157,133,242,.9)"><iconify-icon icon="solar:chart-2-bold-duotone" style="vertical-align:middle;margin-right:4px"></iconify-icon>${card.note}</div>`;
+    if(card.conclusion)h+=`<div class="tf-conclusion"><iconify-icon icon="solar:lightbulb-bold-duotone"></iconify-icon>${card.conclusion}</div>`;
+  }
+
+  body.innerHTML=h;
+  scroll.appendChild(body);
+  el.appendChild(scroll);
   return el;
 }
 
-function tifiBuildCard(data,idx){
-  const el=document.createElement('div');
-  // map new semantic types to existing CSS backgrounds
-  const TYPE_BG_MAP={'tifi-cc-score':'tifi-cc-score','tifi-cc-insight':'tifi-cc-purple','tifi-cc-action':'tifi-cc-orange','tifi-cc-forecast':'tifi-cc-blue'};
-  const cssType=TYPE_BG_MAP[data.type]||data.type;
-  el.className='tifi-ccard state-next '+cssType;
-  if(data.glow){const g=document.createElement('div');g.className='tifi-cc-warm-glow';el.appendChild(g);}
-  // insight glow
-  if(data.type==='tifi-cc-insight'){
-    const cat=TIFI_CATS[data.cat]||TIFI_CATS['инсайты']||TIFI_CATS['советы'];
-    const g=document.createElement('div');g.className='tifi-cc-insight-glow';
-    g.style.background=`rgba(${cat.rgb},.08)`;el.appendChild(g);
-  }
-  const scroll=document.createElement('div');scroll.className='tifi-cc-scroll';
-  let h=`<div class="tifi-cc-body">`;
-  if(data.custom)h+=`<div class="tifi-cc-custom-badge">✦ создано тифи</div>`;
-  const _tag=data.tag||{cls:'tifi-tag-orange',text:'тифи'};
-  h+=`<div class="tifi-cc-tag ${_tag.cls||'tifi-tag-orange'}">${_tag.text||'тифи'}</div>`;
-  // SCORE card — big number layout
-  if(typeof data.score==='number'){
-    const scoreClr=data.score_clr||(data.score>=75?'#3DCC72':data.score>=50?'#FFAB40':'#F45C5C');
-    h+=`<div class="tifi-cc-score-wrap">`;
-    h+=`<div><div class="tifi-cc-score-num" style="color:${scoreClr}">${data.score}</div><div class="tifi-cc-s" style="margin-top:6px">${data.sub||''}</div></div>`;
-    if(data.metrics&&data.metrics.length){
-      h+=`<div class="tifi-cc-score-metrics">`;
-      data.metrics.forEach(m=>{h+=`<div class="tifi-cc-score-row"><span>${m.l}</span><span style="color:${m.clr};font-weight:700">${m.v}</span></div><div class="tifi-cc-score-bar"><div class="tifi-cc-score-bar-f" style="width:${m.w}%;background:${m.clr}"></div></div>`;});
-      h+=`</div>`;
-    }
-    h+=`</div>`;
-    h+=`</div>`;scroll.innerHTML=h;el.appendChild(scroll);return el;
-  }
-  h+=`<div class="tifi-cc-h">${data.title}</div>`;
-  h+=`<div class="tifi-cc-s">${data.sub}</div>`;
-  if(data.nums){h+=`<div class="tifi-cc-bignums">`;data.nums.forEach(n=>{h+=`<div class="tifi-cc-num"><div class="tifi-cc-num-v"${n.clr?` style="color:${n.clr}"`:''}>${n.v}</div><div class="tifi-cc-num-l">${n.l}</div></div>`});h+=`</div>`;}
-  if(data.macros){h+=`<div class="tifi-cc-macros">`;data.macros.forEach(m=>{h+=`<div class="tifi-cc-macro"><div class="tifi-cc-macro-v"${m.clr?` style="color:${m.clr}"`:''}>${m.v}</div><div class="tifi-cc-macro-l">${m.l}</div></div>`});h+=`</div>`;}
-  if(data.ingredients){h+=`<div class="tifi-cc-ingredients">`;data.ingredients.forEach(i=>{h+=`<div class="tifi-cc-ingr">${i}</div>`});h+=`</div>`;}
-  if(data.bar)h+=`<div class="tifi-cc-bar"><div class="tifi-cc-bar-fill" style="width:${data.bar.w}%;background:${data.bar.clr}"></div></div>`;
-  if(data.chips){h+=`<div class="tifi-cc-chips">`;data.chips.forEach(c=>{h+=`<div class="tifi-cc-chip ${c.cls}">${c.t}</div>`});h+=`</div>`;}
-  if(data.list){h+=`<div class="tifi-cc-list">`;data.list.forEach(item=>{const[bg,clr]=item.ico.split(';color:'),bgV=bg.replace('bg:','');h+=`<div class="tifi-cc-li"><div class="tifi-cc-li-ico" style="background:${bgV};color:${clr}">${tifiMkSvg(item.svg)}</div><div><div class="tifi-cc-li-t">${item.t}</div><div class="tifi-cc-li-s">${item.s}</div></div></div>`;});h+=`</div>`;}
-  if(data.rows){h+=`<div class="tifi-cc-rows">`;data.rows.forEach(r=>{h+=`<div class="tifi-cc-row"><div class="tifi-cc-row-l">${r.l}</div><div class="tifi-cc-row-v"${r.clr?` style="color:${r.clr}"`:''}>${r.v}</div></div>`});h+=`</div>`;}
-  if(data.todo){h+=`<div class="tifi-cc-todo">`;data.todo.forEach(item=>{const[bg,clr]=item.ico.split(';color:'),bgV=bg.replace('bg:','');h+=`<div class="tifi-cc-todo-item"><div class="tifi-cc-todo-ico" style="background:${bgV};color:${clr}">${tifiMkSvg(item.svg)}</div><span>${item.t}</span></div>`;});h+=`</div>`;}
-  if(data.meals){h+=`<div class="tifi-cc-meal-list">`;data.meals.forEach(m=>{h+=`<div class="tifi-cc-meal-row"><div class="tifi-cc-meal-ico">${m.ico}</div><div class="tifi-cc-meal-info"><div class="tifi-cc-meal-name">${m.name}</div><div class="tifi-cc-meal-sub">${m.sub}</div></div><div><div class="tifi-cc-meal-kcal" style="color:${m.clr}">${m.kcal}</div><div class="tifi-cc-meal-unit">ккал</div></div></div>`;});h+=`</div>`;}
-  h+=`</div>`;scroll.innerHTML=h;el.appendChild(scroll);return el;
-}
-
-let _tifiActiveFilter='все';
-
+/* ── карусель ── */
 function tifiBuildCarousel(){
   const track=document.getElementById('tifi-ctrack');
   const dotsEl=document.getElementById('tifi-cdots');
   const progEl=document.getElementById('tifi-prog');
   if(!track||!dotsEl||!progEl)return;
 
-  // Filter out divider cards — focus UI handles categories via top label
-  const cards=tifiCards.filter(d=>!d.divider);
+  const cards=(tifiCards.cards||tifiCards).filter(d=>!d.divider);
   tifiCardEls=[];
-  track.innerHTML='';
-  dotsEl.innerHTML='';
-  progEl.innerHTML='';
+  track.innerHTML='';dotsEl.innerHTML='';progEl.innerHTML='';
 
-  cards.forEach((data,i)=>{
-    const el=tifiBuildCard(data,i);
-    const TYPE_BG_MAP={'tifi-cc-score':'tifi-cc-score','tifi-cc-insight':'tifi-cc-purple','tifi-cc-action':'tifi-cc-orange','tifi-cc-forecast':'tifi-cc-blue'};
-    const cssType=TYPE_BG_MAP[data.type]||data.type||'tifi-cc-dark';
-    el.className='tifi-ccard '+cssType+' '+(i===0?'state-current':'state-next');
-    if(data.glow){const g=document.createElement('div');g.className='tifi-cc-warm-glow';el.prepend(g);}
+  const CATS=tifiCards.categories||[];
+
+  cards.forEach((card,i)=>{
+    const el=tifiRenderCard(card);
+    el.className=el.className.replace('state-next','')+(i===0?' state-current':' state-next');
     track.appendChild(el);
     tifiCardEls.push(el);
 
-    const seg=document.createElement('div');
-    seg.className='tifi-prog-seg';
-    const fill=document.createElement('div');
-    fill.className='tifi-prog-fill';
-    fill.id='tpf'+i;
-    const cat=TIFI_CATS[data.cat]||TIFI_CATS['советы'];
-    fill.style.background=cat.clr;
+    // progress segment
+    const seg=document.createElement('div');seg.className='tifi-prog-seg';
+    const fill=document.createElement('div');fill.className='tifi-prog-fill';fill.id='tpf'+i;
+    const cat=CATS.find(c=>c.id===card.category);
+    const clr=cat?undefined:_tifiCatColor(card.category);
+    fill.style.background=cat?_tifiCatColor(card.category):clr||'#FF8040';
     fill.style.width=i===0?'100%':'0%';
-    seg.appendChild(fill);
-    progEl.appendChild(seg);
+    seg.appendChild(fill);progEl.appendChild(seg);
 
+    // dot
     const dot=document.createElement('div');
-    const on=i===0;
-    dot.className='tifi-cdot'+(on?' on':'');
-    dot.style.background=on?cat.dotClr:'rgba(255,255,255,.14)';
-    dot._catClr=cat.dotClr;
+    dot.className='tifi-cdot'+(i===0?' on':'');
+    dot.style.background=i===0?(fill.style.background):'rgba(255,255,255,.14)';
+    dot._catClr=fill.style.background;
     dotsEl.appendChild(dot);
   });
 
-  tifiCards._display=cards;
   const ctr=document.getElementById('tifi-counter');
   if(ctr)ctr.textContent='1 / '+cards.length;
   _tifiUpdateTopBar(0);
 
-  // Tap left 35% = prev, right 35% = next, middle = safe zone
   const stage=document.getElementById('tifi-ctrack');
   stage.onclick=function(e){
-    if(e.target.closest('.tifi-cc-todo-item,.tifi-cc-chip,.tifi-div-enter-btn,button,a')){return;}
+    if(e.target.closest('button,a'))return;
     const rect=stage.getBoundingClientRect();
     const x=e.clientX-rect.left;
     const third=rect.width*0.35;
-    if(x<third) tifiPrevCard();
-    else if(x>rect.width-third) tifiNextCard();
+    if(x<third)tifiPrevCard();
+    else if(x>rect.width-third)tifiNextCard();
   };
 }
 
+function _tifiCatColor(cat){
+  const map={советы:'#FF8040',питание:'#4EAEE5',активность:'#3DCC72',сон:'#9D85F2'};
+  return map[cat]||'#FF8040';
+}
+
 function _tifiUpdateTopBar(idx){
-  const cards=tifiCards._display||tifiCards.filter(d=>!d.divider);
-
-  cards.forEach((_,i)=>{
-    const f=document.getElementById('tpf'+i);
-    if(f)f.style.width=i<=idx?'100%':'0%';
-  });
-
+  const cards=(tifiCards.cards||tifiCards).filter(d=>!d.divider);
+  cards.forEach((_,i)=>{const f=document.getElementById('tpf'+i);if(f)f.style.width=i<=idx?'100%':'0%';});
   document.querySelectorAll('.tifi-cdot').forEach((d,i)=>{
-    const on=i===idx;
-    d.classList.toggle('on',on);
+    const on=i===idx;d.classList.toggle('on',on);
     d.style.background=on?(d._catClr||'rgba(255,255,255,.5)'):'rgba(255,255,255,.14)';
   });
-
   const d=cards[idx];
   if(d){
-    const cat=TIFI_CATS[d.cat]||TIFI_CATS['советы'];
     const lbl=document.getElementById('tifi-cat-lbl');
     const cnt=document.getElementById('tifi-cat-cnt');
-    if(lbl){lbl.textContent=d.cat;lbl.style.color=cat.clr;}
+    if(lbl){lbl.textContent=d.category||'';lbl.style.color=_tifiCatColor(d.category);}
     if(cnt){
-      const catCards=cards.filter(c=>c.cat===d.cat);
-      let pos=0;for(let i=0;i<idx;i++){if(cards[i].cat===d.cat)pos++;}
+      const catCards=cards.filter(c=>c.category===d.category);
+      let pos=0;for(let i=0;i<idx;i++){if(cards[i].category===d.category)pos++;}
       cnt.textContent=(pos+1)+' / '+catCards.length;
     }
   }
-
   const ctr=document.getElementById('tifi-counter');
   if(ctr)ctr.textContent=(idx+1)+' / '+cards.length;
 }
@@ -6995,44 +7458,32 @@ function _tifiPlace(el,pos){
 }
 
 function tifiGoTo(newIdx){
-  if(newIdx===tifiCur||newIdx<0)return;
-  const cards=tifiCards._display||tifiCards.filter(d=>!d.divider);
-  if(newIdx>=cards.length)return;
-  const oldIdx=tifiCur;
-  tifiCur=newIdx;
-  tifiCardEls.forEach((el,i)=>{
-    if(i===oldIdx||i===newIdx)return;
-    _tifiPlace(el,i<newIdx?'prev':'next');
-  });
+  const cards=(tifiCards.cards||tifiCards).filter(d=>!d.divider);
+  if(newIdx===tifiCur||newIdx<0||newIdx>=cards.length)return;
+  const oldIdx=tifiCur;tifiCur=newIdx;
+  tifiCardEls.forEach((el,i)=>{if(i!==oldIdx&&i!==newIdx)_tifiPlace(el,i<newIdx?'prev':'next');});
   _tifiPlace(tifiCardEls[oldIdx],oldIdx<newIdx?'prev':'next');
   _tifiPlace(tifiCardEls[newIdx],'cur');
   _tifiUpdateTopBar(newIdx);
 }
+function tifiNextCard(){tifiGoTo(tifiCur+1);}
+function tifiPrevCard(){tifiGoTo(tifiCur-1);}
 
-function tifiNextCard(){
-  const cards=tifiCards._display||tifiCards.filter(d=>!d.divider);
-  tifiGoTo(Math.min(tifiCur+1,cards.length-1));
-}
-function tifiPrevCard(){
-  tifiGoTo(Math.max(tifiCur-1,0));
-}
-
-function tifiUpdateStates(idx){
-  tifiCur=idx||0;
-  tifiCardEls.forEach((el,i)=>{_tifiPlace(el,i===tifiCur?'cur':i<tifiCur?'prev':'next');});
-  _tifiUpdateTopBar(tifiCur);
-}
-
-/* ── добавление новой карточки в течение дня (тифи-планировщик) ── */
+/* ── добавление новой карточки ── */
 function tifiAddCard(data){
-  if(!tifiLoaded||!tifiCards||!tifiCards.length)return;
+  if(!tifiLoaded)return;
   data.custom=true;
-  tifiCards.push(data);
+  if(!tifiCards.cards)tifiCards.cards=[];
+  tifiCards.cards.push(data);
+  const savedIdx=tifiCur;
   tifiBuildCarousel();
-  tifiUpdateStates(tifiCur);
+  tifiCur=savedIdx;
+  tifiCardEls.forEach((el,i)=>_tifiPlace(el,i===tifiCur?'cur':i<tifiCur?'prev':'next'));
+  _tifiUpdateTopBar(tifiCur);
   _tifiShowNewCardBadge();
 }
 
+/* ── добавление новой карточки в течение дня ── */
 function _tifiShowNewCardBadge(){
   // Add a small pulsing dot to the refresh button to signal new content
   const btn=document.getElementById('tifi-refresh-btn');
@@ -7106,9 +7557,11 @@ async function _tifiRequestMidDayCard(timeLabel){
     if(s===-1||e===-1)return;
     const card=JSON.parse(clean.slice(s,e+1));
     if(!card.title)return;
-    // Normalize tag classes same as full normalize
-    if(card.tag?.cls&&!card.tag.cls.startsWith('tifi-tag-'))card.tag.cls='tifi-tag-'+card.tag.cls;
-    card.type=card.type?('tifi-cc-'+card.type.replace('tifi-cc-','')):'tifi-cc-dark';
+    // Normalize to v4 schema
+    if(!card.type||!['score','recipe','compare','tip','warning','progress','meal_plan','shopping','insight','sleep_analysis','challenge','milestone','week_bar'].includes(card.type))card.type='tip';
+    if(!card.bg_theme)card.bg_theme='dark';
+    if(!card.tag_color)card.tag_color='o';
+    if(!card.category)card.category='советы';
     tifiAddCard(card);
   }catch(e){/* silent */}
 }
@@ -7122,7 +7575,6 @@ async function tifiStartScreen(){
   const myToken=++_tifiToken;
   const alive=()=>(myToken===_tifiToken)&&document.getElementById('pp-tifi')?.classList.contains('open');
 
-  // show loading, hide carousel
   ldg.style.display='flex';ldg.style.opacity='1';
   car.classList.remove('visible');car.style.pointerEvents='';
   tifiCur=0;tifiLoaded=false;
@@ -7148,7 +7600,6 @@ async function tifiStartScreen(){
     if(!linesEl||!alive())return;
     const row=document.createElement('div');
     row.className='tl-line';
-    // inline-стиль — страховка если CSS класс не применился (мобильный Chrome quirk)
     row.style.cssText='display:grid;grid-template-columns:56px 18px 1fr;column-gap:7px;align-items:start;width:100%;flex-shrink:0;opacity:0;transition:opacity .25s ease,transform .25s ease;transform:translateY(7px)';
 
     const ts=document.createElement('div');
@@ -7182,7 +7633,7 @@ async function tifiStartScreen(){
   const _t=(fn,ms)=>{const id=setTimeout(fn,ms);_timers.push(id);return id;};
   const _killTimers=()=>_timers.forEach(clearTimeout);
 
-  // --- Phase 1: scripted log lines (timing aligns with real API call) ---
+  // --- Phase 1: scripted log lines ---
   const phase1=[
     {delay:0,    pfx:'▸', cls:'tl-pfx-run',  txt:'инициализация анализа данных',   tCls:'',    pct:5},
     {delay:450,  pfx:'▸', cls:'tl-pfx-run',  txt:'читаю профиль пользователя...',  tCls:'',    pct:12},
@@ -7205,7 +7656,7 @@ async function tifiStartScreen(){
   // thinking indicator appears at 3.4s
   _t(()=>{
     if(alive()&&thinkEl){
-      thinkEl.style.display='';   // clear inline override
+      thinkEl.style.display='';
       thinkEl.classList.add('show');
     }
     tlSetPct(82);
@@ -7214,7 +7665,7 @@ async function tifiStartScreen(){
   // --- Kick off real API call in parallel ---
   const apiKey=_tifiGetKey();
   const userData=_tifiGetUserData();
-  const minDelay=new Promise(r=>setTimeout(r,3800)); // minimum visible time
+  const minDelay=new Promise(r=>setTimeout(r,3800));
   let apiResult=null,apiError=null;
 
   if(!apiKey){
@@ -7236,12 +7687,11 @@ async function tifiStartScreen(){
     return;
   }
 
-  // hide thinking — убираем немедленно, не ждём transition
+  // hide thinking
   if(thinkEl){thinkEl.classList.remove('show');thinkEl.style.display='none';}
 
   let _tifiUsedFallback=false;
   if(apiError&&!apiResult){
-    // error path
     const isKey=apiError.message&&(apiError.message.toLowerCase().includes('invalid api key')||apiError.message.toLowerCase().includes('401')||apiError.message.toLowerCase().includes('no api key')||apiError.message.toLowerCase().includes('invalid_api_key')||!apiKey);
     tlSetPct(100);
     if(liveEl){liveEl.textContent='error';liveEl.style.color='#F45C5C';}
@@ -7249,18 +7699,15 @@ async function tifiStartScreen(){
       tlAddLine('✗','tl-pfx-warn','неверный ключ groq api','warn');
       tlAddLine('→','tl-pfx-info','нажми изменить в заголовке','dim');
     }else{
-      const errMsg=(apiError?.message||'unknown').slice(0,60).toLowerCase();
-      tlAddLine('✗','tl-pfx-warn','ошибка: '+errMsg,'warn');
-      tlAddLine('→','tl-pfx-info','загружаю базовые карточки','dim');
+      tlAddLine('✗','tl-pfx-warn','ошибка соединения · использую кэш','warn');
     }
     tifiCards=_tifiGetCards();
     _tifiUsedFallback=true;
     await new Promise(r=>setTimeout(r,isKey?2200:1600));
   }else{
-    // success path
     tifiCards=apiResult;
-    const n=Array.isArray(tifiCards)?tifiCards.length:0;
-    tlAddLine('✓','tl-pfx-ok',`получен ответ groq api`,'ok');
+    const n=(tifiCards.cards||tifiCards).length;
+    tlAddLine('✓','tl-pfx-ok','получен ответ groq api','ok');
     tlSetPct(90);
     await new Promise(r=>setTimeout(r,320));
     if(!alive())return;
