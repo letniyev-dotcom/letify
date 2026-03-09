@@ -234,7 +234,6 @@ iconify-icon{display:inline-flex;align-items:center;justify-content:center;verti
 .nt.on{color:var(--sun);background:rgba(var(--sun-rgb),.1)}
 .nt:active{transform:scale(.97);transition:transform .03s ease}
 .nt svg{width:22px;height:22px;flex-shrink:0}
-.nt.nt-add{color:var(--sun)!important}
 
 /* ══ TYPOGRAPHY ══ */
 .t1{font-size:26px;font-weight:900;line-height:1.1;letter-spacing:-.02em}
@@ -2314,304 +2313,6 @@ iconify-icon:not(:defined){display:inline-flex;align-items:center;justify-conten
   cursor:pointer;transition:background .14s;
 }
 .tifi-key-del-btn:active{background:rgba(244,92,92,.1)}
-
-/* ══ FEED (HOME PAGE) ══ */
-
-/* Feed group dots (inside fcw) */
-.fdots{display:flex;gap:3.5px;justify-content:center;margin-bottom:10px}
-
-#p-home{overflow:hidden!important;touch-action:none}
-.feed-shell{position:absolute;inset:0;overflow:hidden;padding:6px}
-/* edge hints */
-.feed-et,.feed-eb{position:absolute;left:6px;right:6px;height:80px;pointer-events:none;z-index:25;border-radius:22px;opacity:0;transition:opacity .18s}
-.feed-et{top:6px;background:linear-gradient(to bottom,rgba(255,255,255,.04),transparent)}
-.feed-eb{bottom:calc(var(--nav-h) + 12px);background:linear-gradient(to top,rgba(255,255,255,.04),transparent)}
-.feed-et.on,.feed-eb.on{opacity:1}
-/* side arrows */
-.feed-sarr{position:absolute;top:50%;transform:translateY(-50%);z-index:30;width:26px;height:44px;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .28s}
-.feed-sarr.sl{left:14px}.feed-sarr.sr{right:14px}
-.feed-sarr.vis{opacity:1;animation:spulse 2.6s ease-in-out infinite .6s}
-@keyframes spulse{0%,100%{opacity:.2}50%{opacity:.5}}
-/* card wrappers */
-.fcw{position:absolute;top:6px;left:6px;right:6px;bottom:calc(var(--nav-h) + 8px);border-radius:22px;overflow:hidden;
-  display:flex;flex-direction:column;padding:17px 16px 14px;
-  pointer-events:none;will-change:transform,opacity;
-  background:#0A0A10;border:1px solid rgba(255,255,255,.07)}
-.fcw.active{pointer-events:auto}
-/* group dots */
-.fcw .gdots{display:flex;gap:3.5px;justify-content:center;margin-bottom:10px}
-.fcw .gd{height:2.5px;border-radius:99px;background:rgba(255,255,255,.16);transition:width .22s,background .22s}
-.fcw .gd.cur{background:rgba(255,255,255,.65)}
-/* glows */
-.fgl{position:absolute;top:-55px;right:-55px;width:210px;height:210px;border-radius:50%;filter:blur(70px);pointer-events:none;opacity:.42;z-index:0}
-.fgl2{position:absolute;bottom:-40px;left:-40px;width:150px;height:150px;border-radius:50%;filter:blur(58px);pointer-events:none;opacity:.14;z-index:0}
-/* card zones */
-.fct{flex-shrink:0;position:relative;z-index:1}
-.fcm{flex:1;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:1;min-height:0}
-.fcb{flex-shrink:0;position:relative;z-index:1}
-/* typography */
-.fh1{font-size:26px;font-weight:900;letter-spacing:-.035em;line-height:1.05;color:#EEECE8}
-.fh1 span{font-size:13px;font-weight:600;color:rgba(238,236,232,.46);letter-spacing:0}
-.fsub{font-size:11px;color:rgba(238,236,232,.46);line-height:1.5;margin-top:3px}
-.ftag{display:inline-flex;align-items:center;gap:4px;font-size:7.5px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;padding:3px 9px 3px 7px;border-radius:6px;margin-bottom:10px}
-.ftag iconify-icon{font-size:10px}
-.ftbadge{display:inline-flex;align-items:center;gap:5px;font-size:7.5px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;padding:3.5px 10px;border-radius:7px;margin-bottom:10px;background:rgba(255,107,53,.12);color:#FF6B35;border:1px solid rgba(255,107,53,.2)}
-/* ring */
-.fring{position:relative;flex-shrink:0}
-.fring svg{display:block}
-.fri{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
-.frv{font-weight:900;letter-spacing:-.03em;line-height:1;color:#EEECE8}
-.frl{font-size:7.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:rgba(238,236,232,.46)}
-/* bars */
-.fbrow{display:flex;align-items:center;gap:7px}
-.fblbl{font-size:9.5px;color:rgba(238,236,232,.46);font-weight:600;width:46px;flex-shrink:0}
-.fbtrack{flex:1;height:3.5px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden}
-.fbfill{height:100%;border-radius:99px}
-.fbval{font-size:9.5px;font-weight:800;width:26px;text-align:right;flex-shrink:0}
-/* metric boxes */
-.fmboxes{display:flex;gap:5px}
-.fmbox{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:9px 7px;text-align:center}
-.fmv{font-size:15px;font-weight:900;letter-spacing:-.02em;line-height:1;color:#EEECE8}
-.fml{font-size:7.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:rgba(238,236,232,.46);margin-top:3px}
-/* data rows */
-.fdrows{display:flex;flex-direction:column}
-.fdrow{display:flex;justify-content:space-between;align-items:center;font-size:10.5px;padding:6.5px 0;border-bottom:1px solid rgba(255,255,255,.05)}
-.fdrow:last-child{border-bottom:none;padding-bottom:0}
-.fdl{color:rgba(238,236,232,.46);font-weight:500}
-.fdv{font-weight:800;color:#EEECE8}
-/* streak */
-.fstreak-n{font-size:72px;font-weight:900;letter-spacing:-.04em;line-height:1;
-  background:linear-gradient(135deg,#FF6B35,#FFAB40);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.fwrow{display:flex;gap:3px}
-.fwd{width:31px;height:31px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;text-transform:uppercase;flex-shrink:0}
-.fwd.done{background:rgba(255,107,53,.17);border:1px solid rgba(255,107,53,.2);color:#FF8040}
-.fwd.today{background:linear-gradient(135deg,#FF6B35,#FFAB40);color:#000}
-.fwd.empty{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:rgba(238,236,232,.18)}
-/* progress bar */
-.fpbar{height:3.5px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden}
-.fpfill{height:100%;border-radius:99px}
-/* info box */
-.fibox{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:11px 12px}
-/* badge */
-.fbadge{display:inline-flex;align-items:center;gap:5px;font-size:9.5px;font-weight:700;padding:5px 10px;border-radius:8px}
-/* meal row */
-.fmrow{display:flex;align-items:center;gap:10px;padding:7px 9px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07)}
-.fmi{width:27px;height:27px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.fmn{font-size:10.5px;font-weight:700;color:#EEECE8}
-.fmt{font-size:8.5px;color:rgba(238,236,232,.46);font-weight:600}
-.fmk{font-size:13px;font-weight:900;color:#FF8040}
-/* action row */
-.farow{display:flex;align-items:center;gap:9px;padding:10px 11px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);cursor:pointer;transition:background .1s}
-.farow:active{background:rgba(255,255,255,.08)}
-.fat{font-size:11px;font-weight:700;flex:1;color:#EEECE8}
-.fai{opacity:.35}
-/* task item */
-.ftask{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer}
-.ftask:last-child{border-bottom:none}
-.ftask-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;transition:background .2s}
-.ftask-t{font-size:11px;font-weight:700;flex:1;color:#EEECE8;transition:color .2s,text-decoration .2s}
-.ftask.done .ftask-t{color:rgba(238,236,232,.3);text-decoration:line-through}
-.ftask-tm{font-size:9px;color:rgba(238,236,232,.46);font-weight:600}
-/* swipe hint */
-.fshint{display:flex;align-items:center;justify-content:center;gap:5px;color:rgba(255,255,255,.2)}
-@keyframes fshb{0%,100%{transform:translateY(0);opacity:.2}50%{transform:translateY(4px);opacity:.38}}
-/* mini chart */
-.fmchart{display:flex;align-items:flex-end;gap:3px;height:42px}
-.fmb{flex:1;display:flex;flex-direction:column;align-items:center;gap:2.5px}
-.fmb-f{width:100%;border-radius:3px;min-height:2px}
-.fmb-l{font-size:6.5px;font-weight:700;color:rgba(238,236,232,.18);text-transform:uppercase}
-/* sleep bar */
-.fslbar{height:38px;border-radius:9px;overflow:hidden;display:flex;gap:2px;padding:5px;background:rgba(157,133,242,.06)}
-.fsls{border-radius:4px}
-/* water drops */
-.fdrops{display:flex;gap:4px;flex-wrap:wrap}
-.fdrop{width:24px;height:28px;position:relative}
-.fdrop svg{width:100%;height:100%}
-/* gate card */
-.fgate-logo{font-size:28px;font-weight:900;letter-spacing:-.04em;
-  background:linear-gradient(135deg,#FF6B35,#FFAB40,#9D85F2);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.fgate-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:18px}
-.fgate-chip{font-size:8px;font-weight:700;letter-spacing:.06em;padding:3.5px 9px;border-radius:6px;
-  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.45)}
-.fgate-note{font-size:8.5px;color:rgba(238,236,232,.18);text-align:center;margin-top:10px;line-height:1.6}
-/* buttons */
-.fbtn-gen,.fbtn-more{
-  width:100%;border:none;cursor:pointer;
-  font-family:'Onest',sans-serif;font-size:13px;font-weight:800;letter-spacing:.01em;
-  position:relative;overflow:hidden;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  padding:0;height:48px;border-radius:14px;
-  -webkit-tap-highlight-color:transparent;user-select:none}
-.fbtn-gen{background:#1E1410;color:#FF8040;box-shadow:inset 0 0 0 1.5px rgba(255,107,53,.35);transition:box-shadow .18s,background .18s}
-.fbtn-gen.state-done{background:#0D1F14;color:#3AC76B;box-shadow:inset 0 0 0 1.5px rgba(58,199,107,.35)}
-.fbtn-gen:disabled{opacity:.5;cursor:default}
-.fbtn-more{background:rgba(255,107,53,.1);color:#FF8040;box-shadow:inset 0 0 0 1px rgba(255,107,53,.22);transition:box-shadow .18s,background .18s}
-.fbtn-more:disabled{opacity:.5;cursor:default}
-.fripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.18);transform:scale(0);pointer-events:none;animation:fripple-expand .5s cubic-bezier(0,.5,.5,1) forwards}
-@keyframes fripple-expand{to{transform:scale(1);opacity:0}}
-.fbtn-spinner{width:16px;height:16px;flex-shrink:0;border:2px solid rgba(255,128,64,.22);border-top-color:#FF8040;border-radius:50%;animation:spin .65s linear infinite}
-.state-done .fbtn-spinner{display:none!important}
-.fbtn-check{display:none!important;font-size:16px;animation:fcheckPop .3s cubic-bezier(.34,1.56,.64,1) forwards}
-.state-done .fbtn-check{display:inline-flex!important}
-@keyframes fcheckPop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
-.fbtn-label{transition:opacity .18s}
-.state-loading .fbtn-label{opacity:.5}
-.fbtn-gen.state-loading::after,.fbtn-more.state-loading::after{content:'';position:absolute;inset:0;border-radius:inherit;background:rgba(255,107,53,.07);animation:fstateBreath 1.4s ease-in-out infinite}
-@keyframes fstateBreath{0%,100%{opacity:0}50%{opacity:1}}
-.fgen-count{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;padding:4px 9px;border-radius:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.07);color:rgba(238,236,232,.46);margin-top:8px}
-.fend-big{font-size:44px;font-weight:900;letter-spacing:-.04em;line-height:1;
-  background:linear-gradient(135deg,#FF6B35,#FFAB40);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-/* recipe */
-.frecipe-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}
-.frtag{font-size:8px;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:.05em}
-.frecipe-stat{display:flex;gap:8px;margin-top:10px}
-.frstat{flex:1;text-align:center;padding:7px 4px;background:rgba(255,255,255,.04);border-radius:9px;border:1px solid rgba(255,255,255,.07)}
-.frsv{font-size:14px;font-weight:900;line-height:1;color:#EEECE8}
-.frsl{font-size:7px;font-weight:700;color:rgba(238,236,232,.46);letter-spacing:.05em;text-transform:uppercase;margin-top:2px}
-.fing{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04)}
-.fing:last-child{border-bottom:none}
-.fing-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
-.fing-n{font-size:10.5px;font-weight:600;flex:1;color:#EEECE8}
-.fing-v{font-size:10px;font-weight:800;color:rgba(238,236,232,.46)}
-.fstep{display:flex;gap:9px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04)}
-.fstep:last-child{border-bottom:none}
-.fstep-n{width:18px;height:18px;border-radius:5px;background:rgba(255,255,255,.07);font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;color:#EEECE8}
-.fstep-t{font-size:10px;font-weight:600;line-height:1.5;color:rgba(255,255,255,.75)}
-/* shopping */
-.fshop-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);margin-bottom:5px}
-.fshop-item:last-child{margin-bottom:0}
-.fshop-icon{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
-.fshop-n{font-size:10.5px;font-weight:700;flex:1;color:#EEECE8}
-.fshop-w{font-size:9px;color:rgba(238,236,232,.46);font-weight:600}
-.fshop-must{font-size:7.5px;font-weight:800;color:#3AC76B;letter-spacing:.06em}
-/* tip */
-.ftip-icon-big{font-size:36px;margin-bottom:10px;display:block}
-.ftip-highlight{font-size:18px;font-weight:900;letter-spacing:-.02em;line-height:1.2;margin-bottom:8px;color:#EEECE8}
-.ftip-body{font-size:11px;color:rgba(255,255,255,.65);line-height:1.7}
-/* compare */
-.fcompare-pct{font-size:62px;font-weight:900;letter-spacing:-.04em;line-height:1}
-.fcompare-bar{height:6px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden;margin:10px 0 4px}
-.fcompare-fill{height:100%;border-radius:99px}
-.fcompare-row{display:flex;justify-content:space-between;font-size:9px;font-weight:700;color:rgba(238,236,232,.46)}
-/* motivation */
-.fmot-quote{font-size:19px;font-weight:800;letter-spacing:-.02em;line-height:1.3;margin-bottom:12px;color:#EEECE8}
-.fmot-stat-row{display:flex;gap:6px}
-.fmot-stat{flex:1;padding:10px 8px;background:rgba(255,255,255,.04);border-radius:10px;border:1px solid rgba(255,255,255,.07);text-align:center}
-.fmot-sv{font-size:18px;font-weight:900;line-height:1;color:#EEECE8}
-.fmot-sl{font-size:8px;color:rgba(238,236,232,.46);font-weight:700;margin-top:3px}
-/* insight */
-.fins-number{font-size:52px;font-weight:900;letter-spacing:-.04em;line-height:1}
-.fins-trend{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:7px;font-size:9px;font-weight:800;margin:8px 0}
-/* workout */
-.fwk-exercise{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}
-.fwk-exercise:last-child{border-bottom:none}
-.fwk-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px}
-.fwk-name{font-size:11px;font-weight:700;flex:1;color:#EEECE8}
-.fwk-sets{font-size:10px;font-weight:800;color:#FF6B35}
-/* gen progress */
-@keyframes fdotpulse{0%,80%,100%{opacity:.25}40%{opacity:1}}
-.fldots{display:inline-flex;gap:3px;margin-left:4px}
-.fldots span{width:4px;height:4px;border-radius:50%;background:currentColor;animation:fdotpulse 1.2s ease-in-out infinite}
-.fldots span:nth-child(2){animation-delay:.2s}
-.fldots span:nth-child(3){animation-delay:.4s}
-@keyframes fgateGlow{0%,100%{opacity:.35}50%{opacity:.6}}
-/* noise overlay for feed */
-#feed-noise{position:absolute;inset:0;pointer-events:none;z-index:9990;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.025'/%3E%3C/svg%3E");opacity:.55}
-
-/* ── NAVBAR SETTINGS (pp-navbar) — Live Preview Builder ── */
-
-/* Preview bar */
-.nb-preview-wrap{
-  background:var(--bg3);border-radius:20px;padding:14px 10px 10px;
-  margin-bottom:8px;position:relative;
-}
-.tg-dark .nb-preview-wrap{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07)}
-.nb-preview-label{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--hint);text-align:center;margin-bottom:10px}
-.nb-preview-bar{
-  display:flex;align-items:center;justify-content:center;gap:2px;
-  background:var(--nav-bg,rgba(255,255,255,.92));
-  border:1px solid rgba(255,255,255,.14);
-  border-radius:20px;padding:4px;
-  box-shadow:0 4px 18px rgba(0,0,0,.12);
-  margin:0 auto;width:fit-content;
-  position:relative;
-}
-.tg-dark .nb-preview-bar{background:var(--nav-bg-dark,rgba(24,18,10,.96));border-color:rgba(255,255,255,.1)}
-.nb-slot{
-  width:44px;height:44px;border-radius:13px;
-  display:flex;align-items:center;justify-content:center;
-  cursor:grab;position:relative;flex-shrink:0;
-  transition:background .15s,transform .12s,box-shadow .15s;
-  -webkit-tap-highlight-color:transparent;user-select:none;
-  color:var(--hint);
-}
-.nb-slot.nb-selected{
-  background:rgba(var(--sun-rgb),.12);color:var(--sun);
-  box-shadow:0 0 0 2px rgba(var(--sun-rgb),.35);
-}
-.nb-slot.nb-dragging-slot{opacity:.35;transform:scale(.9)}
-.nb-slot.nb-drop-target{background:rgba(var(--sun-rgb),.08);box-shadow:0 0 0 2px rgba(var(--sun-rgb),.5);transform:scale(1.08)}
-.nb-slot iconify-icon{font-size:22px;pointer-events:none}
-.nb-slot-add{
-  width:44px;height:44px;border-radius:13px;border:1.5px dashed var(--brd);
-  display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;
-  color:var(--hint);opacity:.5;transition:opacity .15s,border-color .15s;
-}
-.nb-slot-add:active{opacity:.8}
-.nb-preview-hint{font-size:10px;color:var(--hint);text-align:center;margin-top:10px;font-weight:500;line-height:1.5}
-
-/* Ghost pill while dragging */
-.nb-drag-ghost{
-  position:fixed;pointer-events:none;z-index:99999;
-  width:44px;height:44px;border-radius:13px;
-  display:flex;align-items:center;justify-content:center;
-  background:var(--bg2);box-shadow:0 8px 24px rgba(0,0,0,.22);
-  border:1.5px solid rgba(var(--sun-rgb),.4);
-  color:var(--sun);transform:scale(1.1);
-  transition:transform .08s;
-}
-.tg-dark .nb-drag-ghost{background:rgba(30,20,10,.96)}
-
-/* Selection state */
-.nb-selection-box{
-  border-radius:18px;border:2px solid rgba(var(--sun-rgb),.3);
-  background:rgba(var(--sun-rgb),.04);padding:12px;margin-bottom:8px;
-  display:none;
-}
-.nb-selection-box.visible{display:block}
-.nb-sel-label{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--sun);margin-bottom:10px}
-.nb-sel-hint{font-size:11px;color:var(--hint);font-weight:500;margin-bottom:10px}
-
-/* Available icon grid */
-.nb-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.nb-grid-item{
-  display:flex;flex-direction:column;align-items:center;gap:5px;
-  padding:10px 6px;border-radius:13px;cursor:pointer;
-  background:var(--bg3);border:1.5px solid transparent;
-  transition:background .12s,border-color .15s,transform .1s;
-  -webkit-tap-highlight-color:transparent;
-}
-.tg-dark .nb-grid-item{background:rgba(255,255,255,.05)}
-.nb-grid-item:active{transform:scale(.95)}
-.nb-grid-item.nb-grid-active{background:rgba(var(--sun-rgb),.1);border-color:rgba(var(--sun-rgb),.3)}
-.nb-grid-item iconify-icon{font-size:22px;color:var(--text)}
-.nb-grid-label{font-size:9px;font-weight:700;color:var(--hint);text-align:center;line-height:1.2}
-.nb-grid-item.nb-grid-in-use{opacity:.35;pointer-events:none}
-
-/* Remove hint */
-.nb-remove-row{
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  padding:10px;border-radius:12px;border:1px dashed rgba(244,92,92,.3);
-  background:rgba(244,92,92,.04);margin-bottom:10px;cursor:pointer;
-  transition:background .12s,border-color .15s;color:#F45C5C;
-  font-size:12px;font-weight:700;
-}
-.nb-remove-row.nb-remove-hover{background:rgba(244,92,92,.12);border-color:rgba(244,92,92,.5)}
-.nb-remove-row.hidden{display:none}
-
-.nb-hint{font-size:11px;color:var(--hint);font-weight:500;padding:6px 2px;text-align:center;line-height:1.5}
-
 </style>
 </head>
 <body>
@@ -2629,14 +2330,7 @@ iconify-icon:not(:defined){display:inline-flex;align-items:center;justify-conten
 <div id="pages">
 
 <!-- ══ HOME ══ -->
-<div class="page active" id="p-home">
-  <div id="feed-noise"></div>
-  <div class="feed-et" id="feed-et"></div>
-  <div class="feed-eb" id="feed-eb"></div>
-  <div class="feed-sarr sl" id="feed-al"><iconify-icon icon="solar:alt-arrow-left-bold" style="font-size:14px;color:rgba(255,255,255,.45)"></iconify-icon></div>
-  <div class="feed-sarr sr" id="feed-ar"><iconify-icon icon="solar:alt-arrow-right-bold" style="font-size:14px;color:rgba(255,255,255,.45)"></iconify-icon></div>
-  <!-- feed cards injected by JS -->
-</div>
+<div class="page active" id="p-home"><div id="h-content" style="min-height:100%;display:flex;flex-direction:column"></div></div>
 
 <!-- ══ TRACK ══ -->
 <div class="page" id="p-track">
@@ -3593,13 +3287,58 @@ iconify-icon:not(:defined){display:inline-flex;align-items:center;justify-conten
   </div>
   <div class="pp-body">
 
-    <!-- Navbar row -->
-    <div class="m3-sec" style="padding-top:0">навигация</div>
-    <div class="pf-list-row" onclick="pushPage('pp-navbar')">
-      <div class="lt-ic"><iconify-icon icon="solar:widget-bold-duotone" style="font-size:17px;color:var(--sun)"></iconify-icon></div>
-      <div class="lt-lbl">навбар</div>
-      <div class="lt-val" id="pf-navbar-val">5 пунктов</div>
-      <svg class="lt-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+    <div class="m3-sec" style="padding-top:0">макет главного экрана</div>
+    <div class="dp-grid">
+
+      <div class="dp-option" id="dp-classic" onclick="setHomeDesign('classic')">
+        <div class="dp-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="dp-thumb">
+          <div style="padding:5px 4px;height:100%;display:flex;flex-direction:column;">
+            <div class="dp-t-header"></div>
+            <div class="dp-t-banner"></div>
+            <div class="dp-t-arcs" style="flex:1;padding:4px 2px">
+              <div class="dp-t-arc-wrap"><svg width="22" height="22" viewBox="0 0 30 30"><circle cx="15" cy="15" r="11" fill="none" stroke="rgba(var(--water-rgb),.2)" stroke-width="2.5"/><circle cx="15" cy="15" r="11" fill="none" stroke="var(--water)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="69" stroke-dashoffset="47" transform="rotate(-90 15 15)"/></svg></div>
+              <div class="dp-t-arc-wrap"><svg width="28" height="28" viewBox="0 0 38 38"><circle cx="19" cy="19" r="14" fill="none" stroke="rgba(var(--sun-rgb),.2)" stroke-width="3"/><circle cx="19" cy="19" r="14" fill="none" stroke="var(--sun)" stroke-width="3" stroke-linecap="round" stroke-dasharray="88" stroke-dashoffset="30" transform="rotate(-90 19 19)"/></svg></div>
+              <div class="dp-t-arc-wrap"><svg width="22" height="22" viewBox="0 0 30 30"><circle cx="15" cy="15" r="11" fill="none" stroke="rgba(139,127,212,.2)" stroke-width="2.5"/><circle cx="15" cy="15" r="11" fill="none" stroke="#8B7FD4" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="69" stroke-dashoffset="20" transform="rotate(-90 15 15)"/></svg></div>
+            </div>
+            <div class="dp-t-weight"></div>
+          </div>
+        </div>
+        <div class="dp-name">классик</div>
+      </div>
+
+      <div class="dp-option" id="dp-linear" onclick="setHomeDesign('linear')">
+        <div class="dp-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="dp-thumb">
+          <div style="padding:5px 4px;height:100%;display:flex;flex-direction:column;">
+            <div class="dp-t-header"></div><div class="dp-t-banner"></div>
+            <div style="margin:4px 2px;background:rgba(255,255,255,.05);border-radius:6px;padding:5px;flex:1">
+              <div style="display:flex;gap:4px;align-items:center;margin-bottom:4px"><div style="width:8px;height:8px;border-radius:2px;background:rgba(var(--sun-rgb),.3);flex-shrink:0"></div><div style="flex:1;height:3px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden"><div style="width:35%;height:100%;background:var(--sun);border-radius:99px"></div></div></div>
+              <div style="display:flex;gap:4px;align-items:center;margin-bottom:4px"><div style="width:8px;height:8px;border-radius:2px;background:rgba(var(--water-rgb),.3);flex-shrink:0"></div><div style="flex:1;height:3px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden"><div style="width:68%;height:100%;background:var(--water);border-radius:99px"></div></div></div>
+              <div style="display:flex;gap:4px;align-items:center"><div style="width:8px;height:8px;border-radius:2px;background:rgba(139,127,212,.3);flex-shrink:0"></div><div style="flex:1;height:3px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden"><div style="width:82%;height:100%;background:#8B7FD4;border-radius:99px"></div></div></div>
+            </div>
+            <div class="dp-t-weight"></div>
+          </div>
+        </div>
+        <div class="dp-name">линейный</div>
+      </div>
+
+      <div class="dp-option" id="dp-bento" onclick="setHomeDesign('bento')">
+        <div class="dp-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="dp-thumb">
+          <div style="padding:5px 4px;height:100%;display:flex;flex-direction:column;">
+            <div style="height:10px;background:rgba(255,255,255,.06);border-radius:3px;margin-bottom:3px"></div>
+            <div class="dp-t-grid" style="flex:1;margin:0;gap:3px">
+              <div style="grid-column:1/-1;background:linear-gradient(130deg,rgba(var(--sun-rgb),.4),rgba(var(--sun2-rgb),.2));height:16px;border-radius:5px;display:flex;align-items:center;padding:0 4px"><div style="font-size:5px;font-weight:900;color:#fff">летний путь</div></div>
+              <div class="dp-t-tile"><div style="font-size:8px;font-weight:900;color:var(--sun)">120</div><div style="font-size:5px;color:var(--hint);font-weight:600">ккал</div><div style="height:2px;background:rgba(var(--sun-rgb),.3);border-radius:99px;margin-top:3px"></div></div>
+              <div style="display:flex;flex-direction:column;gap:3px"><div class="dp-t-tile" style="flex:1"><div style="font-size:7px;font-weight:900;color:var(--water)">1.3л</div><div style="font-size:5px;color:var(--hint);font-weight:600">вода</div></div><div class="dp-t-tile" style="flex:1"><div style="font-size:7px;font-weight:900;color:#8B7FD4">7.5ч</div><div style="font-size:5px;color:var(--hint);font-weight:600">сон</div></div></div>
+            </div>
+            <div class="dp-t-weight" style="margin-top:3px"></div>
+          </div>
+        </div>
+        <div class="dp-name">бенто</div>
+      </div>
+
     </div>
 
     <!-- Colour row — opens pp-color -->
@@ -4081,22 +3820,27 @@ iconify-icon:not(:defined){display:inline-flex;align-items:center;justify-conten
 <!-- NAV — no dots, icon centered -->
 <nav id="nav">
   <div class="nt on" id="nt-home" onclick="navTo('home')">
-    <iconify-icon icon="solar:home-2-bold-duotone" style="font-size:22px"></iconify-icon>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
   </div>
   <div class="nt" id="nt-track" onclick="navTo('track')">
-    <iconify-icon icon="solar:fork-spoon-bold-duotone" style="font-size:22px"></iconify-icon>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>
   </div>
-  <div class="nt nt-add" id="nt-add" onclick="pushPage('pp-act')">
-    <iconify-icon icon="solar:add-circle-bold-duotone" style="font-size:26px"></iconify-icon>
+  <div class="nt" id="nt-plan" onclick="navTo('plan')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/></svg>
+  </div>
+  <div class="nt" id="nt-sleep" onclick="navTo('sleep')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
   </div>
   <div class="nt" id="nt-progress" onclick="navTo('progress')">
-    <iconify-icon icon="solar:chart-2-bold-duotone" style="font-size:22px"></iconify-icon>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-4 4 4 4-6"/></svg>
   </div>
   <div class="nt" id="nt-profile" onclick="navTo('profile')">
+    <!-- аватар: кружок виден только когда загружено фото -->
     <div id="nav-av-wrap" style="width:28px;height:28px;border-radius:50%;overflow:hidden;display:none;align-items:center;justify-content:center;flex-shrink:0;transition:box-shadow .65s ease">
       <img id="nav-av-img" alt="" style="width:100%;height:100%;object-fit:cover;display:block">
     </div>
-    <iconify-icon id="nav-av-svg" icon="solar:user-rounded-bold-duotone" style="font-size:22px;flex-shrink:0"></iconify-icon>
+    <!-- иконка профиля — показывается когда нет фото, стиль = остальные иконки навбара -->
+    <svg id="nav-av-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;flex-shrink:0"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
   </div>
 </nav>
 
@@ -4261,7 +4005,7 @@ async function apiPost(path,body){
 async function reload(){
   await loadData();
   if(_completingMap.size>0)return;
-  const rMap={home:initFeedHome,track:()=>renderTrack(trackTab),progress:renderProgress,profile:renderProfile};
+  const rMap={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};
   rMap[curTab]?.();
 }
 
@@ -4284,7 +4028,7 @@ const gStreak=()=>C.water.streak||0;
 const totalCal=()=>Object.values(gCD()).reduce((a,b)=>a+b,0);
 
 /* ══ NAVIGATION ══ */
-const TABS=['home','track','sleep','progress','profile'];
+const TABS=['home','track','plan','sleep','progress','profile'];
 let curTab='home',trackTab='water',navHidden=false;
 
 function navTo(tab){
@@ -4294,8 +4038,8 @@ function navTo(tab){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const pg=document.getElementById('p-'+tab);
   if(pg){pg.scrollTop=0;pg.classList.add('active');}
-  document.querySelectorAll('.nt').forEach(el=>{const id=el.id.replace('nt-','');el.classList.toggle('on',id===tab);});
-  const renders={home:initFeedHome,track:()=>renderTrack(trackTab),sleep:renderSleep,progress:renderProgress,profile:renderProfile};
+  TABS.forEach(t=>{document.getElementById('nt-'+t)?.classList.toggle('on',t===tab);});
+  const renders={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};
   renders[tab]?.();
   tg?.HapticFeedback?.selectionChanged();
 }
@@ -4376,7 +4120,7 @@ function popPage(doRender=true){
       if(tg.BackButton._letifyHandler){tg.BackButton.offClick(tg.BackButton._letifyHandler);tg.BackButton._letifyHandler=null;}
       tg.BackButton.offClick(popPage);
     }
-    if(doRender&&_completingMap.size===0){const renders={home:initFeedHome,track:()=>renderTrack(trackTab),progress:renderProgress,profile:renderProfile};renders[curTab]?.();}
+    if(doRender&&_completingMap.size===0){const renders={home:renderHome,track:()=>renderTrack(trackTab),plan:renderPlan,sleep:renderSleep,progress:renderProgress,profile:renderProfile};renders[curTab]?.();}
   }
 }
 
@@ -4493,7 +4237,6 @@ function _populatePP(id){
       }).join('');}
     }
   }
-  if(id==='pp-navbar'){renderNavbarSettings();}
   if(id==='pp-plan-settings'){
     const todayJs=new Date().getDay(); // 0=вс,1=пн...
     _psDow=todayJs===0?0:todayJs;
@@ -4568,7 +4311,7 @@ function saveStartWeight(){
   lsSet('user_sw',{start_weight:sw,goal_type:_goalType});
   if(!UID)lsSet('user',C.user);
   popPage();
-  renderProfile();renderProgress();/* renderHome removed */
+  renderProfile();renderProgress();renderHome();
   toast('начальный вес сохранён');
   tg?.HapticFeedback?.notificationOccurred('success');
   apiPost('/api/profile',{start_weight:sw,goal_type:_goalType});
@@ -4741,7 +4484,7 @@ function clearMealEntries(){
   lsSet('meal_entries_'+TODAY+'_'+_currentMealKey,[]);
   if(C.calories)C.calories[_currentMealKey]=0;
   if(!UID)lsSet('cd_'+TODAY,C.calories||{});
-  renderMealDetail();renderTrack('cal');
+  renderMealDetail();renderTrack('cal');renderHome();
   toast('записи очищены');
   tg?.HapticFeedback?.notificationOccurred('success');
 }
@@ -4863,7 +4606,7 @@ async function deleteActDirectly(id,cardEl){
     const done=acts.filter(a=>a.completed).length,total=acts.length;
     T('pl-cnt',total?`${done}/${total}`:'0/0');
     requestAnimationFrame(()=>{const r=$('pl-ring');if(r)r.setAttribute('stroke-dashoffset',125.7*(1-(total?done/total:0)));});
-    /* renderHome removed */
+    renderHome();
   }
 
   toast('удалено');
@@ -4922,7 +4665,7 @@ async function completeAct(id){
   C.acts_today=C.acts_today.map(x=>x.id===id?{...x,completed:1}:x);
   lsSet('acts_'+TODAY,C.acts_today);
   _updatePlanCounters();
-  /* renderHome removed */
+  renderHome();
   tg?.HapticFeedback?.notificationOccurred('success');
   toast('выполнено 🎉');
 
@@ -4957,7 +4700,7 @@ async function completeAct(id){
           // Remove from DOM next frame so layout settles without animation
           requestAnimationFrame(()=>{
             if(cardEl.parentNode)cardEl.remove();
-            if(_completingMap.size===0){}
+            if(_completingMap.size===0){renderPlan();renderHome();}
           });
         },360);
       });
@@ -4986,7 +4729,7 @@ function clearWaterHistory(){
   if(!confirm('очистить всю воду за сегодня?'))return;
   C.water={total:0,entries:[],streak:C.water.streak||0};
   if(!UID)lsSet('wd_'+TODAY,{total:0,entries:[]});
-  renderTrack('water');toast('история воды очищена');
+  renderTrack('water');renderHome();toast('история воды очищена');
   if(curPushPage==='pp-water-hist')_populatePP('pp-water-hist');
   apiPost('/api/water/clear',{});
 }
@@ -4994,7 +4737,7 @@ function clearSleepHistory(){
   if(!confirm('удалить всю историю сна?'))return;
   C.sleep_log=[];
   if(!UID)lsSet('slog',[]);
-  renderSleep();toast('история сна удалена');
+  renderSleep();renderHome();toast('история сна удалена');
   if(curPushPage==='pp-sleep-hist')_populatePP('pp-sleep-hist');
   apiPost('/api/sleep/clear',{});
 }
@@ -5002,7 +4745,7 @@ function clearWeightHistory(){
   if(!confirm('удалить всю историю веса?'))return;
   C.weight_log=[];
   if(!UID)lsSet('wlog',[]);
-  renderProgress();/* renderHome removed */toast('история веса удалена');
+  renderProgress();renderHome();toast('история веса удалена');
   if(curPushPage==='pp-history')_populatePP('pp-history');
   apiPost('/api/weight/clear',{});
 }
@@ -5021,7 +4764,7 @@ function resetAllData(){
   };
   _completingMap.clear();
   lsSet('ds',1);
-  renderProfile();renderProgress();renderSleep();renderTrack(trackTab);
+  renderHome();renderProfile();renderProgress();renderPlan();renderSleep();renderTrack(trackTab);
   toast('все данные сброшены');
   tg?.HapticFeedback?.notificationOccurred('warning');
   apiPost('/api/reset',{});
@@ -5034,14 +4777,14 @@ async function addW(ml){
   C.water.total=(C.water.total||0)+ml;C.water.entries=[...(C.water.entries||[]),ml];
   lsSet('wd_'+TODAY,{total:C.water.total,entries:C.water.entries});
   if(!UID){}// already saved above
-  renderTrack('water');toast('+'+ml+' мл');tg?.HapticFeedback?.impactOccurred('light');
+  renderTrack('water');renderHome();toast('+'+ml+' мл');tg?.HapticFeedback?.impactOccurred('light');
   apiPost('/api/water',{amount:ml});setTimeout(()=>{_addWBusy=false;},250);
 }
 async function undoW(){
   if(!C.water.entries?.length){toast('нечего отменять');return;}
   const last=C.water.entries.pop();C.water.total=Math.max(0,(C.water.total||0)-last);
   lsSet('wd_'+TODAY,{total:C.water.total,entries:C.water.entries});
-  renderTrack('water');toast('отменено −'+last+' мл');apiPost('/api/water/undo',{});
+  renderTrack('water');renderHome();toast('отменено −'+last+' мл');apiPost('/api/water/undo',{});
 }
 async function submitWeight(){
   const v=_wtInt+_wtDec/10;
@@ -5051,7 +4794,7 @@ async function submitWeight(){
   C.weight_log=[...(C.weight_log||[]),{weight:v,logged_at:ts}];
   // NEVER touch start_weight here — it is only set via pp-start-weight screen
   if(!UID)lsSet('wlog',C.weight_log);
-  renderProgress();toast('вес '+v.toFixed(1)+' кг сохранён');tg?.HapticFeedback?.notificationOccurred('success');
+  renderHome();renderProgress();toast('вес '+v.toFixed(1)+' кг сохранён');tg?.HapticFeedback?.notificationOccurred('success');
   await apiPost('/api/weight',{weight:v});
   await reload();
 }
@@ -5060,7 +4803,7 @@ async function submitSleep(){
   popPage();
   C.sleep_log=[...(C.sleep_log||[]),{hours:hrs,quality:_sleepQ,logged_at:TODAY}];
   if(!UID)lsSet('slog',C.sleep_log);
-  renderSleep();toast('сон '+(_slH+(_slMin?'.5':''))+' ч сохранён');tg?.HapticFeedback?.notificationOccurred('success');
+  renderSleep();renderHome();toast('сон '+(_slH+(_slMin?'.5':''))+' ч сохранён');tg?.HapticFeedback?.notificationOccurred('success');
   await apiPost('/api/sleep',{hours:hrs,quality:_sleepQ});await reload();
 }
 async function submitCal(){
@@ -5086,7 +4829,7 @@ async function submitCal(){
   const key='meal_entries_'+TODAY+'_'+_mealTypeE;
   const existing=lsGet(key)||[];existing.push(entry);lsSet(key,existing);
   lsSet('cd_'+TODAY,C.calories);lsSet('macros_'+TODAY,C.macros);
-  renderTrack('cal');toast('+'+_calVal+' ккал');tg?.HapticFeedback?.notificationOccurred('success');
+  renderTrack('cal');renderHome();toast('+'+_calVal+' ккал');tg?.HapticFeedback?.notificationOccurred('success');
   await apiPost('/api/calories',{amount:_calVal,meal_type:_mealTypeE,description:desc,prot,fat,carb});await reload();
 }
 function _saveProfileSilent(){
@@ -5096,7 +4839,7 @@ function _saveProfileSilent(){
   if(!name)return;
   C.user={...C.user,name,height:height||0,age:age||0,gender:_gender};
   if(!UID)lsSet('user',C.user);
-  renderProfile();/* renderHome removed */toast('профиль сохранён');
+  renderProfile();renderHome();toast('профиль сохранён');
   apiPost('/api/profile',{name,height:height||0,age:age||0,gender:_gender});
 }
 function _saveGoalsSilent(){
@@ -5107,7 +4850,7 @@ function _saveGoalsSilent(){
   // Always persist goals to localStorage as authoritative fallback
   lsSet('user_gw',{goal_weight:gw,water_goal:gwat,cal_goal:gcal});
   if(!UID)lsSet('user',C.user);
-  renderProfile();renderProgress();toast('цели сохранены');
+  renderProfile();renderHome();renderProgress();toast('цели сохранены');
   apiPost('/api/goals',{goal_weight:gw,water_goal:gwat,cal_goal:gcal});
 }
 async function submitAct(){
@@ -5121,7 +4864,7 @@ async function submitAct(){
   C.acts_today=[...(C.acts_today||[]),newAct];
   // Always persist to localStorage — prevents task from disappearing when reload() overwrites C.acts_today
   lsSet('acts_'+TODAY,C.acts_today);
-  toast(name+' добавлено 🎉');tg?.HapticFeedback?.notificationOccurred('success');
+  renderPlan();renderHome();toast(name+' добавлено 🎉');tg?.HapticFeedback?.notificationOccurred('success');
   await apiPost('/api/activity/create',{name,type:_actType,time,duration:_actDur,repeat_days:days});
   // After server confirms, reload but MERGE to avoid race condition killing the new task
   if(UID){
@@ -5130,7 +4873,7 @@ async function submitAct(){
     const srvIds=new Set((C.acts_today||[]).map(a=>a.id));
     const onlyLocal=lsActs.filter(a=>!srvIds.has(a.id));
     if(onlyLocal.length)C.acts_today=[...C.acts_today,...onlyLocal];
-    if(_completingMap.size===0){}
+    if(_completingMap.size===0){renderPlan();renderHome();}
   }
 }
 
@@ -5279,7 +5022,7 @@ function setHomeDesign(d){
   _updateDesignVal();
   const pg=$('p-home');
   if(pg){pg.classList.toggle('layout-linear',d==='linear');pg.classList.toggle('layout-bento',d==='bento');}
-  /* renderHome removed */
+  renderHome();
   tg?.HapticFeedback?.selectionChanged();
 }
 
@@ -5585,18 +5328,21 @@ function setAccentTheme(id){
   });
 })();
 
-const THEME_LABELS={sunset:'закат',peach:'персик',mango:'манго',hibiscus:'гибискус',lagoon:'лагуна',lime:'лайм',coral:'кораллы',watermelon:'арбуз',sakura:'сакура',ocean:'океан',violet:'фиолет',mint:'мята',tangerine:'мандарин',sand:'песок',tropics:'тропики',passion:'маракуйя',terracotta:'терракота',bamboo:'бамбук',mimosa:'мимоза',pineapple:'ананас',storm:'гроза',olive:'олива',petrol:'петроль',indigo:'индиго',plum:'слива',mauve:'мов',crimson:'кармин',fern:'папоротник',fuchsia:'фуксия',matcha:'матча'};
 function _syncColorRow(id){
   const t=ACCENT_THEMES[id]||ACCENT_THEMES.sunset;
   const swatch=document.getElementById('dp-color-swatch');
   const nameEl=document.getElementById('dp-color-name');
+  const themeLabels={sunset:'закат',peach:'персик',mango:'манго',hibiscus:'гибискус',lagoon:'лагуна',lime:'лайм',coral:'кораллы',watermelon:'арбуз',sakura:'сакура',ocean:'океан',violet:'фиолет',mint:'мята',tangerine:'мандарин',sand:'песок',tropics:'тропики',passion:'маракуйя',terracotta:'терракота',bamboo:'бамбук',mimosa:'мимоза',pineapple:'ананас',storm:'гроза',olive:'олива',petrol:'петроль',indigo:'индиго',plum:'слива',mauve:'мов',crimson:'кармин',fern:'папоротник',fuchsia:'фуксия',matcha:'матча'};
   if(swatch)swatch.style.background='linear-gradient(135deg,'+t.sun+','+t.sun2+')';
-  if(nameEl)nameEl.textContent=THEME_LABELS[id]||id;
+  if(nameEl)nameEl.textContent=themeLabels[id]||id;
 }
 
 function _updateDesignVal(){
-  const theme=THEME_LABELS[getAccentTheme()]||'закат';
-  T('pf-design-val',theme);
+  const layoutLabels={classic:'классический',linear:'линейный',bento:'бенто'};
+  const themeLabels={sunset:'закат',peach:'персик',mango:'манго',hibiscus:'гибискус',lagoon:'лагуна',lime:'лайм',coral:'кораллы',watermelon:'арбуз',sakura:'сакура',ocean:'океан',violet:'фиолет',mint:'мята',tangerine:'мандарин',sand:'песок',tropics:'тропики',passion:'маракуйя',terracotta:'терракота',bamboo:'бамбук',mimosa:'мимоза',pineapple:'ананас',storm:'гроза',olive:'олива',petrol:'петроль',indigo:'индиго',plum:'слива',mauve:'мов',crimson:'кармин',fern:'папоротник',fuchsia:'фуксия',matcha:'матча'};
+  const layout=layoutLabels[getHomeDesign()]||'классический';
+  const theme=themeLabels[getAccentTheme()]||'закат';
+  T('pf-design-val',layout+' · '+theme);
 }
 
 function _homeData(){
@@ -6431,7 +6177,7 @@ function renderProfile(){
   T('pf-tile-profile',tileProfileParts.join(' · ')||'—');
   // Design label
   const labels={classic:'классический',linear:'линейный',bento:'бенто'};
-  T('pf-design-val',{'sunset':'закат','peach':'персик','mango':'манго','hibiscus':'гибискус','lagoon':'лагуна','lime':'лайм','coral':'кораллы','watermelon':'арбуз','sakura':'сакура','ocean':'океан','violet':'фиолет','mint':'мята','tangerine':'мандарин','sand':'песок','tropics':'тропики','passion':'маракуйя','terracotta':'терракота','bamboo':'бамбук','mimosa':'мимоза','pineapple':'ананас','storm':'гроза','olive':'олива','petrol':'петроль','indigo':'индиго','plum':'слива','mauve':'мов','crimson':'кармин','fern':'папоротник','fuchsia':'фуксия','matcha':'матча'}[getAccentTheme()]||getAccentTheme());
+  T('pf-design-val',labels[getHomeDesign()]||'классический');
   // BMI stats row in hero
   const bmiRow=$('pf-bmi-row');
   if(u.height&&wl.length){
@@ -6513,7 +6259,7 @@ function startPsLongPress(id,el){
         setTimeout(()=>{if(saved.parentNode)saved.remove();},200);
       }
       _renderPsTasksList();
-      
+      renderPlan();renderHome();
       toast('удалено');
       apiPost('/api/activity/delete',{act_id:id});
     }
@@ -6827,7 +6573,7 @@ async function submitScanned(){
   C.macros.fat=+((C.macros.fat||0)+fat).toFixed(1);
   C.macros.carb=+((C.macros.carb||0)+carb).toFixed(1);
   if(!UID){lsSet('cd_'+TODAY,C.calories);}lsSet('macros_'+TODAY,C.macros);
-  renderTrack('cal');
+  renderTrack('cal');renderHome();
   toast('+'+kcal+' ккал · '+desc);
   tg?.HapticFeedback?.notificationOccurred('success');
   const scEntry={id:Date.now(),desc:desc,kcal,prot,fat,carb,grams:_scGrams,ts:new Date().toISOString()};
@@ -6847,13 +6593,11 @@ document.addEventListener('DOMContentLoaded',async()=>{
   // Init crop engine (elements are after script block, must be deferred)
   _lcDOMInit();
   _lcInitFileInput();
-  // Init navbar from saved config
-  const savedNav = lsGet('nav_order');
-  if(savedNav && Array.isArray(savedNav) && savedNav.length >= 2) {
-    _navActiveItems = savedNav;
-    _navApply();
-  }
-  _updateNavbarVal();
+  // Init design state
+  const d=getHomeDesign();
+  const pg=document.getElementById('p-home');
+  if(pg){pg.classList.toggle('layout-linear',d==='linear');pg.classList.toggle('layout-bento',d==='bento');}
+  ['classic','linear','bento'].forEach(k=>{const el=document.getElementById('dp-'+k);if(el)el.classList.toggle('selected',k===d);});
   // Restore accent theme swatches + apply colours
   const at=getAccentTheme();
   Object.keys(ACCENT_THEMES).forEach(k=>{
@@ -6864,13 +6608,13 @@ document.addEventListener('DOMContentLoaded',async()=>{
   _syncColorRow(at);
   _updateDesignVal();
   await loadData();
-  initFeedHome();
+  renderHome();
   _updateNavAvatar(); // restore nav avatar from storage on startup
   setTimeout(()=>{
     const sp=document.getElementById('splash');
     if(sp){sp.classList.add('hiding');setTimeout(()=>sp.remove(),520);}
   },1200);
-  setInterval(async()=>{if(curTab==='home'&&_completingMap.size===0){await loadData();_feedRefreshData();}},30000);
+  setInterval(async()=>{if(curTab==='home'&&_completingMap.size===0){await loadData();renderHome();}},30000);
   // ── Drag-to-select on colour grid ──
   (function(){
     const grid=document.getElementById('cg-grid');
@@ -8159,1289 +7903,6 @@ async function tifiStartScreen(){
 
 /* вызывается из _populatePP */
 function _populateTifiKey_pp(){_populateTifiKey();}
-
-/* ══════════════════════════════════════════════════════
-   FEED HOME — полная реализация ленты на главном экране
-══════════════════════════════════════════════════════ */
-
-// ── Данные ленты ──────────────────────────────────────
-const FEED_GROUPS_STATIC = [
-  { id:'day',       size:1, color:'#FF6B35' },
-  { id:'nutrition', size:2, color:'#FF6B35' },
-  { id:'water',     size:1, color:'#4EAEE5' },
-  { id:'sleep',     size:1, color:'#9D85F2' },
-  { id:'activity',  size:1, color:'#3AC76B' },
-  { id:'weight',    size:1, color:'#3AC76B' },
-  { id:'streak',    size:1, color:'#FFAB40' },
-  { id:'tasks',     size:1, color:'#9D85F2' },
-  { id:'gate',      size:1, color:'#9D85F2' },
-  { id:'tifi-end',  size:1, color:'#FF6B35' }
-];
-
-let _feedGroups = [...FEED_GROUPS_STATIC];
-let _feedGroupIdx = 0;   // current group index
-let _feedCardIdx = 0;    // current card within group
-let _feedBusy = false;
-let _feedGenDone = false;
-let _feedGenBatch = 0;   // which batch was generated last
-let _feedInitDone = false;
-
-// ── Сгенерированные ИИ-карточки (батчи) ──────────────
-const FEED_TIFI_BATCHES = [
-  // BATCH 0: инсайт + мотивация + рецепт(2) + тренировка + покупки + совет
-  [
-    { gid:'b0-insight', title:'инсайт', color:'#2DD4BF', size:1, tifi:true,
-      html:[`<div class="fcw" data-g="b0-insight" data-c="0" style="background:linear-gradient(155deg,#031312,#020B0A);border:1px solid rgba(45,212,191,.14)">
-        <div class="fgl" style="background:#2DD4BF;opacity:.35"></div><div class="fgl2" style="background:#4EAEE5;opacity:.1"></div>
-        <div class="fct">
-          <div class="ftbadge"><iconify-icon icon="solar:magic-stick-3-bold-duotone" style="font-size:10px"></iconify-icon>тифи · инсайт</div>
-          <div class="fins-number" style="color:#2DD4BF">+12%</div>
-          <div style="font-size:15px;font-weight:800;letter-spacing:-.02em;margin-top:2px;color:#EEECE8">белков сверх нормы</div>
-          <div class="fsub" style="margin-top:5px">за последние 7 дней</div>
-        </div>
-        <div class="fcm" style="gap:10px;padding:10px 0">
-          <div class="fins-trend" style="background:rgba(45,212,191,.1);color:#2DD4BF;border:1px solid rgba(45,212,191,.18)">
-            <iconify-icon icon="solar:arrow-up-bold" style="font-size:11px"></iconify-icon>отличный результат
-          </div>
-          <div style="font-size:11px;color:rgba(255,255,255,.68);line-height:1.7">Ты стабильно превышаешь норму белка — это помогает мышечному росту и восстановлению.</div>
-          <div class="fmboxes">
-            <div class="fmbox"><div class="fmv" style="color:#2DD4BF">92г</div><div class="fml">белки</div></div>
-            <div class="fmbox"><div class="fmv" style="color:#3AC76B">норма</div><div class="fml">82г</div></div>
-            <div class="fmbox"><div class="fmv" style="color:#FFAB40">+12%</div><div class="fml">разница</div></div>
-          </div>
-        </div>
-        <div class="fcb"><div class="fshint" style="animation:fshb 2.4s ease-in-out infinite 2s">
-          <iconify-icon icon="solar:alt-arrow-down-bold" style="font-size:12px"></iconify-icon>
-          <span style="font-size:7.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase">листай</span>
-        </div></div>
-      </div>`]
-    },
-    { gid:'b0-motivation', title:'мотивация', color:'#FFAB40', size:1, tifi:true,
-      html:[`<div class="fcw" data-g="b0-motivation" data-c="0" style="background:linear-gradient(155deg,#1A1100,#0E0900);border:1px solid rgba(255,171,64,.14)">
-        <div class="fgl" style="background:#FFAB40;opacity:.38"></div><div class="fgl2" style="background:#FF6B35;opacity:.1"></div>
-        <div class="fct">
-          <div class="ftbadge"><iconify-icon icon="solar:magic-stick-3-bold-duotone" style="font-size:10px"></iconify-icon>тифи · мотивация</div>
-          <div class="fmot-quote">«14 дней — это<br>уже характер,<br>не просто привычка»</div>
-        </div>
-        <div class="fcm" style="gap:11px;padding:8px 0">
-          <div class="fmot-stat-row">
-            <div class="fmot-stat"><div class="fmot-sv" style="color:#FFAB40">14</div><div class="fmot-sl">серия дней</div></div>
-            <div class="fmot-stat"><div class="fmot-sv" style="color:#3AC76B">82</div><div class="fmot-sl">балл сегодня</div></div>
-            <div class="fmot-stat"><div class="fmot-sv" style="color:#4EAEE5">+7</div><div class="fmot-sl">рост к вчера</div></div>
-          </div>
-          <div class="fibox" style="border-color:rgba(255,171,64,.14);background:rgba(255,171,64,.05)">
-            <div style="font-size:9px;font-weight:800;color:#FFAB40;margin-bottom:5px">💡 что тебя мотивирует</div>
-            <div style="font-size:10.5px;color:rgba(255,255,255,.65);line-height:1.65">Ты вошёл в лучшие 30% пользователей с похожей целью. Ещё 7 дней — побьёшь свой рекорд.</div>
-          </div>
-        </div>
-        <div class="fcb"><div class="fshint" style="animation:fshb 2.4s ease-in-out infinite 2s">
-          <iconify-icon icon="solar:alt-arrow-down-bold" style="font-size:12px"></iconify-icon>
-          <span style="font-size:7.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase">листай</span>
-        </div></div>
-      </div>`]
-    },
-    { gid:'b0-recipe', title:'рецепт · салат', color:'#3AC76B', size:2, tifi:true,
-      html:[
-        `<div class="fcw" data-g="b0-recipe" data-c="0" style="background:linear-gradient(155deg,#071508,#030A04);border:1px solid rgba(58,199,107,.14)">
-          <div class="fgl" style="background:#3AC76B;opacity:.32"></div>
-          <div class="fct">
-            <div class="gdots"><div class="gd cur" style="width:22px"></div><div class="gd" style="width:14px"></div></div>
-            <div class="ftbadge"><iconify-icon icon="solar:magic-stick-3-bold-duotone" style="font-size:10px"></iconify-icon>тифи · рецепт</div>
-            <div class="fh1" style="font-size:23px">Греческий<br>салат</div>
-            <div class="fsub">идеально для ужина · 619 ккал остаток</div>
-          </div>
-          <div class="fcm" style="gap:10px;padding:10px 0">
-            <div class="frecipe-tags">
-              <div class="frtag" style="background:rgba(58,199,107,.1);color:#3AC76B">🥗 лёгкое</div>
-              <div class="frtag" style="background:rgba(78,174,229,.1);color:#4EAEE5">⏱ 10 мин</div>
-              <div class="frtag" style="background:rgba(255,107,53,.1);color:#FF8040">🔥 320 ккал</div>
-            </div>
-            <div style="font-size:10.5px;color:rgba(255,255,255,.65);line-height:1.65">Тифи подобрал под твой остаток калорий и потребность в клетчатке.</div>
-            <div class="frecipe-stat">
-              <div class="frstat"><div class="frsv" style="color:#FF8040">320</div><div class="frsl">ккал</div></div>
-              <div class="frstat"><div class="frsv" style="color:#3AC76B">14г</div><div class="frsl">белок</div></div>
-              <div class="frstat"><div class="frsv" style="color:#FFAB40">22г</div><div class="frsl">жиры</div></div>
-              <div class="frstat"><div class="frsv" style="color:#4EAEE5">18г</div><div class="frsl">углев</div></div>
-            </div>
-          </div>
-          <div class="fcb"><div style="display:flex;align-items:center;justify-content:center;gap:4px;color:rgba(255,255,255,.18);font-size:7.5px;font-weight:700;letter-spacing:.07em">
-            <span>ТАП ВПРАВО · ингредиенты</span><iconify-icon icon="solar:alt-arrow-right-bold" style="font-size:10px"></iconify-icon>
-          </div></div>
-        </div>`,
-        `<div class="fcw" data-g="b0-recipe" data-c="1" style="background:linear-gradient(155deg,#071508,#030A04);border:1px solid rgba(58,199,107,.14)">
-          <div class="fgl" style="background:#3AC76B;opacity:.22"></div>
-          <div class="fct">
-            <div class="gdots"><div class="gd" style="width:14px"></div><div class="gd cur" style="width:22px"></div></div>
-            <div class="ftbadge"><iconify-icon icon="solar:magic-stick-3-bold-duotone" style="font-size:10px"></iconify-icon>тифи · рецепт</div>
-            <div style="font-size:13px;font-weight:800;margin-bottom:8px;color:#EEECE8">Ингредиенты</div>
-          </div>
-          <div class="fcm" style="padding:4px 0;overflow-y:auto">
-            <div class="fing"><div class="fing-dot" style="background:#3AC76B"></div><div class="fing-n">огурец</div><div class="fing-v">150г</div></div>
-            <div class="fing"><div class="fing-dot" style="background:#F45C5C"></div><div class="fing-n">помидоры черри</div><div class="fing-v">100г</div></div>
-            <div class="fing"><div class="fing-dot" style="background:#FFAB40"></div><div class="fing-n">болгарский перец</div><div class="fing-v">80г</div></div>
-            <div class="fing"><div class="fing-dot" style="background:#fff"></div><div class="fing-n">фета</div><div class="fing-v">60г</div></div>
-            <div class="fing"><div class="fing-dot" style="background:#4EAEE5"></div><div class="fing-n">маслины</div><div class="fing-v">40г</div></div>
-            <div style="margin-top:10px;font-size:9px;font-weight:800;color:rgba(238,236,232,.46);letter-spacing:.07em;text-transform:uppercase">приготовление</div>
-            <div class="fstep"><div class="fstep-n">1</div><div class="fstep-t">Нарезать все овощи крупными кусочками</div></div>
-            <div class="fstep"><div class="fstep-n">2</div><div class="fstep-t">Добавить маслины и фету поверх</div></div>
-            <div class="fstep"><div class="fstep-n">3</div><div class="fstep-t">Сбрызнуть маслом, добавить орегано</div></div>
-          </div>
-          <div class="fcb"><div class="fshint" style="animation:fshb 2.4s ease-in-out infinite 2s">
-            <iconify-icon icon="solar:alt-arrow-down-bold" style="font-size:12px"></iconify-icon>
-            <span style="font-size:7.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase">листай</span>
-          </div></div>
-        </div>`
-      ]
-    },
-    { gid:'b0-workout', title:'тренировка', color:'#FF6B35', size:1, tifi:true,
-      html:[`<div class="fcw" data-g="b0-workout" data-c="0" style="background:linear-gradient(155deg,#1B0E04,#0C0602);border:1px solid rgba(255,107,53,.13)">
-        <div class="fgl" style="background:#FF6B35;opacity:.32"></div>
-        <div class="fct">
-          <div class="ftbadge"><iconify-icon icon="solar:magic-stick-3-bold-duotone" style="font-size:10px"></iconify-icon>тифи · тренировка</div>
-          <div class="fh1" style="font-size:21px">вечерняя<br>прогулка</div>
-          <div class="fsub">20 мин · лёгкая нагрузка</div>
-        </div>
-        <div class="fcm" style="gap:9px;padding:10px 0">
-          <div style="font-size:10.5px;color:rgba(255,255,255,.65);line-height:1.65;margin-bottom:4px">Ускорит жиросжигание и улучшит качество сна на ~15%.</div>
-          <div class="fwk-exercise"><div class="fwk-icon" style="background:rgba(255,107,53,.12)">🚶</div><div class="fwk-name">прогулка</div><div class="fwk-sets">20 мин</div></div>
-          <div class="fwk-exercise"><div class="fwk-icon" style="background:rgba(78,174,229,.12)">🤸</div><div class="fwk-name">растяжка</div><div class="fwk-sets">5 мин</div></div>
-          <div class="fwk-exercise"><div class="fwk-icon" style="background:rgba(157,133,242,.12)">🧘</div><div class="fwk-name">дыхание</div><div class="fwk-sets">3 мин</div></div>
-          <div class="fbadge" style="background:rgba(255,107,53,.1);color:#FF8040;border:1px solid rgba(255,107,53,.18);margin-top:2px">
-            <iconify-icon icon="solar:fire-bold" style="font-size:11px"></iconify-icon>сожжёт ~90 ккал
-          </div>
-        </div>
-        <div class="fcb"><div class="fshint" style="animation:fshb 2.4s ease-in-out infinite 2s">
-          <iconify-icon icon="solar:alt-arrow-down-bold" style="font-size:12px"></iconify-icon>
-          <span style="font-size:7.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase">листай</span>
-        </div></div>
-      </div>`]
-    },
-    { gid:'b0-tip', title:'совет', color:'#9D85F2', size:1, tifi:true,
-      html:[`<div class="fcw" data-g="b0-tip" data-c="0" style="background:linear-gradient(155deg,#0D0B1C,#060410);border:1px solid rgba(157,133,242,.14)">
-        <div class="fgl" style="background:#9D85F2;opacity:.28"></div>
-        <div class="fct">
-          <div class="ftbadge"><iconify-icon icon="solar:magic-stick-3-bold-duotone" style="font-size:10px"></iconify-icon>тифи · совет</div>
-        </div>
-        <div class="fcm" style="gap:12px;padding:8px 0">
-          <span class="ftip-icon-big">🌙</span>
-          <div class="ftip-highlight">Ложись до 22:45 —<br>ты делаешь это правильно</div>
-          <div class="ftip-body">Твоё тело восстанавливается лучше всего между 22:00 и 02:00. Именно поэтому REM улучшился на 18%. Продолжай!</div>
-          <div class="fibox" style="border-color:rgba(157,133,242,.14);background:rgba(157,133,242,.05)">
-            <div style="font-size:9px;font-weight:800;color:#9D85F2;margin-bottom:5px">следующая цель</div>
-            <div style="font-size:10.5px;color:rgba(255,255,255,.65)">Добавить 20 мин прогулки перед сном → REM +15 мин</div>
-          </div>
-        </div>
-        <div class="fcb"><div class="fshint" style="animation:fshb 2.4s ease-in-out infinite 2s">
-          <iconify-icon icon="solar:alt-arrow-down-bold" style="font-size:12px"></iconify-icon>
-          <span style="font-size:7.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase">листай · конец</span>
-        </div></div>
-      </div>`]
-    }
-  ],
-  // BATCH 1
-  [
-    { gid:'b1-compare', title:'сравнение', color:'#9D85F2', size:1, tifi:true,
-      html:[`<div class="fcw" data-g="b1-compare" data-c="0" style="background:linear-gradient(155deg,#0D0B1C,#060410);border:1px solid rgba(157,133,242,.15)">
-        <div class="fgl" style="background:#9D85F2;opacity:.32"></div>
-        <div class="fct">
-          <div class="ftbadge"><iconify-icon icon="solar:magic-stick-3-bold-duotone" style="font-size:10px"></iconify-icon>тифи · сравнение</div>
-          <div class="fcompare-pct" style="color:#9D85F2">76%</div>
-          <div style="font-size:13px;font-weight:700;margin-top:2px;color:#EEECE8">пользователей позади тебя</div>
-        </div>
-        <div class="fcm" style="gap:11px;padding:10px 0">
-          <div class="fcompare-bar"><div class="fcompare-fill" style="width:76%;background:linear-gradient(90deg,#9D85F2,#4EAEE5)"></div></div>
-          <div class="fcompare-row"><span>0%</span><span style="color:#9D85F2">ты здесь</span><span>100%</span></div>
-          <div style="display:flex;flex-direction:column;gap:7px">
-            <div class="fbrow"><div class="fblbl" style="width:54px">серия</div><div class="fbtrack"><div class="fbfill" style="width:82%;background:#9D85F2"></div></div><div class="fbval" style="color:#9D85F2">топ 18%</div></div>
-            <div class="fbrow"><div class="fblbl" style="width:54px">питание</div><div class="fbtrack"><div class="fbfill" style="width:88%;background:#FF8040"></div></div><div class="fbval" style="color:#FF8040">топ 12%</div></div>
-            <div class="fbrow"><div class="fblbl" style="width:54px">сон</div><div class="fbtrack"><div class="fbfill" style="width:70%;background:#4EAEE5"></div></div><div class="fbval" style="color:#4EAEE5">топ 30%</div></div>
-          </div>
-        </div>
-        <div class="fcb"><div class="fshint" style="animation:fshb 2.4s ease-in-out infinite 2s">
-          <iconify-icon icon="solar:alt-arrow-down-bold" style="font-size:12px"></iconify-icon>
-          <span style="font-size:7.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase">листай</span>
-        </div></div>
-      </div>`]
-    },
-    { gid:'b1-energy', title:'энергия', color:'#FFAB40', size:1, tifi:true,
-      html:[`<div class="fcw" data-g="b1-energy" data-c="0" style="background:linear-gradient(155deg,#1A1100,#0E0900);border:1px solid rgba(255,171,64,.13)">
-        <div class="fgl" style="background:#FFAB40;opacity:.3"></div>
-        <div class="fct">
-          <div class="ftbadge"><iconify-icon icon="solar:magic-stick-3-bold-duotone" style="font-size:10px"></iconify-icon>тифи · энергия</div>
-          <div class="fh1" style="font-size:22px">пик<br>продуктивности</div>
-          <div class="fsub">твоё лучшее время</div>
-        </div>
-        <div class="fcm" style="gap:11px;padding:10px 0">
-          <div class="fmboxes">
-            <div class="fmbox"><div class="fmv" style="color:#FFAB40">09:00</div><div class="fml">работать</div></div>
-            <div class="fmbox"><div class="fmv" style="color:#FF8040">17:00</div><div class="fml">тренировка</div></div>
-            <div class="fmbox"><div class="fmv" style="color:#9D85F2">22:45</div><div class="fml">сон</div></div>
-          </div>
-          <div class="fibox" style="border-color:rgba(255,171,64,.14);background:rgba(255,171,64,.05)">
-            <div style="font-size:10.5px;color:rgba(255,255,255,.7);line-height:1.65">Основываясь на твоих данных сна и активности, твой биоритм настроен на утреннюю продуктивность. Используй 9–11 для сложных задач.</div>
-          </div>
-        </div>
-        <div class="fcb"><div class="fshint" style="animation:fshb 2.4s ease-in-out infinite 2s">
-          <iconify-icon icon="solar:alt-arrow-down-bold" style="font-size:12px"></iconify-icon>
-          <span style="font-size:7.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase">листай · конец</span>
-        </div></div>
-      </div>`]
-    }
-  ]
-];
-
-// ── Генерация HTML статических карточек ──────────────
-function _feedBuildStaticCards(data) {
-  let _feedStaticVars = {};
-  try { _feedStaticVars = (typeof _homeData === 'function') ? (_homeData() || {}) : {}; } catch(e) { _feedStaticVars = {}; }
-  const { u, dsl, wt, wg, wp, ct, cg, cp, mac, sleepPct, sleepH, sqArr, cw, gw, wpct, wbar, streak, planItems } = _feedStaticVars;
-  const dateStr = new Date().toLocaleDateString('ru',{weekday:'short',day:'numeric',month:'short'});
-  const wtmlDisplay = wt ? (wt >= 1000 ? (wt/1000).toFixed(1)+'л' : wt+'мл') : '0мл';
-  const waterPct = Math.round((wp||0)*100);
-  const calPct = Math.round((cp||0)*100);
-  const arcW = ((163.4*(1-(wp||0))).toFixed(2));
-  const arcC = ((207.3*(1-(cp||0))).toFixed(2));
-
-  const macHtml = (mac&&(mac.prot||mac.fat||mac.carb))
-    ? `<span style="color:#3AC76B;font-weight:800">${mac.prot||0}б</span> <span style="color:#FF8040;font-weight:800">${mac.fat||0}ж</span> <span style="color:#9D85F2;font-weight:800">${mac.carb||0}у</span>`
-    : '— — —';
-
-  const dayScore = Math.round(((wp||0)*0.25 + (cp||0)*0.3 + (sleepPct||0)*0.25 + 0.2) * 100);
-  const weekDays = ['пн','вт','ср','чт','пт','сб','вс'];
-  const today = new Date().getDay();
-  const weekHtml = weekDays.map((d,i)=>{
-    const idx=(i+1)%7;const isToday=idx===today;
-    const done=streak>0&&!isToday&&(streak>=(7-i));
-    return `<div class="fwd ${isToday?'today':done?'done':'empty'}">${d}</div>`;
-  }).join('');
-
-  // Tasks from planItems
-  const tasksHtml = (planItems&&planItems.length)?planItems.slice(0,3).map(a=>{
-    const done=a.completed;
-    return `<div class="ftask${done?' done':''}" onclick="event.stopPropagation();_feedToggleTask('${a.id||a.name}',this)">
-      <div class="ftask-dot" style="background:${done?'rgba(58,199,107,.4)':'#9D85F2'}"></div>
-      <div class="ftask-t">${a.name}</div>
-      <div class="ftask-tm">${a.time||''}</div>
-    </div>`;
-  }).join(''):`<div style="font-size:11px;color:rgba(238,236,232,.35);padding:16px 0;text-align:center">нет задач на сегодня</div>`;
-
-  return {
-    day: `<div class="fcw" data-g="day" data-c="0" style="background:linear-gradient(155deg,#1B0E04,#0C0602);border:1px solid rgba(255,107,53,.14)">
-      <div class="fgl" style="background:#FF6B35"></div><div class="fgl2" style="background:#FFAB40"></div>
-      <div class="fct">
-        <div class="ftag" style="background:rgba(255,107,53,.11);color:#FF8040"><iconify-icon icon="solar:chart-2-bold-duotone"></iconify-icon>итог дня</div>
-        <div class="fh1">общий<br>балл</div>
-        <div class="fsub">${dateStr} · 4 метрики</div>
-      </div>
-      <div class="fcm" style="gap:12px;padding:14px 0">
-        <div style="display:flex;align-items:flex-end;gap:14px">
-          <div style="font-size:78px;font-weight:900;letter-spacing:-.04em;line-height:1;color:#FF8040">${dayScore}</div>
-          <div style="flex:1;padding-bottom:8px;display:flex;flex-direction:column;gap:7px">
-            <div class="fbrow"><div class="fblbl">питание</div><div class="fbtrack"><div class="fbfill" style="width:${calPct}%;background:linear-gradient(90deg,#FF6B35,#FFAB40)"></div></div><div class="fbval" style="color:#FF8040">${calPct}%</div></div>
-            <div class="fbrow"><div class="fblbl">вода</div><div class="fbtrack"><div class="fbfill" style="width:${waterPct}%;background:#4EAEE5"></div></div><div class="fbval" style="color:#4EAEE5">${waterPct}%</div></div>
-            <div class="fbrow"><div class="fblbl">сон</div><div class="fbtrack"><div class="fbfill" style="width:${Math.round((sleepPct||0)*100)}%;background:#9D85F2"></div></div><div class="fbval" style="color:#9D85F2">${Math.round((sleepPct||0)*100)}%</div></div>
-            <div class="fbrow"><div class="fblbl">цель</div><div class="fbtrack"><div class="fbfill" style="width:${Math.min(100,parseInt(wbar||0))}%;background:#3AC76B"></div></div><div class="fbval" style="color:#3AC76B">${Math.min(100,parseInt(wbar||0))}%</div></div>
-          </div>
-        </div>
-      </div>
-      <div class="fcb"><div class="fshint" style="animation:fshb 2.4s ease-in-out infinite 2.5s">
-        <iconify-icon icon="solar:alt-arrow-down-bold" style="font-size:12px"></iconify-icon>
-        <span style="font-size:7.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase">листай</span>
-      </div></div>
-    </div>`,
-
-    'nutrition-0': `<div class="fcw" data-g="nutrition" data-c="0" style="background:linear-gradient(155deg,#1B0E04,#0C0602);border:1px solid rgba(255,107,53,.12)">
-      <div class="fgl" style="background:#FF6B35;opacity:.38"></div><div class="fgl2" style="background:#FFAB40;opacity:.11"></div>
-      <div class="fct">
-        <div class="gdots"><div class="gd cur" style="width:22px"></div><div class="gd" style="width:14px"></div></div>
-        <div class="ftag" style="background:rgba(255,107,53,.11);color:#FF8040"><iconify-icon icon="solar:fork-spoon-bold-duotone"></iconify-icon>питание</div>
-        <div class="fh1">${ct||0}<span> ккал</span></div>
-        <div class="fsub">из ${cg||2000} · осталось ${Math.max(0,(cg||2000)-(ct||0))}</div>
-      </div>
-      <div class="fcm" style="gap:11px;padding:10px 0">
-        <div style="display:flex;align-items:center;gap:15px">
-          <div class="fring" style="width:90px;height:90px">
-            <svg width="90" height="90" viewBox="0 0 90 90"><circle cx="45" cy="45" r="36" fill="none" stroke="rgba(255,107,53,.1)" stroke-width="6.5"/><circle cx="45" cy="45" r="36" fill="none" stroke="#FF8040" stroke-width="6.5" stroke-dasharray="${Math.round(226*(cp||0))} 226" stroke-linecap="round" transform="rotate(-90 45 45)"/></svg>
-            <div class="fri"><div class="frv" style="font-size:20px;color:#FF8040">${calPct}%</div><div class="frl">ккал</div></div>
-          </div>
-          <div style="flex:1;display:flex;flex-direction:column;gap:8px">
-            <div class="fbrow"><div class="fblbl">белки</div><div class="fbtrack"><div class="fbfill" style="width:68%;background:#3AC76B"></div></div><div class="fbval" style="color:#3AC76B">${mac&&mac.prot||0}г</div></div>
-            <div class="fbrow"><div class="fblbl">углев</div><div class="fbtrack"><div class="fbfill" style="width:70%;background:#4EAEE5"></div></div><div class="fbval" style="color:#4EAEE5">${mac&&mac.carb||0}г</div></div>
-            <div class="fbrow"><div class="fblbl">жиры</div><div class="fbtrack"><div class="fbfill" style="width:68%;background:#FFAB40"></div></div><div class="fbval" style="color:#FFAB40">${mac&&mac.fat||0}г</div></div>
-          </div>
-        </div>
-        <div class="fmboxes">
-          <div class="fmbox"><div class="fmv" style="color:#3AC76B">${Math.max(0,(cg||2000)-(ct||0))}</div><div class="fml">остаток</div></div>
-          <div class="fmbox"><div class="fmv" style="color:#4EAEE5">${wtmlDisplay}</div><div class="fml">вода</div></div>
-        </div>
-      </div>
-      <div class="fcb"><div style="display:flex;align-items:center;justify-content:center;gap:4px;color:rgba(255,255,255,.18);font-size:7.5px;font-weight:700;letter-spacing:.07em">
-        <span>ТАП ВПРАВО · приёмы пищи</span><iconify-icon icon="solar:alt-arrow-right-bold" style="font-size:10px"></iconify-icon>
-      </div></div>
-    </div>`,
-
-    'nutrition-1': `<div class="fcw" data-g="nutrition" data-c="1" style="background:linear-gradient(155deg,#1B0E04,#0C0602);border:1px solid rgba(255,107,53,.12)">
-      <div class="fgl" style="background:#FF6B35;opacity:.26"></div>
-      <div class="fct">
-        <div class="gdots"><div class="gd" style="width:14px"></div><div class="gd cur" style="width:22px"></div></div>
-        <div class="ftag" style="background:rgba(255,107,53,.11);color:#FF8040"><iconify-icon icon="solar:fork-spoon-bold-duotone"></iconify-icon>приёмы</div>
-        <div class="fh1" style="font-size:21px;line-height:1.2">что ел<br>сегодня</div>
-        <div class="fsub">питание · ${ct||0} ккал</div>
-      </div>
-      <div class="fcm" style="gap:6px;padding:10px 0">
-        <div class="fmrow"><div class="fmi" style="background:rgba(255,171,64,.12)"><iconify-icon icon="solar:sun-bold-duotone" style="color:#FFAB40;font-size:13px"></iconify-icon></div><div style="flex:1"><div class="fmn">завтрак</div><div class="fmt">кликни чтобы добавить</div></div><div class="fmk" onclick="goToTrackTab('cal')" style="cursor:pointer;font-size:11px;color:rgba(255,128,64,.6)">+</div></div>
-        <div class="fmrow"><div class="fmi" style="background:rgba(78,174,229,.12)"><iconify-icon icon="solar:cloud-bold-duotone" style="color:#4EAEE5;font-size:13px"></iconify-icon></div><div style="flex:1"><div class="fmn">обед</div><div class="fmt">кликни чтобы добавить</div></div><div class="fmk" onclick="goToTrackTab('cal')" style="cursor:pointer;font-size:11px;color:rgba(255,128,64,.6)">+</div></div>
-        <div class="fmrow"><div class="fmi" style="background:rgba(157,133,242,.12)"><iconify-icon icon="solar:moon-bold-duotone" style="color:#9D85F2;font-size:13px"></iconify-icon></div><div style="flex:1"><div class="fmn">ужин</div><div class="fmt">кликни чтобы добавить</div></div><div class="fmk" onclick="goToTrackTab('cal')" style="cursor:pointer;font-size:11px;color:rgba(255,128,64,.6)">+</div></div>
-      </div>
-      <div class="fcb"><div class="fshint" style="animation:fshb 2.4s ease-in-out infinite 2s">
-        <iconify-icon icon="solar:alt-arrow-down-bold" style="font-size:12px"></iconify-icon>
-        <span style="font-size:7.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase">листай</span>
-      </div></div>
-    </div>`,
-
-    water: `<div class="fcw" data-g="water" data-c="0" style="background:linear-gradient(155deg,#030E1A,#020811);border:1px solid rgba(78,174,229,.14)">
-      <div class="fgl" style="background:#4EAEE5"></div><div class="fgl2" style="background:#2DD4BF;opacity:.12"></div>
-      <div class="fct">
-        <div class="ftag" style="background:rgba(78,174,229,.11);color:#4EAEE5"><iconify-icon icon="solar:drop-bold-duotone"></iconify-icon>вода</div>
-        <div class="fh1">${wtmlDisplay}</div>
-        <div class="fsub">из 2.5л · ${waterPct}% выполнено</div>
-      </div>
-      <div class="fcm" style="gap:13px;padding:12px 0">
-        <div class="fdrops" id="feed-drops">${_feedDropsHtml(wt||0)}</div>
-        <div class="fmboxes">
-          <div class="fmbox" onclick="addWater(250)" style="cursor:pointer"><div class="fmv" style="color:#4EAEE5">+250</div><div class="fml">мл добавить</div></div>
-          <div class="fmbox"><div class="fmv" style="color:#2DD4BF">${waterPct}%</div><div class="fml">выполнено</div></div>
-        </div>
-        <div class="fibox" style="border-color:rgba(78,174,229,.14);background:rgba(78,174,229,.05);cursor:pointer" onclick="goToTrackTab('water')">
-          <div style="font-size:9px;font-weight:700;color:#4EAEE5;margin-bottom:4px">нажми для деталей</div>
-          <div style="font-size:11px;font-weight:700;color:#EEECE8">открыть дневник воды →</div>
-        </div>
-      </div>
-      <div class="fcb"><div class="fshint" style="animation:fshb 2.4s ease-in-out infinite 2s">
-        <iconify-icon icon="solar:alt-arrow-down-bold" style="font-size:12px"></iconify-icon>
-        <span style="font-size:7.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase">листай</span>
-      </div></div>
-    </div>`,
-
-    sleep: `<div class="fcw" data-g="sleep" data-c="0" style="background:linear-gradient(155deg,#0D0B1C,#060410);border:1px solid rgba(157,133,242,.14)">
-      <div class="fgl" style="background:#9D85F2"></div><div class="fgl2" style="background:#4EAEE5;opacity:.1"></div>
-      <div class="fct">
-        <div class="ftag" style="background:rgba(157,133,242,.11);color:#9D85F2"><iconify-icon icon="solar:moon-stars-bold-duotone"></iconify-icon>сон</div>
-        <div class="fh1">${sleepH||'—'}<span> ч</span></div>
-        <div class="fsub">качество ${Math.round((sleepPct||0)*100)}%</div>
-      </div>
-      <div class="fcm" style="gap:11px;padding:11px 0">
-        <div class="fslbar">
-          <div class="fsls" style="flex:1;background:rgba(157,133,242,.2)"></div>
-          <div class="fsls" style="flex:2;background:rgba(157,133,242,.45)"></div>
-          <div class="fsls" style="flex:1.5;background:rgba(157,133,242,.7)"></div>
-          <div class="fsls" style="flex:2;background:rgba(157,133,242,.45)"></div>
-          <div class="fsls" style="flex:2.5;background:rgba(157,133,242,.75)"></div>
-        </div>
-        <div class="fmboxes">
-          <div class="fmbox"><div class="fmv" style="color:#9D85F2">${Math.round((sleepPct||0)*100)}%</div><div class="fml">качество</div></div>
-          <div class="fmbox" onclick="navTo('sleep')" style="cursor:pointer"><div class="fmv" style="color:#4EAEE5">+</div><div class="fml">добавить</div></div>
-        </div>
-      </div>
-      <div class="fcb"><div class="fshint" style="animation:fshb 2.4s ease-in-out infinite 2s">
-        <iconify-icon icon="solar:alt-arrow-down-bold" style="font-size:12px"></iconify-icon>
-        <span style="font-size:7.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase">листай</span>
-      </div></div>
-    </div>`,
-
-    activity: `<div class="fcw" data-g="activity" data-c="0" style="background:linear-gradient(155deg,#071508,#030A04);border:1px solid rgba(58,199,107,.14)">
-      <div class="fgl" style="background:#3AC76B"></div><div class="fgl2" style="background:#2DD4BF;opacity:.1"></div>
-      <div class="fct">
-        <div class="ftag" style="background:rgba(58,199,107,.11);color:#3AC76B"><iconify-icon icon="solar:running-round-bold-duotone"></iconify-icon>активность</div>
-        <div class="fh1">— <span>шагов</span></div>
-        <div class="fsub">данные с телефона</div>
-      </div>
-      <div class="fcm" style="gap:12px;padding:12px 0">
-        <div class="fibox" style="border-color:rgba(58,199,107,.14);background:rgba(58,199,107,.05)">
-          <div style="font-size:10.5px;color:rgba(255,255,255,.65);line-height:1.65">Подключи Apple Health или Google Fit для отслеживания шагов автоматически.</div>
-        </div>
-      </div>
-      <div class="fcb"><div class="fshint" style="animation:fshb 2.4s ease-in-out infinite 2s">
-        <iconify-icon icon="solar:alt-arrow-down-bold" style="font-size:12px"></iconify-icon>
-        <span style="font-size:7.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase">листай</span>
-      </div></div>
-    </div>`,
-
-    weight: `<div class="fcw" data-g="weight" data-c="0" style="background:linear-gradient(155deg,#071508,#030A04);border:1px solid rgba(58,199,107,.14)">
-      <div class="fgl" style="background:#2DD4BF;opacity:.3"></div><div class="fgl2" style="background:#3AC76B;opacity:.12"></div>
-      <div class="fct">
-        <div class="ftag" style="background:rgba(58,199,107,.11);color:#3AC76B"><iconify-icon icon="solar:target-bold-duotone"></iconify-icon>цель · вес</div>
-        <div class="fh1">${cw?cw.toFixed(1):'—'}<span> кг</span></div>
-        <div class="fsub">${gw?'цель: '+gw.toFixed(1)+' кг · '+wpct:'нет цели по весу'}</div>
-      </div>
-      <div class="fcm" style="gap:12px;padding:14px 0">
-        <div style="display:flex;align-items:center;gap:15px">
-          <div class="fring" style="width:100px;height:100px">
-            <svg width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(58,199,107,.1)" stroke-width="6.5"/><circle cx="50" cy="50" r="40" fill="none" stroke="#3AC76B" stroke-width="6.5" stroke-dasharray="${Math.round(251*(parseInt(wbar||0)/100))} 251" stroke-linecap="round" transform="rotate(-90 50 50)"/></svg>
-            <div class="fri"><div class="frv" style="font-size:22px;color:#3AC76B">${wbar||0}%</div><div class="frl">цель</div></div>
-          </div>
-          <div class="fdrows" style="flex:1">
-            <div class="fdrow"><span class="fdl">сейчас</span><span class="fdv">${cw?cw.toFixed(1):'—'} кг</span></div>
-            <div class="fdrow"><span class="fdl">цель</span><span class="fdv" style="color:#3AC76B">${gw?gw.toFixed(1)+'кг':'не задана'}</span></div>
-            <div class="fdrow"><span class="fdl">прогресс</span><span class="fdv">${wpct||'—'}</span></div>
-          </div>
-        </div>
-      </div>
-      <div class="fcb"><div class="fshint" style="animation:fshb 2.4s ease-in-out infinite 2s">
-        <iconify-icon icon="solar:alt-arrow-down-bold" style="font-size:12px"></iconify-icon>
-        <span style="font-size:7.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase">листай</span>
-      </div></div>
-    </div>`,
-
-    streak: `<div class="fcw" data-g="streak" data-c="0" style="background:linear-gradient(155deg,#1A1100,#0E0900);border:1px solid rgba(255,171,64,.14)">
-      <div class="fgl" style="background:#FFAB40"></div><div class="fgl2" style="background:#FF6B35;opacity:.12"></div>
-      <div class="fct">
-        <div class="ftag" style="background:rgba(255,171,64,.12);color:#FFAB40"><iconify-icon icon="solar:fire-bold-duotone"></iconify-icon>серия дней</div>
-        <div class="fh1">не<br>сдаёшься!</div>
-        <div class="fsub">серия · ${streak||0} дней подряд</div>
-      </div>
-      <div class="fcm" style="gap:11px;padding:11px 0">
-        <div style="display:flex;align-items:flex-end;gap:11px">
-          <div class="fstreak-n">${streak||0}</div>
-          <div style="padding-bottom:11px"><div style="font-size:34px">🔥</div></div>
-          <div style="padding-bottom:12px"><div style="font-size:11px;font-weight:700;color:rgba(238,236,232,.46)">дней<br>подряд</div></div>
-        </div>
-        <div class="fwrow">${weekHtml}</div>
-      </div>
-      <div class="fcb"><div class="fshint" style="animation:fshb 2.4s ease-in-out infinite 2s">
-        <iconify-icon icon="solar:alt-arrow-down-bold" style="font-size:12px"></iconify-icon>
-        <span style="font-size:7.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase">листай</span>
-      </div></div>
-    </div>`,
-
-    tasks: `<div class="fcw" data-g="tasks" data-c="0" style="background:linear-gradient(155deg,#0D0D14,#080810);border:1px solid rgba(157,133,242,.12)">
-      <div class="fgl" style="background:#9D85F2;opacity:.28"></div>
-      <div class="fct">
-        <div class="ftag" style="background:rgba(157,133,242,.11);color:#9D85F2"><iconify-icon icon="solar:checklist-minimalistic-bold-duotone"></iconify-icon>задачи</div>
-        <div class="fh1" style="font-size:22px;line-height:1.15">планы<br>на сегодня</div>
-        <div class="fsub">${planItems?planItems.length:0} задач</div>
-      </div>
-      <div class="fcm" style="padding:12px 0">${tasksHtml}</div>
-      <div class="fcb"><div class="fshint" style="animation:fshb 2.4s ease-in-out infinite 2s">
-        <iconify-icon icon="solar:alt-arrow-down-bold" style="font-size:12px"></iconify-icon>
-        <span style="font-size:7.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase">дальше · тифи</span>
-      </div></div>
-    </div>`,
-
-    gate: `<div class="fcw" data-g="gate" data-c="0" style="background:linear-gradient(155deg,#0E0A18,#060410);border:1px solid rgba(157,133,242,.18)">
-      <div class="fgl" style="background:#9D85F2;opacity:.32;animation:fgateGlow 3s ease-in-out infinite"></div>
-      <div class="fgl2" style="background:#FF6B35;opacity:.14;animation:fgateGlow 3s ease-in-out infinite .8s"></div>
-      <div class="fct" style="text-align:center;padding-top:10px">
-        <div style="font-size:9px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:rgba(157,133,242,.7);margin-bottom:12px">
-          <iconify-icon icon="solar:magic-stick-3-bold-duotone" style="font-size:12px;vertical-align:middle;margin-right:4px"></iconify-icon>тифи изучил всё
-        </div>
-        <div class="fgate-logo">тифи</div>
-        <div style="font-size:11px;color:rgba(238,236,232,.46);margin-top:5px;line-height:1.65">прочитал питание, сон,<br>активность и цели</div>
-      </div>
-      <div class="fcm" style="align-items:center;gap:14px;padding:8px 0">
-        <div class="fgate-chips" style="justify-content:center">
-          <div class="fgate-chip">💡 инсайты</div>
-          <div class="fgate-chip">🍽 рецепты</div>
-          <div class="fgate-chip">💪 тренировка</div>
-          <div class="fgate-chip">🛒 покупки</div>
-          <div class="fgate-chip">✨ советы</div>
-          <div class="fgate-chip">🔥 мотивация</div>
-        </div>
-        <button class="fbtn-gen state-idle" id="feed-btn-gen" onmousedown="_feedRipple(event,this)" onclick="_feedGenerate()">
-          <div class="fbtn-spinner" id="feed-gen-spinner" style="display:none"></div>
-          <iconify-icon icon="solar:check-circle-bold-duotone" class="fbtn-check" id="feed-gen-check" style="color:#3AC76B;display:none"></iconify-icon>
-          <iconify-icon icon="solar:magic-stick-3-bold-duotone" style="font-size:15px" id="feed-gen-icon"></iconify-icon>
-          <span class="fbtn-label" id="feed-btn-text">создать персональную ленту</span>
-        </button>
-        <div class="fgate-note" id="feed-gate-note">тифи сам решает темп, порядок<br>и количество карточек — без лимитов</div>
-      </div>
-      <div class="fcb"></div>
-    </div>`,
-
-    'tifi-end': `<div class="fcw" data-g="tifi-end" data-c="0" style="background:linear-gradient(155deg,#0A0814,#05030B);border:1px solid rgba(255,107,53,.16)">
-      <div class="fgl" style="background:#FF6B35;opacity:.3"></div><div class="fgl2" style="background:#9D85F2;opacity:.12"></div>
-      <div class="fct" style="text-align:center;padding-top:14px">
-        <div style="font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,107,53,.65);margin-bottom:14px">все карточки просмотрены</div>
-        <div class="fend-big">∞</div>
-        <div style="font-size:11.5px;font-weight:700;color:rgba(255,255,255,.6);margin-top:6px;line-height:1.65">тифи готов создать ещё —<br>новые темы, которые тебе нужны</div>
-      </div>
-      <div class="fcm" style="align-items:center;gap:14px;padding:8px 0">
-        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
-          <div class="fgate-chip">📊 аналитика</div>
-          <div class="fgate-chip">🧘 восстановление</div>
-          <div class="fgate-chip">🌅 утро</div>
-        </div>
-        <button class="fbtn-more state-idle" id="feed-btn-more" onmousedown="_feedRipple(event,this)" onclick="_feedGenerateMore()">
-          <div class="fbtn-spinner" id="feed-more-spinner" style="display:none;border-top-color:#FF8040"></div>
-          <iconify-icon icon="solar:refresh-bold-duotone" style="font-size:14px" id="feed-more-icon"></iconify-icon>
-          <span class="fbtn-label" id="feed-btn-more-text">создать ещё</span>
-        </button>
-        <div style="font-size:8.5px;color:rgba(238,236,232,.18);text-align:center">создано сегодня: <span id="feed-total-count">0</span> карточек</div>
-      </div>
-      <div class="fcb"></div>
-    </div>`
-  };
-}
-
-function _feedDropsHtml(waterMl) {
-  const glasses = Math.min(10, Math.floor(waterMl / 250));
-  const total = 10;
-  let html = '';
-  for(let i=0;i<total;i++){
-    const filled = i < glasses;
-    const color = filled ? '#4EAEE5' : 'rgba(255,255,255,.08)';
-    html += `<div class="fdrop"><svg viewBox="0 0 24 28" fill="none">
-      <path d="M12 2C12 2 4 10 4 17a8 8 0 0 0 16 0C20 10 12 2 12 2z" fill="${color}" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
-    </svg></div>`;
-  }
-  return html;
-}
-
-// ── DOM-менеджер ленты ────────────────────────────────
-function _feedBuildDOM() {
-  const container = document.getElementById('p-home');
-  if (!container) return;
-  // Remove existing fcw cards
-  container.querySelectorAll('.fcw').forEach(c => c.remove());
-
-  const staticHtmlMap = _feedBuildStaticCards();
-
-  // Build all cards from _feedGroups
-  _feedGroups.forEach((group) => {
-    const cards = group.htmlArray || null;
-    for (let ci = 0; ci < group.size; ci++) {
-      let el;
-      if (cards) {
-        // tifi-generated cards have htmlArray
-        const tmp = document.createElement('div');
-        tmp.innerHTML = cards[ci] || cards[0];
-        el = tmp.firstElementChild;
-      } else {
-        // static cards - get html from map
-        const key = group.size > 1 ? `${group.id}-${ci}` : group.id;
-        const html = staticHtmlMap[key] || staticHtmlMap[group.id];
-        if (!html) continue;
-        const tmp = document.createElement('div');
-        tmp.innerHTML = html;
-        el = tmp.firstElementChild;
-      }
-      if (!el) continue;
-      el.dataset.g = group.id;
-      el.dataset.c = String(ci);
-      container.appendChild(el);
-    }
-  });
-
-  // Show the active card
-  _feedUpdateVisible();
-}
-
-function _feedGetCard(gi, ci) {
-  const group = _feedGroups[gi];
-  if (!group) return null;
-  return document.querySelector(`.fcw[data-g="${group.id}"][data-c="${ci}"]`);
-}
-
-function _feedUpdateVisible() {
-  document.querySelectorAll('.fcw').forEach(c => {
-    c.classList.remove('active');
-    c.style.transform = 'translateY(108%)';
-    c.style.opacity = '0';
-    c.style.transition = 'none';
-  });
-
-  const cur = _feedGetCard(_feedGroupIdx, _feedCardIdx);
-  if (cur) {
-    cur.classList.add('active');
-    cur.style.transform = 'translateY(0)';
-    cur.style.opacity = '1';
-  }
-
-  // Update side arrows visibility
-  const group = _feedGroups[_feedGroupIdx];
-  const hasMulti = group && group.size > 1;
-  document.getElementById('feed-al')?.classList.toggle('vis', hasMulti && _feedCardIdx > 0);
-  document.getElementById('feed-ar')?.classList.toggle('vis', hasMulti && _feedCardIdx < group.size - 1);
-}
-
-// ── Анимация перехода ─────────────────────────────────
-function _feedTransitionGroup(dir) {
-  if (_feedBusy) return;
-  const nextGroupIdx = _feedGroupIdx + dir;
-  if (nextGroupIdx < 0 || nextGroupIdx >= _feedGroups.length) {
-    // Edge bounce
-    const cur = _feedGetCard(_feedGroupIdx, _feedCardIdx);
-    if (cur) {
-      cur.style.transition = 'transform .12s ease';
-      cur.style.transform = `translateY(${dir > 0 ? '-8px' : '8px'})`;
-      setTimeout(() => { cur.style.transition = 'transform .18s ease'; cur.style.transform = 'translateY(0)'; }, 120);
-    }
-    return;
-  }
-
-  _feedBusy = true;
-  const outEl = _feedGetCard(_feedGroupIdx, _feedCardIdx);
-  const nextCardIdx = dir > 0 ? 0 : _feedGroups[nextGroupIdx].size - 1;
-  const inEl = _feedGetCard(nextGroupIdx, nextCardIdx);
-
-  if (!inEl) { _feedBusy = false; return; }
-
-  const dur = 340;
-  const ease = 'cubic-bezier(0.32,0,0.18,1)';
-
-  if (outEl) {
-    outEl.style.transition = `transform ${dur}ms ${ease}, opacity ${dur}ms ${ease}`;
-    outEl.style.transform = dir > 0 ? 'translateY(-108%)' : 'translateY(108%)';
-    outEl.style.opacity = '0';
-    setTimeout(() => { outEl.style.transition = 'none'; outEl.classList.remove('active'); }, dur);
-  }
-
-  inEl.style.transition = 'none';
-  inEl.style.transform = dir > 0 ? 'translateY(108%)' : 'translateY(-108%)';
-  inEl.style.opacity = '0';
-  inEl.offsetHeight; // force reflow
-
-  inEl.classList.add('active');
-  inEl.style.transition = `transform ${dur}ms ${ease}, opacity ${dur}ms ${ease}`;
-  inEl.style.transform = 'translateY(0)';
-  inEl.style.opacity = '1';
-
-  _feedGroupIdx = nextGroupIdx;
-  _feedCardIdx = nextCardIdx;
-
-  const group = _feedGroups[_feedGroupIdx];
-  const hasMulti = group && group.size > 1;
-  document.getElementById('feed-al')?.classList.toggle('vis', hasMulti && _feedCardIdx > 0);
-  document.getElementById('feed-ar')?.classList.toggle('vis', hasMulti && _feedCardIdx < group.size - 1);
-
-  setTimeout(() => { _feedBusy = false; }, dur + 20);
-  try { navigator.vibrate?.(8); } catch {}
-}
-
-function _feedTransitionCard(dir) {
-  if (_feedBusy) return;
-  const group = _feedGroups[_feedGroupIdx];
-  if (!group) return;
-  const nextCardIdx = _feedCardIdx + dir;
-  if (nextCardIdx < 0 || nextCardIdx >= group.size) {
-    _feedTransitionGroup(dir);
-    return;
-  }
-
-  _feedBusy = true;
-  const outEl = _feedGetCard(_feedGroupIdx, _feedCardIdx);
-  const inEl = _feedGetCard(_feedGroupIdx, nextCardIdx);
-
-  if (!inEl) { _feedBusy = false; return; }
-
-  const dur = 300;
-  const ease = 'cubic-bezier(0.32,0,0.18,1)';
-
-  if (outEl) {
-    outEl.style.transition = `transform ${dur}ms ${ease}, opacity ${dur}ms ${ease}`;
-    outEl.style.transform = dir > 0 ? 'translateX(-106%)' : 'translateX(106%)';
-    outEl.style.opacity = '0';
-    setTimeout(() => { outEl.style.transition = 'none'; outEl.classList.remove('active'); }, dur);
-  }
-
-  inEl.style.transition = 'none';
-  inEl.style.transform = dir > 0 ? 'translateX(106%)' : 'translateX(-106%)';
-  inEl.style.opacity = '0';
-  inEl.offsetHeight;
-
-  inEl.classList.add('active');
-  inEl.style.transition = `transform ${dur}ms ${ease}, opacity ${dur}ms ${ease}`;
-  inEl.style.transform = 'translateX(0) scale(1)';
-  inEl.style.opacity = '1';
-
-  _feedCardIdx = nextCardIdx;
-
-  const hasMulti = group.size > 1;
-  document.getElementById('feed-al')?.classList.toggle('vis', hasMulti && _feedCardIdx > 0);
-  document.getElementById('feed-ar')?.classList.toggle('vis', hasMulti && _feedCardIdx < group.size - 1);
-
-  setTimeout(() => { _feedBusy = false; }, dur + 20);
-}
-
-// ── Touch & gesture handling ──────────────────────────
-let _feedTouch = null;
-let _feedTouchStart = null;
-
-function _feedInitGestures() {
-  const container = document.getElementById('p-home');
-  if (!container) return;
-
-  container.addEventListener('touchstart', e => {
-    if (e.touches.length !== 1) return;
-    const t = e.touches[0];
-    _feedTouch = { x: t.clientX, y: t.clientY, time: Date.now() };
-    _feedTouchStart = { x: t.clientX, y: t.clientY };
-  }, { passive: true });
-
-  container.addEventListener('touchend', e => {
-    if (!_feedTouch || !_feedTouchStart) return;
-    const t = e.changedTouches[0];
-    const dx = t.clientX - _feedTouchStart.x;
-    const dy = t.clientY - _feedTouchStart.y;
-    const dt = Date.now() - _feedTouch.time;
-    const absDx = Math.abs(dx);
-    const absDy = Math.abs(dy);
-
-    if (dt < 230 && absDx < 18 && absDy < 18) {
-      // Tap - check zone
-      const rect = container.getBoundingClientRect();
-      const relX = t.clientX - rect.left;
-      const relY = t.clientY - rect.top;
-      const w = rect.width, h = rect.height;
-      const inTopZone = relY < h * 0.27;
-      const inBotZone = relY > h * 0.73;
-      const inLeftZone = relX < w * 0.30;
-      const inRightZone = relX > w * 0.70;
-
-      if (inTopZone) _feedTransitionGroup(-1);
-      else if (inBotZone) _feedTransitionGroup(1);
-      else if (inLeftZone) _feedTransitionCard(-1);
-      else if (inRightZone) _feedTransitionCard(1);
-      _feedTouch = null;
-      return;
-    }
-
-    // Swipe
-    if (absDy > absDx * 0.8 && absDy > 40) {
-      _feedTransitionGroup(dy < 0 ? 1 : -1);
-    } else if (absDx > absDy * 0.8 && absDx > 30) {
-      _feedTransitionCard(dx < 0 ? 1 : -1);
-    }
-    _feedTouch = null;
-  }, { passive: true });
-
-  // Keyboard
-  document.addEventListener('keydown', e => {
-    if (curTab !== 'home' || curPushPage) return;
-    if (e.key === 'ArrowDown') { e.preventDefault(); _feedTransitionGroup(1); }
-    else if (e.key === 'ArrowUp') { e.preventDefault(); _feedTransitionGroup(-1); }
-    else if (e.key === 'ArrowRight') { e.preventDefault(); _feedTransitionCard(1); }
-    else if (e.key === 'ArrowLeft') { e.preventDefault(); _feedTransitionCard(-1); }
-    else if (e.key === ' ') { e.preventDefault(); document.getElementById('feed-btn-gen')?.click(); }
-  });
-}
-
-// ── Генерация ИИ-карточек ─────────────────────────────
-let _feedTotalGenerated = 0;
-
-function _feedGenerate() {
-  const btn = document.getElementById('feed-btn-gen');
-  const spinner = document.getElementById('feed-gen-spinner');
-  const icon = document.getElementById('feed-gen-icon');
-  const text = document.getElementById('feed-btn-text');
-  const check = document.getElementById('feed-gen-check');
-  if (!btn || btn.disabled) return;
-
-  btn.disabled = true;
-  btn.classList.add('state-loading');
-  if(spinner) spinner.style.display = 'inline-block';
-  if(icon) icon.style.display = 'none';
-  const batchCards = FEED_TIFI_BATCHES[_feedGenBatch % FEED_TIFI_BATCHES.length] || [];
-  const count = batchCards.reduce((s,g)=>s+g.size,0);
-  if(text) text.textContent = `создаю ${count} карточек...`;
-
-  setTimeout(() => {
-    // Insert tifi cards before gate/end
-    const gateIdx = _feedGroups.findIndex(g => g.id === 'gate');
-    const insertIdx = gateIdx >= 0 ? gateIdx : _feedGroups.length - 2;
-    const newGroups = batchCards.map(b => ({
-      id: b.gid, title: b.title, color: b.color, size: b.size, tifi: true,
-      htmlArray: b.html
-    }));
-    const prevGroupIdx2 = _feedGroupIdx;
-    _feedGroups.splice(insertIdx, 0, ...newGroups);
-    if (prevGroupIdx2 >= insertIdx) { _feedGroupIdx = prevGroupIdx2 + newGroups.length; }
-    _feedBuildDOM();
-    _feedTotalGenerated += count;
-    if(document.getElementById('feed-total-count')) document.getElementById('feed-total-count').textContent = _feedTotalGenerated;
-
-    btn.classList.remove('state-loading');
-    btn.classList.add('state-done');
-    if(spinner) spinner.style.display = 'none';
-    if(check) check.style.display = 'inline-flex';
-    if(text) text.textContent = `готово! создал ${count} карточек`;
-
-    _feedGenBatch++;
-    _feedGenDone = true;
-    // Smooth-animate to first new card
-    setTimeout(() => _feedSmoothGoTo(insertIdx, 0), 300);
-  }, 1800);
-}
-
-function _feedGenerateMore() {
-  const btn = document.getElementById('feed-btn-more');
-  const spinner = document.getElementById('feed-more-spinner');
-  const icon = document.getElementById('feed-more-icon');
-  const text = document.getElementById('feed-btn-more-text');
-  if (!btn || btn.disabled) return;
-
-  btn.disabled = true;
-  btn.classList.add('state-loading');
-  if(spinner) spinner.style.display = 'inline-block';
-  if(icon) icon.style.display = 'none';
-  const batchCards = FEED_TIFI_BATCHES[_feedGenBatch % FEED_TIFI_BATCHES.length] || [];
-  const count = batchCards.reduce((s,g)=>s+g.size,0);
-  if(text) text.textContent = `создаю ${count} новых...`;
-
-  setTimeout(() => {
-    const endIdx = _feedGroups.findIndex(g => g.id === 'tifi-end');
-    const insertIdx = endIdx >= 0 ? endIdx : _feedGroups.length;
-    const newGroups = batchCards.map(b => ({
-      id: b.gid+'_'+_feedGenBatch, title: b.title, color: b.color, size: b.size, tifi: true,
-      htmlArray: b.html.map(h=>h.replace(/data-g="[^"]+"/g,`data-g="${b.gid}_${_feedGenBatch}"`))
-    }));
-    // Save current position
-    const prevGroupIdx = _feedGroupIdx;
-    _feedGroups.splice(insertIdx, 0, ...newGroups);
-    // Update current index: if we were at/after insertIdx, shift forward
-    if (prevGroupIdx >= insertIdx) {
-      _feedGroupIdx = prevGroupIdx + newGroups.length;
-    }
-    // Rebuild DOM and show current card instantly (no animation)
-    _feedBuildDOM();
-    _feedTotalGenerated += count;
-    if(document.getElementById('feed-total-count')) document.getElementById('feed-total-count').textContent = _feedTotalGenerated;
-
-    btn.disabled = false;
-    btn.classList.remove('state-loading');
-    if(spinner) spinner.style.display = 'none';
-    if(icon) icon.style.display = 'inline-flex';
-    if(text) text.textContent = 'создать ещё';
-    _feedGenBatch++;
-    // Smooth-animate to first new card
-    setTimeout(() => _feedSmoothGoTo(insertIdx, 0), 300);
-  }, 1600);
-}
-
-function _feedRipple(e, btn) {
-  const rect = btn.getBoundingClientRect();
-  const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-  const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
-  const size = Math.max(rect.width, rect.height) * 2;
-  const rip = document.createElement('span');
-  rip.className = 'fripple';
-  rip.style.cssText = `width:${size}px;height:${size}px;left:${x-size/2}px;top:${y-size/2}px`;
-  btn.appendChild(rip);
-  setTimeout(() => rip.remove(), 520);
-}
-
-function _feedToggleTask(taskId, el) {
-  el.classList.toggle('done');
-  const dot = el.querySelector('.ftask-dot');
-  if (dot) dot.style.background = el.classList.contains('done') ? 'rgba(58,199,107,.4)' : '#9D85F2';
-  // also mark in the plan system
-  toggleComplete?.(taskId);
-}
-
-function _feedRefreshData() {
-  if (!_feedInitDone) return;
-  // Rebuild only static cards, keep tifi cards
-  const container = document.getElementById('p-home');
-  if (!container) return;
-  const staticHtmlMap = _feedBuildStaticCards();
-  FEED_GROUPS_STATIC.forEach(group => {
-    for (let ci = 0; ci < group.size; ci++) {
-      const el = container.querySelector(`.fcw[data-g="${group.id}"][data-c="${ci}"]`);
-      if (!el) return;
-      const key = group.size > 1 ? `${group.id}-${ci}` : group.id;
-      const html = staticHtmlMap[key] || staticHtmlMap[group.id];
-      if (!html) return;
-      const tmp = document.createElement('div');
-      tmp.innerHTML = html;
-      const newEl = tmp.firstElementChild;
-      if (!newEl) return;
-      newEl.dataset.g = group.id;
-      newEl.dataset.c = String(ci);
-      // Preserve active state & transform
-      if (el.classList.contains('active')) {
-        newEl.classList.add('active');
-        newEl.style.transform = 'translateY(0)';
-        newEl.style.opacity = '1';
-      } else {
-        newEl.style.transform = 'translateY(108%)';
-        newEl.style.opacity = '0';
-      }
-      el.replaceWith(newEl);
-    }
-  });
-}
-
-
-// ── Плавный переход к карточке по индексу группы ──────
-function _feedSmoothGoTo(targetGroupIdx, targetCardIdx) {
-  if (_feedBusy) { 
-    // just jump if busy
-    _feedGroupIdx = targetGroupIdx;
-    _feedCardIdx = targetCardIdx;
-    _feedUpdateVisible();
-    return;
-  }
-  // Determine direction
-  const dir = targetGroupIdx >= _feedGroupIdx ? 1 : -1;
-  const stepsAway = Math.abs(targetGroupIdx - _feedGroupIdx);
-
-  if (stepsAway === 0) {
-    _feedUpdateVisible();
-    return;
-  }
-
-  // For large distances, teleport to one step away then animate
-  if (stepsAway > 1) {
-    const jumpToIdx = targetGroupIdx - dir;
-    _feedGroupIdx = jumpToIdx;
-    _feedCardIdx = 0;
-    _feedUpdateVisible();
-    // Small pause then animate the last step
-    setTimeout(() => _feedTransitionGroup(dir), 80);
-    return;
-  }
-
-  // One step — just animate
-  _feedTransitionGroup(dir);
-}
-
-function initFeedHome() {
-  if (!_feedInitDone) {
-    // Reset to initial static groups
-    _feedGroups = [...FEED_GROUPS_STATIC];
-    _feedGroupIdx = 0;
-    _feedCardIdx = 0;
-    _feedBuildDOM();
-    _feedInitGestures();
-    _feedInitDone = true;
-  } else {
-    _feedRefreshData();
-    _feedUpdateVisible();
-  }
-}
-
-/* ══════════════════════════════════════════════════════
-   NAVBAR SETTINGS — Live Preview Builder
-══════════════════════════════════════════════════════ */
-
-// Default nav items config
-const NAV_ALL_ITEMS = [
-  { id:'home',     icon:'solar:home-2-bold-duotone',                 name:'Лента',    desc:'Главная страница',    required:true  },
-  { id:'track',    icon:'solar:fork-spoon-bold-duotone',             name:'Питание',  desc:'Дневник питания',     required:false },
-  { id:'add',      icon:'solar:add-circle-bold-duotone',             name:'Добавить', desc:'Быстрый ввод',        required:false },
-  { id:'progress', icon:'solar:chart-2-bold-duotone',                name:'Прогресс', desc:'Графики и история',   required:false },
-  { id:'sleep',    icon:'solar:moon-stars-bold-duotone',             name:'Сон',      desc:'Трекер сна',          required:false },
-  { id:'profile',  icon:'solar:user-rounded-bold-duotone',           name:'Профиль',  desc:'Настройки и цели',    required:true  },
-  { id:'plan',     icon:'solar:checklist-minimalistic-bold-duotone', name:'Задачи',   desc:'Управление задачами', required:false },
-  { id:'water',    icon:'solar:drop-bold-duotone',                   name:'Вода',     desc:'Трекер воды',         required:false },
-];
-
-let _navActiveItems = lsGet('nav_order') || ['home','track','add','progress','profile'];
-const NAV_MAX = 5;
-let _nbSelectedSlot = null; // index of selected slot (0-based)
-
-/* ── Save & apply navbar ── */
-function _navSave() {
-  lsSet('nav_order', _navActiveItems);
-  _navApply();
-  _updateNavbarVal();
-}
-
-function _navApply() {
-  const nav = document.getElementById('nav');
-  if (!nav) return;
-  nav.innerHTML = _navActiveItems.map(id => {
-    const item = NAV_ALL_ITEMS.find(x => x.id === id);
-    if (!item) return '';
-    const isActive = (id === 'home' && curTab === 'home') || id === curTab;
-    const onclick = id === 'add'      ? "pushPage('pp-act')"
-                  : id === 'sleep'    ? "navTo('sleep')"
-                  : id === 'water'    ? "goToTrackTab('water')"
-                  : id === 'plan'     ? "pushPage('pp-plan-settings')"
-                  : `navTo('${id}')`;
-    return `<div class="nt${isActive?' on':''}" id="nt-${id}" onclick="${onclick}">
-      <iconify-icon icon="${item.icon}" style="font-size:${id==='add'?'26':'22'}px"></iconify-icon>
-    </div>`;
-  }).join('');
-}
-
-function _updateNavbarVal() {
-  const el = document.getElementById('pf-navbar-val');
-  if (el) el.textContent = `${_navActiveItems.length} из ${NAV_MAX}`;
-}
-
-/* ── Render the full navbar settings page ── */
-function renderNavbarSettings() {
-  _nbSelectedSlot = null;
-  _nbRenderPreview();
-  _nbRenderSelectionBox();
-  _nbUpdateCapacityHint();
-}
-
-function _nbRenderPreview() {
-  const bar = document.getElementById('nb-preview-bar');
-  if (!bar) return;
-
-  bar.innerHTML = _navActiveItems.map((id, i) => {
-    const item = NAV_ALL_ITEMS.find(x => x.id === id);
-    if (!item) return '';
-    const isSel = _nbSelectedSlot === i;
-    return `<div class="nb-slot${isSel?' nb-selected':''}"
-        data-slot="${i}" data-id="${id}"
-        onclick="_nbSelectSlot(${i})"
-        ontouchstart="_nbTouchStart(event,${i})"
-        ontouchmove="_nbTouchMove(event)"
-        ontouchend="_nbTouchEnd(event)">
-      <iconify-icon icon="${item.icon}"></iconify-icon>
-    </div>`;
-  }).join('');
-
-  // Add-slot if there's room
-  if (_navActiveItems.length < NAV_MAX) {
-    bar.innerHTML += `<div class="nb-slot-add" onclick="_nbAddSlotTap()">
-      <iconify-icon icon="solar:add-circle-bold-duotone" style="font-size:20px"></iconify-icon>
-    </div>`;
-  }
-}
-
-function _nbRenderSelectionBox() {
-  const box = document.getElementById('nb-sel-box');
-  const grid = document.getElementById('nb-icon-grid');
-  const label = document.getElementById('nb-sel-label');
-  const removeRow = document.getElementById('nb-remove-row');
-  if (!box || !grid) return;
-
-  const isSelected = _nbSelectedSlot !== null;
-  box.classList.toggle('visible', isSelected);
-
-  if (!isSelected) return;
-
-  const selId = _navActiveItems[_nbSelectedSlot];
-  const selItem = NAV_ALL_ITEMS.find(x => x.id === selId);
-  if (label) label.textContent = `заменить «${selItem?.name || ''}»`;
-
-  // Show remove button only for non-required items
-  const canRemove = selItem && !selItem.required && _navActiveItems.length > 2;
-  if (removeRow) removeRow.classList.toggle('hidden', !canRemove);
-
-  // Grid: all available items (not in nav, except current slot)
-  const allItems = NAV_ALL_ITEMS;
-  grid.innerHTML = allItems.map(item => {
-    const inUse = _navActiveItems.includes(item.id) && item.id !== selId;
-    return `<div class="nb-grid-item${inUse?' nb-grid-in-use':''}" onclick="_nbSwapItem('${item.id}')" title="${item.desc}">
-      <iconify-icon icon="${item.icon}" style="color:${item.id===selId?'var(--sun)':'var(--text)'}"></iconify-icon>
-      <div class="nb-grid-label">${item.name}</div>
-    </div>`;
-  }).join('');
-}
-
-function _nbUpdateCapacityHint() {
-  const el = document.getElementById('nb-capacity-hint');
-  if (!el) return;
-  const n = _navActiveItems.length;
-  el.textContent = n >= NAV_MAX
-    ? `навбар заполнен (${NAV_MAX} из ${NAV_MAX})`
-    : `можно добавить ещё ${NAV_MAX - n} пункт${NAV_MAX-n===1?'':'а'}`;
-}
-
-/* ── Slot interactions ── */
-function _nbSelectSlot(idx) {
-  if (_nbSelectedSlot === idx) {
-    _nbSelectedSlot = null;
-  } else {
-    _nbSelectedSlot = idx;
-  }
-  _nbRenderPreview();
-  _nbRenderSelectionBox();
-  // Scroll selection box into view
-  if (_nbSelectedSlot !== null) {
-    setTimeout(() => {
-      document.getElementById('nb-sel-box')?.scrollIntoView({behavior:'smooth', block:'nearest'});
-    }, 80);
-  }
-}
-
-function _nbSwapItem(newId) {
-  if (_nbSelectedSlot === null) return;
-  const oldId = _navActiveItems[_nbSelectedSlot];
-  if (oldId === newId) { _nbSelectSlot(_nbSelectedSlot); return; } // deselect
-  // If newId already in nav, swap positions
-  const existIdx = _navActiveItems.indexOf(newId);
-  if (existIdx >= 0) {
-    _navActiveItems[existIdx] = oldId;
-  }
-  _navActiveItems[_nbSelectedSlot] = newId;
-  _nbSelectedSlot = null;
-  _navSave();
-  _nbRenderPreview();
-  _nbRenderSelectionBox();
-  _nbUpdateCapacityHint();
-  try { navigator.vibrate?.(12); } catch {}
-}
-
-function _nbAddSlotTap() {
-  if (_navActiveItems.length >= NAV_MAX) return;
-  // Select the "add" slot conceptually by showing all available
-  _nbSelectedSlot = -1; // virtual "add" slot
-  const box = document.getElementById('nb-sel-box');
-  const grid = document.getElementById('nb-icon-grid');
-  const label = document.getElementById('nb-sel-label');
-  const removeRow = document.getElementById('nb-remove-row');
-  if (!box || !grid) return;
-  box.classList.add('visible');
-  if (label) label.textContent = 'добавить пункт';
-  if (removeRow) removeRow.classList.add('hidden');
-  const available = NAV_ALL_ITEMS.filter(item => !_navActiveItems.includes(item.id));
-  const inUseItems = NAV_ALL_ITEMS.filter(item => _navActiveItems.includes(item.id));
-  grid.innerHTML = [
-    ...available.map(item => `<div class="nb-grid-item" onclick="_nbAddItem('${item.id}')">
-      <iconify-icon icon="${item.icon}"></iconify-icon>
-      <div class="nb-grid-label">${item.name}</div>
-    </div>`),
-    ...inUseItems.map(item => `<div class="nb-grid-item nb-grid-in-use">
-      <iconify-icon icon="${item.icon}" style="color:var(--text)"></iconify-icon>
-      <div class="nb-grid-label">${item.name}</div>
-    </div>`)
-  ].join('');
-  setTimeout(() => box.scrollIntoView({behavior:'smooth', block:'nearest'}), 80);
-}
-
-function _nbAddItem(id) {
-  if (_navActiveItems.length >= NAV_MAX || _navActiveItems.includes(id)) return;
-  // Insert before profile if it's last required
-  const profileIdx = _navActiveItems.indexOf('profile');
-  if (profileIdx === _navActiveItems.length - 1) {
-    _navActiveItems.splice(profileIdx, 0, id);
-  } else {
-    _navActiveItems.push(id);
-  }
-  _nbSelectedSlot = null;
-  _navSave();
-  renderNavbarSettings();
-  try { navigator.vibrate?.(12); } catch {}
-}
-
-function _nbRemoveSelected() {
-  if (_nbSelectedSlot === null || _nbSelectedSlot < 0) return;
-  const id = _navActiveItems[_nbSelectedSlot];
-  const item = NAV_ALL_ITEMS.find(x => x.id === id);
-  if (!item || item.required || _navActiveItems.length <= 2) return;
-  _navActiveItems.splice(_nbSelectedSlot, 1);
-  _nbSelectedSlot = null;
-  _navSave();
-  renderNavbarSettings();
-  try { navigator.vibrate?.([10,5,10]); } catch {}
-}
-
-/* ── Touch drag-to-reorder in preview bar ── */
-let _nbTouchDrag = null;
-
-function _nbTouchStart(e, slotIdx) {
-  const touch = e.touches[0];
-  _nbTouchDrag = {
-    slotIdx,
-    startX: touch.clientX,
-    startY: touch.clientY,
-    moved: false,
-    ghost: null
-  };
-  // No longpress needed — start drag on first meaningful move
-}
-
-function _nbBeginDrag(slotIdx, touch) {
-  if (!_nbTouchDrag || _nbTouchDrag.moved) return;
-  _nbTouchDrag.moved = true;
-  _nbSelectedSlot = null;
-  _nbRenderPreview();
-
-  const slotEl = document.querySelector(`.nb-slot[data-slot="${slotIdx}"]`);
-  if (!slotEl) return;
-  const item = NAV_ALL_ITEMS.find(x => x.id === _navActiveItems[slotIdx]);
-  if (!item) return;
-
-  const rect = slotEl.getBoundingClientRect();
-  const ghost = document.createElement('div');
-  ghost.className = 'nb-drag-ghost';
-  ghost.innerHTML = `<iconify-icon icon="${item.icon}" style="font-size:22px"></iconify-icon>`;
-  ghost.style.left = (touch.clientX - rect.width/2) + 'px';
-  ghost.style.top  = (touch.clientY - rect.height/2) + 'px';
-  document.body.appendChild(ghost);
-  _nbTouchDrag.ghost = ghost;
-  _nbTouchDrag.ghostOffX = touch.clientX - rect.left - rect.width/2;
-  _nbTouchDrag.ghostOffY = touch.clientY - rect.top - rect.height/2;
-
-  slotEl.classList.add('nb-dragging-slot');
-  try { navigator.vibrate?.(18); } catch {}
-}
-
-function _nbTouchMove(e) {
-  if (!_nbTouchDrag) return;
-  const touch = e.touches[0];
-  const dx = touch.clientX - _nbTouchDrag.startX;
-  const dy = touch.clientY - _nbTouchDrag.startY;
-
-  if (!_nbTouchDrag.moved) {
-    if (Math.abs(dx) > 6 || Math.abs(dy) > 6) {
-      _nbBeginDrag(_nbTouchDrag.slotIdx, touch);
-    }
-    return;
-  }
-
-  e.preventDefault();
-
-  if (_nbTouchDrag.ghost) {
-    _nbTouchDrag.ghost.style.left = (touch.clientX - (_nbTouchDrag.ghost.offsetWidth/2)) + 'px';
-    _nbTouchDrag.ghost.style.top  = (touch.clientY - (_nbTouchDrag.ghost.offsetHeight/2)) + 'px';
-  }
-
-  const bar = document.getElementById('nb-preview-bar');
-  if (!bar) return;
-  const slots = bar.querySelectorAll('.nb-slot');
-  let overSlot = null;
-  slots.forEach(slot => {
-    slot.classList.remove('nb-drop-target');
-    const r = slot.getBoundingClientRect();
-    if (touch.clientX >= r.left && touch.clientX <= r.right &&
-        touch.clientY >= r.top  && touch.clientY <= r.bottom) {
-      overSlot = slot;
-    }
-  });
-  if (overSlot && parseInt(overSlot.dataset.slot) !== _nbTouchDrag.slotIdx) {
-    overSlot.classList.add('nb-drop-target');
-    _nbTouchDrag.overSlot = parseInt(overSlot.dataset.slot);
-  } else {
-    _nbTouchDrag.overSlot = null;
-  }
-}
-
-function _nbTouchEnd(e) {
-  if (!_nbTouchDrag) return;
-
-  if (!_nbTouchDrag.moved) {
-    // Tap → onclick will handle selection
-    _nbTouchDrag = null;
-    return;
-  }
-
-  if (_nbTouchDrag.ghost) _nbTouchDrag.ghost.remove();
-
-  const srcIdx = _nbTouchDrag.slotIdx;
-  const dstIdx = _nbTouchDrag.overSlot;
-
-  if (dstIdx !== null && dstIdx !== undefined && dstIdx !== srcIdx) {
-    const item = _navActiveItems.splice(srcIdx, 1)[0];
-    _navActiveItems.splice(dstIdx, 0, item);
-    _navSave();
-    try { navigator.vibrate?.(15); } catch {}
-  }
-
-  _nbTouchDrag = null;
-  document.querySelectorAll('.nb-slot').forEach(s => s.classList.remove('nb-drop-target','nb-dragging-slot'));
-  _nbRenderPreview();
-  _nbRenderSelectionBox();
-}
-
-
 </script>
 
 <!-- ── AVATAR CROP SCREEN ── -->
@@ -9461,42 +7922,6 @@ function _nbTouchEnd(e) {
   <div class="lc-hint"><div class="lc-hint-txt">перетаскивай · щипок для масштаба</div></div>
 </div>
 <input type="file" id="lf-av-file" accept="image/*" style="position:fixed;opacity:0;pointer-events:none;top:-999px;left:-999px">
-
-
-<!-- ══ PP: Навбар ══ -->
-<div class="push-page" id="pp-navbar">
-  <div class="pp-hdr">
-    <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
-    <div><div class="pp-title">навбар</div><div class="pp-subtitle">порядок и состав навигации</div></div>
-  </div>
-  <div class="pp-body" id="pp-navbar-body">
-    <!-- Live preview bar -->
-    <div class="nb-preview-wrap" style="touch-action:none">
-      <div class="nb-preview-label">превью навбара</div>
-      <div class="nb-preview-bar" id="nb-preview-bar">
-        <!-- slots rendered by JS -->
-      </div>
-      <div class="nb-preview-hint" id="nb-preview-hint">
-        нажми на иконку чтобы выбрать · тяни для смены порядка
-      </div>
-    </div>
-
-    <!-- Selection box — appears when slot selected -->
-    <div class="nb-selection-box" id="nb-sel-box">
-      <div class="nb-sel-label" id="nb-sel-label">выбрать иконку</div>
-      <div class="nb-sel-hint">нажми чтобы заменить · или удали пункт</div>
-      <div class="nb-remove-row hidden" id="nb-remove-row" onclick="_nbRemoveSelected()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
-        удалить пункт из навбара
-      </div>
-      <div class="nb-grid" id="nb-icon-grid">
-        <!-- grid rendered by JS -->
-      </div>
-    </div>
-
-    <div class="nb-hint" id="nb-capacity-hint"></div>
-  </div>
-</div>
 
 </body>
 </html>
