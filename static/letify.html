@@ -223,6 +223,80 @@ iconify-icon{display:inline-flex;align-items:center;justify-content:center;verti
 }
 .tg-dark #nav{background:var(--nav-bg-dark,rgba(24,18,10,.96));border-color:rgba(255,255,255,.1)}
 #nav.gone{bottom:calc(-120px - var(--sb));opacity:0;pointer-events:none}
+
+/* ── Pill mode ── */
+#nav{
+  transform-origin: bottom center;
+  will-change: transform, opacity;
+}
+/* Сворачивание nav → пилюля */
+#nav.pill-mode{
+  transform: scaleX(0.22) scaleY(0.58);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform .34s cubic-bezier(0.4,0,0.2,1),
+              opacity   .20s ease;
+}
+/* Разворачивание: spring-анимация обратно */
+#nav.pill-expand{
+  transition: transform .38s cubic-bezier(0.34,1.3,0.64,1),
+              opacity   .22s ease !important;
+}
+#nav-pill{
+  position:fixed;
+  bottom:18px;
+  left:50%;
+  transform:translateX(-50%) scale(0.5);
+  z-index:9998;
+  width:62px; height:26px;
+  border-radius:99px;
+  background:transparent;
+  border:1.5px solid rgba(255,255,255,.22);
+  box-shadow:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  cursor:pointer;
+  opacity:0;
+  pointer-events:none;
+  transition: opacity .24s ease .05s,
+              transform .36s cubic-bezier(0.34,1.4,0.64,1) .04s;
+  will-change: opacity, transform;
+  -webkit-tap-highlight-color: transparent;
+}
+.tg-dark #nav-pill{ border-color:rgba(255,255,255,.18); }
+.tg-dark #nav-pill .npill-dot{ background:rgba(255,255,255,.4); }
+#nav-pill.show{
+  opacity:1;
+  transform:translateX(-50%) scale(1);
+  pointer-events:all;
+}
+/* Пилюля схлопывается перед разворотом навбара */
+#nav-pill.hiding{
+  opacity:0;
+  transform:translateX(-50%) scale(0.55);
+  pointer-events:none;
+  transition: opacity .16s ease,
+              transform .20s cubic-bezier(0.4,0,0.8,0);
+}
+#nav-pill.gone{ bottom:calc(-120px - var(--sb)); opacity:0; pointer-events:none; }
+.npill-dot{
+  width:4px; height:4px;
+  border-radius:50%;
+  background:rgba(255,255,255,.5);
+  flex-shrink:0;
+  opacity:0;
+}
+#nav-pill.show .npill-dot:nth-child(1){ animation:npDotIn .28s ease .18s forwards; }
+#nav-pill.show .npill-dot:nth-child(2){ animation:npDotIn .28s ease .24s forwards; }
+#nav-pill.show .npill-dot:nth-child(3){ animation:npDotIn .28s ease .30s forwards; }
+@keyframes npDotIn{
+  0%  { transform:scale(0); opacity:0; }
+  65% { transform:scale(1.35); opacity:1; }
+  100%{ transform:scale(1);   opacity:1; }
+}
+#nav-pill:active{ transform:translateX(-50%) scale(.91); transition:transform .08s ease; }
 /* Nav item — no dot, just icon centered */
 .nt{
   width:50px;height:50px;border-radius:16px;
@@ -2351,7 +2425,6 @@ iconify-icon:not(:defined){display:inline-flex;align-items:center;justify-conten
   stroke-width:2.5;
   stroke-linecap:round;
   transition:stroke-dashoffset .4s cubic-bezier(.4,0,.2,1),stroke .35s ease;
-  filter:drop-shadow(0 0 4px rgba(255,107,53,.7));
 }
 #feed-arc-inner{
   position:absolute;inset:0;
@@ -2381,8 +2454,7 @@ iconify-icon:not(:defined){display:inline-flex;align-items:center;justify-conten
   pointer-events:none;
   opacity:0;
   background:#0A0A10;border:1px solid rgba(255,255,255,.07);
-  /* overflow:hidden убран — вызывал repaint на каждом кадре transform-анимации */
-  clip-path:inset(0 round 22px);
+  /* clip-path убран — вызывал repaint на каждом кадре transform-анимации */
   contain:layout style paint;
 }
 .fcw.active,.fcw.fcw-out{display:flex}
@@ -2474,12 +2546,7 @@ iconify-icon:not(:defined){display:inline-flex;align-items:center;justify-conten
 .fcw{
   box-shadow:0 8px 32px rgba(0,0,0,.55),0 2px 8px rgba(0,0,0,.3);
 }
-/* Subtle shimmer overlay on active card */
-.fcw.active::before{
-  content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
-  background:radial-gradient(ellipse 80% 40% at 50% 0%,rgba(255,255,255,.03),transparent 60%);
-  border-radius:22px;
-}
+/* Glow line at card top — одна тонкая линия через ::after, не repaint */
 /* Better tag styles */
 .ftag{
   box-shadow:0 1px 3px rgba(0,0,0,.2);
@@ -4265,7 +4332,11 @@ iconify-icon:not(:defined){display:inline-flex;align-items:center;justify-conten
   </div>
 </nav>
 
-</div><!-- /root -->
+<div id="nav-pill" onclick="_pillExpand()">
+  <div class="npill-dot"></div>
+  <div class="npill-dot"></div>
+  <div class="npill-dot"></div>
+</div></div><!-- /root -->
 
 <script>
 /* ══ TG INIT ══ */
@@ -4464,7 +4535,84 @@ function navTo(tab){
   const renders={home:initFeedHome,track:()=>renderTrack(trackTab),sleep:renderSleep,progress:renderProgress,profile:renderProfile};
   renders[tab]?.();
   tg?.HapticFeedback?.selectionChanged();
+  // При смене таба — сбрасываем пилюлю и перезапускаем таймер если home
+  _pillReset();
+  if(tab==='home') _pillStartTimer();
 }
+
+/* ── Pill logic ── */
+let _pillTimer = null;
+let _pillActive = false;
+const _PILL_DELAY = 5000;
+
+function _pillStartTimer(){
+  _pillReset();
+  _pillTimer = setTimeout(_pillCollapse, _PILL_DELAY);
+}
+
+function _pillReset(){
+  clearTimeout(_pillTimer);
+  _pillTimer = null;
+  if(!_pillActive) return;
+  _pillActive = false;
+  const nav  = document.getElementById('nav');
+  const pill = document.getElementById('nav-pill');
+  if(!nav || !pill) return;
+  pill.classList.remove('show');
+  pill.classList.add('hiding');
+  setTimeout(()=>{
+    pill.classList.remove('hiding');
+    nav.classList.add('pill-expand');
+    requestAnimationFrame(()=>{
+      nav.classList.remove('pill-mode');
+      setTimeout(()=>{ nav.classList.remove('pill-expand'); }, 420);
+    });
+  }, 140);
+}
+
+function _pillCollapse(){
+  if(_pillActive) return;
+  if(curTab !== 'home' || curPushPage) return;
+  _pillActive = true;
+  const nav  = document.getElementById('nav');
+  const pill = document.getElementById('nav-pill');
+  if(!nav || !pill) return;
+  nav.classList.add('pill-mode');
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{ pill.classList.add('show'); });
+  });
+}
+
+function _pillExpand(){
+  if(!_pillActive) return;
+  _pillActive = false;
+  const nav  = document.getElementById('nav');
+  const pill = document.getElementById('nav-pill');
+  if(!nav || !pill) return;
+
+  // 1. Пилюля схлопывается
+  pill.classList.remove('show');
+  pill.classList.add('hiding');
+
+  // 2. Через 160ms (пока пилюля исчезает) — навбар вырастает со spring
+  setTimeout(() => {
+    pill.classList.remove('hiding');
+    // Добавляем spring-transition перед снятием pill-mode
+    nav.classList.add('pill-expand');
+    requestAnimationFrame(() => {
+      nav.classList.remove('pill-mode');
+      // Убираем временный класс после окончания анимации
+      setTimeout(() => { nav.classList.remove('pill-expand'); }, 420);
+    });
+  }, 140);
+
+  try{ tg?.HapticFeedback?.selectionChanged(); }catch{}
+  clearTimeout(_pillTimer);
+  _pillTimer = setTimeout(_pillCollapse, _PILL_DELAY);
+}
+
+// Свайп в ленте → сбрасывает и перезапускает таймер
+
 function setTTab(t){
   trackTab=t;
   ['water','cal'].forEach(k=>{
@@ -4490,6 +4638,9 @@ function pushPage(id){
   if(curPushPage)_pageStack.push(curPushPage);
   curPushPage=id;navHidden=true;
   document.getElementById('nav')?.classList.add('gone');
+  // Скрыть пилюлю при пуш-странице
+  _pillReset();
+  clearTimeout(_pillTimer);
   const pp=document.getElementById(id);
   if(pp){
     // force layout flush перед добавлением класса чтобы transition сработал чисто
@@ -4543,6 +4694,8 @@ function popPage(doRender=true){
       tg.BackButton.offClick(popPage);
     }
     if(doRender&&_completingMap.size===0){const renders={home:initFeedHome,track:()=>renderTrack(trackTab),progress:renderProgress,profile:renderProfile};renders[curTab]?.();}
+    // Перезапустить пилюлю если вернулись на home
+    if(curTab==='home') _pillStartTimer();
   }
 }
 
@@ -7035,6 +7188,8 @@ document.addEventListener('DOMContentLoaded',async()=>{
   _updateDesignVal();
   await loadData();
   initFeedHome();
+  // Запустить таймер пилюли — стартовый таб home
+  setTimeout(() => _pillStartTimer(), 500);
   // Navigate to default tab on startup
   const _dt = lsGet('default_tab');
   if (_dt && _dt !== 'home') {
@@ -9124,7 +9279,7 @@ function _feedBuildDOM() {
       el.dataset.g = group.id;
       el.dataset.c = String(ci);
       // Init all cards hidden below — concept style
-      el.style.transform = 'translateY(28%) translateZ(0)';
+      el.style.transform = 'translateY(22%) translateZ(0)';
       el.style.opacity   = '0';
       container.appendChild(el);
     }
@@ -9154,19 +9309,19 @@ function _feedUpdateVisible() {
     }
   });
   _feedUpdateArrows();
-  if (cur) requestAnimationFrame(() => {
+  if (cur) setTimeout(() => {
     try { if(typeof Iconify!=='undefined') Iconify.scan(cur); } catch {}
-  });
+  }, _FEED_DUR + 80);
 }
 
 // ── Tight Slide — compositor-only: translateY(28%) + opacity ──
 // Только transform+opacity → GPU compositing, ноль layout/paint
 // ── Feed animation constants & simple-anim toggle ──
-const _FEED_DUR  = 280;
-const _FEED_EASE = 'cubic-bezier(0.32,0,0.18,1)';
-const _FEED_T    = () => `transform ${_FEED_DUR}ms ${_FEED_EASE}, opacity ${_FEED_DUR}ms ease`;
-const _FEED_START = { up:'translateY(28%) translateZ(0)', down:'translateY(-28%) translateZ(0)', left:'translateX(38%) translateZ(0)', right:'translateX(-38%) translateZ(0)' };
-const _FEED_EXIT  = { up:'translateY(-28%) translateZ(0)', down:'translateY(28%) translateZ(0)',  left:'translateX(-38%) translateZ(0)', right:'translateX(38%) translateZ(0)' };
+const _FEED_DUR  = 240;
+const _FEED_EASE = 'cubic-bezier(0.4,0,0.2,1)';
+const _FEED_T    = () => `transform ${_FEED_DUR}ms ${_FEED_EASE}, opacity ${_FEED_DUR}ms ease-out`;
+const _FEED_START = { up:'translateY(22%) translateZ(0)', down:'translateY(-22%) translateZ(0)', left:'translateX(30%) translateZ(0)', right:'translateX(-30%) translateZ(0)' };
+const _FEED_EXIT  = { up:'translateY(-22%) translateZ(0)', down:'translateY(22%) translateZ(0)',  left:'translateX(-30%) translateZ(0)', right:'translateX(30%) translateZ(0)' };
 const _FEED_HOME  = 'translateY(0) translateZ(0)';
 
 
@@ -9179,37 +9334,37 @@ function _feedAnimate(newEl, oldEl, dir, onDone) {
   const T = _FEED_T();
   const endT = _FEED_DUR + 60;
 
-  // OUT — старая уходит
-  if (oldEl && oldEl !== newEl) {
-    oldEl.style.willChange = 'transform,opacity';
-    oldEl.classList.add('fcw-out');
-    oldEl.style.zIndex = '2';
-    oldEl.style.transition = T;
-    oldEl.style.transform  = _FEED_EXIT[dir];
-    oldEl.style.opacity    = '0';
-    oldEl.style.pointerEvents = 'none';
-    setTimeout(() => {
-      oldEl.classList.remove('active','fcw-out');
-      oldEl.style.cssText = '';
-    }, endT);
-  }
-
-  // IN — новая карточка: двойной rAF (нет forced reflow)
-  newEl.style.willChange = 'transform,opacity';
-  newEl.classList.add('active');
-  newEl.style.transition = 'none';
-  newEl.style.transform  = _FEED_START[dir];
-  newEl.style.opacity    = '0';
-  newEl.style.zIndex     = '5';
-
+  // OUT + IN стартуют в одном rAF — синхронно, без сдвига кадров
   requestAnimationFrame(() => {
+    // OUT — старая уходит
+    if (oldEl && oldEl !== newEl) {
+      oldEl.style.willChange = 'transform,opacity';
+      oldEl.classList.add('fcw-out');
+      oldEl.style.zIndex = '2';
+      oldEl.style.transition = T;
+      oldEl.style.transform  = _FEED_EXIT[dir];
+      oldEl.style.opacity    = '0';
+      oldEl.style.pointerEvents = 'none';
+      setTimeout(() => {
+        oldEl.classList.remove('active','fcw-out');
+        oldEl.style.cssText = '';
+      }, endT);
+    }
+
+    // IN — ставим начальную позицию
+    newEl.style.willChange = 'transform,opacity';
+    newEl.classList.add('active');
+    newEl.style.transition = 'none';
+    newEl.style.transform  = _FEED_START[dir];
+    newEl.style.opacity    = '0';
+    newEl.style.zIndex     = '5';
+
     requestAnimationFrame(() => {
       newEl.style.transition = T;
       newEl.style.transform  = _FEED_HOME;
       newEl.style.opacity    = '1';
       setTimeout(() => {
         newEl.style.transition = '';
-        newEl.style.willChange = 'auto';
         newEl.style.zIndex = '';
         _feedBusy = false;
         onDone?.();
@@ -9224,19 +9379,27 @@ function _feedTransitionGroup(dir) {
   if (_feedBusy) return;
   const nextGroupIdx = _feedGroupIdx + dir;
   if (nextGroupIdx < 0 || nextGroupIdx >= _feedGroups.length) {
-    try { navigator.vibrate?.(12); } catch {}
+    const cur = _feedGetCard(_feedGroupIdx, _feedCardIdx);
+    if (cur) {
+      cur.style.transition = `transform .12s ${_FEED_EASE}`;
+      cur.style.transform  = `translateY(${dir > 0 ? '-8px' : '8px'}) translateZ(0)`;
+      setTimeout(() => {
+        cur.style.transition = `transform .18s ${_FEED_EASE}`;
+        cur.style.transform  = _FEED_HOME;
+        setTimeout(() => { cur.style.transition = ''; }, 200);
+      }, 120);
+    }
     return;
   }
   const oldEl      = _feedGetCard(_feedGroupIdx, _feedCardIdx);
   const nextGroup  = _feedGroups[nextGroupIdx];
-  const nextCardIdx = dir > 0 ? 0 : (nextGroup.size - 1);
+  const nextCardIdx = 0;
   const newEl      = _feedGetCard(nextGroupIdx, nextCardIdx);
   if (!newEl) return;
   _feedGroupIdx = nextGroupIdx;
   _feedCardIdx  = nextCardIdx;
   _feedUpdateArrows();
   _feedAnimate(newEl, oldEl, dir > 0 ? 'up' : 'down', _feedUpdateArrows);
-  try { navigator.vibrate?.(6); } catch {}
 }
 
 function _feedTransitionCard(dir) {
@@ -9269,9 +9432,14 @@ function _feedUpdateVDots() {
   const total = _feedGroups.length;
   const cur   = _feedGroupIdx;
 
-  const arcFill  = document.getElementById('feed-arc-fill');
-  const arcNum   = document.getElementById('feed-arc-num');
-  const arcTotal = document.getElementById('feed-arc-total');
+  if (!_feedUpdateVDots._el) {
+    _feedUpdateVDots._el = {
+      fill:  document.getElementById('feed-arc-fill'),
+      num:   document.getElementById('feed-arc-num'),
+      total: document.getElementById('feed-arc-total'),
+    };
+  }
+  const { fill: arcFill, num: arcNum, total: arcTotal } = _feedUpdateVDots._el;
   if (!arcFill || !arcNum || !arcTotal) return;
 
   // r=18 → circumference = 2π*18 ≈ 113.1
@@ -9287,7 +9455,6 @@ function _feedUpdateVDots() {
   // Colour from current group
   const color = _feedGroups[cur]?.color || '#FF6B35';
   arcFill.style.stroke = color;
-  arcFill.style.filter = `drop-shadow(0 0 4px ${color}bb)`;
   arcNum.style.color   = color;
 
   arcNum.textContent   = cur + 1;
@@ -9303,7 +9470,7 @@ function _feedInitGestures() {
   feed.addEventListener('touchstart', e => {
     // Don't hijack taps on interactive elements (buttons, inputs, links)
     const tgt = e.target;
-    if (tgt.closest('button,a,input,select,textarea,[role="button"],.fmbox,.fibox,.farow,.fbtn-gen,.fbtn-more,.fcw [onclick]')) return;
+    if (tgt.closest('button,a,input,select,textarea,[role="button"]')) return;
     if (_feedBusy) return;
     const t = e.touches[0], w = feed.clientWidth, h = feed.clientHeight;
     _fTouch = {
@@ -9320,23 +9487,23 @@ function _feedInitGestures() {
   feed.addEventListener('touchend', e => {
     if (et) et.classList.remove('on');
     if (eb) eb.classList.remove('on');
+    if (!_fTouch.t || _feedBusy) return;
     const t   = e.changedTouches[0];
     const dx  = t.clientX - _fTouch.x;
     const dy  = _fTouch.y - t.clientY;
     const dt  = Date.now() - _fTouch.t;
     const aDx = Math.abs(dx), aDy = Math.abs(dy);
-    if (_feedBusy) return;
-    // Vertical swipe
-    if (aDy > _FEED_MIN_SWIPE && aDy > aDx * 1.2) {
+    // Vertical swipe — приоритет
+    if (aDy > _FEED_MIN_SWIPE && aDy > aDx * 0.9) {
       dy > 0 ? _feedTransitionGroup(1) : _feedTransitionGroup(-1);
       return;
     }
-    // Horizontal swipe — for multi-card groups
-    if (aDx > _FEED_MIN_SWIPE && aDx > aDy * 1.2) {
+    // Horizontal swipe — только если явно горизонтальный
+    if (aDx > _FEED_MIN_SWIPE && aDx > aDy * 1.5) {
       dx < 0 ? _feedTransitionCard(1) : _feedTransitionCard(-1);
       return;
     }
-    // Tap zones fallback
+    // Tap зоны
     if (dt < _FEED_TAP_MS && aDy < _FEED_TAP_MOVE && aDx < _FEED_TAP_MOVE * 1.8) {
       if (_fTouch.xZone === 'right') _feedTransitionCard(1);
       else if (_fTouch.xZone === 'left') _feedTransitionCard(-1);
@@ -10123,4 +10290,4 @@ function _nbTouchEnd(e) {
 </div>
 
 </body>
-</html>
+  </html>
