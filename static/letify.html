@@ -1923,7 +1923,7 @@ iconify-icon{display:inline-flex;align-items:center;justify-content:center;verti
 /* ── PILLS + FEED SYSTEM ── */
 #tifi-carousel{position:absolute;inset:0;opacity:0;transition:opacity .4s ease;pointer-events:none}
 #tifi-carousel.visible{opacity:1;pointer-events:all}
-.tifi-prog{display:flex;gap:2px;padding:10px 14px 0;position:absolute;top:0;left:0;right:0;z-index:8}
+.tifi-prog{display:none}
 .tifi-prog-seg{flex:1;height:4px;border-radius:99px;background:rgba(255,255,255,.09);overflow:hidden;transition:opacity .2s}
 .tifi-prog-fill{height:100%;border-radius:99px;width:0%;transition:width .18s ease}
 .tifi-cat-row{position:absolute;top:22px;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:8;pointer-events:none}
@@ -2488,7 +2488,7 @@ iconify-icon:not(:defined){display:inline-flex;align-items:center;justify-conten
 .fcw.active,.fcw.fcw-out{display:flex}
 .fcw.active{pointer-events:auto;opacity:1;transform:translateY(0) translateZ(0)}
 /* group dots */
-.fcw .gdots{display:flex;gap:3.5px;justify-content:center;margin-bottom:10px}
+.fcw .gdots{display:none}
 .fcw .gd{height:2.5px;border-radius:99px;background:rgba(255,255,255,.16);transition:width .22s,background .22s}
 .fcw .gd.cur{background:rgba(255,255,255,.65)}
 /* glows — живут на отдельном слое, но замораживаются во время анимации */
@@ -2563,16 +2563,20 @@ iconify-icon:not(:defined){display:inline-flex;align-items:center;justify-conten
 /* swipe hint */
 .fshint{display:flex;align-items:center;justify-content:center;gap:5px;color:rgba(255,255,255,.2)}
 @keyframes fshb{0%,100%{transform:translateY(0);opacity:.2}50%{transform:translateY(4px);opacity:.38}}
-/* Hint animations only run on the visible card */
+/* Pause hint animation only on inactive cards — точечно, без * */
 .fcw:not(.active) .fshint{animation:none!important}
-/* Pause ALL animations on non-active cards to save GPU cycles */
-.fcw:not(.active) *{animation-play-state:paused!important}
+/* Pause keyframe animations on inactive cards via class — НЕ через :not(*) */
+.fcw-paused .sp-dot,.fcw-paused .tl-live,.fcw-paused [class*="pulse"],
+.fcw-paused [class*="spin"],.fcw-paused [class*="blink"]{animation-play-state:paused!important}
 /* Remove swipe hints from cards */
 .fcb{flex-shrink:0;position:relative;z-index:1}
 
-/* ── Card design polish v16 ── */
-.fcw{
+/* box-shadow только на активной карточке — не на всех */
+.fcw.active{
   box-shadow:0 8px 32px rgba(0,0,0,.55),0 2px 8px rgba(0,0,0,.3);
+}
+.fcw.fcw-out{
+  box-shadow:0 4px 16px rgba(0,0,0,.3);
 }
 /* Subtle shimmer overlay on active card */
 .fcw.active::before{
@@ -9374,6 +9378,23 @@ function _initSimpleAnimTog() {
   if (tog) { tog.classList.toggle('on', on); tog.classList.toggle('off', !on); }
 }
 
+// ── GPU pre-promote: вызывается сразу после завершения анимации
+// Промотирует текущую и соседние карточки заранее — до следующего свайпа
+function _feedPrePromote() {
+  const cur  = _feedGetCard(_feedGroupIdx, _feedCardIdx);
+  const next = _feedGetCard(_feedGroupIdx + 1, 0) || _feedGetCard(_feedGroupIdx, _feedCardIdx + 1);
+  const prev = _feedGetCard(_feedGroupIdx - 1, 0) || _feedGetCard(_feedGroupIdx, _feedCardIdx - 1);
+  [cur, next, prev].forEach(el => {
+    if (el && !el.style.willChange) el.style.willChange = 'transform,opacity';
+  });
+  // Снимаем промоцию со всех остальных — освобождаем GPU-память
+  document.querySelectorAll('.fcw').forEach(el => {
+    if (el !== cur && el !== next && el !== prev) {
+      el.style.willChange = 'auto';
+    }
+  });
+}
+
 function _feedAnimate(newEl, oldEl, dir, onDone) {
   if (_feedBusy) return;
   if (!newEl) { _feedUpdateVisible(); onDone?.(); return; }
@@ -9427,10 +9448,15 @@ function _feedAnimate(newEl, oldEl, dir, onDone) {
       newEl.style.opacity    = '1';
       setTimeout(() => {
         newEl.style.transition = '';
-        newEl.style.willChange = 'auto'; // освобождаем GPU-память после анимации
+        newEl.style.willChange = 'auto';
         newEl.style.zIndex = '';
         _feedBusy = false;
-        onDone?.();
+        // DOM-обновления (dots, vdots) — в следующем rAF,
+        // чтобы не стать причиной repaint в последний кадр анимации
+        requestAnimationFrame(() => {
+          onDone?.();
+          _feedPrePromote();
+        });
       }, endT);
     });
   });
@@ -9463,7 +9489,9 @@ function _feedTransitionGroup(dir) {
   if (!newEl) return;
   _feedGroupIdx = nextGroupIdx;
   _feedCardIdx  = nextCardIdx;
-  _feedUpdateArrows();
+  // КРИТИЧНО: НЕ вызываем _feedUpdateArrows() до анимации —
+  // innerHTML + strokeDashoffset вызывают forced layout и убивают первый кадр.
+  // Откладываем все DOM-обновления на ПОСЛЕ запуска анимации.
   _feedAnimate(newEl, oldEl, dir > 0 ? 'up' : 'down', _feedUpdateArrows);
 }
 
@@ -9477,7 +9505,6 @@ function _feedTransitionCard(dir) {
   const newEl = _feedGetCard(_feedGroupIdx, nextCardIdx);
   if (!newEl) return;
   _feedCardIdx = nextCardIdx;
-  _feedUpdateArrows();
   _feedAnimate(newEl, oldEl, dir > 0 ? 'left' : 'right', _feedUpdateArrows);
 }
 
@@ -9652,6 +9679,7 @@ function initFeedHome() {
     _feedBuildDOM();
     _feedInitGestures();
     _feedInitDone = true;
+    requestAnimationFrame(_feedPrePromote); // промотируем слои до первого свайпа
   } else {
     _feedRefreshData();
     _feedUpdateVisible();
