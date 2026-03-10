@@ -5494,7 +5494,37 @@ _nbTouchDrag = null;
 document.querySelectorAll('.nb-slot').forEach(s => s.classList.remove('nb-drop-target','nb-dragging-slot'));
 _nbRenderPreview();
 _nbRenderSelectionBox();
-}</script> <div id="lf-crop-scr"> <div class="lc-hdr"> <button class="lc-btn lc-cancel" id="lc-cancel">отмена</button> <span class="lc-ttl">обрезка фото</span> <button class="lc-btn lc-apply" id="lc-apply">готово</button> </div> <div class="lc-area"> <canvas id="lc-canvas"></canvas> <div style="position:absolute;inset:0;pointer-events:none;z-index:5"> <div class="lc-frame" id="lc-frame"></div> </div> </div> <div class="lc-zoom" id="lc-zoom">100%</div> <div class="lc-hint"><div class="lc-hint-txt">перетаскивай · щипок для масштаба</div></div>
+}
+// — удержание навбара → настройки —
+(function(){
+  var nav = document.getElementById('nav');
+  if (!nav) return;
+  var _timer = null;
+  var _fired = false;
+
+  function start() {
+    _fired = false;
+    _timer = setTimeout(function(){
+      _fired = true;
+      try { navigator.vibrate && navigator.vibrate(18); } catch(e){}
+      try { window.tg && window.tg.HapticFeedback && window.tg.HapticFeedback.impactOccurred('medium'); } catch(e){}
+      pushPage('pp-design');
+    }, 500);
+  }
+
+  function cancel() {
+    if (_timer) { clearTimeout(_timer); _timer = null; }
+  }
+
+  nav.addEventListener('touchstart',  start,  { passive: true });
+  nav.addEventListener('touchend',    cancel);
+  nav.addEventListener('touchcancel', cancel);
+  nav.addEventListener('touchmove',   cancel, { passive: true });
+  nav.addEventListener('mousedown',   start);
+  nav.addEventListener('mouseup',     cancel);
+  nav.addEventListener('mouseleave',  cancel);
+})();
+</script> <div id="lf-crop-scr"> <div class="lc-hdr"> <button class="lc-btn lc-cancel" id="lc-cancel">отмена</button> <span class="lc-ttl">обрезка фото</span> <button class="lc-btn lc-apply" id="lc-apply">готово</button> </div> <div class="lc-area"> <canvas id="lc-canvas"></canvas> <div style="position:absolute;inset:0;pointer-events:none;z-index:5"> <div class="lc-frame" id="lc-frame"></div> </div> </div> <div class="lc-zoom" id="lc-zoom">100%</div> <div class="lc-hint"><div class="lc-hint-txt">перетаскивай · щипок для масштаба</div></div>
 </div>
 <input type="file" id="lf-av-file" accept="image/*" style="position:fixed;opacity:0;pointer-events:none;top:-999px;left:-999px"> <div class="push-page" id="pp-navbar"> <div class="pp-hdr"> <button class="pp-back" onclick="popPage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button> <div><div class="pp-title">навбар</div><div class="pp-subtitle">порядок и состав навигации</div></div> </div> <div class="pp-body" id="pp-navbar-body"> <div class="nb-preview-wrap" style="touch-action:none"> <div class="nb-preview-label">превью навбара</div> <div class="nb-preview-bar" id="nb-preview-bar"> </div> <div class="nb-preview-hint" id="nb-preview-hint">
 нажми на иконку чтобы выбрать · тяни для смены порядка
