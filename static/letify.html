@@ -2320,10 +2320,9 @@ iconify-icon:not(:defined){display:inline-flex;align-items:center;justify-conten
 .feed-eb{bottom:calc(var(--nav-h) + 12px);background:none}
 .feed-et.on,.feed-eb.on{opacity:1}
 /* side arrows */
-.feed-sarr{position:absolute;top:50%;transform:translateY(-50%);z-index:30;width:26px;height:44px;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .28s}
-.feed-sarr.sl{left:14px}.feed-sarr.sr{right:14px}
-.feed-sarr.vis{opacity:1;animation:spulse 2.6s ease-in-out infinite .6s}
-@keyframes spulse{0%,100%{opacity:.2}50%{opacity:.5}}
+.feed-sarr{position:absolute;top:50%;transform:translateY(-50%);z-index:30;width:36px;height:56px;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .3s ease}
+.feed-sarr.sl{left:8px}.feed-sarr.sr{right:8px}
+.feed-sarr.vis{opacity:1}
 @keyframes feedRipple{to{transform:scale(3);opacity:0}}
 
 /* ── Feed progress arc-ring (top-right corner) ── */
@@ -2430,10 +2429,12 @@ iconify-icon:not(:defined){display:inline-flex;align-items:center;justify-conten
 .fstreak-n{font-size:72px;font-weight:900;letter-spacing:-.04em;line-height:1;
   background:linear-gradient(135deg,#FF6B35,#FFAB40);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .fwrow{display:flex;gap:3px}
-.fwd{width:31px;height:31px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;text-transform:uppercase;flex-shrink:0}
-.fwd.done{background:rgba(255,107,53,.17);border:1px solid rgba(255,107,53,.2);color:#FF8040}
-.fwd.today{background:linear-gradient(135deg,#FF6B35,#FFAB40);color:#000}
-.fwd.empty{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:rgba(238,236,232,.18)}
+.fwd{flex:1;height:42px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:7px;font-weight:800;text-transform:uppercase;gap:4px;min-width:0}
+.fwd.done{background:rgba(255,107,53,.13);border:1px solid rgba(255,107,53,.2);color:#FF8040}
+.fwd.today{background:linear-gradient(160deg,#FF6B35,#FFAB40);border:none;color:#000;font-weight:900}
+.fwd.empty{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:rgba(238,236,232,.2)}
+.fwd-dot{width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.6}
+.fwd.empty .fwd-dot{opacity:0}
 /* progress bar */
 .fpbar{height:3.5px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden}
 .fpfill{height:100%;border-radius:99px}
@@ -2467,7 +2468,7 @@ iconify-icon:not(:defined){display:inline-flex;align-items:center;justify-conten
 /* Pause ALL animations on non-active cards to save GPU cycles */
 .fcw:not(.active) *{animation-play-state:paused!important}
 /* Remove swipe hints from cards */
-.fcb{display:none!important}
+.fcb{flex-shrink:0;position:relative;z-index:1}
 
 /* ── Card design polish v16 ── */
 .fcw{
@@ -2784,8 +2785,8 @@ iconify-icon:not(:defined){display:inline-flex;align-items:center;justify-conten
 <div class="page active" id="p-home">
   <div id="feed-et" class="feed-et"></div>
   <div id="feed-eb" class="feed-eb"></div>
-  <div class="feed-sarr sl" id="feed-al"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
-  <div class="feed-sarr sr" id="feed-ar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+  <div class="feed-sarr sl" id="feed-al"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+  <div class="feed-sarr sr" id="feed-ar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
   <!-- Vertical position dots -->
   <div id="feed-vdots">
     <svg id="feed-arc-svg" width="46" height="46" viewBox="0 0 46 46">
@@ -3764,14 +3765,7 @@ iconify-icon:not(:defined){display:inline-flex;align-items:center;justify-conten
       <svg class="lt-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
     </div>
 
-    <!-- Анимации -->
-    <div class="m3-sec">анимации</div>
-    <div class="lt" style="padding:14px 0" onclick="toggleSimpleAnim()">
-      <div class="lt-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--sun)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
-      <div class="lt-lbl">упрощённые анимации</div>
-      <div class="tog off" id="tog-simple-anim" style="flex-shrink:0;margin-left:auto;pointer-events:none"></div>
-    </div>
-    <div style="font-size:11px;color:var(--hint);padding:0 0 14px 44px;margin-top:-6px;line-height:1.4">карточки переключаются мгновенно — без анимации</div>
+
 
     <!-- Colour row — opens pp-color -->
     <div class="m3-sec">цвет акцента</div>
@@ -4661,12 +4655,11 @@ function _populatePP(id){
       if(!acts.length){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--hint);font-size:13px;font-weight:600">нет выполненных задач</div>';}
       else{el.innerHTML=acts.map(a=>{
         const col=ACT_COL[a.type]||'#FF9800';
-        return`<div class="ac done" style="margin-bottom:8px"><div class="ac-ico" style="background:${col}18">✅</div><div class="ac-body"><div class="ac-name done-text">${a.name}</div><div class="ac-sub">${fmtRange(a)} · ${a.duration} мин</div></div><span class="pill p-ok">✓</span></div>`;
+        return`<div class="ac done" style="margin-bottom:8px"><div style="display:flex;align-items:center;justify-content:center;margin:4px 0"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#3AC76B" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg></div><div class="ac-body"><div class="ac-name done-text">${a.name}</div><div class="ac-sub">${fmtRange(a)} · ${a.duration} мин</div></div><span class="pill p-ok">✓</span></div>`;
       }).join('');}
     }
   }
   if(id==='pp-navbar'){renderNavbarSettings();}
-  if(id==='pp-design'){_initSimpleAnimTog();}
   requestAnimationFrame(()=>{try{if(typeof Iconify!=='undefined')Iconify.scan();}catch{}});
   if(id==='pp-plan-settings'){
     const todayJs=new Date().getDay(); // 0=вс,1=пн...
@@ -5212,6 +5205,7 @@ async function addW(ml){
   renderTrack('water');toast('+'+ml+' мл');tg?.HapticFeedback?.impactOccurred('light');
   apiPost('/api/water',{amount:ml});setTimeout(()=>{_addWBusy=false;},250);
 }
+function addWater(ml){ addW(ml); }
 async function undoW(){
   if(!C.water.entries?.length){toast('нечего отменять');return;}
   const last=C.water.entries.pop();C.water.total=Math.max(0,(C.water.total||0)-last);
@@ -7093,7 +7087,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
 ══════════════════════════════════════ */
 
 function _tifiGetKey(){return lsGet('groq_key')||'';}
-function _tifiSetKey(k){lsSet('groq_key',k);}
+function _tifiSetKey(k){lsSet('groq_key',k);setTimeout(_feedSwapNoKey,100);}
 function _tifiMaskKey(k){if(!k||k.length<8)return k;return k.slice(0,8)+'•••••••••'+k.slice(-4);}
 
 /* ── обновить статус в pp-other ── */
@@ -8411,7 +8405,7 @@ const FEED_TIFI_BATCHES = [
             <div class="fmot-stat"><div class="fmot-sv" style="color:#4EAEE5">+7</div><div class="fmot-sl">рост к вчера</div></div>
           </div>
           <div class="fibox" style="border-color:rgba(255,171,64,.14);background:rgba(255,171,64,.05)">
-            <div style="font-size:9px;font-weight:800;color:#FFAB40;margin-bottom:5px">💡 что тебя мотивирует</div>
+            <div style="font-size:9px;font-weight:800;color:#FFAB40;margin-bottom:5px;letter-spacing:.04em;text-transform:uppercase">что тебя мотивирует</div>
             <div style="font-size:10.5px;color:rgba(255,255,255,.65);line-height:1.65">Ты вошёл в лучшие 30% пользователей с похожей целью. Ещё 7 дней — побьёшь свой рекорд.</div>
           </div>
         </div>
@@ -8587,7 +8581,8 @@ function _feedBuildStaticCards(data) {
   const weekHtml = weekDays.map((d,i)=>{
     const idx=(i+1)%7;const isToday=idx===today;
     const done=streak>0&&!isToday&&(streak>=(7-i));
-    return `<div class="fwd ${isToday?'today':done?'done':'empty'}">${d}</div>`;
+    const cls=isToday?'today':done?'done':'empty';
+    return `<div class="fwd ${cls}">${d}<div class="fwd-dot"></div></div>`;
   }).join('');
 
   // ── Tasks multi-card builder ──────────────────────────
@@ -8666,7 +8661,7 @@ function _feedBuildStaticCards(data) {
       </div>
       <div class="fcm" style="padding:12px 0;align-items:center;justify-content:center">
         <div style="text-align:center;padding:20px 0">
-          <div style="font-size:38px;margin-bottom:8px">✅</div>
+          <div style="display:flex;align-items:center;justify-content:center;margin:4px 0"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#3AC76B" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg></div>
           <div style="font-size:13px;font-weight:800;color:rgba(255,255,255,.7)">все задачи выполнены</div>
           <div style="font-size:10px;color:rgba(255,255,255,.35);margin-top:4px">отличный день!</div>
         </div>
@@ -8750,7 +8745,7 @@ function _feedBuildStaticCards(data) {
       const tl = _taskTimeLabel(a);
       const isDone = a.completed;
       return `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)">
-        <div style="width:28px;height:28px;border-radius:8px;background:${isDone?'rgba(58,199,107,.1)':col+'18'};display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;${isDone?'opacity:.5':''}">${isDone?'✅':ico}</div>
+        <div style="width:28px;height:28px;border-radius:8px;background:${isDone?'rgba(58,199,107,.1)':col+'18'};display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;${isDone?'opacity:.5':''}">${isDone?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3DCC72" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':ico}</div>
         <div style="flex:1;min-width:0">
           <div style="font-size:11px;font-weight:700;color:${isDone?'rgba(255,255,255,.35)':'#EEECE8'};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;${isDone?'text-decoration:line-through':''}">${a.name}</div>
           <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:1px">${_fmtRange(a)}</div>
@@ -8858,7 +8853,7 @@ function _feedBuildStaticCards(data) {
       <div class="fcm" style="gap:13px;padding:12px 0">
         <div class="fdrops" id="feed-drops">${_feedDropsHtml(wt||0)}</div>
         <div class="fmboxes">
-          <div class="fmbox" onclick="addWater(250)" style="cursor:pointer"><div class="fmv" style="color:#4EAEE5">+250</div><div class="fml">мл добавить</div></div>
+          <div class="fmbox" onclick="addW(250)" style="cursor:pointer"><div class="fmv" style="color:#4EAEE5">+250</div><div class="fml">мл добавить</div></div>
           <div class="fmbox"><div class="fmv" style="color:#2DD4BF">${waterPct}%</div><div class="fml">выполнено</div></div>
         </div>
         <div class="fibox" style="border-color:rgba(78,174,229,.14);background:rgba(78,174,229,.05);cursor:pointer" onclick="goToTrackTab('water')">
@@ -8888,7 +8883,7 @@ function _feedBuildStaticCards(data) {
         </div>
         <div class="fmboxes">
           <div class="fmbox"><div class="fmv" style="color:#9D85F2">${Math.round((sleepPct||0)*100)}%</div><div class="fml">качество</div></div>
-          <div class="fmbox" onclick="navTo('sleep')" style="cursor:pointer"><div class="fmv" style="color:#4EAEE5">+</div><div class="fml">добавить</div></div>
+          <div class="fmbox" onclick="navTo('track')" style="cursor:pointer"><div class="fmv" style="color:#4EAEE5">+</div><div class="fml">добавить</div></div>
         </div>
       </div>
       <div class="fcb"><div class="fshint" style="animation:fshb 2.4s ease-in-out infinite 2s">
@@ -8939,26 +8934,45 @@ function _feedBuildStaticCards(data) {
       </div></div>
     </div>`,
 
-    streak: `<div class="fcw" data-g="streak" data-c="0" style="radial-gradient(ellipse 65% 55% at 92% 8%,rgba(255,171,64,0.32),transparent 70%), radial-gradient(ellipse 55% 48% at 8% 88%,rgba(255,107,53,0.1),transparent 70%), background:linear-gradient(155deg,#1A1100,#0E0900);border:1px solid rgba(255,171,64,.14)">
+    streak: `<div class="fcw" data-g="streak" data-c="0" style="background:linear-gradient(155deg,#170F00,#0C0700);border:1px solid rgba(255,171,64,.16)">
       <div class="fct">
-        <div class="ftag" style="background:rgba(255,171,64,.12);color:#FFAB40;border:1px solid rgba(255,171,64,.2)"><iconify-icon icon="solar:fire-bold-duotone"></iconify-icon>серия дней</div>
-        <div class="fh1" style="font-size:22px">${streak>=1?'горишь!':'только начало'}</div>
-        <div class="fsub">${streak>=1?`${streak} дней активности подряд`:'начни сегодня — первый день серии'}</div>
-      </div>
-      <div class="fcm" style="gap:14px;padding:14px 0;justify-content:center">
-        <div style="display:flex;align-items:center;justify-content:center;gap:16px">
-          <div style="text-align:center">
-            <div style="font-size:80px;font-weight:900;letter-spacing:-.04em;line-height:1;background:linear-gradient(135deg,#FF6B35,#FFAB40);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">${streak||0}</div>
-            <div style="font-size:11px;font-weight:700;color:rgba(238,236,232,.45);margin-top:4px;text-transform:uppercase;letter-spacing:.08em">дней подряд</div>
-          </div>
+        <div class="ftag" style="background:rgba(255,171,64,.13);color:#FFAB40;border:1px solid rgba(255,171,64,.22)">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="#FFAB40" style="flex-shrink:0"><path d="M17.66 11.2c-.23-.3-.51-.56-.77-.82-.67-.6-1.43-1.03-2.07-1.66C13.33 7.26 13 4.85 13.95 3c-.95.23-1.78.75-2.49 1.32C8.42 6.45 7.15 10.04 8.07 13.38c.06.22.12.44.12.67 0 .34-.27.53-.54.42-.26-.1-.41-.37-.49-.63-.06-.17-.1-.35-.12-.52C6.44 12.75 5.5 12.3 5.5 11v-.17c0-.19-.12-.36-.3-.39-.32-.07-.62.1-.72.4-.1.29-.15.6-.15.92 0 3.89 3.11 7 7 7 3.98 0 7-3.05 7-6.97-.05-1.01-.25-2.2-1.37-2.98z"/></svg>
+          серия дней
         </div>
-        <div style="display:flex;gap:5px;justify-content:center">${weekHtml}</div>
-        ${streak>=3?`<div style="background:rgba(255,171,64,.08);border:1px solid rgba(255,171,64,.15);border-radius:12px;padding:10px 14px;text-align:center"><div style="font-size:11px;font-weight:700;color:rgba(255,171,64,.9);line-height:1.55">🏆 так держать! ещё ${7-streak%7} дней — и новый рекорд недели</div></div>`:''}
+        <div style="margin-top:8px;display:flex;align-items:baseline;gap:6px">
+          <span style="font-size:56px;font-weight:900;letter-spacing:-.04em;line-height:1;background:linear-gradient(135deg,#FF8040,#FFAB40);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">${streak||0}</span>
+          <span style="font-size:13px;font-weight:700;color:rgba(238,236,232,.4);text-transform:uppercase;letter-spacing:.08em;padding-bottom:6px">${streak===1?'день':streak>=2&&streak<=4?'дня':'дней'}</span>
+        </div>
+        <div class="fsub" style="margin-top:2px">${streak>=1?'активность '+streak+(streak===1?' день':streak>=2&&streak<=4?' дня':' дней')+' подряд':'начни сегодня — первый день серии'}</div>
       </div>
-      <div class="fcb"><div class="fshint" style="animation:fshb 2.4s ease-in-out infinite 2s">
-        <iconify-icon icon="solar:alt-arrow-down-bold" style="font-size:12px"></iconify-icon>
-        <span style="font-size:7.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase">листай</span>
-      </div></div>
+      <div class="fcm" style="gap:10px;padding:8px 0">
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">
+          ${weekDays.map((d,i)=>{
+            const idx=(i+1)%7; const isToday=idx===today;
+            const done=streak>0&&!isToday&&(streak>=(7-i));
+            return '<div style="display:flex;flex-direction:column;align-items:center;gap:3px">'
+              +'<div style="width:100%;aspect-ratio:1/1;border-radius:9px;display:flex;align-items:center;justify-content:center;'
+              +(isToday?'background:linear-gradient(135deg,#FF6B35,#FFAB40);'
+              :done?'background:rgba(255,107,53,.15);border:1px solid rgba(255,107,53,.22);'
+              :'background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);')
+              +'">'
+              +(isToday?'<svg width="11" height="11" viewBox="0 0 24 24" fill="#000"><path d="M17.66 11.2c-.23-.3-.51-.56-.77-.82-.67-.6-1.43-1.03-2.07-1.66C13.33 7.26 13 4.85 13.95 3c-.95.23-1.78.75-2.49 1.32C8.42 6.45 7.15 10.04 8.07 13.38c.06.22.12.44.12.67 0 .34-.27.53-.54.42-.26-.1-.41-.37-.49-.63-.06-.17-.1-.35-.12-.52C6.44 12.75 5.5 12.3 5.5 11v-.17c0-.19-.12-.36-.3-.39-.32-.07-.62.1-.72.4-.1.29-.15.6-.15.92 0 3.89 3.11 7 7 7 3.98 0 7-3.05 7-6.97-.05-1.01-.25-2.2-1.37-2.98z"/></svg>'
+              :done?'<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#FF8040" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+              :'')
+              +'</div>'
+              +'<div style="font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:'+(isToday?'rgba(255,171,64,.9)':done?'rgba(255,128,64,.55)':'rgba(238,236,232,.18)')+'">'+d+'</div>'
+              +'</div>';
+          }).join('')}
+        </div>
+        ${streak>=3?`<div style="background:rgba(255,171,64,.07);border:1px solid rgba(255,171,64,.13);border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:8px">
+          <div style="width:26px;height:26px;border-radius:8px;background:rgba(255,171,64,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="#FFAB40"><path d="M17.66 11.2c-.23-.3-.51-.56-.77-.82-.67-.6-1.43-1.03-2.07-1.66C13.33 7.26 13 4.85 13.95 3c-.95.23-1.78.75-2.49 1.32C8.42 6.45 7.15 10.04 8.07 13.38c.06.22.12.44.12.67 0 .34-.27.53-.54.42-.26-.1-.41-.37-.49-.63-.06-.17-.1-.35-.12-.52C6.44 12.75 5.5 12.3 5.5 11v-.17c0-.19-.12-.36-.3-.39-.32-.07-.62.1-.72.4-.1.29-.15.6-.15.92 0 3.89 3.11 7 7 7 3.98 0 7-3.05 7-6.97-.05-1.01-.25-2.2-1.37-2.98z"/></svg>
+          </div>
+          <div style="font-size:10px;font-weight:700;color:rgba(255,171,64,.8);line-height:1.45">так держать! ещё ${7-streak%7===0?7:7-streak%7} дней — и новый рекорд</div>
+        </div>`:''}
+      </div>
+      <div class="fcb"></div>
     </div>`,
 
     // tasks cards (multi-page, dynamic count)
@@ -9014,6 +9028,26 @@ function _feedBuildStaticCards(data) {
       </div>
     </div>`,
 
+
+    'no-key': `<div class="fcw" data-g="no-key" data-c="0" style="background:linear-gradient(155deg,#0E0A18,#060410);border:1px solid rgba(157,133,242,.18)">
+      <div class="fct" style="text-align:center;padding-top:8px">
+        <div style="font-size:9px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:rgba(157,133,242,.6);margin-bottom:10px">тифи ai</div>
+        <div class="fgate-logo" style="font-size:28px;margin-bottom:6px">тифи</div>
+        <div class="fh1" style="font-size:20px;background:none;-webkit-text-fill-color:initial;color:#EEECE8">добавь ключ Groq</div>
+        <div class="fsub" style="margin-top:5px">чтобы получить персональные<br>карточки от ИИ</div>
+      </div>
+      <div class="fcm" style="align-items:center;gap:12px;padding:8px 0">
+        <div style="background:rgba(157,133,242,.07);border:1px solid rgba(157,133,242,.14);border-radius:13px;padding:13px 15px;width:100%;box-sizing:border-box">
+          <div style="font-size:10px;font-weight:700;color:rgba(157,133,242,.75);margin-bottom:5px">Groq API — бесплатно</div>
+          <div style="font-size:10.5px;color:rgba(238,236,232,.5);line-height:1.55">зайди на console.groq.com,<br>создай ключ и добавь в настройках</div>
+        </div>
+        <button onclick="navTo('profile');setTimeout(()=>pushPage('pp-other'),200)" style="width:100%;padding:13px;border-radius:14px;border:none;background:rgba(157,133,242,.18);color:#C4B5F7;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+          добавить ключ
+        </button>
+      </div>
+      <div class="fcb"></div>
+    </div>`,
     'tifi-end': `<div class="fcw" data-g="tifi-end" data-c="0" style="radial-gradient(ellipse 65% 55% at 92% 8%,rgba(255,107,53,0.26),transparent 70%), radial-gradient(ellipse 55% 48% at 8% 88%,rgba(157,133,242,0.1),transparent 70%), background:linear-gradient(155deg,#0A0814,#05030B);border:1px solid rgba(255,107,53,.16)">
       <div class="fct" style="text-align:center;padding-top:14px">
         <div style="font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,107,53,.65);margin-bottom:14px">все карточки просмотрены</div>
@@ -9135,39 +9169,13 @@ const _FEED_START = { up:'translateY(28%) translateZ(0)', down:'translateY(-28%)
 const _FEED_EXIT  = { up:'translateY(-28%) translateZ(0)', down:'translateY(28%) translateZ(0)',  left:'translateX(-38%) translateZ(0)', right:'translateX(38%) translateZ(0)' };
 const _FEED_HOME  = 'translateY(0) translateZ(0)';
 
-function _isSimpleAnim() { return lsGet('simple_anim') === true; }
-function toggleSimpleAnim() {
-  const on = !_isSimpleAnim();
-  lsSet('simple_anim', on);
-  const tog = document.getElementById('tog-simple-anim');
-  if (tog) { tog.classList.toggle('on', on); tog.classList.toggle('off', !on); }
-  try { tg?.HapticFeedback?.selectionChanged(); } catch {}
-}
-function _initSimpleAnimTog() {
-  const on = _isSimpleAnim();
-  const tog = document.getElementById('tog-simple-anim');
-  if (tog) { tog.classList.toggle('on', on); tog.classList.toggle('off', !on); }
-}
 
 function _feedAnimate(newEl, oldEl, dir, onDone) {
   if (_feedBusy) return;
   if (!newEl) { _feedUpdateVisible(); onDone?.(); return; }
   _feedBusy = true;
 
-  // ── УПРОЩЁННЫЙ режим: мгновенная замена без анимации ──
-  if (_isSimpleAnim()) {
-    if (oldEl && oldEl !== newEl) {
-      oldEl.classList.remove('active','fcw-out');
-      oldEl.style.cssText = '';
-    }
-    newEl.classList.add('active');
-    newEl.style.cssText = '';
-    _feedBusy = false;
-    onDone?.();
-    return;
-  }
-
-  // ── ПОЛНЫЙ режим: плавная анимация ──
+  // ── Плавная анимация ──
   const T = _FEED_T();
   const endT = _FEED_DUR + 60;
 
@@ -9216,16 +9224,7 @@ function _feedTransitionGroup(dir) {
   if (_feedBusy) return;
   const nextGroupIdx = _feedGroupIdx + dir;
   if (nextGroupIdx < 0 || nextGroupIdx >= _feedGroups.length) {
-    const cur = _feedGetCard(_feedGroupIdx, _feedCardIdx);
-    if (cur) {
-      cur.style.transition = `transform .12s ${_FEED_EASE}`;
-      cur.style.transform  = `translateY(${dir > 0 ? '-8px' : '8px'}) translateZ(0)`;
-      setTimeout(() => {
-        cur.style.transition = `transform .18s ${_FEED_EASE}`;
-        cur.style.transform  = _FEED_HOME;
-        setTimeout(() => { cur.style.transition = ''; }, 200);
-      }, 120);
-    }
+    try { navigator.vibrate?.(12); } catch {}
     return;
   }
   const oldEl      = _feedGetCard(_feedGroupIdx, _feedCardIdx);
@@ -9281,19 +9280,14 @@ function _feedUpdateVDots() {
   const pct  = total > 1 ? cur / (total - 1) : 1;
   const offset = CIRC - pct * CIRC;
 
-  // В упрощённом режиме — мгновенная смена без transition
-  if (_isSimpleAnim()) {
-    arcFill.style.transition = 'none';
-  } else {
-    arcFill.style.transition = '';
-  }
+
   arcFill.style.strokeDasharray  = `${CIRC} ${CIRC}`;
   arcFill.style.strokeDashoffset = offset;
 
   // Colour from current group
   const color = _feedGroups[cur]?.color || '#FF6B35';
   arcFill.style.stroke = color;
-  arcFill.style.filter = _isSimpleAnim() ? 'none' : `drop-shadow(0 0 4px ${color}bb)`;
+  arcFill.style.filter = `drop-shadow(0 0 4px ${color}bb)`;
   arcNum.style.color   = color;
 
   arcNum.textContent   = cur + 1;
@@ -9309,7 +9303,7 @@ function _feedInitGestures() {
   feed.addEventListener('touchstart', e => {
     // Don't hijack taps on interactive elements (buttons, inputs, links)
     const tgt = e.target;
-    if (tgt.closest('button,a,input,select,textarea,[role="button"]')) return;
+    if (tgt.closest('button,a,input,select,textarea,[role="button"],.fmbox,.fibox,.farow,.fbtn-gen,.fbtn-more,.fcw [onclick]')) return;
     if (_feedBusy) return;
     const t = e.touches[0], w = feed.clientWidth, h = feed.clientHeight;
     _fTouch = {
@@ -9332,12 +9326,17 @@ function _feedInitGestures() {
     const dt  = Date.now() - _fTouch.t;
     const aDx = Math.abs(dx), aDy = Math.abs(dy);
     if (_feedBusy) return;
-    // Vertical swipe — full screen, any zone
-    if (aDy > _FEED_MIN_SWIPE && aDy > aDx * 1.1) {
+    // Vertical swipe
+    if (aDy > _FEED_MIN_SWIPE && aDy > aDx * 1.2) {
       dy > 0 ? _feedTransitionGroup(1) : _feedTransitionGroup(-1);
       return;
     }
-    // Tap zones — left/right for horizontal card swipe
+    // Horizontal swipe — for multi-card groups
+    if (aDx > _FEED_MIN_SWIPE && aDx > aDy * 1.2) {
+      dx < 0 ? _feedTransitionCard(1) : _feedTransitionCard(-1);
+      return;
+    }
+    // Tap zones fallback
     if (dt < _FEED_TAP_MS && aDy < _FEED_TAP_MOVE && aDx < _FEED_TAP_MOVE * 1.8) {
       if (_fTouch.xZone === 'right') _feedTransitionCard(1);
       else if (_fTouch.xZone === 'left') _feedTransitionCard(-1);
@@ -9369,9 +9368,24 @@ function _feedSmoothGoTo(targetGroupIdx, targetCardIdx) {
   setTimeout(() => _feedTransitionGroup(dir), 60);
 }
 
+function _feedSwapNoKey() {
+  if (!_feedInitDone) return;
+  const noKeyIdx = _feedGroups.findIndex(g => g.id === 'no-key');
+  if (noKeyIdx >= 0 && _tifiGetKey()) {
+    _feedGroups[noKeyIdx] = { id:'gate', size:1, color:'#9D85F2' };
+    _feedBuildDOM(); _feedUpdateVisible();
+  }
+}
 function initFeedHome() {
   if (!_feedInitDone) {
-    _feedGroups    = [...FEED_GROUPS_STATIC];
+    _feedGroups = [...FEED_GROUPS_STATIC];
+    if (lsGet('feed_gen_done')) {
+      _feedGroups = _feedGroups.filter(g => g.id !== 'gate');
+      _feedGenDone = true;
+    } else if (!_tifiGetKey()) {
+      const gi = _feedGroups.findIndex(g => g.id === 'gate');
+      if (gi >= 0) _feedGroups[gi] = { id:'no-key', size:1, color:'#9D85F2' };
+    }
     _feedGroupIdx  = 0;
     _feedCardIdx   = 0;
     _feedBuildDOM();
@@ -9387,13 +9401,18 @@ function initFeedHome() {
 function _feedRefreshData() {
   const tifiGroups = _feedGroups.filter(g => g.tifi || g.htmlArray);
   const hasTifiEnd = _feedGroups.some(g => g.id === 'tifi-end');
-  _feedGroups = [...FEED_GROUPS_STATIC]; // static never includes tifi-end
-  // Re-inject tifi groups before gate
-  const gateIdx = _feedGroups.findIndex(g => g.id === 'gate');
-  if (tifiGroups.length > 0 && gateIdx >= 0) {
-    _feedGroups.splice(gateIdx, 0, ...tifiGroups);
+  _feedGroups = [...FEED_GROUPS_STATIC];
+  if (lsGet('feed_gen_done')) {
+    _feedGroups = _feedGroups.filter(g => g.id !== 'gate');
+    _feedGenDone = true;
+  } else if (!_tifiGetKey()) {
+    const gi = _feedGroups.findIndex(g => g.id === 'gate');
+    if (gi >= 0) _feedGroups[gi] = { id:'no-key', size:1, color:'#9D85F2' };
   }
-  // Re-add tifi-end only if it was there before
+  const insertAt = _feedGroups.findIndex(g => g.id === 'gate' || g.id === 'no-key');
+  if (tifiGroups.length > 0) {
+    _feedGroups.splice(insertAt >= 0 ? insertAt : _feedGroups.length, 0, ...tifiGroups);
+  }
   if (hasTifiEnd) _feedGroups.push({ id:'tifi-end', size:1, color:'#FF6B35' });
   _feedGroupIdx = Math.min(_feedGroupIdx, _feedGroups.length - 1);
   _feedCardIdx  = 0;
@@ -9545,6 +9564,7 @@ function _feedGenerate() {
 
       _feedBuildDOM();
       _feedGenDone  = true;
+      lsSet('feed_gen_done', true);
       _feedGenBatch = 1;
 
       // Get FRESH element refs after DOM rebuild
@@ -10103,4 +10123,4 @@ function _nbTouchEnd(e) {
 </div>
 
 </body>
-  </html>
+</html>
