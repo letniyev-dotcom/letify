@@ -2399,7 +2399,35 @@ iconify-icon:not(:defined){display:inline-flex;align-items:center;justify-conten
 .feed-sarr.vis{opacity:1}
 @keyframes feedRipple{to{transform:scale(3);opacity:0}}
 
-/* ── Feed progress arc-ring (top-right corner) ── */
+/* ── Floating card-group dots (outside card, above it) ── */
+#feed-card-dots{
+  position:absolute;
+  top:calc(var(--st) + 6px);
+  left:50%;
+  transform:translateX(-50%);
+  z-index:50;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  height:14px;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .25s ease;
+}
+#feed-card-dots.show{ opacity:1; }
+.fcd{
+  height:3px;
+  border-radius:99px;
+  background:rgba(238,236,232,.22);
+  transition: width .28s cubic-bezier(0.4,0,0.2,1),
+              background .28s ease,
+              transform .28s cubic-bezier(0.4,0,0.2,1);
+  will-change: width, background;
+}
+.fcd.cur{
+  background:rgba(238,236,232,.75);
+}
 #feed-vdots{
   position:absolute;
   right:13px;
@@ -2546,7 +2574,12 @@ iconify-icon:not(:defined){display:inline-flex;align-items:center;justify-conten
 .fcw{
   box-shadow:0 8px 32px rgba(0,0,0,.55),0 2px 8px rgba(0,0,0,.3);
 }
-/* Glow line at card top — одна тонкая линия через ::after, не repaint */
+/* Subtle shimmer overlay on active card */
+.fcw.active::before{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 80% 40% at 50% 0%,rgba(255,255,255,.03),transparent 60%);
+  border-radius:22px;
+}
 /* Better tag styles */
 .ftag{
   box-shadow:0 1px 3px rgba(0,0,0,.2);
@@ -2852,6 +2885,8 @@ iconify-icon:not(:defined){display:inline-flex;align-items:center;justify-conten
 <div class="page active" id="p-home">
   <div id="feed-et" class="feed-et"></div>
   <div id="feed-eb" class="feed-eb"></div>
+  <!-- Floating card-group dots -->
+  <div id="feed-card-dots"></div>
   <div class="feed-sarr sl" id="feed-al"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
   <div class="feed-sarr sr" id="feed-ar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
   <!-- Vertical position dots -->
@@ -9317,54 +9352,82 @@ function _feedUpdateVisible() {
 // ── Tight Slide — compositor-only: translateY(28%) + opacity ──
 // Только transform+opacity → GPU compositing, ноль layout/paint
 // ── Feed animation constants & simple-anim toggle ──
-const _FEED_DUR  = 240;
-const _FEED_EASE = 'cubic-bezier(0.4,0,0.2,1)';
-const _FEED_T    = () => `transform ${_FEED_DUR}ms ${_FEED_EASE}, opacity ${_FEED_DUR}ms ease-out`;
-const _FEED_START = { up:'translateY(22%) translateZ(0)', down:'translateY(-22%) translateZ(0)', left:'translateX(30%) translateZ(0)', right:'translateX(-30%) translateZ(0)' };
-const _FEED_EXIT  = { up:'translateY(-22%) translateZ(0)', down:'translateY(22%) translateZ(0)',  left:'translateX(-30%) translateZ(0)', right:'translateX(30%) translateZ(0)' };
+const _FEED_DUR  = 280;
+const _FEED_EASE = 'cubic-bezier(0.32,0,0.18,1)';
+const _FEED_T    = () => `transform ${_FEED_DUR}ms ${_FEED_EASE}, opacity ${_FEED_DUR}ms ease`;
+const _FEED_START = { up:'translateY(28%) translateZ(0)', down:'translateY(-28%) translateZ(0)', left:'translateX(38%) translateZ(0)', right:'translateX(-38%) translateZ(0)' };
+const _FEED_EXIT  = { up:'translateY(-28%) translateZ(0)', down:'translateY(28%) translateZ(0)',  left:'translateX(-38%) translateZ(0)', right:'translateX(38%) translateZ(0)' };
 const _FEED_HOME  = 'translateY(0) translateZ(0)';
 
+
+function _isSimpleAnim() { return lsGet('simple_anim') === true; }
+function toggleSimpleAnim() {
+  const on = !_isSimpleAnim();
+  lsSet('simple_anim', on);
+  const tog = document.getElementById('tog-simple-anim');
+  if (tog) { tog.classList.toggle('on', on); tog.classList.toggle('off', !on); }
+  try { tg?.HapticFeedback?.selectionChanged(); } catch {}
+}
+function _initSimpleAnimTog() {
+  const on = _isSimpleAnim();
+  const tog = document.getElementById('tog-simple-anim');
+  if (tog) { tog.classList.toggle('on', on); tog.classList.toggle('off', !on); }
+}
 
 function _feedAnimate(newEl, oldEl, dir, onDone) {
   if (_feedBusy) return;
   if (!newEl) { _feedUpdateVisible(); onDone?.(); return; }
   _feedBusy = true;
 
-  // ── Плавная анимация ──
+  // ── УПРОЩЁННЫЙ режим: мгновенная замена без анимации ──
+  if (_isSimpleAnim()) {
+    if (oldEl && oldEl !== newEl) {
+      oldEl.classList.remove('active','fcw-out');
+      oldEl.style.cssText = '';
+    }
+    newEl.classList.add('active');
+    newEl.style.cssText = '';
+    _feedBusy = false;
+    onDone?.();
+    return;
+  }
+
+  // ── ПОЛНЫЙ режим: плавная анимация ──
   const T = _FEED_T();
   const endT = _FEED_DUR + 60;
 
-  // OUT + IN стартуют в одном rAF — синхронно, без сдвига кадров
+  // OUT — старая уходит немедленно (вне rAF — не вызывает reflow)
+  if (oldEl && oldEl !== newEl) {
+    oldEl.style.willChange = 'transform,opacity';
+    oldEl.classList.add('fcw-out');
+    oldEl.style.zIndex = '2';
+    oldEl.style.transition = T;
+    oldEl.style.transform  = _FEED_EXIT[dir];
+    oldEl.style.opacity    = '0';
+    oldEl.style.pointerEvents = 'none';
+    setTimeout(() => {
+      oldEl.classList.remove('active','fcw-out');
+      oldEl.style.cssText = '';
+    }, endT);
+  }
+
+  // IN — новая карточка: двойной rAF гарантирует отрисовку начальной позиции
+  // до запуска transition (без этого браузер «схлопывает» оба стиля в один кадр)
+  newEl.style.willChange = 'transform,opacity';
+  newEl.classList.add('active');
+  newEl.style.transition = 'none';
+  newEl.style.transform  = _FEED_START[dir];
+  newEl.style.opacity    = '0';
+  newEl.style.zIndex     = '5';
+
   requestAnimationFrame(() => {
-    // OUT — старая уходит
-    if (oldEl && oldEl !== newEl) {
-      oldEl.style.willChange = 'transform,opacity';
-      oldEl.classList.add('fcw-out');
-      oldEl.style.zIndex = '2';
-      oldEl.style.transition = T;
-      oldEl.style.transform  = _FEED_EXIT[dir];
-      oldEl.style.opacity    = '0';
-      oldEl.style.pointerEvents = 'none';
-      setTimeout(() => {
-        oldEl.classList.remove('active','fcw-out');
-        oldEl.style.cssText = '';
-      }, endT);
-    }
-
-    // IN — ставим начальную позицию
-    newEl.style.willChange = 'transform,opacity';
-    newEl.classList.add('active');
-    newEl.style.transition = 'none';
-    newEl.style.transform  = _FEED_START[dir];
-    newEl.style.opacity    = '0';
-    newEl.style.zIndex     = '5';
-
     requestAnimationFrame(() => {
       newEl.style.transition = T;
       newEl.style.transform  = _FEED_HOME;
       newEl.style.opacity    = '1';
       setTimeout(() => {
         newEl.style.transition = '';
+        newEl.style.willChange = 'auto'; // освобождаем GPU-память после анимации
         newEl.style.zIndex = '';
         _feedBusy = false;
         onDone?.();
@@ -9391,6 +9454,8 @@ function _feedTransitionGroup(dir) {
     }
     return;
   }
+  // Скрываем dots при смене группы
+  document.getElementById('feed-card-dots')?.classList.remove('show');
   const oldEl      = _feedGetCard(_feedGroupIdx, _feedCardIdx);
   const nextGroup  = _feedGroups[nextGroupIdx];
   const nextCardIdx = 0;
@@ -9421,7 +9486,36 @@ function _feedUpdateArrows() {
   const hasMulti = group && group.size > 1;
   document.getElementById('feed-al')?.classList.toggle('vis', hasMulti && _feedCardIdx > 0);
   document.getElementById('feed-ar')?.classList.toggle('vis', hasMulti && _feedCardIdx < group.size - 1);
+  _feedUpdateCardDots();
   _feedUpdateVDots();
+}
+
+function _feedUpdateCardDots() {
+  const wrap = document.getElementById('feed-card-dots');
+  if (!wrap) return;
+  const group = _feedGroups[_feedGroupIdx];
+  const size  = group?.size ?? 1;
+
+  if (size <= 1) {
+    wrap.classList.remove('show');
+    return;
+  }
+
+  // Rebuild dots if count changed
+  if (wrap.children.length !== size) {
+    wrap.innerHTML = Array.from({length: size}, (_, i) =>
+      `<div class="fcd${i === _feedCardIdx ? ' cur' : ''}" style="width:${i === _feedCardIdx ? 18 : 6}px"></div>`
+    ).join('');
+  } else {
+    // Just update classes and widths with animation
+    Array.from(wrap.children).forEach((dot, i) => {
+      const isCur = i === _feedCardIdx;
+      dot.classList.toggle('cur', isCur);
+      dot.style.width = isCur ? '18px' : '6px';
+    });
+  }
+
+  wrap.classList.add('show');
 }
 
 // ── Touch & gesture — прямо как в концепте ───────────
